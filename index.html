@@ -612,9 +612,6 @@
   .shotset{display:block}
   .shotask{margin:12px 0 10px; font-size:13.5px; color:var(--ink-2); line-height:1.45; min-height:2.6em}
   .shotask b{color:var(--ink)}
-  .shotdiag{display:grid; grid-template-columns:1fr; gap:12px; justify-items:center}
-  .shotdiag.two{grid-template-columns:1fr 1fr; align-items:start}
-  @media (max-width:520px){ .shotdiag.two{grid-template-columns:1fr} }
   svg.rose, svg.wgrid, svg.corr{width:100%; max-width:330px; height:auto; touch-action:manipulation}
 
   .rz{cursor:pointer}
@@ -710,6 +707,32 @@
   .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:9px;
     padding:10px 12px; margin-bottom:12px; font-size:13px; line-height:1.45; color:var(--ink-2)}
   .banner.monitor b{color:var(--ink)}
+
+  /* one diagram at a time, the other tucked into the corner */
+  .shotdiag{position:relative; display:block; margin-top:4px}
+  .diagmain{display:flex; justify-content:center}
+  .inset{position:absolute; top:0; right:0; width:96px; padding:4px; cursor:pointer;
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:9px;
+    box-shadow:0 4px 14px rgba(0,0,0,.10)}
+  .inset svg{width:100%; height:auto; display:block; pointer-events:none}
+  .inset:hover{border-color:var(--accent-fill)}
+  .inset:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
+  @media (max-width:430px){ .inset{width:78px} }
+  .ballchip.win{border-style:solid; border-width:2px}
+
+  /* ---- end-of-session summary ---- */
+  .sumwrap{display:flex; flex-direction:column; gap:14px; margin-bottom:16px}
+  .sumcard{background:var(--surface-2); border:1px solid var(--line); border-radius:11px;
+    padding:13px 13px 9px; text-align:center}
+  .sumcard .eyebrow{display:block; margin-bottom:8px}
+  .sumcard svg{width:100%; max-width:300px; height:auto; margin:0 auto; display:block}
+  .sumcard .note{margin:8px 0 0; text-align:left}
+  .sumcard .rz, .sumcard .wcell{cursor:default}
+  .sumcard .rz[style*="--heat"]{filter:none}
+  .pctmk text{fill:#12200f; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:15px; font-weight:600; text-anchor:middle; paint-order:stroke;
+    stroke:#ffffff; stroke-width:3.2px; stroke-linejoin:round}
+  .pctmk text.pctn{font-size:11px; fill:#3c4a38; stroke-width:2.6px}
 
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
@@ -1590,7 +1613,7 @@ function makeSample(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1906,7 +1929,7 @@ function openSession(areaId, resume){
     state.draft = resume;
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
-                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, compete:0, won:null, notes:"", max:areaMax(a) };
+                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
     a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
@@ -1955,6 +1978,68 @@ function notesBlock(id, label){
   return d;
 }
 
+/* ---------- compete: the app makes the call ---------- */
+/* Ten balls at a random distance each: five just find the target, five have to go
+   through a named window as well. Five plus ten is fifteen. The calls are drawn once
+   and kept with the draft, so a phone that sleeps mid-block comes back to the same
+   sequence rather than reshuffling under the balls already logged. */
+function competeSpec(a){
+  if(!a || !a.track) return null;
+  var plain = [], windowed = false;
+  a.sets.forEach(function(s){
+    if(s.parts && s.guide === "windows") windowed = true;
+    else if(!s.parts && s.tc) plain.push({label:s.label, tc:s.tc});
+  });
+  if(!plain.length) return null;
+  return { pool:plain, windowed:windowed, max: windowed ? 15 : 10, balls:10 };
+}
+function makeCompeteCalls(a){
+  var spec = competeSpec(a); if(!spec) return null;
+  function pick(){ return spec.pool[Math.floor(Math.random()*spec.pool.length)]; }
+  var calls = [];
+  for(var i=0;i<spec.balls;i++){
+    var p = pick();
+    var isWin = spec.windowed && i >= spec.balls/2;
+    calls.push({ kind: isWin ? "w" : "t", win: isWin ? 1+Math.floor(Math.random()*5) : null,
+                 label:p.label, tc:p.tc });
+  }
+  for(var j=calls.length-1;j>0;j--){          // shuffle so the windows are not all last
+    var k = Math.floor(Math.random()*(j+1)), t = calls[j]; calls[j]=calls[k]; calls[k]=t;
+  }
+  return calls;
+}
+function competeDraft(a){
+  var d = state.draft, spec = competeSpec(a);
+  if(!spec) return null;
+  if(!d.competeCalls || d.competeCalls.length !== spec.balls) d.competeCalls = makeCompeteCalls(a);
+  if(!d.competeShots || d.competeShots.length !== spec.balls){
+    d.competeShots = []; for(var i=0;i<spec.balls;i++) d.competeShots.push(null);
+  }
+  return spec;
+}
+function competeBlock(a){
+  var spec = competeDraft(a);
+  var wrap = document.createElement("div");
+  if(!spec){
+    wrap.appendChild(scoreRow("Points", a.compete.tgt,
+      [{key:"__compete", label:null, max:a.compete.max, min:a.compete.min}], null));
+    wrap.appendChild(winRow());
+    return wrap;
+  }
+  var lead = document.createElement("p"); lead.className="shotask complead";
+  lead.innerHTML = 'Ten balls, the app calls each one. Five just have to find the target, '+
+    'five have to go through a named window as well. <b>'+spec.max+' points.</b>';
+  wrap.appendChild(lead);
+  wrap.appendChild(shotRow(a, {id:"__compete", tc:null}, null, {
+    calls: state.draft.competeCalls,
+    shots: state.draft.competeShots,
+    max: spec.max,
+    onScore: function(sc){ state.draft.compete = sc.total; updateTotal(); }
+  }));
+  wrap.appendChild(winRow());
+  return wrap;
+}
+
 function buildSessionCards(a, last){
   var host = $("sessCards"); host.innerHTML = "";
   var cards = [], n = a.sets.length;
@@ -1983,10 +2068,7 @@ function buildSessionCards(a, last){
     }
   });
 
-  var cb = document.createElement("div");
-  cb.appendChild(scoreRow("Points", a.compete.tgt, [{key:"__compete", label:null, max:a.compete.max, min:a.compete.min}], null));
-  cb.appendChild(winRow());
-  cards.push(pcard(a.compete.label, cb));
+  cards.push(pcard(a.compete.label, competeBlock(a)));
 
   var nb = document.createElement("div");
   nb.appendChild(notesBlock("sessNotes", "What worked \u00b7 one thing to fix"));
@@ -2010,6 +2092,81 @@ function monitorNote(){
   return d;
 }
 
+/* ---------- session summary ---------- */
+/* Every ball the session logged, pooled onto one picture. Numbers give way to a
+   percentage per zone and a wash whose strength follows it, so the pattern reads
+   before you read a figure. Same drawing serves History later, different pool. */
+function poolShots(a, sess){
+  var t = {}, w = {}, n = 0, wn = 0;
+  function eat(list, calls){
+    (list||[]).forEach(function(x, i){
+      if(!x) return;
+      if(x.z != null){ t[x.z] = (t[x.z]||0)+1; n++; }
+      if(x.w != null){
+        w[x.w] = (w[x.w]||0)+1; wn++;
+        var want = calls ? (calls[i]||{}).win : i+1;
+        if(x.w === want) w.__hit = (w.__hit||0)+1;
+      }
+    });
+  }
+  if(sess.shots) a.sets.forEach(function(s){ eat(sess.shots[s.id], null); });
+  eat(sess.competeShots, sess.competeCalls);
+  return {t:t, n:n, w:w, wn:wn};
+}
+function pctText(c, n){ return n ? Math.round(c/n*100)+"%" : ""; }
+function heatFill(c, n){
+  var o = n ? Math.min(0.55, c/n*1.5) : 0;
+  return "fill:rgba(203,146,22," + o.toFixed(3) + ")";
+}
+function heatSvg(svg, ids, counts, n, markFn){
+  var out = "";
+  ids.forEach(function(id){
+    var c = counts[id] || 0;
+    if(!c) return;
+    var p = markFn(id);
+    out += '<g class="pctmk"><text x="'+f1(p[0])+'" y="'+f1(p[1])+'">'+pctText(c, n)+'</text>'+
+           '<text class="pctn" x="'+f1(p[0])+'" y="'+f1(p[1]+15)+'">'+c+'</text></g>';
+    // inline fill beats the stylesheet, so the wash shows through the gradient
+    svg = svg.replace('data-z="'+id+'"', 'data-z="'+id+'" style="'+heatFill(c, n)+'"');
+  });
+  return svg.replace('<g class="marks"></g>', '<g class="marks">'+out+'</g>');
+}
+function summaryBlock(a, sess){
+  var pool = poolShots(a, sess);
+  if(!pool.n && !pool.wn) return null;
+  var wrap = document.createElement("div"); wrap.className="sumwrap";
+  var html = '';
+
+  if(pool.n){
+    var ids = shapeZones(a).map(function(z){ return z.id; });
+    if(ids.indexOf("c") === -1) ids.unshift("c");
+    var svg = heatSvg(shapeSvg(a, {tc:""}, false), ids, pool.t, pool.n, function(id){
+      if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 26];
+      return shapeMark(a, id, 0);
+    });
+    html += '<div class="sumcard"><span class="eyebrow">Where every ball finished \u00b7 '+pool.n+' balls</span>'+
+            svg + '<p class="note">In the target ' + pctText(pool.t.c||0, pool.n) + ' of the time.</p></div>';
+  }
+
+  if(pool.wn){
+    var wsvg = windowSvg(false), wout = "";
+    WCELL.forEach(function(c){
+      var n2 = pool.w[c.w] || 0;
+      wsvg = wsvg.replace('class="wcell" x="'+c.x+'" y="'+c.y+'"',
+                          'class="wcell" style="'+heatFill(n2, pool.wn)+'" x="'+c.x+'" y="'+c.y+'"');
+      if(!n2) return;
+      var p = wMark(c.w, 0);
+      wout += '<g class="pctmk"><text x="'+p[0]+'" y="'+(p[1]-2)+'">'+pctText(n2, pool.wn)+'</text>'+
+              '<text class="pctn" x="'+p[0]+'" y="'+(p[1]+13)+'">'+n2+'</text></g>';
+    });
+    wsvg = wsvg.replace('<g class="marks"></g>', '<g class="marks">'+wout+'</g>');
+    html += '<div class="sumcard"><span class="eyebrow">Which windows \u00b7 '+pool.wn+' balls</span>'+ wsvg +
+            '<p class="note">Through the window that was called ' + pctText(pool.w.__hit||0, pool.wn) + ' of the time.</p></div>';
+  }
+  wrap.innerHTML = html;
+  return wrap;
+}
+
 function renderReview(host, a){
   var d = state.draft, rows = "";
   a.sets.forEach(function(s, i){
@@ -2019,7 +2176,8 @@ function renderReview(host, a){
               '<span>'+s.label+(pt.label?' · '+pt.label:'')+'</span><b>'+v+'/'+pt.max+'</b></div>';
     });
   });
-  host.innerHTML = '<div class="rvlist">'+rows+'</div>'+
+  var sum = summaryBlock(a, d);
+  host.innerHTML = (sum ? sum.innerHTML : "") + '<div class="rvlist">'+rows+'</div>'+
     '<div class="rvtot"><span class="eyebrow">Session score</span>'+
     '<span class="f">'+(d.total||0)+' <span style="color:var(--muted);font-size:16px">/ '+d.max+'</span></span></div>'+
     '<p class="note">Tap any line to go back and change it.</p>';
@@ -2047,8 +2205,7 @@ function buildSessionList(a, last){
   var cg = document.createElement("div"); cg.className="setgroup";
   cg.innerHTML = '<span class="eyebrow">'+a.compete.label+'</span>';
   var cw = document.createElement("div"); cw.className="sets";
-  cw.appendChild(scoreRow("Points", a.compete.tgt, [{key:"__compete", label:null, max:a.compete.max, min:a.compete.min}], null));
-  cw.appendChild(winRow());
+  cw.appendChild(competeBlock(a));
   cg.appendChild(cw); host.appendChild(cg);
   var nb = notesBlock("sessNotes", "Session notes \u2014 what worked \u00b7 one thing to fix");
   nb.style.marginTop = "18px";
@@ -2320,29 +2477,6 @@ function wMark(wid, n){
 }
 
 /* ---- reading the taps back as scores ---- */
-function shotDone(s, sh){
-  if(!sh) return false;
-  return s.parts ? (sh.w != null && sh.z != null) : (sh.z != null);
-}
-function shotScores(s, shots){
-  var w = 0, t = 0;
-  shots.forEach(function(sh, i){
-    if(!sh) return;
-    if(sh.w === i+1) w++;
-    if(sh.z === "c") t++;
-  });
-  return {w:w, t:t};
-}
-function applyShots(s, shots){
-  var sc = shotScores(s, shots);
-  if(s.parts){
-    state.draft.scores[s.id+"_w"] = sc.w;
-    state.draft.scores[s.id+"_t"] = sc.t;
-  } else {
-    state.draft.scores[s.id] = sc.t;
-  }
-  updateTotal();
-}
 function draftShots(s){
   var d = state.draft;
   d.shots = d.shots || {};
@@ -2355,134 +2489,200 @@ function draftShots(s){
 }
 
 /* ---- the card ---- */
-function shotRow(a, s, last){
-  var kind = trackKind(a, s);
-  var isWin = kind === "windows";
-  var nb = ballsIn(s);
-  var shots = draftShots(s);
-  var parts = setParts(s);
+
+/* One diagram at a time. On a called-window ball the grid comes up first; once the
+   window is tapped it folds into a corner and the target takes the page. The inset
+   stays live, so changing your mind about the window costs a tap, not the ball.
+   `cfg.calls` turns the same row into the compete block, where the app makes the call. */
+function callsFor(s, cfg){
+  if(cfg && cfg.calls) return cfg.calls;
+  var n = ballsIn(s), out = [];
+  for(var i=0;i<n;i++) out.push(s.parts ? {kind:"w", win:i+1, tc:s.tc} : {kind:"t", tc:s.tc});
+  return out;
+}
+function tallyShots(calls, shots){
+  var w = 0, t = 0;
+  shots.forEach(function(sh, i){
+    if(!sh) return;
+    var c = calls[i] || {};
+    if(c.kind === "w" && sh.w === c.win) w++;
+    if(sh.z === "c") t++;
+  });
+  return {w:w, t:t, total:w+t};
+}
+function shotDone(s, sh, call){
+  if(!sh) return false;
+  var needsWindow = call ? call.kind === "w" : !!(s && s.parts);
+  return needsWindow ? (sh.w != null && sh.z != null) : (sh.z != null);
+}
+function shotScores(s, shots){ return tallyShots(callsFor(s), shots); }
+function applyShots(s, shots){
+  var sc = shotScores(s, shots);
+  if(s.parts){
+    state.draft.scores[s.id+"_w"] = sc.w;
+    state.draft.scores[s.id+"_t"] = sc.t;
+  } else {
+    state.draft.scores[s.id] = sc.t;
+  }
+  updateTotal();
+}
+
+function shotRow(a, s, last, cfg){
+  var calls = callsFor(s, cfg);
+  var nb = calls.length;
+  var anyWindow = calls.some(function(c){ return c.kind === "w"; });
+  var shots = cfg ? cfg.shots : draftShots(s);
+  var parts = cfg ? null : setParts(s);
 
   var row = document.createElement("div"); row.className = "set shotset";
-  row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+s.tgt+'</div></div>';
+  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+s.tgt+'</div></div>';
 
   var ask = document.createElement("p"); ask.className = "shotask";
-  var diag = document.createElement("div"); diag.className = "shotdiag" + (isWin ? " two" : "");
-  diag.innerHTML = (isWin ? windowSvg(true) : "") + shapeSvg(a, s, true);
-  var grid = isWin ? diag.querySelector("svg.wgrid") : null;
-  var rose = diag.querySelector("svg.rose, svg.corr");
-
+  var diag = document.createElement("div"); diag.className = "shotdiag";
   var chips = document.createElement("div"); chips.className = "balls";
   var acts = document.createElement("div"); acts.className = "shotacts";
   var undo = document.createElement("button"); undo.type="button"; undo.textContent="Undo";
   acts.appendChild(undo);
   var tally = document.createElement("div"); tally.className = "shottally";
 
-  var cur = 0;
+  var cur = 0, phase = null;
+  function call(){ return calls[cur] || {}; }
   function firstOpen(){
-    for(var i=0;i<nb;i++){ if(!shotDone(s, shots[i])) return i; }
+    for(var i=0;i<nb;i++){ if(!shotDone(s, shots[i], calls[i])) return i; }
     return nb-1;
   }
   cur = firstOpen();
+  function stage(){
+    if(call().kind !== "w") return "t";
+    if(phase) return phase;
+    return (shots[cur] && shots[cur].w != null) ? "t" : "w";
+  }
+  function rescore(){
+    if(cfg) cfg.onScore(tallyShots(calls, shots));
+    else applyShots(s, shots);
+  }
 
-  function paint(){
-    var sh = shots[cur] || {};
-    // prompt
-    if(isWin){
-      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+', called at window <b>'+(cur+1)+'</b>. '+
-        (sh.w == null ? 'Tap the window it went through.' : (sh.z == null ? 'Now tap where it finished.' : 'Logged. Tap a ball below to change it.'));
-    } else {
-      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+'. '+
-        (sh.z == null ? 'Tap where it finished.' : 'Logged. Tap a ball below to change it.');
-    }
-    // live picks
-    if(grid){
-      grid.querySelectorAll(".wc").forEach(function(g){
-        g.classList.toggle("on", sh.w != null && +g.getAttribute("data-w") === sh.w);
-        g.classList.toggle("called", +g.getAttribute("data-w") === cur+1);
-      });
-    }
-    rose.querySelectorAll(".rz").forEach(function(z){
-      z.classList.toggle("on", sh.z != null && z.getAttribute("data-z") === sh.z);
+  function windowMarks(){
+    var seen = {}, out = "";
+    shots.forEach(function(x, i){
+      if(!x || x.w == null) return;
+      var n = seen[x.w] || 0; seen[x.w] = n+1;
+      var p = wMark(x.w, n);
+      out += '<g class="mk'+(calls[i] && x.w===calls[i].win ? " hit" : "")+(i===cur?" now":"")+'">'+
+             '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
+             '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
-    // markers
+    return out;
+  }
+  function targetMarks(){
     var seen = {}, out = "";
     shots.forEach(function(x, i){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n);
-      out += '<g class="mk'+(x.z==="c"?" hit":"")+(i===cur?" now":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
+      out += '<g class="mk'+(x.z==="c"?" hit":"")+(i===cur?" now":"")+'">'+
+             '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
-    rose.querySelector(".marks").innerHTML = out;
-    if(grid){
-      var ws = {}, wo = "";
-      shots.forEach(function(x, i){
-        if(!x || x.w == null) return;
-        var n = ws[x.w] || 0; ws[x.w] = n+1;
-        var p = wMark(x.w, n);
-        wo += '<g class="mk'+(i===cur?" now":"")+(x.w===i+1?" hit":"")+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
-              '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
-      });
-      grid.querySelector(".marks").innerHTML = wo;
+    return out;
+  }
+
+  function paint(){
+    var sh = shots[cur] || {}, c = call(), st = stage();
+    var where = c.label ? c.label + " · " : "";
+    if(c.kind === "w"){
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' · '+where+'called at window <b>'+c.win+'</b>. '+
+        (st === "w" ? 'Tap the window it went through.' : 'Now tap where it finished.');
+    } else {
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+(where ? ' · '+c.label : '')+'. '+
+        (sh.z == null ? 'Tap where it finished.' : 'Logged. Tap a ball below to change it.');
     }
-    // ball chips
+
+    var wantSide = c.kind === "w" && (st === "t" || sh.z != null);
+    // only redraw the frame when the picture itself changes; repeated taps on the
+    // same diagram just move markers, which keeps focus and avoids churn
+    var key = st + "|" + (c.tc||"") + "|" + (wantSide ? 1 : 0);
+    if(key !== diag.__key){
+      var main = st === "w" ? windowSvg(true) : shapeSvg(a, {tc: c.tc}, true);
+      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc: c.tc}, false) : windowSvg(false));
+      diag.innerHTML = '<div class="diagmain">'+main+'</div>'+
+        (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":"windows")+'">'+side+'</button>' : '');
+      diag.__key = key;
+    }
+    var mainMarks = diag.querySelector(".diagmain .marks");
+    if(mainMarks) mainMarks.innerHTML = st === "w" ? windowMarks() : targetMarks();
+    var sideMarks = diag.querySelector(".inset .marks");
+    if(sideMarks) sideMarks.innerHTML = st === "w" ? targetMarks() : windowMarks();
+
+    if(st === "w"){
+      diag.querySelectorAll(".diagmain .wc").forEach(function(g){
+        g.classList.toggle("on", sh.w != null && +g.getAttribute("data-w") === sh.w);
+        g.classList.toggle("called", +g.getAttribute("data-w") === c.win);
+      });
+    } else {
+      diag.querySelectorAll(".diagmain .rz").forEach(function(z){
+        z.classList.toggle("on", sh.z != null && z.getAttribute("data-z") === sh.z);
+      });
+    }
+
     chips.innerHTML = "";
     for(var i=0;i<nb;i++){
       (function(i){
         var x = shots[i];
         var b = document.createElement("button"); b.type="button"; b.className="ballchip";
         if(i===cur) b.classList.add("now");
-        if(shotDone(s, x)) b.classList.add("done");
+        if(shotDone(s, x, calls[i])) b.classList.add("done");
         if(x && x.z === "c") b.classList.add("good");
+        if(calls[i].kind === "w") b.classList.add("win");
         b.textContent = String(i+1);
         b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+ZONE_LABEL[x.z] : ", not logged"));
-        b.addEventListener("click", function(){ cur = i; paint(); });
+        b.addEventListener("click", function(){ cur = i; phase = null; paint(); });
         chips.appendChild(b);
       })(i);
     }
-    // tally
-    var sc = shotScores(s, shots);
-    tally.innerHTML = isWin
-      ? '<span>Window <b>'+sc.w+'</b>/'+parts[0].max+'</span><span>Target <b>'+sc.t+'</b>/'+parts[1].max+'</span>'
-      : '<span>In the target <b>'+sc.t+'</b>/'+s.max+'</span>';
+
+    var sc = tallyShots(calls, shots);
+    tally.innerHTML = cfg
+      ? '<span>Compete <b>'+sc.total+'</b>/'+cfg.max+'</span>'
+      : (anyWindow
+          ? '<span>Window <b>'+sc.w+'</b>/'+parts[0].max+'</span><span>Target <b>'+sc.t+'</b>/'+parts[1].max+'</span>'
+          : '<span>In the target <b>'+sc.t+'</b>/'+s.max+'</span>');
   }
 
   function advance(){
-    var sh = shots[cur];
-    if(shotDone(s, sh) && cur < nb-1){
-      for(var i=cur+1;i<nb;i++){ if(!shotDone(s, shots[i])){ cur = i; return; } }
-    }
+    if(!shotDone(s, shots[cur], calls[cur])) return;
+    for(var i=cur+1;i<nb;i++){ if(!shotDone(s, shots[i], calls[i])){ cur = i; return; } }
   }
   function record(patch){
     var sh = shots[cur] || {};
     for(var k in patch) sh[k] = patch[k];
     shots[cur] = sh;
-    applyShots(s, shots);
+    phase = null;
+    rescore();
     advance();
     paint();
     saveDraft();
   }
 
-  if(grid){
-    grid.querySelectorAll(".wc").forEach(function(g){
-      var wid = +g.getAttribute("data-w");
-      g.addEventListener("click", function(){ record({w:wid}); });
-      g.addEventListener("keydown", function(ev){
-        if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); record({w:wid}); }
-      });
-    });
-  }
-  rose.querySelectorAll(".rz").forEach(function(z){
-    var zid = z.getAttribute("data-z");
-    z.addEventListener("click", function(){ record({z:zid}); });
-    z.addEventListener("keydown", function(ev){
-      if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); record({z:zid}); }
-    });
+  diag.addEventListener("click", function(ev){
+    var back = ev.target.closest(".inset");
+    if(back){ phase = (stage()==="w") ? "t" : "w"; paint(); return; }
+    var cell = ev.target.closest(".diagmain .wc");
+    if(cell){ record({w: +cell.getAttribute("data-w")}); return; }
+    var zone = ev.target.closest(".diagmain .rz");
+    if(zone){ record({z: zone.getAttribute("data-z")}); }
+  });
+  diag.addEventListener("keydown", function(ev){
+    if(ev.key !== "Enter" && ev.key !== " ") return;
+    var cell = ev.target.closest(".diagmain .wc");
+    if(cell){ ev.preventDefault(); record({w: +cell.getAttribute("data-w")}); return; }
+    var zone = ev.target.closest(".diagmain .rz");
+    if(zone){ ev.preventDefault(); record({z: zone.getAttribute("data-z")}); }
   });
   undo.addEventListener("click", function(){
     if(shots[cur]) shots[cur] = null;
     else if(cur > 0){ cur--; shots[cur] = null; }
-    applyShots(s, shots); paint(); saveDraft();
+    phase = null; rescore(); paint(); saveDraft();
   });
 
   row.appendChild(ask);
@@ -2490,7 +2690,7 @@ function shotRow(a, s, last){
   row.appendChild(chips);
   row.appendChild(tally);
   row.appendChild(acts);
-  applyShots(s, shots);
+  rescore();
   paint();
   return row;
 }
