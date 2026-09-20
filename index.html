@@ -15,7 +15,7 @@
     --bg:#eef0ec; --surface:#ffffff; --surface-2:#f6f7f4;
     --ink:#141a16; --ink-2:#4a564e; --muted:#77847b;
     --line:#d7ddd6; --line-strong:#b6c0b8;
-    --accent:#8f5c06; --accent-fill:#c1841a; --accent-wash:#f6edda;
+    --accent:#a80050; --accent-fill:#d2006a; --accent-wash:#fce8f2;
     --up:#1b6741; --down:#96382b;
     --up-wash:#e2efe7; --down-wash:#f5e3e0;
     --radius:10px;
@@ -25,7 +25,7 @@
       --bg:#0e1310; --surface:#161d19; --surface-2:#1b231e;
       --ink:#e8ece8; --ink-2:#aab5ad; --muted:#889389;
       --line:#293229; --line-strong:#3d4a42;
-      --accent:#e0ad51; --accent-fill:#e0ad51; --accent-wash:#2a2318;
+      --accent:#ff5fa8; --accent-fill:#ff2f90; --accent-wash:#330f22;
       --up:#57b487; --down:#e08574;
       --up-wash:#17261f; --down-wash:#2a1c19;
     }
@@ -34,7 +34,7 @@
     --bg:#0e1310; --surface:#161d19; --surface-2:#1b231e;
     --ink:#e8ece8; --ink-2:#aab5ad; --muted:#889389;
     --line:#293229; --line-strong:#3d4a42;
-    --accent:#e0ad51; --accent-fill:#e0ad51; --accent-wash:#2a2318;
+    --accent:#ff5fa8; --accent-fill:#ff2f90; --accent-wash:#330f22;
     --up:#57b487; --down:#e08574;
     --up-wash:#17261f; --down-wash:#2a1c19;
   }
@@ -213,7 +213,7 @@
   }
   .targets .trow{display:flex; gap:7px; margin-top:8px}
   .targets .trow button{border-radius:7px; padding:6px 13px; font-size:12.5px; font-weight:600; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink-2)}
-  .targets .trow button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#1c1405}
+  .targets .trow button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
 
   /* ---------- cards ---------- */
   .modebar{display:flex; justify-content:flex-end; margin:10px 0 0}
@@ -271,7 +271,9 @@
     background:var(--surface-2); border:1px solid var(--line-strong); border-radius:9px;
     padding:11px 14px; font-size:14px; font-weight:600; color:var(--ink-2); flex:none;
   }
-  .nav.next{background:var(--accent-fill); border-color:var(--accent-fill); color:#1c1405; padding:11px 18px}
+  .nav.next{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff; padding:11px 18px}
+  .nav.back{padding:11px 16px; font-size:15px}
+  .nav.back[disabled]{opacity:.38; cursor:default}
   :root[data-theme="dark"] .nav.next{color:#0e1310}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nav.next{color:#0e1310}}
 
@@ -296,7 +298,7 @@
     background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
     padding:6px 12px; font-size:12.5px; font-weight:600; color:var(--ink-2); line-height:1.2;
   }
-  .chips button[aria-pressed="true"]{background:var(--accent-fill); border-color:var(--accent-fill); color:#1c1405}
+  .chips button[aria-pressed="true"]{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   :root[data-theme="dark"] .chips button[aria-pressed="true"]{color:#0e1310}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chips button[aria-pressed="true"]{color:#0e1310}}
   @media (max-width:430px){ .condrow{grid-template-columns:1fr; gap:3px} .condrow > span{padding-top:0} }
@@ -475,7 +477,7 @@
   .tot .of{font-family:"IBM Plex Mono", monospace; font-size:14px; color:var(--muted)}
   .tot .vs{font-size:12px; color:var(--muted); line-height:1.3}
   .save{
-    background:var(--accent-fill); color:#1c1405; border:0; border-radius:9px;
+    background:var(--accent-fill); color:#ffffff; border:0; border-radius:9px;
     padding:11px 18px; font-weight:700; font-size:14px;
   }
   .save[disabled]{opacity:.45}
@@ -630,7 +632,7 @@
   .rose .rz{fill:url(#gRough); stroke:#5b8450; stroke-width:1.1}
   .rose .rc{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
   .fringe{fill:#94bd84; pointer-events:none}
-  .rose .rz:hover, .rose .rz.on{fill:#f0d69a; stroke:var(--accent-fill); stroke-width:2.6}
+  .rose .rz:hover, .rose .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
   .pin{pointer-events:none}
   .pin line{stroke:#f4f6f2; stroke-width:2.4}
   .pinflag{fill:#c8402f}
@@ -650,7 +652,7 @@
   .fpole{stroke:#55624f; stroke-width:2.2}
   .fflag{fill:#c8402f}
   .fgate{stroke:#8d9a8a; stroke-width:1.2; stroke-dasharray:4 4}
-  .corr .rz:hover, .corr .rz.on{fill:#f0d69a; stroke:var(--accent-fill); stroke-width:2.6}
+  .corr .rz:hover, .corr .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
   .corr .rzl.sandl{fill:#4a3a1e}
 
   /* the window frame */
@@ -670,17 +672,17 @@
   .mk text{fill:#f6f9f4; font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:13px; font-weight:600; text-anchor:middle}
   .corr .mk text{font-size:12px}
-  .mk.hit circle{fill:#d39b1f}
-  .mk.hit text{fill:#221a06}
+  .mk.hit circle{fill:#d2006a}
+  .mk.hit text{fill:#ffffff}
   .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
-  .mk.hit.now circle{stroke:#221a06; stroke-width:3}
+  .mk.hit.now circle{stroke:#3d0020; stroke-width:3}
 
   .balls{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
     background:var(--surface-2); color:var(--muted); font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:14px; font-weight:600; cursor:pointer; padding:0}
   .ballchip.done{background:var(--surface); color:var(--ink); border-color:var(--ink-2)}
-  .ballchip.good{background:var(--accent-fill); border-color:var(--accent-fill); color:#1c1405}
+  .ballchip.good{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .ballchip.now{box-shadow:0 0 0 2px var(--accent-fill)}
   .shottally{display:flex; gap:16px; margin-top:12px; font-size:13px; color:var(--muted)}
   .shottally b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; color:var(--ink)}
@@ -753,7 +755,6 @@
   #goalsProject{color:var(--accent); margin-top:2px}
 
   /* ---- the season mix ---- */
-  #seasonPanel{margin-top:18px}
   .seasonhd{margin-bottom:3px}
   .seasonn{margin:0 0 9px; font-size:12.5px; color:var(--muted)}
   .sbars{display:flex; flex-direction:column; gap:7px}
@@ -766,6 +767,27 @@
   .srow .n{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--ink)}
   .srow .n.off{color:var(--accent)}
   .srow .w{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--muted); font-size:12px}
+
+  /* the compete call */
+  .shotask .callnum{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:11.5px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted)}
+  .shotask .callclub{display:block; font-family:Archivo, sans-serif; font-size:30px;
+    font-weight:700; line-height:1.12; color:var(--ink); margin:2px 0 1px}
+  .shotask .callwin{display:block; font-family:Archivo, sans-serif; font-size:17px;
+    font-weight:600; color:var(--accent)}
+  .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
+  .complead{min-height:0}
+
+  /* the welcome page */
+  .homeproj{color:var(--accent); margin:0 0 12px; font-size:26px}
+  .gonext{display:block; width:100%; margin-top:18px; padding:15px 18px; border:0; border-radius:10px;
+    background:var(--accent-fill); color:#ffffff; font-family:Archivo, sans-serif;
+    font-size:17px; font-weight:600; cursor:pointer}
+  :root[data-theme="dark"] .gonext{color:#12030a}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gonext{color:#12030a}}
+  .backlink{background:none; border:0; padding:2px 0 10px; cursor:pointer; color:var(--muted);
+    font-family:Archivo, sans-serif; font-size:14px; font-weight:600}
+  .backlink:hover{color:var(--accent)}
 
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
@@ -876,28 +898,21 @@
 
   <!-- HOME -->
   <section id="viewHome">
-    <p class="banner hello" id="helloBar" hidden></p>
-    <h1>The five performance areas</h1>
-    <p class="lede">An hour an area, or pair a short one with another. Ten minutes warm-up, the scored sets, ten minutes competing. Score every set and beat your last number.</p>
-    <div class="banner resume" id="resumeBar" hidden>
-      <span id="resumeText"></span>
-      <span class="resacts">
-        <button id="resumeGo">Carry on</button>
-        <button id="resumeDrop" class="ghost">Discard</button>
-      </span>
+    <div id="homeWelcome">
+      <p class="banner hello" id="helloBar" hidden></p>
+      <div class="banner resume" id="resumeBar" hidden>
+        <span id="resumeText"></span>
+        <span class="resacts">
+          <button id="resumeGo">Carry on</button>
+          <button id="resumeDrop" class="ghost">Discard</button>
+        </span>
+      </div>
+      <div id="homeGoals"></div>
+      <button class="gonext" id="homeNext">Next &rarr;</button>
     </div>
-    <div class="banner" id="sampleBanner" hidden>
-      <span>Showing example sessions so you can see how it reads. Your first save clears them.</span>
-      <button id="clearSample">Clear examples</button>
-    </div>
-    <div class="arealist" id="areaList"></div>
-
-    <div class="panel">
-      <h2>Where the practice went</h2>
-      <div class="balance" id="balance"></div>
-      <div id="seasonPanel"></div>
-      <div class="split" id="split"></div>
-      <p class="note">The programme prescribes an even split of hours: hour one long game, hour two inside 100. Two-thirds of strokes come from outside 100 yards, so when the split slides it should slide towards approach, not away from it.</p>
+    <div id="homeAreas" hidden>
+      <button class="backlink" id="homeBack">&larr; Welcome</button>
+      <div class="arealist" id="areaList"></div>
     </div>
   </section>
 
@@ -969,6 +984,13 @@
   <section id="viewHistory" hidden>
     <h1>History</h1>
     <p class="lede">Every saved session, and the shape of the trend for each area.</p>
+    <div class="panel">
+      <h2>Where the practice went</h2>
+      <div class="balance" id="balance"></div>
+      <div class="split" id="split"></div>
+      <p class="note">The programme prescribes an even split of hours: hour one long game, hour two inside 100. Two-thirds of strokes come from outside 100 yards, so when the split slides it should slide towards approach, not away from it.</p>
+    </div>
+
     <div id="charts"></div>
     <h2 style="margin-top:22px">Score against conditions</h2>
     <div id="condPanel"></div>
@@ -1040,7 +1062,7 @@
 
 <div class="totalbar" id="totalBar" hidden>
   <div class="totalin">
-    <button class="nav" id="navBack" aria-label="Previous">←</button>
+    <button class="nav back" id="navBack" aria-label="Previous page">← Back</button>
     <div class="tot">
       <span class="fig" id="totFig">0</span><span class="of" id="totOf">/ 55</span>
       <span class="vs" id="totVs"></span>
@@ -1060,14 +1082,14 @@ var AREAS = [
   targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 35 balls, full routine every ball) → 10 min compete",
   sets:[
-    {id:"a", label:"Driver · 10 balls", tc:"40 yd", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
+    {id:"a", label:"Driver · 10 balls", short:"Driver", tc:"40 yd", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
       max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
     {id:"b", guide:"windows", label:"Driver · five windows", tc:"40 yd", tgt:"Five balls: a point for the window, a point for the 40-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"3-wood", tc:"35 yd", tgt:"35-yd target (17 each side)", max:5},
+    {id:"c", label:"3-wood", short:"3-wood", tc:"35 yd", tgt:"35-yd target (17 each side)", max:5},
     {id:"d", guide:"windows", label:"3-wood · five windows", tc:"35 yd", tgt:"Five balls: a point for the window, a point for the 35-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"5-wood / 2 hybrid", tc:"30 yd", tgt:"30-yd target (15 each side)", max:5},
+    {id:"e", label:"5-wood / 2 hybrid", short:"5-wood / 2H", tc:"30 yd", tgt:"30-yd target (15 each side)", max:5},
     {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tc:"30 yd", tgt:"Five balls: a point for the window, a point for the 30-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
@@ -1077,13 +1099,13 @@ var AREAS = [
   targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
   sets:[
-    {id:"a", label:"Approach 125y", tc:"15 ft", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"a", label:"Approach 125y", short:"125 yards", tc:"15 ft", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"b", guide:"windows", label:"Five windows · 125y", tc:"15 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"Approach 150y", tc:"20 ft", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"c", label:"Approach 150y", short:"150 yards", tc:"20 ft", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"d", guide:"windows", label:"Five windows · 150y", tc:"20 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"Approach 175y", tc:"24 ft", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"e", label:"Approach 175y", short:"175 yards", tc:"24 ft", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
@@ -1115,14 +1137,14 @@ var AREAS = [
   targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
   hour:"10 min warm-up → 40 min benchmark (8 sets, about 50 balls, full routine every ball) → 10 min compete",
   sets:[
-    {id:"a", label:"30y", tc:"7 ft", tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
+    {id:"a", label:"30y", short:"30 yards", tc:"7 ft", tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
     {id:"b", guide:"heights", label:"30y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", tc:"10 ft", tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
+    {id:"c", label:"50y", short:"50 yards", tc:"10 ft", tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
     {id:"d", guide:"heights", label:"50y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", tc:"12 ft", tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
-    {id:"f", label:"90y", tc:"13 ft", tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
+    {id:"e", label:"70y", short:"70 yards", tc:"12 ft", tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
+    {id:"f", label:"90y", short:"90 yards", tc:"13 ft", tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
     {id:"g", guide:"heights", label:"90y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", label:"Rotation · 30 / 50 / 70 / 90", tgt:"20 balls, cycle the four targets five times. A point inside each target", max:20}
@@ -1525,28 +1547,6 @@ var COND = {
     {id:"speed", label:"Green speed", opts:[["fast","Fast"],["med","Medium"],["slow","Slow"]], hide:{venue:["indoor"]}}
   ]
 };
-function trainRow(draft){
-  var box = document.createElement("div"); box.className="condbox";
-  box.innerHTML = '<span class="eyebrow">What kind of practice <span style="text-transform:none;letter-spacing:0;font-weight:400">\u00b7 one tap, it feeds the season mix</span></span>';
-  var row = document.createElement("div"); row.className="condrow";
-  row.innerHTML = '<span>Training</span>';
-  var chips = document.createElement("div"); chips.className="chips";
-  TRAIN.filter(function(t){ return t.id !== "phys"; }).forEach(function(t){
-    var b = document.createElement("button"); b.type="button"; b.textContent = t.name;
-    b.title = t.note;
-    b.setAttribute("aria-pressed", draft.train === t.id ? "true" : "false");
-    b.addEventListener("click", function(){
-      draft.train = (draft.train === t.id) ? null : t.id;
-      box.querySelectorAll(".chips button").forEach(function(x){
-        x.setAttribute("aria-pressed", x.textContent === trainName(draft.train) ? "true" : "false");
-      });
-      saveDraft();
-    });
-    chips.appendChild(b);
-  });
-  row.appendChild(chips); box.appendChild(row);
-  return box;
-}
 function condKind(areaId, kind){
   if(kind==="gym") return null;
   if(areaId===4) return "putt";
@@ -1582,6 +1582,7 @@ var state = {
   draft:null,
   gymDraft:null,
   condArea:"all",
+  homePage:0,
   cardMode:true,
   deck:null,
   restTimer:null,
@@ -1613,66 +1614,6 @@ function loadLocal(){
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
     return true;
   }catch(e){ return false; }
-}
-
-/* ---- sample data so the page opens with something to read ---- */
-function makeSample(){
-  var out=[], base=new Date();
-  var G = ["venue","temp","windStr","windDir","rain"], P = ["venue","speed"];
-  var plan = [
-    {a:10, s:26, c:["out","mild","med","into","dry"]},
-    {a:11, s:24, c:["out","mild","med","into","dry"]},
-    {a:2,  s:44, c:["out","warm","light","lr","dry"]},
-    {a:10, s:22, c:["out","cold","strong","rl","showers"]},
-    {a:4,  s:62, c:["green","med"]},
-    {a:3,  s:48, c:["out","mild","light","behind","dry"]},
-    {a:11, s:29, c:["out","warm","med","lr","dry"]},
-    {a:2,  s:49, c:["indoor"]},
-    {a:10, s:30, c:["out","cold","med","rl","dry"]},
-    {a:4,  s:68, c:["green","fast"]},
-    {a:3,  s:52, c:["out","warm","light","into","dry"]},
-    {a:11, s:26, c:["out","mild","med","rl","dry"]},
-    {a:2,  s:46, c:["out","mild","med","rl","dry"]},
-    {a:10, s:33, c:["out","warm","light","behind","dry"]},
-    {a:4,  s:71, c:["green","slow"]},
-    {a:3,  s:55, c:["out","mild","med","lr","dry"]},
-    {a:11, s:31, c:["out","mild","light","into","dry"]},
-    {a:10, s:35, c:["out","warm","light","into","dry"]},
-    {a:2,  s:42, c:["out","cold","strong","rl","wet"]}
-  ];
-  plan.forEach(function(p,i){
-    var a=area(p.a); var d=new Date(base.getTime()-(plan.length-i)*2*86400000);
-    var left=p.s, sc={}, flat=[];
-    a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ flat.push(pt); }); });
-    flat.forEach(function(pt,j){
-      var take = j===flat.length-1 ? Math.max(0,Math.min(pt.max,left)) : Math.min(pt.max, Math.round(pt.max*(p.s/areaMax(a))));
-      sc[pt.key]=take; left-=take;
-    });
-    var sum=0; for(var k in sc){ sum+=sc[k]; }
-    var mt = {};
-    if(p.a===10){ var f = 95.5 + i*0.35; mt = { chsFast:Math.round(f*10)/10, chsSlow:Math.round((f-4.5)*10)/10 }; }
-    var keys = p.a===4 ? P : G, cond = {};
-    p.c.forEach(function(v,ci){ if(keys[ci]) cond[keys[ci]] = v; });
-    if(cond.venue==="out") cond.surface = (i%3===0) ? "mat" : "grass";
-    out.push({ id:"sample"+i, playerId:state.activePlayer, kind:"practice", areaId:p.a,
-      date:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),
-      scores:sc, metrics:mt, cond:cond, compete:Math.round(a.compete.max*0.5), won:(i%3!==0), notes:"", total:sum, max:areaMax(a), sample:true });
-  });
-  // a few S&C sessions so the strength side reads too
-  var gplan = [[1,40],[2,22],[3,60],[1,42.5],[2,24],[3,65]];
-  gplan.forEach(function(p,i){
-    var g = gym(p[0]);
-    var d = new Date(base.getTime()-(gplan.length-i)*4*86400000);
-    var ex = {}, done = 0;
-    g.blocks.forEach(function(b){ b.ex.forEach(function(e){
-      var ok = (i+e.sets)%5 !== 4; if(ok) done += e.sets;
-      ex[e.id] = { load: e.load ? (e.key ? p[1] : Math.round(p[1]*0.35*2)/2) : null, done:ok };
-    }); });
-    out.push({ id:"gsample"+i, playerId:state.activePlayer, kind:"gym", areaId:6, gymId:p[0],
-      date:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),
-      ex:ex, prep:true, scores:{}, metrics:{}, notes:"", total:done, max:gymSets(g), sample:true });
-  });
-  return out;
 }
 
 /* ============ persistence ============ */
@@ -1737,7 +1678,7 @@ function show(view){
   $("viewBench").hidden = view!=="bench";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
-  if(view==="home") renderHello();
+  if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
   $("viewGoals").hidden = view!=="goals";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session"||view==="gym")?"true":"false");
@@ -1811,7 +1752,7 @@ var HELLO = [
   "Let's find something today, {n}.",
   "Good to see you, {n}.",
   "Let's make it count, {n}.",
-  "One more in the bank, {n}.",
+  "Time to put one in the log, {n}.",
   "Go on then, {n}.",
   "Let's have it, {n}."
 ];
@@ -1965,67 +1906,6 @@ function areaLive(a){
   }
   return bits.join(" · ");
 }
-/* ---------- the season, and what kind of practice it was ---------- */
-/* One slice of the periodisation: the macro cycle's seasonal mix. Every practice
-   session carries the kind of training it was, and the home page compares what
-   actually happened against what this phase asks for. */
-var TRAIN = [
-  {id:"tech",  name:"Technical",   note:"Mechanics, one piece at a time"},
-  {id:"cons",  name:"Consistency", note:"Same shot, again and again, to a target"},
-  {id:"vary",  name:"Variability", note:"Different flights, shapes and lies"},
-  {id:"comp",  name:"Competition", note:"One ball, a score, pressure"},
-  {id:"ment",  name:"Mental",      note:"Routine, visualisation, reflection"},
-  {id:"phys",  name:"Physical",    note:"Gym, speed sticks, movement"}
-];
-var SEASON = [
-  {id:"pre",  name:"Pre-season",  months:[2,3,4],
-   mix:{tech:20, cons:20, vary:20, comp:20, ment:10, phys:10}},
-  {id:"in",   name:"In-season",   months:[5,6,7,8,9],
-   mix:{tech:15, cons:25, vary:15, comp:30, ment:10, phys:5}},
-  {id:"post", name:"Post-season", months:[10,11,0,1],
-   mix:{tech:45, cons:10, vary:10, comp:5, ment:10, phys:20}}
-];
-function seasonFor(dateStr){
-  var m = dateStr ? (new Date(dateStr + "T00:00:00")).getMonth() : (new Date()).getMonth();
-  for(var i=0;i<SEASON.length;i++){ if(SEASON[i].months.indexOf(m) !== -1) return SEASON[i]; }
-  return SEASON[1];
-}
-function trainName(id){
-  for(var i=0;i<TRAIN.length;i++){ if(TRAIN[i].id === id) return TRAIN[i].name; }
-  return id;
-}
-function sessionTrain(s){
-  if(s.train) return s.train;
-  if(s.kind === "gym") return "phys";     // the gym is physical by definition
-  return null;
-}
-function renderSeason(){
-  var host = $("seasonPanel"); if(!host) return;
-  var ph = seasonFor(today());
-  var since = new Date(Date.now() - 56*86400000).toISOString().slice(0,10);
-  var pool = mine().filter(function(s){ return !s.sample && s.kind !== "round" && s.date >= since; });
-  var counts = {}, n = 0;
-  TRAIN.forEach(function(t){ counts[t.id] = 0; });
-  pool.forEach(function(s){ var k = sessionTrain(s); if(k && counts[k] != null){ counts[k]++; n++; } });
-
-  var rows = TRAIN.map(function(t){
-    var want = ph.mix[t.id], got = n ? Math.round(counts[t.id]/n*100) : 0;
-    var off = got - want;
-    return '<div class="srow"><span>'+t.name+'</span>'+
-      '<span class="strack"><span class="sfill" style="width:'+Math.min(100,got)+'%"></span>'+
-      '<span class="starget" style="left:'+Math.min(100,want)+'%"></span></span>'+
-      '<span class="n num'+(Math.abs(off)>=12 ? " off" : "")+'">'+got+'%</span>'+
-      '<span class="w num">'+want+'%</span></div>';
-  }).join("");
-
-  host.innerHTML = '<div class="seasonhd"><span class="eyebrow">'+ph.name+' · the mix it asks for</span></div>'+
-    '<p class="seasonn">'+n+' of the last eight weeks’ sessions carry a training tag.</p>'+
-    '<div class="sbars">'+rows+'</div>'+
-    '<p class="note">The bar is what you did, the mark is what this phase asks for. '+
-    (n < 6 ? 'Too few tagged sessions to read anything into yet.'
-           : 'Anything more than twelve points either way is worth a look.')+'</p>';
-}
-
 function renderGoals(){
   var host = $("goalsBody"); if(!host) return;
   host.innerHTML = "";
@@ -2069,8 +1949,29 @@ function renderGoals(){
   host.appendChild(perf);
 }
 
+function homePage(n){
+  state.homePage = n;
+  $("homeWelcome").hidden = n !== 0;
+  $("homeAreas").hidden = n !== 1;
+  if(n === 0) renderHello();
+}
+function renderHomeGoals(){
+  var host = $("homeGoals"); if(!host) return;
+  host.innerHTML = "";
+  var proj = projectFor();
+  if(proj){
+    var h = document.createElement("h1"); h.className="homeproj"; h.textContent = proj;
+    host.appendChild(h);
+  }
+  host.appendChild(bulletBox({
+    eyebrow:"This season \u00b7 what it is all for",
+    lines: outcomesFor,
+    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveLocal(); pushMeta(); } }
+  }));
+}
 function renderHome(){
   renderHello();
+  renderHomeGoals();
   var host = $("areaList"); host.innerHTML = "";
   liveAreas().forEach(function(a){
     var hist = sessionsFor(a.id);
@@ -2145,9 +2046,7 @@ function renderHome(){
   pb.addEventListener("click", function(){ openGym(6); });
   host.appendChild(pb);
 
-  renderBalance();
   renderResume();
-  $("sampleBanner").hidden = !state.sampleOn;
 }
 
 function renderBalance(){
@@ -2176,7 +2075,6 @@ function renderBalance(){
       '<span class="n num">'+counts[k]+'</span>';
     host.appendChild(row);
   });
-  renderSeason();
   var lng = counts[10]+counts[11]+counts[1], in100 = counts[2]+counts[3]+counts[4], tot = lng+in100;
   $("split").innerHTML =
     '<div><b class="num">'+(tot? Math.round(lng/tot*100):0)+'%</b>long game · last 28 days</div>'+
@@ -2213,7 +2111,8 @@ function deckShow(i){
 }
 function updateNav(){
   var d = state.deck, last = d ? (d.idx === d.cards.length-1) : true;
-  $("navBack").hidden = !d || d.idx === 0;
+  $("navBack").hidden = !d;
+  $("navBack").disabled = !d || d.idx === 0;
   $("navNext").hidden = !d || last;
   $("saveBtn").hidden = !!d && !last;
 }
@@ -2322,7 +2221,6 @@ function sessionIntro(){
 function condPage(){
   var d = document.createElement("div");
   d.innerHTML = '<div id="sessCond"></div>';
-  d.appendChild(trainRow(state.draft));
   var n = document.createElement("p"); n.className="note";
   n.textContent = "Logged once at the start. You will not be asked again.";
   d.appendChild(n);
@@ -2354,7 +2252,7 @@ function competeSpec(a){
   var plain = [], windowed = false;
   a.sets.forEach(function(s){
     if(s.parts && s.guide === "windows") windowed = true;
-    else if(!s.parts && s.tc) plain.push({label:s.label, tc:s.tc});
+    else if(!s.parts && s.tc) plain.push({label:s.short || s.label, tc:s.tc});
   });
   if(!plain.length) return null;
   return { pool:plain, windowed:windowed, max: windowed ? 15 : 10, balls:10 };
@@ -2454,7 +2352,8 @@ function buildSessionCards(a, last){
 }
 function monitorNote(){
   var d = document.createElement("div"); d.className="banner monitor";
-  d.innerHTML = '<b>Monitor on before ball one.</b> The speed is measured across these ten, so it has to be running now, not after.';
+  d.innerHTML = '<b>Use the launch monitor for this set only.</b> Get it running before ball one. '+
+    'You enter the fastest and slowest of the ten on the next screen.';
   return d;
 }
 
@@ -2482,7 +2381,7 @@ function poolShots(a, sess){
 function pctText(c, n){ return n ? Math.round(c/n*100)+"%" : ""; }
 function heatFill(c, n){
   var o = n ? Math.min(0.55, c/n*1.5) : 0;
-  return "fill:rgba(203,146,22," + o.toFixed(3) + ")";
+  return "fill:rgba(210,0,106," + o.toFixed(3) + ")";
 }
 function heatSvg(svg, ids, counts, n, markFn){
   var out = "";
@@ -2955,12 +2854,18 @@ function shotRow(a, s, last, cfg){
 
   function paint(){
     var sh = shots[cur] || {}, c = call(), st = stage();
-    var where = c.label ? c.label + " · " : "";
-    if(c.kind === "w"){
-      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' · '+where+'called at window <b>'+c.win+'</b>. '+
+    if(c.label){
+      // on compete the call is the instruction, so it is said loudly and first
+      ask.innerHTML = '<span class="callnum">Ball '+(cur+1)+' of '+nb+'</span>'+
+        '<span class="callclub">'+c.label+'</span>'+
+        '<span class="callwin">'+(c.kind === "w" ? 'through window '+c.win : 'find the target')+'</span>'+
+        '<span class="calldo">'+(c.kind === "w" && st === "w" ? 'Tap the window it went through.'
+          : (shotDone(s, sh, c) ? 'Logged. Tap a ball below to change it.' : 'Tap where it finished.'))+'</span>';
+    } else if(c.kind === "w"){
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' \u00b7 called at window <b>'+c.win+'</b>. '+
         (st === "w" ? 'Tap the window it went through.' : 'Now tap where it finished.');
     } else {
-      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+(where ? ' · '+c.label : '')+'. '+
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+'. '+
         (sh.z == null ? 'Tap where it finished.' : 'Logged. Tap a ball below to change it.');
     }
 
@@ -3842,6 +3747,7 @@ function saveCurrent(){
   clearDraft();
   if(s.kind==="gym") state.gymDraft = null;
   state.praise = (s.kind === "practice") ? sessionPraise(saved) : null;
+  state.homePage = 0;
   render();
   show("home");
   state.praise = null;
@@ -4088,6 +3994,7 @@ function renderConditions(){
 }
 
 function renderHistory(){
+  renderBalance();
   renderConditions();
   var host = $("charts"); host.innerHTML="";
   var any=false;
@@ -4252,6 +4159,11 @@ function openPast(s){
 
   h += condChips(s);
 
+  if(!isGym){
+    var sa = area(s.areaId);
+    if(sa){ var sum = summaryBlock(sa, s); if(sum) h += sum.innerHTML; }
+  }
+
   if(isGym){
     var g = gym(s.gymId);
     g.blocks.forEach(function(b){
@@ -4412,7 +4324,9 @@ $("lightbox").addEventListener("click", function(e){ if(e.target === this) close
 document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("lightbox").hidden) closeGuide(); });
 
 /* ---------- wiring ---------- */
-$("tabPractice").addEventListener("click", function(){ show("home"); });
+$("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
+$("homeNext").addEventListener("click", function(){ homePage(1); });
+$("homeBack").addEventListener("click", function(){ homePage(0); });
 $("tabBench").addEventListener("click", function(){ renderBench(); show("bench"); });
 $("tabHistory").addEventListener("click", function(){ renderHistory(); show("history"); });
 $("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
@@ -4423,10 +4337,6 @@ $("sessMode").addEventListener("click", function(){ state.cardMode = !state.card
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
 $("gymBack").addEventListener("click", function(){ show("home"); });
 $("saveBtn").addEventListener("click", saveCurrent);
-$("clearSample").addEventListener("click", function(){
-  state.sessions = state.sessions.filter(function(s){ return !s.sample; });
-  state.sampleOn = false; saveLocal(); render();
-});
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
   if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveLocal(); pushMeta(); render(); }
@@ -4643,7 +4553,6 @@ applyCouponIdentity();
 window.addEventListener("lcl-who", function(){
   if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
 });
-if(!had || !state.sessions.length){ state.sessions = makeSample(); state.sampleOn = true; }
 renderPlayer();
 render();
 show("home");
