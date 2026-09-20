@@ -76,10 +76,11 @@
     border:0; background:var(--surface-2); border-radius:999px; width:24px; height:24px;
     font-size:13px; line-height:1; color:var(--ink-2);
   }
-  nav.tabs{display:flex; gap:2px; margin-top:8px}
+  nav.tabs{display:flex; gap:0; margin-top:8px; overflow-x:auto; scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{
-    background:none; border:0; border-bottom:2px solid transparent; padding:8px 12px 9px;
-    font-size:13px; font-weight:600; color:var(--muted); letter-spacing:.01em;
+    background:none; border:0; border-bottom:2px solid transparent; padding:8px 6px 9px;
+    font-size:12.5px; font-weight:600; color:var(--muted); letter-spacing:0; white-space:nowrap;
   }
   nav.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent-fill)}
 
@@ -140,7 +141,7 @@
     border-radius:var(--radius); padding:10px 13px; margin:12px 0 6px; font-size:13px; color:var(--ink-2);
   }
   .targets .eyebrow{display:block; margin-bottom:3px}
-  .hourline{font-size:12.5px; color:var(--muted); margin:0 0 16px}
+  .planline{font-size:12.5px; color:var(--muted); margin:0 0 16px}
   input[type="date"]{
     font:inherit; font-size:13px; background:var(--surface); color:var(--ink);
     border:1px solid var(--line); border-radius:7px; padding:5px 8px;
@@ -566,6 +567,20 @@
   .hrow .s{font-family:"IBM Plex Mono", monospace; font-weight:600}
   .hrow .x{background:none; border:0; color:var(--muted); font-size:15px; padding:0 2px; line-height:1}
   .hrow .nt{font-size:12px; color:var(--muted); grid-column:1/-1; margin-top:-2px}
+  .hrow .nt b{color:var(--ink-2); font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600}
+  .hrow.live{background:var(--accent-wash)}
+  .hrow .pill{display:inline-block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.7px; text-transform:uppercase; padding:2px 7px; border-radius:999px;
+    margin-right:7px; vertical-align:1px; border:1px solid var(--line-strong); color:var(--muted)}
+  .hrow .pill.now{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
+  .hrow .pill.part{background:#fff3d6; border-color:#e6b94d; color:#8a5d00}
+  .hrow .openacts{margin-top:7px}
+  .hrow .openacts button{padding:5px 13px; font-size:12.5px}
+  .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
+  .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px;
+    padding:8px 14px; font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
+    color:var(--ink); cursor:pointer}
+  .openacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .empty{color:var(--muted); font-size:13.5px; padding:22px 0; text-align:center}
   .tools{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px}
   .tools button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px; padding:8px 13px; font-size:13px; font-weight:600}
@@ -681,6 +696,9 @@
     background:var(--surface-2)}
   .slopebox .eyebrow{display:block; margin-bottom:7px}
   /* the run, at the top of every page of the session */
+  .savetick{margin:-4px 0 10px; text-align:right; font-size:11.5px; color:var(--muted);
+    font-family:"IBM Plex Mono", ui-monospace, monospace}
+  .savetick.bad{color:#c8402f; font-weight:600}
   .runbar{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:0 0 14px}
   .runbox{background:var(--surface); border:1px solid var(--line); border-radius:11px;
     padding:9px 8px 8px; text-align:center}
@@ -1013,7 +1031,8 @@
     <nav class="tabs" role="tablist">
       <button id="tabPractice" role="tab" aria-selected="true">Practice</button>
       <button id="tabBench" role="tab" aria-selected="false">Benchmarks</button>
-      <button id="tabHistory" role="tab" aria-selected="false">History</button>
+      <button id="tabSessions" role="tab" aria-selected="false">Sessions</button>
+      <button id="tabHistory" role="tab" aria-selected="false">Progress</button>
       <button id="tabGoals" role="tab" aria-selected="false">Goals</button>
     </nav>
   </div>
@@ -1054,6 +1073,7 @@
     </div>
     <div class="modebar"><button class="modetoggle" id="sessMode">Show all sets</button></div>
     <div class="prog" id="sessProg"></div>
+    <p class="savetick" id="saveTick" hidden></p>
     <div class="runbar" id="runBar" hidden>
       <div class="runbox now"><b id="runNow">0</b><span>On a run</span></div>
       <div class="runbox"><b id="runToday">0</b><span>Best today</span></div>
@@ -1112,20 +1132,9 @@
   </section>
 
   <!-- HISTORY -->
-  <section id="viewHistory" hidden>
-    <h1>History</h1>
-    <p class="lede">Every saved session, and the shape of the trend for each area.</p>
-    <div class="panel">
-      <h2>Where the practice went</h2>
-      <div class="balance" id="balance"></div>
-      <div class="split" id="split"></div>
-      <p class="note">The programme prescribes an even split of hours: hour one long game, hour two inside 100. Two-thirds of strokes come from outside 100 yards, so when the split slides it should slide towards approach, not away from it.</p>
-    </div>
-
-    <div id="charts"></div>
-    <h2 style="margin-top:22px">Score against conditions</h2>
-    <div id="condPanel"></div>
-    <h2 style="margin-top:20px">All sessions</h2>
+  <section id="viewSessions" hidden>
+    <h1>Sessions</h1>
+    <p class="lede">Every session she has logged. Tap one to open it.</p>
     <div id="storeLine"></div>
     <div id="histList"></div>
     <div class="tools">
@@ -1134,6 +1143,21 @@
       <button id="copySummary">Copy summary</button>
     </div>
     <p class="status" id="status"></p>
+  </section>
+
+  <section id="viewHistory" hidden>
+    <h1>Progress</h1>
+    <p class="lede">How the numbers are moving, area by area, and what the conditions did to them.</p>
+    <div class="panel">
+      <h2>Where the practice went</h2>
+      <div class="balance" id="balance"></div>
+      <div class="split" id="split"></div>
+      <p class="note">The programme prescribes an even split: one session long game, one session inside 100. Two-thirds of strokes come from outside 100 yards, so when the split slides it should slide towards approach, not away from it.</p>
+    </div>
+
+    <div id="charts"></div>
+    <h2 style="margin-top:22px">Score against conditions</h2>
+    <div id="condPanel"></div>
   </section>
 
   <svg id="gfxDefs" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
@@ -1219,7 +1243,7 @@ var AREAS = [
      is 30 yards, which is the 72% figure, so this is tighter than a fairway on purpose.
      No second ring: the PGA corridor is wider, not tighter, because the men miss by
      more yards at the same angle. */
-  hour:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
+  plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
   sets:[
     {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
       max:15, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"Fastest and slowest of the fifteen"},
@@ -1236,7 +1260,7 @@ var AREAS = [
   /* The circle is the LPGA 66% circle for that carry, read off the club-matched
      proximity curve. The bullseye is the PGA circle from the same yardage: inside it
      the ball was tour standard for a man playing a shorter club from the same spot. */
-  hour:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
+  plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
     {id:"a", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
     {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Same club, same target. A point for the window, a point for the circle",
@@ -1259,7 +1283,7 @@ var AREAS = [
    already scored under it still open and still chart. Not offered on the home page. */
 { id:1, retired:true, name:"Ball flight control", sub:"Tee shots & approach · earlier format", block:"long",
   targets:"GIR 67 → 73% · driving accuracy 71 → 82% · driving distance 272+ · 150y ± 9 yd · club-head speed + 5 mph · a fade on demand",
-  hour:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, full routine every ball) → 10 min compete",
+  plan:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, full routine every ball) → 10 min compete",
   sets:[
     {id:"a", label:"Approach 125y", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
@@ -1279,7 +1303,7 @@ var AREAS = [
 
 { id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
   targets:"30y → 11 ft · 50y → 17 ft · 70y → 19 ft · 90y → 20 ft · tighter dispersion · low, normal and high on command",
-  hour:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
+  plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
     {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, tgt:"Inside 11 ft scores · the LPGA 66% circle from here", max:5},
     {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
@@ -1300,7 +1324,7 @@ var AREAS = [
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
-  hour:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
+  plan:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
   /* Five balls a page. The old sets said "4 sets of 5" on one card; they are now four
      cards of five, which is how they are actually hit. */
   sets:[
@@ -1324,7 +1348,7 @@ var AREAS = [
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
-  hour:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
+  plan:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
   sets:[
     {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", max:20},
     {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", max:15},
@@ -1769,10 +1793,13 @@ var LS = "lcl.v1";
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function fmtDate(s){ if(!s) return ""; var p=s.split("-"); return p[2]+"/"+p[1]; }
-function mine(){ return state.sessions.filter(function(s){ return s.playerId===state.activePlayer; }); }
+/* Everything that counts — graphs, placings, bests — reads finished sessions only.
+   A session still being played is in the list, but it is not history yet. */
+function mine(){ return state.sessions.filter(function(s){ return s.playerId===state.activePlayer && s.status!=="live"; }); }
+function mineAll(){ return state.sessions.filter(function(s){ return s.playerId===state.activePlayer; }); }
 
 /* ---- local cache ----
-   Everything lives in this browser, so a write that quietly fails loses an hour of
+   Everything lives in this browser, so a write that quietly fails loses a session's
    work. Nothing here swallows an error any more: the app knows whether storage is
    working, says so, and refuses to write an empty history over a full one. */
 var STORE = { ok:null, why:"", at:0, wrote:0, read:false };
@@ -1882,7 +1909,7 @@ function connect(){
       }
       // push anything the cloud does not have yet
       var remoteIds={}; remote.forEach(function(r){ remoteIds[r.id]=true; });
-      local.forEach(function(s){ if(!remoteIds[s.id]) pushDoc(s); });
+      local.forEach(function(s){ if(!remoteIds[s.id] && s.status!=="live") pushDoc(s); });
       saveLocal(); render();
       setStatus("Saved to this artifact. Open it on your phone and the same history is there.");
     }).catch(function(){ setStatus("Working offline in this browser. History is kept on this device."); });
@@ -1901,15 +1928,21 @@ function show(view){
   $("viewBench").hidden = view!=="bench";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
+  $("viewSessions").hidden = view!=="sessions";
   if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
   $("viewGoals").hidden = view!=="goals";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session"||view==="gym")?"true":"false");
   $("tabBench").setAttribute("aria-selected", view==="bench"?"true":"false");
-  $("tabHistory").setAttribute("aria-selected", (view==="history"||view==="past")?"true":"false");
+  $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
+  $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
   $("tabGoals").setAttribute("aria-selected", view==="goals"?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
-  if(view!=="session" && view!=="gym"){ state.deck = null; clearRest(); }
+  if(view!=="session" && view!=="gym"){
+    state.deck = null; clearRest();
+    var fl = $("runFlash");
+    if(fl && !fl.hidden){ clearTimeout(fl.__t); fl.hidden = true; }   // the star does not follow you out
+  }
   updateNav();
   window.scrollTo(0,0);
 }
@@ -2360,70 +2393,127 @@ function stashNotes(){
 }
 
 
-/* ---- keep an unfinished session safe: phone locks, tab dies, signal goes ---- */
-var DRAFT_KEY = "lcl.draft.v1";
+/* ---- an unfinished session is still a session ----
+   The first thing entered — a condition, a ball, a note — puts it in the sessions
+   list, marked live. Every tap after that updates it there, and a timer writes
+   anyway. A phone that locks, a signal that goes or a tab that dies costs nothing:
+   the session is already in the list, waiting to be picked up. */
 var draftTimer = null;
 
+/* Opening an area and walking away is not a session. Nothing is written until
+   something is actually entered. */
+function draftHasContent(d){
+  if(!d) return false;
+  if(d.total || d.compete) return true;
+  if(d.notes && String(d.notes).trim()) return true;
+  function any(o, f){ if(!o) return false; for(var k in o){ if(f(o[k])) return true; } return false; }
+  if(any(d.cond, function(v){ return !!v; })) return true;
+  if(any(d.metrics, function(v){ return v != null; })) return true;
+  if(any(d.slope, function(v){ return !!v; })) return true;
+  if(any(d.shots, function(list){ return (list||[]).some(function(x){ return x && x.z != null; }); })) return true;
+  if(any(d.ex, function(v){ return v && (v.load || v.done); })) return true;
+  return false;
+}
+function liveSessions(){
+  return state.sessions.filter(function(s){ return s.status==="live" && s.playerId===state.activePlayer; })
+    .sort(function(a,b){ return (b.at||0)-(a.at||0); });
+}
+/* live and open in this tab, so she can carry straight on, as against live and
+   left behind, which is the one she has to come back to */
+function isOpen(x){
+  if(!x) return false;
+  return (!!state.draft && state.draft.id===x.id) || (!!state.gymDraft && state.gymDraft.id===x.id);
+}
+function sessAt(id){
+  for(var i=0;i<state.sessions.length;i++){ if(state.sessions[i].id===id) return i; }
+  return -1;
+}
+/* The record in the list and the thing on the screen are one object, so there is
+   nothing to copy back and forth and nothing to fall out of step. */
 function saveDraft(){
-  try{
-    var d = state.draft || state.gymDraft;
-    if(!d){ localStorage.removeItem(DRAFT_KEY); return; }
-    stashNotes();
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      kind: state.draft ? "session" : "gym",
-      idx: state.deck ? state.deck.idx : 0,
-      cardMode: state.cardMode,
-      at: Date.now(),
-      draft: d
-    }));
-  }catch(e){}
+  var d = state.draft || state.gymDraft;
+  if(!d || !draftHasContent(d)) return;
+  stashNotes();
+  d.status = "live";
+  d.at = Date.now();
+  d.pos = state.deck ? state.deck.idx : 0;
+  d.cardMode = state.cardMode;
+  if(state.sampleOn){ state.sessions = state.sessions.filter(function(x){ return !x.sample; }); state.sampleOn = false; }
+  var at = sessAt(d.id);
+  if(at >= 0) state.sessions[at] = d; else state.sessions.push(d);
+  var ok = saveLocal();
+  STORE.draftAt = ok ? d.at : 0;
+  STORE.draftOk = ok;
+  paintTick();
+}
+/* A quiet line that says the session is safe, because the one thing worse than losing a
+   session is not knowing whether it was ever kept. */
+function paintTick(){
+  var el = $("saveTick"); if(!el) return;
+  if(!state.draft && !state.gymDraft){ el.hidden = true; return; }
+  if(STORE.draftOk === false){
+    el.hidden = false; el.className = "savetick bad";
+    el.textContent = "Not being saved on this device";
+    return;
+  }
+  if(!STORE.draftAt){ el.hidden = true; return; }
+  el.hidden = false; el.className = "savetick";
+  el.textContent = "Saved " + whenText(STORE.draftAt);
 }
 function clearDraft(){
-  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
   if(draftTimer){ clearInterval(draftTimer); draftTimer = null; }
 }
-function loadDraft(){
-  try{ return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }catch(e){ return null; }
+function dropSession(x){
+  state.sessions = state.sessions.filter(function(y){ return y.id !== x.id; });
+  if(state.draft && state.draft.id === x.id){ state.draft = null; clearDraft(); }
+  if(state.gymDraft && state.gymDraft.id === x.id){ state.gymDraft = null; clearDraft(); }
+  saveLocal();
+  if(state.db){ try{ state.db.doc("sessions/"+x.id).delete().catch(function(){}); }catch(e){} }
 }
+function loadDraft(){ return liveSessions()[0] || null; }
 function watchDraft(){
   if(draftTimer) clearInterval(draftTimer);
   draftTimer = setInterval(saveDraft, 15000);
 }
-function draftLabel(o){
-  if(!o || !o.draft) return "";
-  if(o.kind === "gym"){
-    var g = gym(o.draft.gymId);
+function draftLabel(d){
+  if(!d) return "";
+  if(d.kind === "gym"){
+    var g = gym(d.gymId);
     return g.name + (g.extra ? "" : " \u00b7 " + g.lift);
   }
-  var a = area(o.draft.areaId);
+  var a = area(d.areaId);
   return a ? a.name : "Practice";
 }
-function draftProgress(o){
-  if(!o || !o.draft) return "";
-  var d = o.draft;
-  if(o.kind === "gym") return (d.total||0) + " of " + (d.max||0) + " sets done";
+function draftProgress(d){
+  if(!d) return "";
+  if(d.kind === "gym") return (d.total||0) + " of " + (d.max||0) + " sets done";
   return (d.total||0) + " of " + (d.max||0) + " points scored";
 }
 function renderResume(){
   var bar = $("resumeBar"); if(!bar) return;
-  var o = loadDraft();
-  if(!o || !o.draft || o.draft.playerId !== state.activePlayer){ bar.hidden = true; return; }
-  var when = o.draft.date === today() ? "today" : "on " + fmtDate(o.draft.date);
+  if(state.view === "session" || state.view === "gym"){ bar.hidden = true; return; }
+  var d = liveSessions()[0];
+  if(!d){ bar.hidden = true; return; }
+  var when = d.date === today() ? "today" : "on " + fmtDate(d.date);
   $("resumeText").textContent =
-    "Unfinished " + draftLabel(o) + " session from " + when + ", " + draftProgress(o) + ".";
+    "Unfinished " + draftLabel(d) + " session from " + when + ", " + draftProgress(d) + ".";
   bar.hidden = false;
 }
-function resumeDraft(){
-  var o = loadDraft();
-  if(!o || !o.draft) return;
-  if(typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
-  if(o.kind === "gym") openGym(o.draft.gymId, o.draft);
-  else openSession(o.draft.areaId, o.draft);
-  if(o.idx && state.deck) deckShow(o.idx);
+function resumeDraft(d){
+  if(!d || !d.id) d = liveSessions()[0];
+  if(!d) return;
+  if(typeof d.cardMode === "boolean") state.cardMode = d.cardMode;
+  if(d.kind === "gym") openGym(d.gymId, d);
+  else openSession(d.areaId, d);
+  if(d.pos && state.deck) deckShow(d.pos);
 }
 
 /* ---------- practice session ---------- */
+/* Starting a second session does not touch the first: it stays in the list,
+   unfinished, until she picks it up again or deletes it. */
 function openSession(areaId, resume){
+  if(!resume) resume = liveSessions().filter(function(x){
+    return x.kind === "practice" && x.areaId === areaId; })[0] || null;
   var a = area(areaId);
   if(resume){
     state.draft = resume;
@@ -2434,12 +2524,15 @@ function openSession(areaId, resume){
   }
   state.gymDraft = null;
   state.runShown = 0;
+  if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
   watchDraft();
+  paintTick();
   $("sessArea").textContent = a.retired ? "Earlier format" : "Area "+areaNo(a);
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
   renderSession();
   show("session");
+  return true;
 }
 function renderSession(){
   var a = area(state.draft.areaId);
@@ -2454,7 +2547,7 @@ function renderSession(){
 function sessionIntro(){
   var d = document.createElement("div");
   d.innerHTML = '<div id="sessTargetBox"></div><div id="sessChecks"></div>'+
-                '<p class="hourline" id="sessHour"></p>';
+                '<p class="planline" id="sessHour"></p>';
   return d;
 }
 function condPage(){
@@ -2470,7 +2563,7 @@ function condPage(){
 function fillIntro(a){
   renderTargets("sessTargetBox", a.id);
   renderChecks("sessChecks", a.id);
-  $("sessHour").textContent = a.hour;
+  $("sessHour").textContent = a.plan;
   renderCond("sessCond", state.draft, condKind(a.id, "practice"));
 }
 
@@ -2597,7 +2690,7 @@ function monitorNote(){
 }
 
 /* ---------- runs ----------
-   Every captured ball in the hour, in the order she hit them, as a pass or a miss.
+   Every captured ball in the session, in the order she hit them, as a pass or a miss.
    The run carries across sets: changing club and walking to the next target is part
    of it. Recomputed from scratch whenever anything changes, so correcting a ball
    three sets back fixes the run rather than leaving a phantom streak. */
@@ -2926,7 +3019,7 @@ function placingBlock(a, sess){
     var gap = r.best - want;
     if(Math.abs(gap) >= 1.5){
       resid = '<p class="plnote">A run of '+r.best+' against '+want.toFixed(1)+' expected from '+t.in_+
-        ' in the target, so ' + (gap > 0 ? 'the good ones came in clusters' : 'they came scattered through the hour') +
+        ' in the target, so ' + (gap > 0 ? 'the good ones came in clusters' : 'they came scattered through the session') +
         ' (' + (gap > 0 ? '+' : '') + gap.toFixed(1) + ').</p>';
     }
   }
@@ -4327,6 +4420,8 @@ function gymDue(){
 }
 function openGym(id, resume){
   var gid = resume ? resume.gymId : (id || gymDue());
+  if(!resume) resume = liveSessions().filter(function(x){
+    return x.kind === "gym" && x.gymId === gid; })[0] || null;
   var g = gym(gid);
   if(resume){
     state.gymDraft = resume;
@@ -4341,6 +4436,7 @@ function openGym(id, resume){
     }); });
   }
   state.draft = null;
+  if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
   watchDraft();
   $("gymName").textContent = g.name + " · " + g.lift;
   $("gymDate").value = state.gymDraft.date;
@@ -4378,7 +4474,7 @@ function gymIntro(){
     '<li>The compound runs 4 sets of 4–6; support runs 2 sets of 8–10; throws and jumps are 4 × 3 done fast; trunk is 2 sets, taken inside the support rest periods.</li>'+
     '<li>When every set reaches the top of its range, add a little load: enough that sets 3 and 4 are a fight.</li>'+
     '<li>Nothing else changes. Same warm-up, same exercises, all year. Miss your reps two sessions running on the same lift? Drop 10% and build back.</li></ol></div>' +
-    '<p class="hourline">Power first while fresh, then the compound, then support with the trunk work in its rest periods. Three times a week, inside the hour.</p>' +
+    '<p class="planline">Power first while fresh, then the compound, then support with the trunk work in its rest periods. Three times a week, inside an hour.</p>' +
     '<details class="prepbox" id="prepBox" open><summary>Movement prep <span>every session · 8–10 min</span></summary>'+
     '<p class="note" style="margin:8px 0 0">Work down the left column, then the right. Pogo hops come last on purpose: they bridge mobility and jumping. Cold gym or an early start? Double the bike and do a third set of pogos.</p>'+
     '<div id="prepList"></div></details>'+
@@ -4741,7 +4837,7 @@ function saveCurrent(){
   var s;
   if(state.view==="session"){
     s = state.draft;
-    // an empty session is almost always a mis-tap on save, not a real hour
+    // an empty session is almost always a mis-tap on save, not a real session
     var anyMetric = false;
     if(s.metrics){ for(var mk in s.metrics){ if(s.metrics[mk] != null) anyMetric = true; } }
     if(!s.total && !s.compete && !anyMetric && !$("sessNotes").value.trim()){
@@ -4757,19 +4853,28 @@ function saveCurrent(){
   } else return;
 
   if(state.sampleOn){ state.sessions = state.sessions.filter(function(x){ return !x.sample; }); state.sampleOn=false; }
+  /* it is already in the list, live: finishing it marks it done rather than adding
+     a second copy */
+  var at = sessAt(s.id);
+  s.status = "done";
+  delete s.pos; delete s.cardMode; delete s.at;
   var saved = JSON.parse(JSON.stringify(s));
-  state.sessions.push(saved);
+  if(at >= 0) state.sessions[at] = saved; else { state.sessions.push(saved); at = state.sessions.length-1; }
   var ok = saveLocal();
   pushDoc(s);
   if(!ok){
-    // the hour is still in memory, so say so before anything is cleared
+    // the session is still in memory, so say so before anything is cleared
+    s.status = "live"; state.sessions[at] = s;
     alert("This session could NOT be saved on this device.\n\n" + STORE.why +
           "\n\nIt is still on the screen. Use Back up my data in History, or write the scores down, before you close the page.");
     renderStoreLine();
     return;
   }
   clearDraft();
-  if(s.kind==="gym") state.gymDraft = null;
+  // the session is over: let go of it, or the run bar and the star can fire again on it
+  if(s.kind==="gym") state.gymDraft = null; else state.draft = null;
+  var fl = $("runFlash");
+  if(fl && !fl.hidden){ clearTimeout(fl.__t); fl.hidden = true; }
   state.praise = (s.kind === "practice") ? sessionPraise(saved) : null;
   state.homePage = 0;
   render();
@@ -5039,14 +5144,17 @@ function whenText(ms){
    saved at all. */
 function renderStoreLine(){
   var host = $("storeLine"); if(!host) return;
-  var live = state.sessions.filter(function(s){ return !s.sample; });
-  var mineN = live.filter(function(s){ return s.playerId===state.activePlayer; }).length;
-  var others = live.length - mineN;
+  var kept = state.sessions.filter(function(s){ return !s.sample; });
+  var ours = kept.filter(function(s){ return s.playerId===state.activePlayer; });
+  var mineN = ours.filter(function(s){ return s.status!=="live"; }).length;
+  var part = ours.length - mineN;
+  var others = kept.length - ours.length;
   var warn = STORE.ok === false;
   host.innerHTML = '<div class="storebox'+(warn ? " bad" : "")+'">'+
     (warn ? '<b>Not saving on this device.</b> ' + STORE.why +
             ' Back up what is here before you close the page.'
           : '<b>'+mineN+' '+(mineN===1?"session":"sessions")+'</b> saved on this device'+
+            (part ? ' \u00b7 '+part+' unfinished' : '')+
             (others ? ' \u00b7 '+others+' under another name' : '')+
             (STORE.at ? ' \u00b7 last written '+whenText(STORE.at) : ''))+
     '</div>'+
@@ -5088,8 +5196,7 @@ function restoreData(){
   setStatus(added + " " + (added===1?"session":"sessions") + " restored.");
 }
 
-function renderHistory(){
-  renderStoreLine();
+function renderProgress(){
   renderBalance();
   renderConditions();
   var host = $("charts"); host.innerHTML="";
@@ -5135,37 +5242,80 @@ function renderHistory(){
     host.appendChild(card);
   });
 
-  if(!any) host.innerHTML = '<div class="empty">No sessions saved yet. Run an hour and score it.</div>';
+  if(!any) host.innerHTML = '<div class="empty">No sessions saved yet. Run a session and score it.</div>';
 
+}
+
+/* The sessions list is its own tab now: what she did, when, how it went, and a way
+   in to any of it. */
+function sessionMeta(sess){
+  if(sess.kind === "gym") return "";
+  var a = area(sess.areaId), bits = [];
+  if(!a) return "";
+  if(sess.bestRun) bits.push("run " + sess.bestRun);
+  if(a.placing){
+    var t = testSplit(a, sess);
+    if(t.n >= a.placing.n) bits.push(ordinalPlace(tablesFor(a.placing).count[Math.min(a.placing.n, t.in_)]) + " of 100");
+  }
+  if(sess.compete) bits.push("compete " + sess.compete);
+  return bits.join(" \u00b7 ");
+}
+/* Every session she has started, finished or not, in one list. The status says
+   which is which, and an unfinished one can be picked up where it stopped. */
+function sessStatus(x){
+  if(x.status !== "live") return { key:"done", word:"Complete" };
+  if(isOpen(x)) return { key:"now", word:"In progress" };
+  return { key:"part", word:"Incomplete" };
+}
+function sessLabel(x){
+  return isSpeed(x) ? "Speed sticks"
+       : isBand(x) ? "Band session"
+       : isPrep(x) ? "Movement prep"
+       : x.kind==="gym" ? "S&C \u00b7 "+gym(x.gymId).name+" \u00b7 "+gym(x.gymId).lift
+       : areaTitle(area(x.areaId));
+}
+function renderSessions(){
+  renderStoreLine();
   var list = $("histList"); list.innerHTML="";
-  var all = mine().filter(function(s){ return s.kind!=="round"; }).slice().sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:0; });
+  var all = mineAll().filter(function(x){ return x.kind!=="round"; }).slice().sort(function(a,b){
+    if(a.status==="live" && b.status!=="live") return -1;
+    if(b.status==="live" && a.status!=="live") return 1;
+    return a.date<b.date?1:a.date>b.date?-1:0;
+  });
   if(!all.length){ list.innerHTML = '<div class="empty">Nothing logged.</div>'; return; }
   var wrapEl = document.createElement("div"); wrapEl.className="hlist";
-  all.forEach(function(s){
-    var label = isSpeed(s) ? "Speed sticks"
-              : isBand(s) ? "Band session"
-              : isPrep(s) ? "Movement prep"
-              : s.kind==="gym" ? "S&C · "+gym(s.gymId).name+" · "+gym(s.gymId).lift
-              : areaTitle(area(s.areaId));
-    var row = document.createElement("div"); row.className="hrow";
+  all.forEach(function(x){
+    var label = sessLabel(x), st = sessStatus(x), open = st.key !== "done";
+    var row = document.createElement("div");
+    row.className = "hrow" + (open ? " live" : "");
     row.setAttribute("role","button"); row.setAttribute("tabindex","0");
-    row.setAttribute("aria-label","Open the "+label+" session from "+fmtDate(s.date));
+    row.setAttribute("aria-label",(open ? "Carry on with the " : "Open the ")+label+" session from "+fmtDate(x.date));
+    function go(){ if(open) resumeDraft(x); else openPast(x); }
     row.addEventListener("keydown", function(ev){
-      if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); openPast(s); }
+      if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); go(); }
     });
-    row.innerHTML = '<span class="d">'+fmtDate(s.date)+'</span>'+
+    var meta = open ? draftProgress(x) + (x.at ? " \u00b7 saved " + whenText(x.at) : "") : sessionMeta(x);
+    var note = x.notes ? x.notes.replace(/</g,"&lt;") : "";
+    row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
-      '<span class="s">'+(s.kind==="gym" ? s.total+"/"+s.max+" sets"
-                        : s.total+"/"+s.max)+'</span>'+
-      '<button class="x" title="Delete" aria-label="Delete session">×</button>'+
-      (s.notes ? '<span class="nt">'+s.notes.replace(/</g,"&lt;")+'</span>' : '');
-    row.addEventListener("click", function(){ openPast(s); });
+      '<span class="s">'+(x.kind==="gym" ? x.total+"/"+x.max+" sets" : x.total+"/"+x.max)+'</span>'+
+      '<button class="x" title="Delete" aria-label="Delete session">\u00d7</button>'+
+      '<span class="nt"><span class="pill '+st.key+'">'+st.word+'</span>'+
+        (meta ? '<b>'+meta+'</b>' : "")+(meta && note ? " \u00b7 " : "")+note+'</span>'+
+      (st.key === "part" ? '<span class="openacts"><button type="button" class="pri" data-go="on">Resume</button></span>' : "");
+    row.addEventListener("click", function(){ go(); });
+    var on = row.querySelector('[data-go="on"]');
+    if(on) on.addEventListener("click", function(ev){ ev.stopPropagation(); resumeDraft(x); });
     row.querySelector(".x").addEventListener("click", function(ev){
       ev.stopPropagation();
-      state.sessions = state.sessions.filter(function(x){ return x.id!==s.id; });
-      saveLocal();
-      if(state.db){ try{ state.db.doc("sessions/"+s.id).delete().catch(function(){}); }catch(e){} }
+      var q = open
+        ? "Delete the unfinished " + label + " session from " + fmtDate(x.date) + "?\n\nWhat is scored in it is lost."
+        : "Delete the " + label + " session from " + fmtDate(x.date) + "?\n\nThis cannot be undone.";
+      if(!confirm(q)) return;
+      dropSession(x);
       render();
+      if(state.view !== "sessions") show("sessions");
+      else renderSessions();
     });
     wrapEl.appendChild(row);
   });
@@ -5174,7 +5324,8 @@ function renderHistory(){
 
 function render(){
   renderHome();
-  if(state.view==="history") renderHistory();
+  if(state.view==="history") renderProgress();
+  if(state.view==="sessions") renderSessions();
 }
 
 
@@ -5430,7 +5581,8 @@ $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show(
 $("homeNext").addEventListener("click", function(){ homePage(1); });
 $("homeBack").addEventListener("click", function(){ homePage(0); });
 $("tabBench").addEventListener("click", function(){ renderBench(); show("bench"); });
-$("tabHistory").addEventListener("click", function(){ renderHistory(); show("history"); });
+$("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
+$("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
 $("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
 $("sessionBack").addEventListener("click", function(){ show("home"); });
 $("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx-1); });
@@ -5482,10 +5634,13 @@ $("coachFile").addEventListener("change", function(){
   fr.readAsText(f);
   this.value = "";
 });
-$("pastBack").addEventListener("click", function(){ renderHistory(); show("history"); });
-$("resumeGo").addEventListener("click", resumeDraft);
+$("pastBack").addEventListener("click", function(){ renderSessions(); show("sessions"); });
+$("resumeGo").addEventListener("click", function(){ resumeDraft(); });
 $("resumeDrop").addEventListener("click", function(){
-  clearDraft(); state.draft = null; state.gymDraft = null; renderResume();
+  var d = liveSessions()[0];
+  if(!d) { renderResume(); return; }
+  if(!confirm("Delete the unfinished " + draftLabel(d) + " session?\n\nWhat is scored in it is lost.")) return;
+  dropSession(d); render(); renderResume();
 });
 window.addEventListener("pagehide", saveDraft);
 window.addEventListener("beforeunload", saveDraft);
@@ -5559,7 +5714,7 @@ function renderCoach(){
       (stale && all.length ? '<p class="cnote"><em>Worth a look</em>Nothing scored in the last ten days.</p>' : '')+
       (p.checks ? '<p class="cnote"><em>Their check list</em>'+String(p.checks).replace(/</g,"&lt;")+'</p>' : '')+
       '<div class="acts">'+
-        '<button type="button" data-go="history">History</button>'+
+        '<button type="button" data-go="sessions">Sessions</button>'+
         '<button type="button" data-go="bench">Benchmarks</button>'+
         '<button type="button" data-go="home">Practice</button>'+
       '</div>';
@@ -5569,7 +5724,7 @@ function renderCoach(){
         state.activePlayer = p.id;
         saveLocal(); renderPlayer(); render();
         var to = b.getAttribute("data-go");
-        if(to === "history"){ renderHistory(); show("history"); }
+        if(to === "sessions"){ renderSessions(); show("sessions"); }
         else if(to === "bench"){ renderBench(); show("bench"); }
         else show("home");
       });
