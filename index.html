@@ -178,9 +178,10 @@
   .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
   .stepper .max{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--muted)}
 
-  .set.metric{background:var(--surface-2); grid-template-columns:1fr auto}
-  .set.metric .lbl{font-size:13px; color:var(--ink-2)}
-  .mfields{display:flex; gap:12px; flex-wrap:wrap}
+  .set.metric{background:var(--surface-2); display:block}
+  .set.metric .lbl{font-size:14px; color:var(--ink)}
+  .mwas{margin-top:4px; font-size:12.5px; color:var(--muted)}
+  .mfields{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
   .mfield{display:flex; flex-direction:column; gap:3px}
   .mfield > span{font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600; text-align:center}
   .mspin{display:flex; align-items:center; gap:4px}
@@ -190,6 +191,7 @@
     display:flex; align-items:center; justify-content:center; flex:none;
   }
   .mspin button:active{background:var(--accent-wash)}
+  .mspin input::placeholder{color:var(--muted); font-size:13px; letter-spacing:0}
   .mfield input{
     font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
     font-size:17px; font-weight:600; width:62px; height:40px; text-align:center; color:var(--ink);
@@ -659,8 +661,8 @@
   .wcell{fill:var(--surface); stroke:var(--ink-2); stroke-width:1.6; cursor:pointer}
   .wc:hover .wcell{fill:var(--accent-wash)}
   .wc:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
-  .wc.called .wcell{stroke:var(--accent-fill); stroke-width:3}
-  .wc.on .wcell{fill:var(--accent-wash); stroke:var(--accent-fill); stroke-width:3}
+  .wc.called .wcell{fill:#f6e27a; stroke:#c9a227; stroke-width:2.4}
+  .wc.on .wcell{stroke:var(--ink); stroke-width:3.2}
   .wnum{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:21px;
     font-weight:600; text-anchor:middle; pointer-events:none}
   .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
@@ -671,8 +673,10 @@
   .mk text{fill:#f6f9f4; font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:13px; font-weight:600; text-anchor:middle}
   .corr .mk text{font-size:12px}
-  .mk.hit circle{fill:var(--accent)}
+  .mk.hit circle{fill:#d39b1f}
+  .mk.hit text{fill:#221a06}
   .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
+  .mk.hit.now circle{stroke:#221a06; stroke-width:3}
 
   .balls{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
@@ -690,6 +694,22 @@
   @media (max-width:520px){ .pastrose{grid-template-columns:1fr} }
   .pastrose .rz, .pastrose .wcell{cursor:default}
 
+
+  /* ---- three-bullet targets and checks ---- */
+  .projname{font-family:Archivo, sans-serif; font-size:16px; font-weight:600; color:var(--accent);
+    margin:0 0 7px}
+  .blist{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px}
+  .blist li{font-size:14px; line-height:1.45; color:var(--ink-2)}
+  .blist li em{color:var(--muted); font-style:normal}
+  .bedit{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:center; margin-bottom:7px}
+  .bedit span{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; color:var(--muted)}
+  .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:7px;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    font-family:Archivo, sans-serif; font-size:14px}
+  .carryask{margin:0 0 9px; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
+  .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:9px;
+    padding:10px 12px; margin-bottom:12px; font-size:13px; line-height:1.45; color:var(--ink-2)}
+  .banner.monitor b{color:var(--ink)}
 
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
@@ -1570,7 +1590,7 @@ function makeSample(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1906,42 +1926,61 @@ function renderSession(){
   if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
   updateTotal();
 }
+
 function sessionIntro(){
   var d = document.createElement("div");
   d.innerHTML = '<div id="sessTargetBox"></div><div id="sessChecks"></div>'+
-                '<p class="hourline" id="sessHour"></p><div id="sessCond"></div>';
+                '<p class="hourline" id="sessHour"></p>';
   return d;
 }
+function condPage(){
+  var d = document.createElement("div");
+  d.innerHTML = '<div id="sessCond"></div>'+
+                '<p class="note">Logged once at the start. You will not be asked again.</p>';
+  return d;
+}
+
+
 function fillIntro(a){
   renderTargets("sessTargetBox", a.id);
   renderChecks("sessChecks");
   $("sessHour").textContent = a.hour;
   renderCond("sessCond", state.draft, condKind(a.id, "practice"));
 }
+
 function notesBlock(id, label){
   var d = document.createElement("div"); d.className="notes"; d.style.marginTop="0";
   d.innerHTML = '<label class="eyebrow" for="'+id+'">'+label+'</label>'+
                 '<textarea id="'+id+'" placeholder="One line is enough."></textarea>';
   return d;
 }
+
 function buildSessionCards(a, last){
   var host = $("sessCards"); host.innerHTML = "";
   var cards = [], n = a.sets.length;
 
   cards.push(pcard('Before you start<b>'+a.name+'</b>', sessionIntro()));
+  cards.push(pcard('Conditions<b>'+a.name+'</b>', condPage()));
 
   a.sets.forEach(function(s, i){
     var body = document.createElement("div");
     var tracked = trackKind(a, s);
+    if(s.metrics) body.appendChild(monitorNote());
     body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, null));
-    if(s.metrics) body.appendChild(metricRow(s, last));
     if(s.guide && GUIDES[s.guide] && !tracked){
       var w = document.createElement("div"); w.className="dgwrap";
       w.innerHTML = GUIDES[s.guide].svg;
       body.appendChild(w);
     }
-    var grp = s.group ? s.group.split("·")[0].trim() : "";
-    cards.push(pcard('Set '+(i+1)+' of '+n+(grp?' · '+grp:'')+'<b>'+a.name+'</b>', body));
+    var grp = s.group ? s.group.split("\u00b7")[0].trim() : "";
+    cards.push(pcard('Set '+(i+1)+' of '+n+(grp?' \u00b7 '+grp:'')+'<b>'+a.name+'</b>', body));
+
+    // a reading taken off that set, not a set of its own: give it its own page
+    if(s.metrics){
+      var mb = document.createElement("div");
+      mb.appendChild(metricRow(s, last));
+      cards.push(pcard('After '+s.label+'<b>'+a.name+'</b>', mb));
+    }
   });
 
   var cb = document.createElement("div");
@@ -1949,7 +1988,11 @@ function buildSessionCards(a, last){
   cb.appendChild(winRow());
   cards.push(pcard(a.compete.label, cb));
 
-  cards.push(pcard('Session notes', notesBlock("sessNotes", "What worked · one thing to fix")));
+  var nb = document.createElement("div");
+  nb.appendChild(notesBlock("sessNotes", "What worked \u00b7 one thing to fix"));
+  var cw = document.createElement("div"); cw.id = "sessChecksEnd"; cw.style.marginTop = "16px";
+  nb.appendChild(cw);
+  cards.push(pcard('Session notes', nb));
 
   var rv = document.createElement("div");
   var rvc = pcard('Review and save<b>'+a.name+'</b>', rv);
@@ -1958,8 +2001,15 @@ function buildSessionCards(a, last){
 
   cards.forEach(function(c){ host.appendChild(c); });
   fillIntro(a);
+  renderChecks("sessChecksEnd", {prompt:"Any swing checks to carry into the next session? Edit them here and they come with you."});
   deckInit(cards, "sessProg");
 }
+function monitorNote(){
+  var d = document.createElement("div"); d.className="banner monitor";
+  d.innerHTML = '<b>Monitor on before ball one.</b> The speed is measured across these ten, so it has to be running now, not after.';
+  return d;
+}
+
 function renderReview(host, a){
   var d = state.draft, rows = "";
   a.sets.forEach(function(s, i){
@@ -1977,9 +2027,11 @@ function renderReview(host, a){
     el.addEventListener("click", function(){ deckShow(+el.getAttribute("data-go")); });
   });
 }
+
 function buildSessionList(a, last){
   var host = $("sessCards"); host.innerHTML = "";
   host.appendChild(sessionIntro());
+  host.appendChild(condPage());
   var current=null, wrap=null;
   a.sets.forEach(function(s){
     if(s.group || !wrap){
@@ -1988,6 +2040,7 @@ function buildSessionList(a, last){
       wrap = document.createElement("div"); wrap.className="sets";
       current.appendChild(wrap); host.appendChild(current);
     }
+    if(s.metrics) wrap.appendChild(monitorNote());
     wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, s.guide));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
@@ -1997,10 +2050,13 @@ function buildSessionList(a, last){
   cw.appendChild(scoreRow("Points", a.compete.tgt, [{key:"__compete", label:null, max:a.compete.max, min:a.compete.min}], null));
   cw.appendChild(winRow());
   cg.appendChild(cw); host.appendChild(cg);
-  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes \u2014 what worked \u00b7 one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
+  var ce = document.createElement("div"); ce.id = "sessChecksEnd"; ce.style.marginTop = "16px";
+  host.appendChild(ce);
   fillIntro(a);
+  renderChecks("sessChecksEnd", {prompt:"Any swing checks to carry into the next session? Edit them here and they come with you."});
   state.deck = null;
   $("sessProg").innerHTML = "";
   updateNav();
@@ -2354,7 +2410,7 @@ function shotRow(a, s, last){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n);
-      out += '<g class="mk'+(i===cur?" now":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
+      out += '<g class="mk'+(x.z==="c"?" hit":"")+(i===cur?" now":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     rose.querySelector(".marks").innerHTML = out;
@@ -2463,10 +2519,9 @@ function metricRow(s, last){
   var row = document.createElement("div"); row.className="set metric";
   var lm = last && last.metrics ? last.metrics : null;
   var was = lm && (lm[s.metrics[0].id] || lm[s.metrics[1].id])
-    ? '<br><b style="color:var(--ink-2)">Last session: fastest ' + (lm[s.metrics[0].id]||"–") + " mph, slowest " + (lm[s.metrics[1].id]||"–") + " mph</b>" : "";
-  row.innerHTML = '<div><div class="lbl">'+s.metricLabel+'</div><div class="tgt">'+s.metricNote+was+
-    '<br>Type the figure straight in if the monitor gives it to you, to one decimal: 87.8, not 87 or 88. The buttons move a whole mph at a time, and pick up from last session when there is one, otherwise + starts at 80 and − at 105.</div></div>';
-  var START_LO = 80, START_HI = 105, MIN = 40, MAX = 140, STEP = 1;
+    ? '<div class="mwas">Last session: fastest ' + (lm[s.metrics[0].id]||"\u2013") + " mph, slowest " + (lm[s.metrics[1].id]||"\u2013") + " mph</div>" : "";
+  row.innerHTML = '<div class="lbl">'+s.metricLabel+infoChip("speed")+'</div>'+was;
+  var MIN = 40, MAX = 140, STEP = 0.1, START = 90;
   function round1(v){ return Math.round(v*10)/10; }
   var fields = document.createElement("div"); fields.className="mfields";
   s.metrics.forEach(function(m){
@@ -2474,17 +2529,17 @@ function metricRow(s, last){
     var lab = document.createElement("span"); lab.textContent = m.label;
     var spin = document.createElement("div"); spin.className="mspin";
 
-    var minus = document.createElement("button"); minus.type="button"; minus.textContent="−";
-    minus.setAttribute("aria-label","Lower "+m.label+" club head speed");
+    var minus = document.createElement("button"); minus.type="button"; minus.textContent="\u2212";
+    minus.setAttribute("aria-label","Lower "+m.label+" club head speed by a tenth");
     var inp = document.createElement("input");
     inp.type="number"; inp.min=String(MIN); inp.max=String(MAX); inp.step="0.1"; inp.inputMode="decimal";
-    inp.placeholder="—"; inp.id="m_"+m.id; inp.setAttribute("aria-label", s.metricLabel+" club head speed in mph");
+    inp.placeholder="mph"; inp.id="m_"+m.id; inp.setAttribute("aria-label", s.metricLabel+" club head speed in mph");
     if(state.draft.metrics && state.draft.metrics[m.id]!=null) inp.value = String(state.draft.metrics[m.id]);
     var plus = document.createElement("button"); plus.type="button"; plus.textContent="+";
-    plus.setAttribute("aria-label","Raise "+m.label+" club head speed");
+    plus.setAttribute("aria-label","Raise "+m.label+" club head speed by a tenth");
 
     function commit(v){
-      if(v==null || isNaN(v)){ inp.value=""; state.draft.metrics[m.id]=null; return; }
+      if(v==null || isNaN(v)){ inp.value=""; state.draft.metrics[m.id]=null; saveDraft(); return; }
       v = round1(Math.max(MIN, Math.min(MAX, v)));
       inp.value = String(v);
       state.draft.metrics[m.id] = v;
@@ -2492,11 +2547,7 @@ function metricRow(s, last){
     }
     function nudge(dir){
       var cur = parseFloat(inp.value);
-      if(isNaN(cur)){
-        var seed = (lm && lm[m.id]) ? lm[m.id] : (dir>0 ? START_LO : START_HI);
-        commit(seed + (lm && lm[m.id] ? dir*STEP : 0));
-        return;
-      }
+      if(isNaN(cur)){ commit((lm && lm[m.id]) ? lm[m.id] : START); return; }
       commit(cur + dir*STEP);
     }
     minus.addEventListener("click", function(){ nudge(-1); });
@@ -2548,61 +2599,67 @@ function renderCourseRules(hostId){
       '<ul class="rulelist">'+g[1].map(function(r){ return "<li>"+r+"</li>"; }).join("")+'</ul></div>';
   }).join("");
 }
+/* Targets and swing checks are three bullets. Anything stored as the old single
+   string is split on the middle dot so nothing already saved is lost. */
+function toBullets(v){
+  var a = Array.isArray(v) ? v.slice(0,3)
+        : String(v||"").split(/\s*\u00b7\s*/).slice(0,3);
+  while(a.length < 3) a.push("");
+  return a.map(function(x){ return (x==null ? "" : String(x).trim()); });
+}
+var DECK_PROJECT = { annabel:"Project Bellasteros", charlotte:"Project Bryson De Chabo" };
 var ROUND_TARGETS = "Doubles \u2264 1 a round \u00b7 pin high on approaches, not short \u00b7 play away from the short side";
 var DECK_TARGETS = {
   charlotte:{
-    10:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed +5 mph",
-    11:"GIR 67 \u2192 73% \u00b7 pin high on approaches, not short",
-    1:"GIR 67 \u2192 73% \u00b7 driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed +5 mph",
-    2:"30y \u2192 7 ft \u00b7 50y \u2192 10 ft \u00b7 70y \u2192 12 ft \u00b7 90y \u2192 13 ft \u00b7 tighter 30\u201390y dispersion",
-    3:"Up and down 50 \u2192 60%+ \u00b7 bunker save 40 \u2192 50%",
-    4:"Under 29 putts a round \u00b7 no more than two three-putts in three rounds \u00b7 6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30% \u00b7 lag 90% inside 3 ft",
-    5:"Pin high on approaches, not short. Hit the flag \u00b7 play away from the short side"
+    10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "Club-head speed +5 mph"],
+    11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
+    2:["30y \u2192 7 ft \u00b7 50y \u2192 10 ft", "70y \u2192 12 ft \u00b7 90y \u2192 13 ft", "Tighter 30\u201390y dispersion"],
+    3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
+    4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
+    5:["Pin high on approaches, not short", "Hit the flag", "Play away from the short side"]
   },
   annabel:{
-    10:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 a fade on demand, every time",
-    11:"GIR 67 \u2192 73% \u00b7 150y \u00b1 9 yd \u00b7 pin high on approaches, not short",
-    1:"GIR 67 \u2192 73% \u00b7 driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 150y \u00b1 9 yd \u00b7 a fade on demand, every time",
-    2:"30y \u2192 7 ft \u00b7 50y \u2192 10 ft \u00b7 70y \u2192 12 ft \u00b7 90y \u2192 13 ft \u00b7 tighter 30\u201390y dispersion",
-    3:"Up and down 50 \u2192 60%+",
-    4:"Under 29 putts a round \u00b7 no more than two three-putts in three rounds \u00b7 6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30% \u00b7 lag 90% inside 3 ft",
-    5:"Doubles \u2264 1 a round \u00b7 play away from the short side"
+    10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "A fade on demand, every time"],
+    11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
+    2:["30y \u2192 7 ft \u00b7 50y \u2192 10 ft", "70y \u2192 12 ft \u00b7 90y \u2192 13 ft", "Tighter 30\u201390y dispersion"],
+    3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
+    4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
+    5:["Doubles \u2264 1 a round", "Think avoid double, not miracle", "Play away from the short side"]
   }
 };
 var DECK_CHECKS = {
-  charlotte:"Rolling inside takeaway \u00b7 flipping through impact \u00b7 always be checking alignment",
-  annabel:"Closed clubface \u00b7 away takeaway and standing up \u00b7 always be checking alignment"
+  charlotte:["Rolling inside takeaway", "Flipping through impact", "Always be checking alignment"],
+  annabel:["Closed clubface", "Away takeaway and standing up", "Always be checking alignment"]
 };
-var DEFAULT_CHECKS = "Always be checking alignment";
+var DEFAULT_CHECKS = ["Always be checking alignment", "", ""];
+
 function checksFor(){
   var p = playerObj();
-  return (p && p.checks) ? p.checks : DEFAULT_CHECKS;
+  return toBullets((p && p.checks) ? p.checks : DEFAULT_CHECKS);
 }
-function renderChecks(hostId){
+
+
+function renderChecks(hostId, opts){
   var host = $(hostId); if(!host) return;
-  var box = document.createElement("div"); box.className="targets";
-  var hd = document.createElement("div"); hd.className="thd";
-  hd.innerHTML = '<span class="eyebrow">Swing checks \u00b7 '+ (playerObj() ? playerObj().name : "") +'</span>';
-  var edit = document.createElement("button"); edit.type="button"; edit.className="edit"; edit.textContent="Edit";
-  hd.appendChild(edit); box.appendChild(hd);
-  var body = document.createElement("div"); body.textContent = checksFor();
-  box.appendChild(body);
-  edit.addEventListener("click", function(){
-    var ta = document.createElement("textarea"); ta.value = checksFor();
-    ta.setAttribute("aria-label","Swing checks");
-    var row = document.createElement("div"); row.className="trow";
-    var save = document.createElement("button"); save.type="button"; save.className="pri"; save.textContent="Save";
-    var cancel = document.createElement("button"); cancel.type="button"; cancel.textContent="Cancel";
-    row.appendChild(save); row.appendChild(cancel);
-    body.textContent=""; body.appendChild(ta); body.appendChild(row); edit.disabled=true; ta.focus();
-    save.addEventListener("click", function(){
-      var pl = playerObj(); if(pl){ pl.checks = ta.value.trim(); saveLocal(); pushMeta(); }
-      renderChecks(hostId);
-    });
-    cancel.addEventListener("click", function(){ renderChecks(hostId); });
+  opts = opts || {};
+  var box = bulletBox({
+    eyebrow:"Swing checks \u00b7 " + (playerObj() ? playerObj().name : ""),
+    lines: checksFor,
+    onSave: function(v){
+      var pl = playerObj();
+      if(pl){ pl.checks = v; saveLocal(); pushMeta(); }
+      if(state.draft) state.draft.checks = checksFor();
+      if(opts.after) opts.after();
+    }
   });
-  host.innerHTML=""; host.appendChild(box);
+  host.innerHTML = "";
+  if(opts.prompt){
+    var p = document.createElement("p"); p.className="carryask"; p.textContent = opts.prompt;
+    host.appendChild(p);
+  }
+  host.appendChild(box);
 }
+
 function playerObj(){
   var m = state.players.filter(function(x){ return x.id===state.activePlayer; });
   return m[0] || state.players[0];
@@ -2611,11 +2668,19 @@ function defaultTarget(areaId){
   if(areaId===5) return ROUND_TARGETS;
   var a = area(areaId); return a ? a.targets : "";
 }
+
 function targetsFor(areaId){
   var p = playerObj();
-  if(p && p.targets && p.targets[areaId] != null && p.targets[areaId] !== "") return p.targets[areaId];
-  return defaultTarget(areaId);
+  if(p && p.targets && p.targets[areaId] != null && p.targets[areaId] !== "")
+    return toBullets(p.targets[areaId]);
+  return toBullets(defaultTarget(areaId));
 }
+function projectFor(){
+  var p = playerObj();
+  return (p && p.project) ? p.project : "";
+}
+
+
 function seedByName(p){
   if(!p) return false;
   if(p.targets && Object.keys(p.targets).length) return false;
@@ -2624,43 +2689,80 @@ function seedByName(p){
   else if(n.indexOf("annabel")===0) key = "annabel";
   if(!key) return false;
   p.targets = JSON.parse(JSON.stringify(DECK_TARGETS[key]));
-  if(!p.checks) p.checks = DECK_CHECKS[key];
+  if(!p.checks) p.checks = DECK_CHECKS[key].slice();
+  if(!p.project) p.project = DECK_PROJECT[key];
   return true;
 }
-function renderTargets(hostId, areaId){
-  var host = $(hostId); if(!host) return;
-  var box = document.createElement("div"); box.className="targets";
-  if(hostId==="roundTargetBox") box.style.marginTop = "12px";
+
+
+function bulletBox(opts){
+  /* opts: {eyebrow, lead, lines, onSave, onReset, hostId, cls} */
+  var box = document.createElement("div"); box.className = "targets" + (opts.cls ? " "+opts.cls : "");
   var hd = document.createElement("div"); hd.className="thd";
-  hd.innerHTML = '<span class="eyebrow">2026/27 targets \u00b7 '+ (playerObj() ? playerObj().name : "") +'</span>';
+  hd.innerHTML = '<span class="eyebrow">'+opts.eyebrow+'</span>';
   var edit = document.createElement("button"); edit.type="button"; edit.className="edit"; edit.textContent="Edit";
   hd.appendChild(edit); box.appendChild(hd);
-  var body = document.createElement("div"); body.textContent = targetsFor(areaId);
+
+  if(opts.lead){
+    var lead = document.createElement("div"); lead.className="projname"; lead.textContent = opts.lead;
+    box.appendChild(lead);
+  }
+  var body = document.createElement("div");
+  function paint(){
+    body.innerHTML = '<ul class="blist">' + opts.lines().map(function(x){
+      return '<li>' + (x ? String(x).replace(/</g,"&lt;") : '<em>not set</em>') + '</li>';
+    }).join("") + '</ul>';
+  }
+  paint();
   box.appendChild(body);
 
   edit.addEventListener("click", function(){
-    var ta = document.createElement("textarea");
-    ta.value = targetsFor(areaId);
-    ta.setAttribute("aria-label","Targets for this area");
+    var cur = opts.lines(), ins = [];
+    body.innerHTML = "";
+    for(var i=0;i<3;i++){
+      (function(i){
+        var wrap = document.createElement("label"); wrap.className="bedit";
+        wrap.innerHTML = '<span>'+(i+1)+'</span>';
+        var inp = document.createElement("input"); inp.type="text"; inp.value = cur[i] || "";
+        inp.setAttribute("aria-label", opts.eyebrow+", point "+(i+1));
+        wrap.appendChild(inp); body.appendChild(wrap); ins.push(inp);
+      })(i);
+    }
     var row = document.createElement("div"); row.className="trow";
     var save = document.createElement("button"); save.type="button"; save.className="pri"; save.textContent="Save";
     var cancel = document.createElement("button"); cancel.type="button"; cancel.textContent="Cancel";
-    var reset = document.createElement("button"); reset.type="button"; reset.textContent="Reset";
-    row.appendChild(save); row.appendChild(cancel); row.appendChild(reset);
-    body.textContent = ""; body.appendChild(ta); body.appendChild(row);
-    edit.disabled = true; ta.focus();
+    row.appendChild(save); row.appendChild(cancel);
+    if(opts.onReset){
+      var reset = document.createElement("button"); reset.type="button"; reset.textContent="Reset";
+      row.appendChild(reset);
+      reset.addEventListener("click", function(){ opts.onReset(); edit.disabled=false; paint(); });
+    }
+    body.appendChild(row);
+    edit.disabled = true; ins[0].focus();
     save.addEventListener("click", function(){
-      var pl = playerObj();
-      if(pl){ pl.targets = pl.targets || {}; pl.targets[areaId] = ta.value.trim(); saveLocal(); pushMeta(); }
-      renderTargets(hostId, areaId);
+      opts.onSave(ins.map(function(x){ return x.value.trim(); }));
+      edit.disabled=false; paint();
     });
-    cancel.addEventListener("click", function(){ renderTargets(hostId, areaId); });
-    reset.addEventListener("click", function(){
+    cancel.addEventListener("click", function(){ edit.disabled=false; paint(); });
+  });
+  return box;
+}
+function renderTargets(hostId, areaId){
+  var host = $(hostId); if(!host) return;
+  var box = bulletBox({
+    eyebrow:"2026/27 targets \u00b7 " + (playerObj() ? playerObj().name : ""),
+    lead: projectFor(),
+    lines: function(){ return targetsFor(areaId); },
+    onSave: function(v){
+      var pl = playerObj();
+      if(pl){ pl.targets = pl.targets || {}; pl.targets[areaId] = v; saveLocal(); pushMeta(); }
+    },
+    onReset: function(){
       var pl = playerObj();
       if(pl && pl.targets){ delete pl.targets[areaId]; saveLocal(); pushMeta(); }
-      renderTargets(hostId, areaId);
-    });
+    }
   });
+  if(hostId==="roundTargetBox") box.style.marginTop = "12px";
   host.innerHTML = ""; host.appendChild(box);
 }
 
@@ -3146,8 +3248,15 @@ function saveCurrent(){
   var s;
   if(state.view==="session"){
     s = state.draft;
+    // an empty session is almost always a mis-tap on save, not a real hour
+    var anyMetric = false;
+    if(s.metrics){ for(var mk in s.metrics){ if(s.metrics[mk] != null) anyMetric = true; } }
+    if(!s.total && !s.compete && !anyMetric && !$("sessNotes").value.trim()){
+      if(!confirm("Nothing was scored in this session. Save it anyway?")) return;
+    }
     s.date = $("sessDate").value || today();
     s.notes = $("sessNotes").value.trim();
+    s.checks = checksFor();
   } else if(state.view==="gym"){
     s = state.gymDraft;
     s.date = $("gymDate").value || today();
@@ -3516,7 +3625,7 @@ function pastShots(a, set, sess){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n);
-      out += '<g class="mk"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
+      out += '<g class="mk'+(x.z==="c"?" hit":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     return out;
@@ -3682,6 +3791,28 @@ function summary(){
 }
 
 /* ---------- diagram lightbox ---------- */
+function openInfo(title, lines){
+  $("lbTitle").textContent = title;
+  $("lbImg").innerHTML = "";
+  $("lbBody").innerHTML = lines.map(function(x){ return "<li>"+x+"</li>"; }).join("");
+  $("lightbox").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("lbClose").focus();
+}
+var INFO = {
+  speed:{ title:"Club head speed", lines:[
+    "Fastest and slowest of the ten driver balls.",
+    "Type the figure straight in if the monitor gives it to you, to one decimal: 87.8, not 87 or 88.",
+    "The arrows move a tenth at a time and start from last session when there is one.",
+    "Test the driver, never the stick. Stick speed rising while driver speed sits still means she has learned to swing a light object fast."]}
+};
+function infoChip(key){
+  if(!INFO[key]) return "";
+  return '<button type="button" class="vid info" data-info="'+key+'" aria-label="About '+INFO[key].title.toLowerCase()+'">'+
+    '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><circle cx="5" cy="5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.2"/>'+
+    '<path d="M5 4.3 L5 7.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'+
+    '<circle cx="5" cy="2.9" r="0.75" fill="currentColor"/></svg>what this is</button>';
+}
 function openGuide(key){
   var g = GUIDES[key]; if(!g) return;
   $("lbTitle").textContent = g.title;
@@ -3697,7 +3828,9 @@ function closeGuide(){
 }
 document.addEventListener("click", function(e){
   var t = e.target.closest ? e.target.closest(".vid.guide") : null;
-  if(t){ e.preventDefault(); openGuide(t.getAttribute("data-guide")); }
+  if(t){ e.preventDefault(); openGuide(t.getAttribute("data-guide")); return; }
+  var it = e.target.closest ? e.target.closest(".vid.info") : null;
+  if(it){ e.preventDefault(); openInfo(INFO[it.getAttribute("data-info")].title, INFO[it.getAttribute("data-info")].lines); }
 });
 $("lbClose").addEventListener("click", closeGuide);
 $("lightbox").addEventListener("click", function(e){ if(e.target === this) closeGuide(); });
