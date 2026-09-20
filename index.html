@@ -604,6 +604,58 @@
   .pastcond span{background:var(--surface-2); border:1px solid var(--line); border-radius:99px;
     padding:4px 11px; font-size:12px; color:var(--ink-2)}
 
+  /* ---- where the ball went ---- */
+  .shotset{display:block}
+  .shotask{margin:12px 0 10px; font-size:13.5px; color:var(--ink-2); line-height:1.45; min-height:2.6em}
+  .shotask b{color:var(--ink)}
+  .shotdiag{display:grid; grid-template-columns:1fr; gap:12px; justify-items:center}
+  .shotdiag.two{grid-template-columns:1fr 1fr; align-items:start}
+  @media (max-width:520px){ .shotdiag.two{grid-template-columns:1fr} }
+  svg.rose, svg.wgrid{width:100%; max-width:320px; height:auto; touch-action:manipulation}
+  .rz{fill:var(--surface-2); stroke:var(--line); stroke-width:1.5; cursor:pointer}
+  .rz:hover{fill:var(--accent-wash)}
+  .rz:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
+  .rz.on{fill:var(--accent-wash); stroke:var(--accent-fill); stroke-width:2.5}
+  .rc{fill:var(--surface)}
+  .rc.on{fill:var(--accent-wash)}
+  .rzl{fill:var(--muted); font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
+    text-anchor:middle; pointer-events:none}
+  .rcl{fill:var(--ink); font-family:Archivo, sans-serif; font-size:16px; font-weight:600;
+    text-anchor:middle; pointer-events:none}
+  .wframe{fill:none; stroke:var(--line); stroke-width:1.5; stroke-dasharray:5 5}
+  .wcell{fill:var(--surface); stroke:var(--ink-2); stroke-width:1.6; cursor:pointer}
+  .wc:hover .wcell{fill:var(--accent-wash)}
+  .wc:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
+  .wc.called .wcell{stroke:var(--accent-fill); stroke-width:3}
+  .wc.on .wcell{fill:var(--accent-wash); stroke:var(--accent-fill); stroke-width:3}
+  .wnum{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:21px;
+    font-weight:600; text-anchor:middle; pointer-events:none}
+  .wovl{fill:var(--muted); font-family:Archivo, sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:1.1px; text-anchor:middle; pointer-events:none}
+  .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
+  .mk circle{fill:var(--ink); stroke:var(--surface); stroke-width:2}
+  .mk text{fill:var(--surface); font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:13px; font-weight:600; text-anchor:middle}
+  .mk.hit circle{fill:var(--accent)}
+  .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
+  .balls{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px}
+  .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
+    background:var(--surface-2); color:var(--muted); font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:14px; font-weight:600; cursor:pointer; padding:0}
+  .ballchip.done{background:var(--surface); color:var(--ink); border-color:var(--ink-2)}
+  .ballchip.good{background:var(--accent-fill); border-color:var(--accent-fill); color:#1c1405}
+  .ballchip.unseen{border-style:dashed}
+  .ballchip.now{box-shadow:0 0 0 2px var(--accent-fill)}
+  .shottally{display:flex; gap:16px; margin-top:12px; font-size:13px; color:var(--muted)}
+  .shottally b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; color:var(--ink)}
+  .shotacts{display:flex; gap:8px; margin-top:11px}
+  .shotacts button{background:var(--surface-2); border:1px solid var(--line-strong); border-radius:7px;
+    padding:7px 13px; font-family:Archivo, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
+  .shotacts button.ghost{color:var(--muted)}
+  .pastrose{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 4px}
+  @media (max-width:520px){ .pastrose{grid-template-columns:1fr} }
+  .pastrose .rz, .pastrose .wcell{cursor:default}
+
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto}
@@ -863,35 +915,35 @@
 
 /* ============ the programme ============ */
 var AREAS = [
-{ id:10, no:1, name:"Tee shots", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long",
+{ id:10, no:1, name:"Tee shots", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long", track:true,
   targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 35 balls, full routine every ball) → 10 min compete",
   sets:[
-    {id:"a", label:"Driver · 10 balls", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
+    {id:"a", label:"Driver · 10 balls", tc:"Fairway", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
       max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
-    {id:"b", guide:"windows", label:"Driver · five windows", tgt:"Five balls: a point for the window, a point for the 40-yd target",
+    {id:"b", guide:"windows", label:"Driver · five windows", tc:"Fairway", tgt:"Five balls: a point for the window, a point for the 40-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"3-wood", tgt:"35-yd target (17 each side)", max:5},
-    {id:"d", guide:"windows", label:"3-wood · five windows", tgt:"Five balls: a point for the window, a point for the 35-yd target",
+    {id:"c", label:"3-wood", tc:"35 yd", tgt:"35-yd target (17 each side)", max:5},
+    {id:"d", guide:"windows", label:"3-wood · five windows", tc:"35 yd", tgt:"Five balls: a point for the window, a point for the 35-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"5-wood / 2 hybrid", tgt:"30-yd target (15 each side)", max:5},
-    {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tgt:"Five balls: a point for the window, a point for the 30-yd target",
+    {id:"e", label:"5-wood / 2 hybrid", tc:"30 yd", tgt:"30-yd target (15 each side)", max:5},
+    {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tc:"30 yd", tgt:"Five balls: a point for the window, a point for the 30-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
   compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:11, no:2, name:"Approach play", sub:"125, 150 and 175 yards · into greens", block:"long",
+{ id:11, no:2, name:"Approach play", sub:"125, 150 and 175 yards · into greens", block:"long", track:true,
   targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
   sets:[
-    {id:"a", label:"Approach 125y", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
+    {id:"a", label:"Approach 125y", tc:"15 ft", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"b", guide:"windows", label:"Five windows · 125y", tc:"15 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"Approach 150y", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"d", guide:"windows", label:"Five windows · 150y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
+    {id:"c", label:"Approach 150y", tc:"20 ft", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"d", guide:"windows", label:"Five windows · 150y", tc:"20 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"Approach 175y", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"f", guide:"windows", label:"Five windows · 175y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
+    {id:"e", label:"Approach 175y", tc:"24 ft", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
   compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
@@ -1464,7 +1516,7 @@ function makeSample(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1780,7 +1832,7 @@ function openSession(areaId, resume){
     state.draft = resume;
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
-                    date:today(), scores:{}, metrics:{}, cond:{}, compete:0, won:null, notes:"", max:areaMax(a) };
+                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, compete:0, won:null, notes:"", max:areaMax(a) };
     a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
@@ -1826,9 +1878,10 @@ function buildSessionCards(a, last){
 
   a.sets.forEach(function(s, i){
     var body = document.createElement("div");
-    body.appendChild(scoreRow(s.label, s.tgt, setParts(s), last, null));
+    var tracked = trackKind(a, s);
+    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, null));
     if(s.metrics) body.appendChild(metricRow(s, last));
-    if(s.guide && GUIDES[s.guide]){
+    if(s.guide && GUIDES[s.guide] && !tracked){
       var w = document.createElement("div"); w.className="dgwrap";
       w.innerHTML = GUIDES[s.guide].svg;
       body.appendChild(w);
@@ -1881,7 +1934,7 @@ function buildSessionList(a, last){
       wrap = document.createElement("div"); wrap.className="sets";
       current.appendChild(wrap); host.appendChild(current);
     }
-    wrap.appendChild(scoreRow(s.label, s.tgt, setParts(s), last, s.guide));
+    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, s.guide));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
   var cg = document.createElement("div"); cg.className="setgroup";
@@ -1937,6 +1990,278 @@ function guideChip(key){
     '<rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.2"/>'+
     '<path d="M0.5 6.5 L3.5 3.5 L6 6 L7.5 4.5 L9.5 6.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>diagram</button>';
 }
+/* ---------- where the ball went ---------- */
+/* One tap a ball. On a windows set the grid says which window it flew through and
+   the rosette says where it finished; the two existing scorers are worked out from
+   the taps rather than typed in. Only the long-game areas carry this: the zones on
+   a rosette mean nothing from a bunker. */
+var ZONES = [
+  {id:"long",   lab:"Long"},
+  {id:"longR",  lab:"Long R"},
+  {id:"right",  lab:"Right"},
+  {id:"shortR", lab:"Short R"},
+  {id:"short",  lab:"Short"},
+  {id:"shortL", lab:"Short L"},
+  {id:"left",   lab:"Left"},
+  {id:"longL",  lab:"Long L"}
+];
+var ZONE_LABEL = {c:"In the target", "?":"Not seen"};
+ZONES.forEach(function(z){ ZONE_LABEL[z.id] = z.lab; });
+function zoneIndex(id){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].id===id) return i; } return -1; }
+
+function trackKind(a, s){
+  if(!a || !a.track) return null;
+  if(s.parts && s.guide==="windows") return "windows";
+  if(!s.parts && s.max && s.max<=10) return "target";
+  return null;
+}
+function ballsIn(s){ return s.parts ? 5 : s.max; }
+
+/* ---- geometry ---- */
+var ROSE_C = 150, ROSE_R = 138, ROSE_IN = 52;
+function polar(cx, cy, rad, deg){
+  var t = deg*Math.PI/180;
+  return [cx + rad*Math.sin(t), cy - rad*Math.cos(t)];
+}
+function f1(n){ return (Math.round(n*10)/10).toString(); }
+function sectorPath(cx, cy, r0, r1, d0, d1){
+  var a=polar(cx,cy,r1,d0), b=polar(cx,cy,r1,d1), c=polar(cx,cy,r0,d1), e=polar(cx,cy,r0,d0);
+  return "M"+f1(e[0])+" "+f1(e[1])+
+         "L"+f1(a[0])+" "+f1(a[1])+
+         "A"+r1+" "+r1+" 0 0 1 "+f1(b[0])+" "+f1(b[1])+
+         "L"+f1(c[0])+" "+f1(c[1])+
+         "A"+r0+" "+r0+" 0 0 0 "+f1(e[0])+" "+f1(e[1])+"Z";
+}
+function roseSvg(centreLabel, tappable){
+  var out = "";
+  ZONES.forEach(function(z, i){
+    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(ROSE_C,ROSE_C,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+'"' : '')+'></path>';
+    var p = polar(ROSE_C, ROSE_C, ROSE_IN+(ROSE_R-ROSE_IN)*0.80, i*45);
+    out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
+  });
+  out += '<circle class="rz rc" data-z="c" cx="'+ROSE_C+'" cy="'+ROSE_C+'" r="'+ROSE_IN+'"'+
+         (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
+  out += '<text class="rcl" x="'+ROSE_C+'" y="'+(ROSE_C+ROSE_IN-11)+'">'+(centreLabel||"In")+'</text>';
+  return '<svg viewBox="0 0 300 300" class="rose" role="group" aria-label="Where the ball finished">'+
+         out+'<g class="marks"></g></svg>';
+}
+/* Ball markers keep to the inner half of each ring segment; the labels have the outer
+   half to themselves, so a busy zone never writes over its own name. */
+var ROSE_SPREAD = [[0,0.30],[-14,0.52],[14,0.52],[-14,0.10],[14,0.10],[0,0.06],[-24,0.34],[24,0.34],[0,0.56],[0,0.20]];
+var CENTRE_ANG = [0, -55, 55, -110, 110];
+function roseMark(zoneId, n){
+  if(zoneId==="c"){
+    var ring = n < CENTRE_ANG.length ? ROSE_IN*0.50 : ROSE_IN*0.82;
+    return polar(ROSE_C, ROSE_C, ring, CENTRE_ANG[n % CENTRE_ANG.length]);
+  }
+  var i = zoneIndex(zoneId); if(i<0) return [ROSE_C, ROSE_C];
+  var m = ROSE_SPREAD[n % ROSE_SPREAD.length];
+  return polar(ROSE_C, ROSE_C, ROSE_IN + (ROSE_R-ROSE_IN)*(0.08 + 0.52*m[1]), i*45 + m[0]);
+}
+
+var WCELL = [{w:1,x:48,y:64},{w:2,x:160,y:64},{w:3,x:104,y:136},{w:4,x:48,y:208},{w:5,x:160,y:208}];
+function windowSvg(tappable){
+  var att = tappable ? ' role="button" tabindex="0"' : '';
+  var out = '<rect class="wframe" x="34" y="56" width="232" height="230" rx="7"></rect>';
+  out += '<g class="wc" data-w="0"'+att+' aria-label="Over the top"><rect class="wcell" x="34" y="4" width="232" height="44" rx="6"></rect>'+
+         '<text class="wovl" x="150" y="32">OVER THE TOP</text></g>';
+  WCELL.forEach(function(c){
+    out += '<g class="wc" data-w="'+c.w+'"'+att+' aria-label="Window '+c.w+'">'+
+           '<rect class="wcell" x="'+c.x+'" y="'+c.y+'" width="92" height="64" rx="4"></rect>'+
+           '<text class="wnum" x="'+(c.x+46)+'" y="'+(c.y+42)+'">'+c.w+'</text></g>';
+  });
+  out += '<circle class="wball" cx="150" cy="292" r="6"></circle>';
+  return '<svg viewBox="0 0 300 302" class="wgrid" role="group" aria-label="Which window the ball flew through">'+
+         out+'<g class="marks"></g></svg>';
+}
+function wMark(wid, n){
+  if(wid===0) return [104 + (n%5)*23, 30];
+  var c=null; WCELL.forEach(function(x){ if(x.w===wid) c=x; });
+  if(!c) return [150,150];
+  return [c.x + 20 + (n%3)*26, c.y + 22 + Math.floor(n/3)*24];
+}
+
+/* ---- reading the taps back as scores ---- */
+function shotDone(s, sh){
+  if(!sh) return false;
+  if(sh.z === "?") return true;
+  return s.parts ? (sh.w != null && sh.z != null) : (sh.z != null);
+}
+function shotScores(s, shots){
+  var w = 0, t = 0;
+  shots.forEach(function(sh, i){
+    if(!sh) return;
+    if(sh.w === i+1) w++;
+    if(sh.z === "c") t++;
+  });
+  return {w:w, t:t};
+}
+function applyShots(s, shots){
+  var sc = shotScores(s, shots);
+  if(s.parts){
+    state.draft.scores[s.id+"_w"] = sc.w;
+    state.draft.scores[s.id+"_t"] = sc.t;
+  } else {
+    state.draft.scores[s.id] = sc.t;
+  }
+  updateTotal();
+}
+function draftShots(s){
+  var d = state.draft;
+  d.shots = d.shots || {};
+  var n = ballsIn(s), cur = d.shots[s.id];
+  if(!cur || cur.length !== n){
+    cur = []; for(var i=0;i<n;i++) cur.push(null);
+    d.shots[s.id] = cur;
+  }
+  return cur;
+}
+
+/* ---- the card ---- */
+function shotRow(a, s, last){
+  var kind = trackKind(a, s);
+  var isWin = kind === "windows";
+  var nb = ballsIn(s);
+  var shots = draftShots(s);
+  var parts = setParts(s);
+
+  var row = document.createElement("div"); row.className = "set shotset";
+  row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+s.tgt+'</div></div>';
+
+  var ask = document.createElement("p"); ask.className = "shotask";
+  var diag = document.createElement("div"); diag.className = "shotdiag" + (isWin ? " two" : "");
+  diag.innerHTML = (isWin ? windowSvg(true) : "") + roseSvg(s.tc || "In", true);
+  var grid = isWin ? diag.querySelector("svg.wgrid") : null;
+  var rose = diag.querySelector("svg.rose");
+
+  var chips = document.createElement("div"); chips.className = "balls";
+  var acts = document.createElement("div"); acts.className = "shotacts";
+  var undo = document.createElement("button"); undo.type="button"; undo.textContent="Undo";
+  var miss = document.createElement("button"); miss.type="button"; miss.className="ghost"; miss.textContent="Didn't see it";
+  acts.appendChild(undo); acts.appendChild(miss);
+  var tally = document.createElement("div"); tally.className = "shottally";
+
+  var cur = 0;
+  function firstOpen(){
+    for(var i=0;i<nb;i++){ if(!shotDone(s, shots[i])) return i; }
+    return nb-1;
+  }
+  cur = firstOpen();
+
+  function paint(){
+    var sh = shots[cur] || {};
+    // prompt
+    if(isWin){
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+', called at window <b>'+(cur+1)+'</b>. '+
+        (sh.w == null ? 'Tap the window it went through.' : (sh.z == null ? 'Now tap where it finished.' : 'Logged. Tap a ball below to change it.'));
+    } else {
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+'. '+
+        (sh.z == null ? 'Tap where it finished.' : 'Logged. Tap a ball below to change it.');
+    }
+    // live picks
+    if(grid){
+      grid.querySelectorAll(".wc").forEach(function(g){
+        g.classList.toggle("on", sh.w != null && +g.getAttribute("data-w") === sh.w);
+        g.classList.toggle("called", +g.getAttribute("data-w") === cur+1);
+      });
+    }
+    rose.querySelectorAll(".rz").forEach(function(z){
+      z.classList.toggle("on", sh.z != null && z.getAttribute("data-z") === sh.z);
+    });
+    // markers
+    var seen = {}, out = "";
+    shots.forEach(function(x, i){
+      if(!x || x.z == null || x.z === "?") return;
+      var n = seen[x.z] || 0; seen[x.z] = n+1;
+      var p = roseMark(x.z, n);
+      out += '<g class="mk'+(i===cur?" now":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="13"></circle>'+
+             '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
+    });
+    rose.querySelector(".marks").innerHTML = out;
+    if(grid){
+      var ws = {}, wo = "";
+      shots.forEach(function(x, i){
+        if(!x || x.w == null) return;
+        var n = ws[x.w] || 0; ws[x.w] = n+1;
+        var p = wMark(x.w, n);
+        wo += '<g class="mk'+(i===cur?" now":"")+(x.w===i+1?" hit":"")+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
+              '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
+      });
+      grid.querySelector(".marks").innerHTML = wo;
+    }
+    // ball chips
+    chips.innerHTML = "";
+    for(var i=0;i<nb;i++){
+      (function(i){
+        var x = shots[i];
+        var b = document.createElement("button"); b.type="button"; b.className="ballchip";
+        if(i===cur) b.classList.add("now");
+        if(shotDone(s, x)) b.classList.add("done");
+        if(x && x.z === "c") b.classList.add("good");
+        if(x && x.z === "?") b.classList.add("unseen");
+        b.textContent = String(i+1);
+        b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+ZONE_LABEL[x.z] : ", not logged"));
+        b.addEventListener("click", function(){ cur = i; paint(); });
+        chips.appendChild(b);
+      })(i);
+    }
+    // tally
+    var sc = shotScores(s, shots);
+    tally.innerHTML = isWin
+      ? '<span>Window <b>'+sc.w+'</b>/'+parts[0].max+'</span><span>Target <b>'+sc.t+'</b>/'+parts[1].max+'</span>'
+      : '<span>In the target <b>'+sc.t+'</b>/'+s.max+'</span>';
+  }
+
+  function advance(){
+    var sh = shots[cur];
+    if(shotDone(s, sh) && cur < nb-1){
+      for(var i=cur+1;i<nb;i++){ if(!shotDone(s, shots[i])){ cur = i; return; } }
+    }
+  }
+  function record(patch){
+    var sh = shots[cur] || {};
+    for(var k in patch) sh[k] = patch[k];
+    shots[cur] = sh;
+    applyShots(s, shots);
+    advance();
+    paint();
+    saveDraft();
+  }
+
+  if(grid){
+    grid.querySelectorAll(".wc").forEach(function(g){
+      var wid = +g.getAttribute("data-w");
+      g.addEventListener("click", function(){ record({w:wid}); });
+      g.addEventListener("keydown", function(ev){
+        if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); record({w:wid}); }
+      });
+    });
+  }
+  rose.querySelectorAll(".rz").forEach(function(z){
+    var zid = z.getAttribute("data-z");
+    z.addEventListener("click", function(){ record({z:zid}); });
+    z.addEventListener("keydown", function(ev){
+      if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); record({z:zid}); }
+    });
+  });
+  undo.addEventListener("click", function(){
+    if(shots[cur]) shots[cur] = null;
+    else if(cur > 0){ cur--; shots[cur] = null; }
+    applyShots(s, shots); paint(); saveDraft();
+  });
+  miss.addEventListener("click", function(){ record({z:"?", w:(isWin?0:undefined)}); });
+
+  row.appendChild(ask);
+  row.appendChild(diag);
+  row.appendChild(chips);
+  row.appendChild(tally);
+  row.appendChild(acts);
+  applyShots(s, shots);
+  paint();
+  return row;
+}
+
 function scoreRow(label, tgt, parts, last, guide){
   var row = document.createElement("div"); row.className="set";
   row.innerHTML = '<div><div class="lbl">'+label+guideChip(guide)+'</div><div class="tgt">'+tgt+'</div></div>';
@@ -3000,6 +3325,50 @@ function condChips(s){
   });
   return out.length ? '<div class="pastcond">'+out.join("")+'</div>' : "";
 }
+/* A saved set, redrawn: the same two diagrams with every ball in place. */
+function pastShots(a, set, sess){
+  var shots = sess.shots && sess.shots[set.id];
+  if(!shots || !shots.length) return "";
+  var any = false; shots.forEach(function(x){ if(x && (x.z || x.w != null)) any = true; });
+  if(!any) return "";
+  var isWin = !!set.parts;
+
+  function marks(list){
+    var seen = {}, out = "";
+    list.forEach(function(x, i){
+      if(!x || x.z == null || x.z === "?") return;
+      var n = seen[x.z] || 0; seen[x.z] = n+1;
+      var p = roseMark(x.z, n);
+      out += '<g class="mk"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="13"></circle>'+
+             '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
+    });
+    return out;
+  }
+  function wmarks(list){
+    var seen = {}, out = "";
+    list.forEach(function(x, i){
+      if(!x || x.w == null || x.w === "?") return;
+      var n = seen[x.w] || 0; seen[x.w] = n+1;
+      var p = wMark(x.w, n);
+      out += '<g class="mk'+(x.w===i+1?" hit":"")+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
+             '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
+    });
+    return out;
+  }
+  function put(svg, inner){
+    return svg.replace('<g class="marks"></g>', '<g class="marks">'+inner+'</g>');
+  }
+
+  var unseen = shots.filter(function(x){ return x && x.z === "?"; }).length;
+  var html = '<div class="pastrose">';
+  if(isWin) html += '<div>'+put(windowSvg(false), wmarks(shots))+'</div>';
+  html += '<div>'+put(roseSvg(set.tc || "In", false), marks(shots))+'</div>';
+  html += '</div>';
+  if(unseen) html += '<p class="note" style="margin:2px 0 8px">'+unseen+
+    (unseen===1 ? ' ball was not seen down.' : ' balls were not seen down.')+'</p>';
+  return html;
+}
+
 function openPast(s){
   var isGym = s.kind === "gym";
   var name = isGym
@@ -3008,7 +3377,8 @@ function openPast(s){
     : (area(s.areaId) ? (area(s.areaId).retired ? areaTitle(area(s.areaId)) : area(s.areaId).name) : "Practice");
   var who = (state.players.filter(function(p){ return p.id===s.playerId; })[0] || {}).name || "";
 
-  $("pastKind").textContent = isGym ? "Strength & conditioning" : "Area " + s.areaId;
+  $("pastKind").textContent = isGym ? "Strength & conditioning"
+    : (area(s.areaId) ? (area(s.areaId).retired ? "Earlier format" : "Area " + areaNo(area(s.areaId))) : "Practice");
   $("pastName").textContent = name;
   $("pastWhen").textContent = fmtDate(s.date) + (who ? " \u00b7 " + who : "");
 
@@ -3052,6 +3422,7 @@ function openPast(s){
         h += '<div class="pastrow"><span>'+set.label+
              (set.tgt ? '<span class="sub">'+set.tgt+'</span>' : '')+'</span>'+
              '<b>'+bits.join(" \u00b7 ")+'</b></div>';
+        h += pastShots(a, set, s);
       });
     }
     if(s.metrics && (s.metrics.chsFast || s.metrics.chsSlow)){
@@ -3070,9 +3441,24 @@ function openPast(s){
 }
 
 /* ---------- export ---------- */
+function sessionZones(sess){
+  var t = {c:0, unseen:0};
+  ZONES.forEach(function(z){ t[z.id] = 0; });
+  if(!sess.shots) return t;
+  for(var k in sess.shots){
+    (sess.shots[k]||[]).forEach(function(x){
+      if(!x || x.z == null) return;
+      if(x.z === "?") t.unseen++;
+      else if(t[x.z] != null) t[x.z]++;
+    });
+  }
+  return t;
+}
 function csv(){
   var head = ["player","date","area","kind","total","max","pct","venue","surface","temperature","wind_strength","wind_direction","rain","green_speed",
-              "compete","won","chs_fastest_mph","chs_slowest_mph","key_lift_kg","notes"];
+              "compete","won","chs_fastest_mph","chs_slowest_mph","key_lift_kg",
+              "in_target","miss_long","miss_long_right","miss_right","miss_short_right","miss_short","miss_short_left","miss_left","miss_long_left","not_seen",
+              "notes"];
   var lines = [head.join(",")];
   var pname = {}; state.players.forEach(function(p){ pname[p.id]=p.name; });
   mine().filter(function(s){ return s.kind!=="round"; }).sort(function(a,b){ return a.date<b.date?-1:1; }).forEach(function(s){
@@ -3083,13 +3469,15 @@ function csv(){
               : areaTitle(area(s.areaId));
     var kl = "";
     if(s.kind==="gym"){ var k=keyEx(gym(s.gymId)); if(k && s.ex && s.ex[k.id]) kl = s.ex[k.id].load||""; }
-    var c = s.cond || {};
+    var c = s.cond || {}, zt = sessionZones(s);
     lines.push([
       q(pname[s.playerId]||""), s.date, q(label), s.kind,
       s.total||0, s.max||0, s.max ? Math.round(s.total/s.max*100) : "",
       c.venue||"", c.surface||"", c.temp||"", c.windStr||"", c.windDir||"", c.rain||"", c.speed||"",
       s.compete||0, s.won==null?"":(s.won?"yes":"no"),
-      (s.metrics&&s.metrics.chsFast)||"", (s.metrics&&s.metrics.chsSlow)||"", kl, q(s.notes||"")
+      (s.metrics&&s.metrics.chsFast)||"", (s.metrics&&s.metrics.chsSlow)||"", kl,
+      zt.c, zt.long, zt.longR, zt.right, zt.shortR, zt.short, zt.shortL, zt.left, zt.longL, zt.unseen,
+      q(s.notes||"")
     ].join(","));
   });
   return lines.join("\n");
