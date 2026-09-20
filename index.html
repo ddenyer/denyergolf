@@ -676,6 +676,15 @@
   .slopebox{margin:12px 0 2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
     background:var(--surface-2)}
   .slopebox .eyebrow{display:block; margin-bottom:7px}
+  .modes{margin-bottom:14px}
+  .modes .eyebrow{display:block; margin-bottom:8px}
+  .mrow{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px}
+  .mtile{background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 11px; text-align:center}
+  .mtile b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:22px;
+    color:var(--ink); line-height:1.1}
+  .mtile span{display:block; font-size:11.5px; color:var(--ink-2); margin-top:3px; line-height:1.25}
+  .mtile .mn{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--muted)}
   .slopetab{margin-top:12px}
   .slopetab .eyebrow{display:block; margin-bottom:6px}
   .strow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:7px 0;
@@ -801,6 +810,16 @@
     padding:11px 14px; margin:0 0 14px; font-family:Archivo, sans-serif; font-size:15.5px;
     font-weight:600; color:var(--ink); line-height:1.4}
 
+  .banner.warn{background:#fde7ea; border:1px solid #c8402f; border-radius:10px;
+    padding:11px 14px; margin:0 0 14px; font-family:Archivo, sans-serif; font-size:14.5px;
+    color:#5c1410; line-height:1.45; display:block}
+  .banner.warn b{color:#8c1d16}
+  .storebox{border:1px solid var(--line); border-radius:10px; background:var(--surface-2);
+    padding:10px 13px; font-size:13.5px; color:var(--ink-2); line-height:1.45; margin-bottom:10px}
+  .storebox b{color:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace}
+  .storebox.bad{background:#fde7ea; border-color:#c8402f; color:#5c1410}
+  .storebox.bad b{color:#8c1d16; font-family:Archivo, sans-serif}
+
   /* ---- goals ---- */
   .goalgrp{margin-bottom:22px}
   .goalgrp h2{font-size:19px; margin:0 0 3px}
@@ -836,6 +855,8 @@
     font-weight:700; line-height:1.12; color:var(--ink); margin:2px 0 1px}
   .shotask .callwin{display:block; font-family:Archivo, sans-serif; font-size:17px;
     font-weight:600; color:var(--accent)}
+  .shotask .callband{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:13px; color:var(--muted)}
   .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
   .complead{min-height:0}
 
@@ -960,7 +981,8 @@
   <!-- HOME -->
   <section id="viewHome">
     <div id="homeWelcome">
-      <p class="banner hello" id="helloBar" hidden></p>
+      <p class="banner warn" id="storeWarn" hidden></p>
+    <p class="banner hello" id="helloBar" hidden></p>
       <div class="banner resume" id="resumeBar" hidden>
         <span id="resumeText"></span>
         <span class="resacts">
@@ -1056,6 +1078,7 @@
     <h2 style="margin-top:22px">Score against conditions</h2>
     <div id="condPanel"></div>
     <h2 style="margin-top:20px">All sessions</h2>
+    <div id="storeLine"></div>
     <div id="histList"></div>
     <div class="tools">
       <button id="exportCsv">Export CSV</button>
@@ -1160,14 +1183,14 @@ var AREAS = [
   targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
   sets:[
-    {id:"a", label:"Approach 125y", short:"125 yards", tc:"15 ft", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"b", guide:"windows", label:"Five windows · 125y", tc:"15 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
+    {id:"a", label:"Approach 125y", short:"125 yards", tc:"15 ft", dist:125, tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"b", guide:"windows", label:"Five windows · 125y", tc:"15 ft", dist:125, tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"Approach 150y", short:"150 yards", tc:"20 ft", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"d", guide:"windows", label:"Five windows · 150y", tc:"20 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
+    {id:"c", label:"Approach 150y", short:"150 yards", tc:"20 ft", dist:150, tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"d", guide:"windows", label:"Five windows · 150y", tc:"20 ft", dist:150, tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"Approach 175y", short:"175 yards", tc:"24 ft", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
+    {id:"e", label:"Approach 175y", short:"175 yards", tc:"24 ft", dist:175, tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", dist:175, tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
@@ -1196,20 +1219,22 @@ var AREAS = [
 
 { id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
   targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
-  hour:"10 min warm-up → 40 min benchmark (8 sets, about 50 balls, full routine every ball) → 10 min compete",
+  hour:"10 min warm-up → 40 min benchmark (9 sets, about 55 balls, full routine every ball) → 10 min compete",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"7 ft", tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tc:"7 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
+    {id:"a", label:"30y", short:"30 yards", tc:"7 ft", dist:30, tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"7 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"10 ft", tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tc:"10 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
+    {id:"c", label:"50y", short:"50 yards", tc:"10 ft", dist:50, tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"10 ft", dist:50, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"12 ft", tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
-    {id:"f", label:"90y", short:"90 yards", tc:"13 ft", tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tc:"13 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
+    {id:"e", label:"70y", short:"70 yards", tc:"12 ft", dist:70, tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
+    {id:"i", guide:"heights", label:"70y · five heights", tc:"12 ft", dist:70, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 12 ft",
+      parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"f", label:"90y", short:"90 yards", tc:"13 ft", dist:90, tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"13 ft", dist:90, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", label:"Rotation · 30 / 50 / 70 / 90", tgt:"20 balls, cycle the four targets five times. A point inside each target", max:20,
-      cycle:[{label:"30 yards",tc:"7 ft"},{label:"50 yards",tc:"10 ft"},{label:"70 yards",tc:"12 ft"},{label:"90 yards",tc:"13 ft"}]}
+      cycle:[{label:"30 yards",tc:"7 ft",dist:30},{label:"50 yards",tc:"10 ft",dist:50},{label:"70 yards",tc:"12 ft",dist:70},{label:"90 yards",tc:"13 ft",dist:90}]}
   ],
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
@@ -1642,6 +1667,20 @@ function areaNo(a){ return a.no || a.id; }
 /* The name in prose, without the bracket: "approach", not "approach (ball flight control)". */
 function areaWord(a){ return String(a.name||"").replace(/\s*\(.*\)\s*$/, "").toLowerCase(); }
 function areaTitle(a){ return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name; }
+/* A 7 ft circle round a 50-yard flag is a 48 to 52 yard shot. Saying it that way
+   turns an abstract target into a number she can aim at. */
+function bandText(dist, tc){
+  if(!dist || !tc) return "";
+  var m = /^([\d.]+)\s*ft/.exec(String(tc));
+  if(!m) return "";
+  var yd = Math.round(parseFloat(m[1]) / 3);
+  if(!yd) return "";
+  return (dist - yd) + "\u2013" + (dist + yd) + " yards scores";
+}
+function tgtText(s){
+  var b = bandText(s.dist, s.tc);
+  return s.tgt + (b ? " \u00b7 " + b : "");
+}
 function setParts(s){
   if(s.parts) return s.parts.map(function(p){ return { key:s.id+"_"+p.id, label:p.label, max:p.max }; });
   return [{ key:s.id, label:null, max:s.max }];
@@ -1672,24 +1711,72 @@ function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth
 function fmtDate(s){ if(!s) return ""; var p=s.split("-"); return p[2]+"/"+p[1]; }
 function mine(){ return state.sessions.filter(function(s){ return s.playerId===state.activePlayer; }); }
 
-/* ---- local cache ---- */
+/* ---- local cache ----
+   Everything lives in this browser, so a write that quietly fails loses an hour of
+   work. Nothing here swallows an error any more: the app knows whether storage is
+   working, says so, and refuses to write an empty history over a full one. */
+var STORE = { ok:null, why:"", at:0, wrote:0, read:false };
+function storageWorks(){
+  try{
+    localStorage.setItem("lcl.probe", "1");
+    localStorage.removeItem("lcl.probe");
+    return true;
+  }catch(e){
+    STORE.why = (e && e.name === "QuotaExceededError")
+      ? "This browser has run out of room for saved data."
+      : "This browser is not letting the page save anything. Private browsing does that.";
+    return false;
+  }
+}
+function storedCount(){
+  try{
+    var raw = localStorage.getItem(LS);
+    if(!raw) return 0;
+    var o = JSON.parse(raw);
+    return (o && o.sessions) ? o.sessions.length : 1;
+  }catch(e){ return 1; }   // unreadable, but something is there: do not write over it
+}
 function saveLocal(){
+  var live = state.sessions.filter(function(s){ return !s.sample; });
+  // a boot that failed to read must never be the thing that empties the store
+  if(!live.length && !STORE.read && storedCount()){
+    STORE.ok = false;
+    STORE.why = "The history on this device could not be read, so it has been left alone.";
+    return false;
+  }
   try{
     localStorage.setItem(LS, JSON.stringify({
       players:state.players, activePlayer:state.activePlayer, cardMode:state.cardMode,
-      sessions:state.sessions.filter(function(s){ return !s.sample; })
+      savedAt:Date.now(), sessions:live
     }));
-  }catch(e){}
+    STORE.ok = true; STORE.at = Date.now(); STORE.wrote = live.length; STORE.why = "";
+    return true;
+  }catch(e){
+    STORE.ok = false;
+    STORE.why = (e && e.name === "QuotaExceededError")
+      ? "This browser has run out of room, so the session was not saved."
+      : "This browser is not letting the page save anything, so the session was not saved.";
+    return false;
+  }
 }
 function loadLocal(){
   try{
-    var raw = localStorage.getItem(LS); if(!raw) return false;
+    var raw = localStorage.getItem(LS);
+    STORE.ok = storageWorks();
+    if(!raw){ STORE.read = true; return false; }
     var o = JSON.parse(raw);
     if(o && o.players && o.players.length){ state.players=o.players; state.activePlayer=o.activePlayer||o.players[0].id; }
     if(o && o.sessions) state.sessions = o.sessions;
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
+    if(o && o.savedAt) STORE.at = o.savedAt;
+    STORE.read = true;
+    STORE.wrote = (o && o.sessions) ? o.sessions.length : 0;
     return true;
-  }catch(e){ return false; }
+  }catch(e){
+    STORE.ok = false;
+    STORE.why = "The history saved on this device could not be read. Nothing has been deleted.";
+    return false;
+  }
 }
 
 /* ============ persistence ============ */
@@ -1931,6 +2018,14 @@ function sessionPraise(sess){
   }
   return "Another session in the bag. That is how it adds up.";
 }
+function renderStoreWarn(){
+  var el = $("storeWarn"); if(!el) return;
+  if(STORE.ok === false){
+    el.hidden = false;
+    el.innerHTML = '<b>This device is not saving.</b> ' + STORE.why +
+                   ' Anything scored now will be lost when the page closes.';
+  } else el.hidden = true;
+}
 function renderHello(){
   var bar = $("helloBar"); if(!bar) return;
   var text = state.praise || helloLine();
@@ -2029,7 +2124,7 @@ function homePage(n){
   state.homePage = n;
   $("homeWelcome").hidden = n !== 0;
   $("homeAreas").hidden = n !== 1;
-  if(n === 0) renderHello();
+  if(n === 0){ renderHello(); renderStoreWarn(); }
 }
 function renderHomeGoals(){
   var host = $("homeGoals"); if(!host) return;
@@ -2046,6 +2141,7 @@ function renderHomeGoals(){
   }));
 }
 function renderHome(){
+  renderStoreWarn();
   renderHello();
   renderHomeGoals();
   var host = $("areaList"); host.innerHTML = "";
@@ -2391,7 +2487,7 @@ function buildSessionCards(a, last){
     var body = document.createElement("div");
     var tracked = trackKind(a, s);
     if(s.metrics) body.appendChild(monitorNote());
-    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, null));
+    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, null));
     if(s.guide && GUIDES[s.guide] && !tracked){
       var w = document.createElement("div"); w.className="dgwrap";
       w.innerHTML = GUIDES[s.guide].svg;
@@ -2543,11 +2639,53 @@ function sumCard(eyebrow, svg, note){
   return '<div class="sumcard"><span class="eyebrow">'+eyebrow+'</span>'+svg+
          (note ? '<p class="note">'+note+'</p>' : '')+'</div>';
 }
+/* Four numbers that answer a different question from the plots: does it hold up when
+   the shot is the same every time, when a shape is called, when the target keeps
+   moving, and when it counts. */
+var MODE_ORDER = ["repeat", "shape", "vary", "compete"];
+function modeOf(a, s){
+  if(s.cycle || s.guide === "ladder") return "vary";
+  if(s.parts && (s.guide === "windows" || s.guide === "heights")) return "shape";
+  return "repeat";
+}
+function modeLabel(a, k){
+  if(k === "repeat") return "Distance target";
+  if(k === "vary") return "Variation";
+  if(k === "compete") return "Compete";
+  var heights = a.sets.some(function(s){ return s.guide === "heights"; });
+  return heights ? "Heights" : "Windows";
+}
+function modeStats(a, sess){
+  var out = {};
+  MODE_ORDER.forEach(function(k){ out[k] = {v:0, m:0}; });
+  a.sets.forEach(function(s){
+    var k = modeOf(a, s);
+    setParts(s).forEach(function(pt){
+      out[k].v += (sess.scores && sess.scores[pt.key]) || 0;
+      out[k].m += pt.max;
+    });
+  });
+  out.compete.v = sess.compete || 0;
+  out.compete.m = sess.competeMax || (a.compete ? a.compete.max : 0);
+  return out;
+}
+function modeBlock(a, sess){
+  var st = modeStats(a, sess), out = "";
+  MODE_ORDER.forEach(function(k){
+    var e = st[k];
+    if(!e.m) return;
+    out += '<div class="mtile"><b>'+Math.round(e.v/e.m*100)+'%</b>'+
+           '<span>'+modeLabel(a, k)+'</span><span class="mn">'+e.v+' of '+e.m+'</span></div>';
+  });
+  return out ? '<div class="modes"><span class="eyebrow">How it held up</span><div class="mrow">'+out+'</div></div>' : "";
+}
+
 function summaryBlock(a, sess){
   var pool = poolShots(a, sess);
-  if(!pool.n && !pool.wn && !pool.cn && !pool.ln) return null;
+  var anyPlot = pool.n || pool.wn || pool.cn || pool.ln;
+  if(!anyPlot && !(sess.total || sess.compete)) return null;
   var wrap = document.createElement("div"); wrap.className="sumwrap";
-  var html = '';
+  var html = modeBlock(a, sess);
 
   if(pool.n){
     var ids = shapeZones(a).map(function(z){ return z.id; });
@@ -2590,7 +2728,7 @@ function summaryBlock(a, sess){
       wsvg = wsvg.replace('class="wcell" x="'+c.x+'" y="'+c.y+'"',
                           'class="wcell" style="'+heatFill(n2, pool.wn)+'" x="'+c.x+'" y="'+c.y+'"');
       if(!n2) return;
-      var p = gridMark(pool.grid, c.w, 0);
+      var p = gridPct(pool.grid, c);
       wout += '<g class="pctmk"><text x="'+p[0]+'" y="'+(p[1]-2)+'">'+pctText(n2, pool.wn)+'</text>'+
               '<text class="pctn" x="'+p[0]+'" y="'+(p[1]+13)+'">'+n2+'</text></g>';
     });
@@ -2635,7 +2773,7 @@ function buildSessionList(a, last){
       current.appendChild(wrap); host.appendChild(current);
     }
     if(s.metrics) wrap.appendChild(monitorNote());
-    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, s.tgt, setParts(s), last, s.guide));
+    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, s.guide));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
   var cg = document.createElement("div"); cg.className="setgroup";
@@ -2771,7 +2909,7 @@ function roseSvg(centreLabel, tappable){
   out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
   out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
          (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
-  out += pinAt(CX, CY - 12, 30);
+  out += pinAt(CX, CY - 3, 30);   // the hole itself lands on the centre
   out += '<g class="caption"><rect class="cappill" x="86" y="3" width="128" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+(centreLabel||"In")+'</text></g>';
   return '<svg viewBox="0 0 300 318" class="rose" role="group" aria-label="Where the ball finished">'+
@@ -2940,7 +3078,7 @@ var GRIDS = {
   heights:{
     vb:"0 0 300 258", frame:null, ball:{cx:150, cy:250},
     word:"height", heading:"Which heights", title:"Which height the ball came out at",
-    cols:4, dx:28, dy:26, mx:74, my:26,
+    cols:4, dx:28, dy:26, mx:74, my:26, px:150, py:30,
     cells:[{w:1,x:56,y:8,W:188,H:72,lab:"Higher",sub:"balls 3 + 5"},
            {w:2,x:56,y:86,W:188,H:72,lab:"Normal",sub:"ball 1"},
            {w:3,x:56,y:164,W:188,H:72,lab:"Lower",sub:"balls 2 + 4"}],
@@ -2972,6 +3110,11 @@ function gridSvg(kind, tappable){
   if(g.ball) out += '<circle class="wball" cx="'+g.ball.cx+'" cy="'+g.ball.cy+'" r="6"></circle>';
   return '<svg viewBox="'+g.vb+'" class="wgrid" role="group" aria-label="'+g.title+'">'+
          out+'<g class="marks"></g></svg>';
+}
+/* The session percentage sits where it does not land on a band's own name. */
+function gridPct(kind, c){
+  var g = grid(kind);
+  return [c.x + (g.px != null ? g.px : g.mx), c.y + (g.py != null ? g.py : g.my)];
 }
 function gridMark(kind, wid, n){
   var g = grid(kind), c = gridCell(kind, wid);
@@ -3149,7 +3292,7 @@ function callsFor(a, s, cfg){
       out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc});
     } else if(s.cycle){
       var c = s.cycle[i % s.cycle.length];
-      out.push({kind:"t", label:c.label, tc:c.tc, quiet:true});
+      out.push({kind:"t", label:c.label, tc:c.tc, dist:c.dist, quiet:true});
     } else if(areaShape(a) === "clock"){
       out.push({kind:"t", st:(i%5)+1, tc:s.tc});
     } else {
@@ -3228,7 +3371,7 @@ function shotRow(a, s, last, cfg){
   var wantsSlope = !cfg && (kind === "lag" || areaShape(a) === "clock");
 
   var row = document.createElement("div"); row.className = "set shotset";
-  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+s.tgt+'</div></div>';
+  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s)+'</div></div>';
   if(wantsSlope) row.appendChild(slopeBox(kind, s, function(){ diag.__key = null; paint(); }));
 
   var ask = document.createElement("p"); ask.className = "shotask";
@@ -3309,6 +3452,7 @@ function shotRow(a, s, last, cfg){
       // on compete the call is the instruction, so it is said loudly and first
       ask.innerHTML = '<span class="callnum">Ball '+(cur+1)+' of '+nb+'</span>'+
         '<span class="callclub">'+c.label+'</span>'+
+        (c.dist && bandText(c.dist, c.tc) ? '<span class="callband">'+bandText(c.dist, c.tc)+'</span>' : '')+
         (c.quiet ? '' : '<span class="callwin">'+(c.kind === "w" ? 'through window '+c.win : 'find the target')+'</span>')+
         '<span class="calldo">'+(c.kind === "w" && st === "w" ? 'Tap the '+word+' it went through.'
           : (shotDone(s, sh, c) ? 'Logged. Tap a ball below to change it.' : 'Tap where it finished.'))+'</span>';
@@ -4215,7 +4359,15 @@ function saveCurrent(){
   if(state.sampleOn){ state.sessions = state.sessions.filter(function(x){ return !x.sample; }); state.sampleOn=false; }
   var saved = JSON.parse(JSON.stringify(s));
   state.sessions.push(saved);
-  saveLocal(); pushDoc(s);
+  var ok = saveLocal();
+  pushDoc(s);
+  if(!ok){
+    // the hour is still in memory, so say so before anything is cleared
+    alert("This session could NOT be saved on this device.\n\n" + STORE.why +
+          "\n\nIt is still on the screen. Use Back up my data in History, or write the scores down, before you close the page.");
+    renderStoreLine();
+    return;
+  }
   clearDraft();
   if(s.kind==="gym") state.gymDraft = null;
   state.praise = (s.kind === "practice") ? sessionPraise(saved) : null;
@@ -4475,7 +4627,69 @@ function renderConditions(){
 
 }
 
+function whenText(ms){
+  if(!ms) return "";
+  var d = new Date(ms), now = new Date();
+  var hm = String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  var same = d.toDateString() === now.toDateString();
+  return hm + (same ? " today" : " on " + fmtDate(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")));
+}
+/* What the app can actually see on this device, said plainly. If a session ever goes
+   missing again this line says whether it was saved and never read back, or never
+   saved at all. */
+function renderStoreLine(){
+  var host = $("storeLine"); if(!host) return;
+  var live = state.sessions.filter(function(s){ return !s.sample; });
+  var mineN = live.filter(function(s){ return s.playerId===state.activePlayer; }).length;
+  var others = live.length - mineN;
+  var warn = STORE.ok === false;
+  host.innerHTML = '<div class="storebox'+(warn ? " bad" : "")+'">'+
+    (warn ? '<b>Not saving on this device.</b> ' + STORE.why +
+            ' Back up what is here before you close the page.'
+          : '<b>'+mineN+' '+(mineN===1?"session":"sessions")+'</b> saved on this device'+
+            (others ? ' \u00b7 '+others+' under another name' : '')+
+            (STORE.at ? ' \u00b7 last written '+whenText(STORE.at) : ''))+
+    '</div>'+
+    '<div class="tools"><button id="backupBtn">Back up my data</button>'+
+    '<button id="restoreBtn">Restore from a backup</button></div>';
+  $("backupBtn").addEventListener("click", backupData);
+  $("restoreBtn").addEventListener("click", restoreData);
+}
+function backupData(){
+  var blob = JSON.stringify({ v:1, at:Date.now(), players:state.players,
+    sessions:state.sessions.filter(function(s){ return !s.sample; }) });
+  var name = "longer-closer-lower-" + today() + ".json";
+  if(window.claude && claude.use){
+    claude.use("downloads").then(function(dl){
+      if(!dl){ fallbackCopy(blob, "Backup"); return; }
+      dl.save({filename:name, data:blob}).catch(function(){ fallbackCopy(blob, "Backup"); });
+    }).catch(function(){ fallbackCopy(blob, "Backup"); });
+    return;
+  }
+  try{
+    var a = document.createElement("a");
+    a.href = "data:application/json;charset=utf-8," + encodeURIComponent(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setStatus("Backup downloaded as " + name + ".");
+  }catch(e){ fallbackCopy(blob, "Backup"); }
+}
+function restoreData(){
+  var txt = prompt("Paste the backup file's contents here. Anything already saved is kept.");
+  if(!txt) return;
+  var o; try{ o = JSON.parse(txt); }catch(e){ setStatus("That did not look like a backup file."); return; }
+  var have = {}; state.sessions.forEach(function(x){ have[x.id]=true; });
+  var added = 0;
+  (o.sessions||[]).forEach(function(x){ if(x && x.id && !have[x.id]){ state.sessions.push(x); added++; } });
+  (o.players||[]).forEach(function(pp){
+    if(!state.players.some(function(x){ return x.id===pp.id; })) state.players.push(pp);
+  });
+  saveLocal(); render();
+  setStatus(added + " " + (added===1?"session":"sessions") + " restored.");
+}
+
 function renderHistory(){
+  renderStoreLine();
   renderBalance();
   renderConditions();
   var host = $("charts"); host.innerHTML="";
