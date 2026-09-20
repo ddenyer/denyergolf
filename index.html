@@ -734,6 +734,39 @@
     stroke:#ffffff; stroke-width:3.2px; stroke-linejoin:round}
   .pctmk text.pctn{font-size:11px; fill:#3c4a38; stroke-width:2.6px}
 
+  .banner.hello{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:10px;
+    padding:11px 14px; margin:0 0 14px; font-family:Archivo, sans-serif; font-size:15.5px;
+    font-weight:600; color:var(--ink); line-height:1.4}
+
+  /* ---- goals ---- */
+  .goalgrp{margin-bottom:22px}
+  .goalgrp h2{font-size:19px; margin:0 0 3px}
+  .goalgrp .lede{margin:0 0 12px}
+  .goalarea{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:14px; margin-bottom:12px}
+  .gahd{display:flex; align-items:baseline; gap:9px; margin-bottom:10px}
+  .gahd .n{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--accent)}
+  .gahd b{font-family:Archivo, sans-serif; font-size:17px; font-weight:600}
+  .galive{margin:9px 0 12px; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:12.5px; color:var(--muted)}
+  .targets.proc{border-left-color:var(--line-strong)}
+  #goalsProject{color:var(--accent); margin-top:2px}
+
+  /* ---- the season mix ---- */
+  #seasonPanel{margin-top:18px}
+  .seasonhd{margin-bottom:3px}
+  .seasonn{margin:0 0 9px; font-size:12.5px; color:var(--muted)}
+  .sbars{display:flex; flex-direction:column; gap:7px}
+  .srow{display:grid; grid-template-columns:96px 1fr 44px 40px; gap:9px; align-items:center; font-size:13px}
+  .srow > span:first-child{color:var(--ink-2)}
+  .strack{position:relative; height:10px; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:99px; overflow:visible}
+  .sfill{position:absolute; left:0; top:0; bottom:0; background:var(--accent-fill); border-radius:99px}
+  .starget{position:absolute; top:-4px; width:2px; height:18px; background:var(--ink-2); border-radius:1px}
+  .srow .n{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--ink)}
+  .srow .n.off{color:var(--accent)}
+  .srow .w{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--muted); font-size:12px}
+
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto}
@@ -834,6 +867,7 @@
       <button id="tabPractice" role="tab" aria-selected="true">Practice</button>
       <button id="tabBench" role="tab" aria-selected="false">Benchmarks</button>
       <button id="tabHistory" role="tab" aria-selected="false">History</button>
+      <button id="tabGoals" role="tab" aria-selected="false">Goals</button>
     </nav>
   </div>
 </header>
@@ -842,6 +876,7 @@
 
   <!-- HOME -->
   <section id="viewHome">
+    <p class="banner hello" id="helloBar" hidden></p>
     <h1>The five performance areas</h1>
     <p class="lede">An hour an area, or pair a short one with another. Ten minutes warm-up, the scored sets, ten minutes competing. Score every set and beat your last number.</p>
     <div class="banner resume" id="resumeBar" hidden>
@@ -860,6 +895,7 @@
     <div class="panel">
       <h2>Where the practice went</h2>
       <div class="balance" id="balance"></div>
+      <div id="seasonPanel"></div>
       <div class="split" id="split"></div>
       <p class="note">The programme prescribes an even split of hours: hour one long game, hour two inside 100. Two-thirds of strokes come from outside 100 yards, so when the split slides it should slide towards approach, not away from it.</p>
     </div>
@@ -964,6 +1000,14 @@
         <stop offset="0" stop-color="#9cc48e"/><stop offset="1" stop-color="#6e9c62"/></radialGradient>
     </defs>
   </svg>
+
+  <!-- GOALS -->
+  <section id="viewGoals" hidden>
+    <div class="eyebrow" id="goalsWho"></div>
+    <h1 id="goalsProject" hidden></h1>
+    <p class="lede">Outcome, then what has to improve to get there, then what you do in the week.</p>
+    <div id="goalsBody"></div>
+  </section>
 
   <!-- COACH -->
   <section id="viewCoach" hidden>
@@ -1481,6 +1525,28 @@ var COND = {
     {id:"speed", label:"Green speed", opts:[["fast","Fast"],["med","Medium"],["slow","Slow"]], hide:{venue:["indoor"]}}
   ]
 };
+function trainRow(draft){
+  var box = document.createElement("div"); box.className="condbox";
+  box.innerHTML = '<span class="eyebrow">What kind of practice <span style="text-transform:none;letter-spacing:0;font-weight:400">\u00b7 one tap, it feeds the season mix</span></span>';
+  var row = document.createElement("div"); row.className="condrow";
+  row.innerHTML = '<span>Training</span>';
+  var chips = document.createElement("div"); chips.className="chips";
+  TRAIN.filter(function(t){ return t.id !== "phys"; }).forEach(function(t){
+    var b = document.createElement("button"); b.type="button"; b.textContent = t.name;
+    b.title = t.note;
+    b.setAttribute("aria-pressed", draft.train === t.id ? "true" : "false");
+    b.addEventListener("click", function(){
+      draft.train = (draft.train === t.id) ? null : t.id;
+      box.querySelectorAll(".chips button").forEach(function(x){
+        x.setAttribute("aria-pressed", x.textContent === trainName(draft.train) ? "true" : "false");
+      });
+      saveDraft();
+    });
+    chips.appendChild(b);
+  });
+  row.appendChild(chips); box.appendChild(row);
+  return box;
+}
 function condKind(areaId, kind){
   if(kind==="gym") return null;
   if(areaId===4) return "putt";
@@ -1613,7 +1679,7 @@ function makeSample(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, train:s.train||null, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1671,10 +1737,13 @@ function show(view){
   $("viewBench").hidden = view!=="bench";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
+  if(view==="home") renderHello();
   $("viewPast").hidden = view!=="past";
+  $("viewGoals").hidden = view!=="goals";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session"||view==="gym")?"true":"false");
   $("tabBench").setAttribute("aria-selected", view==="bench"?"true":"false");
   $("tabHistory").setAttribute("aria-selected", (view==="history"||view==="past")?"true":"false");
+  $("tabGoals").setAttribute("aria-selected", view==="goals"?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
   if(view!=="session" && view!=="gym"){ state.deck = null; clearRest(); }
   updateNav();
@@ -1708,7 +1777,300 @@ function sparkline(vals, max){
     '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="3" fill="var(--accent-fill)"/></svg>';
 }
 
+/* ---------- who is holding the phone, and what to say to her ---------- */
+/* The coupon is the login: the gate writes the name it belongs to and the app
+   picks it up here. Without a gate (the artifact build) this does nothing. */
+var WHO_KEY = "lcl.who";
+function couponPlayer(){
+  try{ return localStorage.getItem(WHO_KEY) || ""; }catch(e){ return ""; }
+}
+function applyCouponIdentity(){
+  var name = couponPlayer();
+  if(!name) return false;
+  var want = name.trim().toLowerCase();
+  var found = null;
+  state.players.forEach(function(p){ if((p.name||"").trim().toLowerCase() === want) found = p; });
+  if(!found){
+    var only = state.players.length === 1 ? state.players[0] : null;
+    if(only && /^player\s*\d*$/i.test((only.name||"").trim())){
+      only.name = name; seedByName(only); found = only;      // the unnamed default becomes her
+    } else {
+      found = {id:uid(), name:name}; seedByName(found); state.players.push(found);
+    }
+  }
+  if(state.activePlayer !== found.id){ state.activePlayer = found.id; }
+  saveLocal();
+  return true;
+}
+
+var HELLO = [
+  "Let's boom it, {n}.",
+  "{n} is back at it.",
+  "Right then, {n}.",
+  "Time to go to work, {n}.",
+  "Let's find something today, {n}.",
+  "Good to see you, {n}.",
+  "Let's make it count, {n}.",
+  "One more in the bank, {n}.",
+  "Go on then, {n}.",
+  "Let's have it, {n}."
+];
+var HELLO_BACK = [
+  "Back at it, {n}.",
+  "Good to have you back, {n}.",
+  "Been a while, {n}. Let's go."
+];
+function ordinal(n){
+  var s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+function daysSince(dateStr){
+  if(!dateStr) return null;
+  var a = new Date(dateStr + "T00:00:00"), b = new Date(today() + "T00:00:00");
+  return Math.round((b - a) / 86400000);
+}
+function pickLine(list, key){
+  var last = -1;
+  try{ last = parseInt(localStorage.getItem(key), 10); }catch(e){}
+  var i = Math.floor(Math.random() * list.length);
+  if(list.length > 1 && i === last) i = (i + 1) % list.length;
+  try{ localStorage.setItem(key, String(i)); }catch(e){}
+  return list[i];
+}
+function helloLine(){
+  var p = playerObj(), name = (p && p.name) || "";
+  if(!name || /^player\s*\d*$/i.test(name.trim())) return "";
+  var mineAll = mine().filter(function(s){ return !s.sample; });
+  if(!mineAll.length) return "First one, " + name + ". Let's get a number on the board.";
+  var latest = mineAll.map(function(s){ return s.date; }).sort().pop();
+  var gap = daysSince(latest);
+  var list = (gap != null && gap >= 14) ? HELLO_BACK : HELLO;
+  return pickLine(list, "lcl.hello").replace("{n}", name);
+}
+
+/* A line that is true, or nothing. Ranked: a record beats a milestone beats a
+   count, and a plain result is better than a manufactured congratulation. */
+function sessionPraise(sess){
+  var p = playerObj(), name = (p && p.name) || "";
+  var a = area(sess.areaId);
+  var label = a ? a.name.toLowerCase() : "practice";
+  var all = mine().filter(function(s){ return !s.sample && s.kind === "practice"; });
+  var inArea = all.filter(function(s){ return s.areaId === sess.areaId; });
+  var prev = inArea.filter(function(s){ return s.id !== sess.id; });
+  var n = inArea.length;
+
+  if(n === 1) return "First " + label + " session logged" + (name ? ", " + name : "") +
+    ". Now there is a number to beat.";
+
+  if([10,25,50,100].indexOf(n) !== -1)
+    return "That is your " + ordinal(n) + " " + label + " session" + (name ? ", " + name : "") + ".";
+  if([25,50,100,200].indexOf(all.length) !== -1)
+    return "That is " + all.length + " sessions logged" + (name ? ", " + name : "") + ". Keep going.";
+
+  var bestPrev = 0; prev.forEach(function(s){ if((s.total||0) > bestPrev) bestPrev = s.total||0; });
+  if(prev.length && (sess.total||0) > bestPrev)
+    return "Best " + label + " score yet: " + sess.total + " out of " + sess.max + ".";
+
+  if(sess.metrics && sess.metrics.chsFast){
+    var fastPrev = 0;
+    all.forEach(function(s){ if(s.id !== sess.id && s.metrics && s.metrics.chsFast > fastPrev) fastPrev = s.metrics.chsFast; });
+    if(sess.metrics.chsFast > fastPrev)
+      return "Fastest you have logged: " + sess.metrics.chsFast + " mph.";
+  }
+
+  if(a && sess.shots){
+    var best = null;
+    a.sets.forEach(function(set){
+      var list = sess.shots[set.id]; if(!list) return;
+      var k = list.filter(function(x){ return x && x.z === "c"; }).length;
+      if(!k) return;
+      var was = 0;
+      prev.forEach(function(s){
+        var l2 = s.shots && s.shots[set.id]; if(!l2) return;
+        var k2 = l2.filter(function(x){ return x && x.z === "c"; }).length;
+        if(k2 > was) was = k2;
+      });
+      if(k > was && (!best || k > best.k)) best = {k:k, of:list.length, label:set.label};
+    });
+    if(best) return best.k + " of " + best.of + " in the target at " + best.label + ", your best yet.";
+  }
+
+  if(sess.competeMax && sess.compete === sess.competeMax)
+    return "A clean sweep in compete: " + sess.compete + " out of " + sess.competeMax + ".";
+
+  var last = prev.sort(function(x,y){ return x.date < y.date ? -1 : 1; }).slice(-1)[0];
+  if(last && (sess.total||0) > (last.total||0))
+    return "Up " + ((sess.total||0) - (last.total||0)) + " on last time at " + label + ".";
+
+  var month = sess.date.slice(0,7);
+  var thisMonth = inArea.filter(function(s){ return (s.date||"").slice(0,7) === month; }).length;
+  if(thisMonth >= 3)
+    return "Good work. That is your " + ordinal(thisMonth) + " " + label + " session this month.";
+
+  var outs = (p && p.outcomes) ? p.outcomes.filter(function(x){ return x; }) : [];
+  if(outs.length){
+    var o = outs[Math.floor(Math.random()*outs.length)];
+    return "Another one in the bank. One session closer to " + o.charAt(0).toLowerCase() + o.slice(1) + ".";
+  }
+  return "Another session in the bag. That is how it adds up.";
+}
+function renderHello(){
+  var bar = $("helloBar"); if(!bar) return;
+  var text = state.praise || helloLine();
+  bar.textContent = text;
+  bar.hidden = !text;
+}
+
+/* ---------- goals ---------- */
+/* Outcome, performance, process, the same three columns as the wall chart.
+   Performance is the targets that already drive each session, given a home of
+   their own; the live line underneath is what the app can actually measure. */
+var DECK_PROCESS = {
+  10:["Driving and hybrids at the range, Mon and Thu afternoons",
+      "Speed stick work alongside the gym",
+      "Strength and conditioning for club head speed"],
+  11:["Approach on the sim, Tue and Wed evenings and Friday morning",
+      "Nine box drill for flight control",
+      "Beat your proximity every session"],
+  2:["Wedge distance ladder on the sim: 30, 50, 70, 90",
+     "Beat your proximity every session",
+     "Three heights on command"],
+  3:["Up and down sets, Mon and Thu",
+     "A different lie every time",
+     "Bunker work every session"],
+  4:["Putting ladder",
+     "Circle drill and lag, tracked under pressure",
+     "Mat practice at home"]
+};
+function outcomesFor(){
+  var p = playerObj();
+  return toBullets((p && p.outcomes) ? p.outcomes : ["", "", ""]);
+}
+function processFor(areaId){
+  var p = playerObj();
+  if(p && p.process && p.process[areaId]) return toBullets(p.process[areaId]);
+  return toBullets(DECK_PROCESS[areaId] || ["", "", ""]);
+}
+function areaLive(a){
+  var h = sessionsFor(a.id);
+  if(!h.length) return "Nothing logged yet.";
+  var best = 0; h.forEach(function(s){ if((s.total||0) > best) best = s.total||0; });
+  var last = h[h.length-1];
+  var bits = ["Last " + (last.total||0) + "/" + (last.max||areaMax(a)),
+              "best " + best, h.length + (h.length===1 ? " session" : " sessions")];
+  if(a.id === 10){
+    var sr = speedRows();
+    if(sr.length){ var pb = 0; sr.forEach(function(x){ if(x.f > pb) pb = x.f; });
+      bits.push("fastest " + pb + " mph"); }
+  }
+  return bits.join(" · ");
+}
+/* ---------- the season, and what kind of practice it was ---------- */
+/* One slice of the periodisation: the macro cycle's seasonal mix. Every practice
+   session carries the kind of training it was, and the home page compares what
+   actually happened against what this phase asks for. */
+var TRAIN = [
+  {id:"tech",  name:"Technical",   note:"Mechanics, one piece at a time"},
+  {id:"cons",  name:"Consistency", note:"Same shot, again and again, to a target"},
+  {id:"vary",  name:"Variability", note:"Different flights, shapes and lies"},
+  {id:"comp",  name:"Competition", note:"One ball, a score, pressure"},
+  {id:"ment",  name:"Mental",      note:"Routine, visualisation, reflection"},
+  {id:"phys",  name:"Physical",    note:"Gym, speed sticks, movement"}
+];
+var SEASON = [
+  {id:"pre",  name:"Pre-season",  months:[2,3,4],
+   mix:{tech:20, cons:20, vary:20, comp:20, ment:10, phys:10}},
+  {id:"in",   name:"In-season",   months:[5,6,7,8,9],
+   mix:{tech:15, cons:25, vary:15, comp:30, ment:10, phys:5}},
+  {id:"post", name:"Post-season", months:[10,11,0,1],
+   mix:{tech:45, cons:10, vary:10, comp:5, ment:10, phys:20}}
+];
+function seasonFor(dateStr){
+  var m = dateStr ? (new Date(dateStr + "T00:00:00")).getMonth() : (new Date()).getMonth();
+  for(var i=0;i<SEASON.length;i++){ if(SEASON[i].months.indexOf(m) !== -1) return SEASON[i]; }
+  return SEASON[1];
+}
+function trainName(id){
+  for(var i=0;i<TRAIN.length;i++){ if(TRAIN[i].id === id) return TRAIN[i].name; }
+  return id;
+}
+function sessionTrain(s){
+  if(s.train) return s.train;
+  if(s.kind === "gym") return "phys";     // the gym is physical by definition
+  return null;
+}
+function renderSeason(){
+  var host = $("seasonPanel"); if(!host) return;
+  var ph = seasonFor(today());
+  var since = new Date(Date.now() - 56*86400000).toISOString().slice(0,10);
+  var pool = mine().filter(function(s){ return !s.sample && s.kind !== "round" && s.date >= since; });
+  var counts = {}, n = 0;
+  TRAIN.forEach(function(t){ counts[t.id] = 0; });
+  pool.forEach(function(s){ var k = sessionTrain(s); if(k && counts[k] != null){ counts[k]++; n++; } });
+
+  var rows = TRAIN.map(function(t){
+    var want = ph.mix[t.id], got = n ? Math.round(counts[t.id]/n*100) : 0;
+    var off = got - want;
+    return '<div class="srow"><span>'+t.name+'</span>'+
+      '<span class="strack"><span class="sfill" style="width:'+Math.min(100,got)+'%"></span>'+
+      '<span class="starget" style="left:'+Math.min(100,want)+'%"></span></span>'+
+      '<span class="n num'+(Math.abs(off)>=12 ? " off" : "")+'">'+got+'%</span>'+
+      '<span class="w num">'+want+'%</span></div>';
+  }).join("");
+
+  host.innerHTML = '<div class="seasonhd"><span class="eyebrow">'+ph.name+' · the mix it asks for</span></div>'+
+    '<p class="seasonn">'+n+' of the last eight weeks’ sessions carry a training tag.</p>'+
+    '<div class="sbars">'+rows+'</div>'+
+    '<p class="note">The bar is what you did, the mark is what this phase asks for. '+
+    (n < 6 ? 'Too few tagged sessions to read anything into yet.'
+           : 'Anything more than twelve points either way is worth a look.')+'</p>';
+}
+
+function renderGoals(){
+  var host = $("goalsBody"); if(!host) return;
+  host.innerHTML = "";
+  var p = playerObj();
+  $("goalsWho").textContent = p ? p.name : "";
+  $("goalsProject").textContent = projectFor();
+  $("goalsProject").hidden = !projectFor();
+
+  var out = document.createElement("div"); out.className="goalgrp";
+  out.innerHTML = '<h2>Outcome</h2><p class="lede">What the season is for. Three, no more.</p>';
+  out.appendChild(bulletBox({
+    eyebrow:"Outcome goals",
+    lines: outcomesFor,
+    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveLocal(); pushMeta(); } }
+  }));
+  host.appendChild(out);
+
+  var perf = document.createElement("div"); perf.className="goalgrp";
+  perf.innerHTML = '<h2>Performance</h2><p class="lede">What has to improve to get there. '+
+    'These are the targets each session opens with.</p>';
+  liveAreas().forEach(function(a){
+    var card = document.createElement("div"); card.className="goalarea";
+    card.innerHTML = '<div class="gahd"><span class="n num">'+areaNo(a)+'</span><b>'+a.name+'</b></div>';
+    card.appendChild(bulletBox({
+      eyebrow:"Targets",
+      lines: function(){ return targetsFor(a.id); },
+      onSave: function(v){ var pl = playerObj(); if(pl){ pl.targets = pl.targets || {}; pl.targets[a.id] = v; saveLocal(); pushMeta(); } },
+      onReset: function(){ var pl = playerObj(); if(pl && pl.targets){ delete pl.targets[a.id]; saveLocal(); pushMeta(); } }
+    }));
+    var live = document.createElement("p"); live.className="galive"; live.textContent = areaLive(a);
+    card.appendChild(live);
+    card.appendChild(bulletBox({
+      eyebrow:"How · the week",
+      cls:"proc",
+      lines: function(){ return processFor(a.id); },
+      onSave: function(v){ var pl = playerObj(); if(pl){ pl.process = pl.process || {}; pl.process[a.id] = v; saveLocal(); pushMeta(); } },
+      onReset: function(){ var pl = playerObj(); if(pl && pl.process){ delete pl.process[a.id]; saveLocal(); pushMeta(); } }
+    }));
+    perf.appendChild(card);
+  });
+  host.appendChild(perf);
+}
+
 function renderHome(){
+  renderHello();
   var host = $("areaList"); host.innerHTML = "";
   liveAreas().forEach(function(a){
     var hist = sessionsFor(a.id);
@@ -1814,6 +2176,7 @@ function renderBalance(){
       '<span class="n num">'+counts[k]+'</span>';
     host.appendChild(row);
   });
+  renderSeason();
   var lng = counts[10]+counts[11]+counts[1], in100 = counts[2]+counts[3]+counts[4], tot = lng+in100;
   $("split").innerHTML =
     '<div><b class="num">'+(tot? Math.round(lng/tot*100):0)+'%</b>long game · last 28 days</div>'+
@@ -1929,7 +2292,7 @@ function openSession(areaId, resume){
     state.draft = resume;
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
-                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
+                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
     a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
@@ -1958,8 +2321,11 @@ function sessionIntro(){
 }
 function condPage(){
   var d = document.createElement("div");
-  d.innerHTML = '<div id="sessCond"></div>'+
-                '<p class="note">Logged once at the start. You will not be asked again.</p>';
+  d.innerHTML = '<div id="sessCond"></div>';
+  d.appendChild(trainRow(state.draft));
+  var n = document.createElement("p"); n.className="note";
+  n.textContent = "Logged once at the start. You will not be asked again.";
+  d.appendChild(n);
   return d;
 }
 
@@ -2808,6 +3174,10 @@ function toBullets(v){
   return a.map(function(x){ return (x==null ? "" : String(x).trim()); });
 }
 var DECK_PROJECT = { annabel:"Project Bellasteros", charlotte:"Project Bryson De Chabo" };
+var DECK_OUTCOMES = {
+  annabel:["Win a multi-round tournament", "Make the cut at the English Amateur", "A plus handicap"],
+  charlotte:["Win a multi-round tournament", "Top ten English girls", "A plus handicap"]
+};
 var ROUND_TARGETS = "Doubles \u2264 1 a round \u00b7 pin high on approaches, not short \u00b7 play away from the short side";
 var DECK_TARGETS = {
   charlotte:{
@@ -2891,6 +3261,8 @@ function seedByName(p){
   p.targets = JSON.parse(JSON.stringify(DECK_TARGETS[key]));
   if(!p.checks) p.checks = DECK_CHECKS[key].slice();
   if(!p.project) p.project = DECK_PROJECT[key];
+  if(!p.outcomes) p.outcomes = DECK_OUTCOMES[key].slice();
+  if(!p.process) p.process = JSON.parse(JSON.stringify(DECK_PROCESS));
   return true;
 }
 
@@ -3464,12 +3836,15 @@ function saveCurrent(){
   } else return;
 
   if(state.sampleOn){ state.sessions = state.sessions.filter(function(x){ return !x.sample; }); state.sampleOn=false; }
-  state.sessions.push(JSON.parse(JSON.stringify(s)));
+  var saved = JSON.parse(JSON.stringify(s));
+  state.sessions.push(saved);
   saveLocal(); pushDoc(s);
   clearDraft();
   if(s.kind==="gym") state.gymDraft = null;
+  state.praise = (s.kind === "practice") ? sessionPraise(saved) : null;
   render();
   show("home");
+  state.praise = null;
 }
 
 /* ---------- history ---------- */
@@ -4040,6 +4415,7 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
 $("tabPractice").addEventListener("click", function(){ show("home"); });
 $("tabBench").addEventListener("click", function(){ renderBench(); show("bench"); });
 $("tabHistory").addEventListener("click", function(){ renderHistory(); show("history"); });
+$("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
 $("sessionBack").addEventListener("click", function(){ show("home"); });
 $("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx-1); });
 $("navNext").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx+1); });
@@ -4053,7 +4429,7 @@ $("clearSample").addEventListener("click", function(){
 });
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
-  if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveLocal(); pushMeta(); }
+  if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveLocal(); pushMeta(); render(); }
 });
 $("playerSwitch").addEventListener("click", function(){
   var i = state.players.map(function(p){ return p.id; }).indexOf(state.activePlayer);
@@ -4263,6 +4639,10 @@ function coachImport(text){
 
 /* ---------- boot ---------- */
 var had = loadLocal();
+applyCouponIdentity();
+window.addEventListener("lcl-who", function(){
+  if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
+});
 if(!had || !state.sessions.length){ state.sessions = makeSample(); state.sampleOn = true; }
 renderPlayer();
 render();
@@ -4294,6 +4674,10 @@ connect();
   var STRICT = true;
   var API    = "/api/validate-code";
   var KEY    = "dg.access.v1";
+  // The coupon is the login. Each player has her own code, so the code names her.
+  // Not a secret: anyone reading this page can see both. Inside a gated tool that
+  // is a partition, not a lock, which is all it needs to be.
+  var WHO    = { BELLA: "Annabel", CHABO: "Charlotte" };
   var TTL    = 30 * 86400000;
 
   var gate  = document.getElementById("gate");
@@ -4337,6 +4721,11 @@ connect();
       localStorage.setItem(KEY, JSON.stringify({
         code: code, at: Date.now(), membership: (d && d.membership) || ""
       }));
+      if(WHO[code]){
+        localStorage.setItem("lcl.who", WHO[code]);
+        // the app has already booted by now, so tell it who turned up
+        try{ window.dispatchEvent(new CustomEvent("lcl-who")); }catch(e){}
+      }
     }catch(e){}
   }
   function forget(){ try{ localStorage.removeItem(KEY); }catch(e){} }
