@@ -617,6 +617,8 @@
   svg.rose, svg.wgrid, svg.corr, svg.clock, svg.lag{width:100%; max-width:330px; height:auto; touch-action:manipulation}
 
   .rz{cursor:pointer}
+  .rz, .wc, .stn{-webkit-tap-highlight-color:transparent}
+  .rz:focus, .wc:focus{outline:none}
   .rz:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
   .rzl{font-family:Archivo, sans-serif; font-size:13px; font-weight:600; text-anchor:middle;
     pointer-events:none; fill:#2b3a27}
@@ -690,6 +692,8 @@
   .cz{fill:rgba(255,255,255,.42); stroke:#7ba86c; stroke-width:1.2}
   .cin{fill:rgba(255,255,255,.6); stroke:#7ba86c; stroke-width:1.4}
   .clock .rz:hover, .clock .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  /* the hole never lights up: the count inside it is the confirmation */
+  .clock .rz.cin:hover, .clock .rz.cin.on{fill:rgba(255,255,255,.6); stroke:#7ba86c; stroke-width:1.4}
   /* a white halo so the label stays readable wherever the slope arrow lands */
   .czl{fill:#2b3a27; font-family:Archivo, sans-serif; font-size:11px; font-weight:700;
     letter-spacing:1.1; text-anchor:middle; pointer-events:none;
@@ -1215,21 +1219,21 @@ var AREAS = [
   /* Five balls a page. The old sets said "4 sets of 5" on one card; they are now four
      cards of five, which is how they are actually hit. */
   sets:[
-    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · set 1 of 4", tc:"3 ft", tgt:"Good lie, the first distance · within 3 ft", max:5},
-    {id:"a2", blk:"Pitching & chipping", label:"Release 1 · 50° · set 2 of 4", tc:"3 ft", tgt:"Good lie, the second distance · within 3 ft", max:5},
-    {id:"a3", blk:"Pitching & chipping", label:"Release 1 · 50° · set 3 of 4", tc:"3 ft", tgt:"Good lie, the third distance · within 3 ft", max:5},
-    {id:"a4", blk:"Pitching & chipping", label:"Release 1 · 50° · set 4 of 4", tc:"3 ft", tgt:"Good lie, the fourth distance · within 3 ft", max:5},
-    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° and 58° · set 1 of 3", tc:"3 ft", tgt:"Good lie · within 3 ft", max:5},
-    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° and 58° · set 2 of 3", tc:"3 ft", tgt:"Good lie, a different distance · within 3 ft", max:5},
-    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 54° and 58° · set 3 of 3", tc:"3 ft", tgt:"Good lie, a different distance · within 3 ft", max:5},
-    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill", tc:"3 ft", tgt:"Five balls · within 3 ft · you choose the loft", max:5},
-    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough", tc:"3 ft", tgt:"Five balls · within 3 ft · you choose the loft", max:5},
-    {id:"c3", blk:"Pitching & chipping", label:"Tricky lie · bare", tc:"3 ft", tgt:"Five balls · within 3 ft · you choose the loft", max:5},
-    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · target 1", tc:"3 ft", tgt:"Five balls · within 3 ft", max:5},
-    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · target 2", tc:"3 ft", tgt:"Five balls · within 3 ft", max:5},
-    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · target 3", tc:"3 ft", tgt:"Five balls · within 3 ft", max:5},
-    {id:"e1", blk:"Bunkers", label:"Bunker · bad lie · set 1 of 2", tc:"3 ft", tgt:"Downhill or plugged · five balls · within 3 ft", max:5},
-    {id:"e2", blk:"Bunkers", label:"Bunker · bad lie · set 2 of 2", tc:"3 ft", tgt:"Downhill or plugged · five balls · within 3 ft", max:5}
+    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"3 ft", tgt:"Set 1 of 4 · good lie · within 3 ft", max:5},
+    {id:"a2", blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"3 ft", tgt:"Set 2 of 4 · good lie · within 3 ft", max:5},
+    {id:"a3", blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"3 ft", tgt:"Set 3 of 4 · good lie · within 3 ft", max:5},
+    {id:"a4", blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"3 ft", tgt:"Set 4 of 4 · good lie · within 3 ft", max:5},
+    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"3 ft", tgt:"Set 1 of 3 · good lie · within 3 ft", max:5},
+    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"3 ft", tgt:"Set 2 of 3 · good lie · within 3 ft", max:5},
+    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"3 ft", tgt:"Set 3 of 3 · good lie · within 3 ft", max:5},
+    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"3 ft", tgt:"Set 1 of 3 · within 3 ft · you choose the loft", max:5},
+    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"3 ft", tgt:"Set 2 of 3 · within 3 ft · you choose the loft", max:5},
+    {id:"c3", blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"3 ft", tgt:"Set 3 of 3 · within 3 ft · you choose the loft", max:5},
+    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"3 ft", tgt:"Set 1 of 3 · within 3 ft", max:5},
+    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"3 ft", tgt:"Set 2 of 3 · within 3 ft", max:5},
+    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"3 ft", tgt:"Set 3 of 3 · within 3 ft", max:5},
+    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"3 ft", tgt:"Set 1 of 2 · within 3 ft", max:5},
+    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"3 ft", tgt:"Set 2 of 2 · within 3 ft", max:5}
   ],
   compete:{max:30, label:"Compete · 15 shots", tgt:"Random targets with a partner, alternating shots and target choice, or 15 shots alone. In the target 1, holed 2."} },
 
