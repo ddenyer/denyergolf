@@ -605,23 +605,56 @@
     padding:4px 11px; font-size:12px; color:var(--ink-2)}
 
   /* ---- where the ball went ---- */
+  /* Grass and sand colours are fixed rather than themed: a fairway that inverted
+     into the darkest band in dark mode would read as the rough. */
   .shotset{display:block}
   .shotask{margin:12px 0 10px; font-size:13.5px; color:var(--ink-2); line-height:1.45; min-height:2.6em}
   .shotask b{color:var(--ink)}
   .shotdiag{display:grid; grid-template-columns:1fr; gap:12px; justify-items:center}
   .shotdiag.two{grid-template-columns:1fr 1fr; align-items:start}
   @media (max-width:520px){ .shotdiag.two{grid-template-columns:1fr} }
-  svg.rose, svg.wgrid{width:100%; max-width:320px; height:auto; touch-action:manipulation}
-  .rz{fill:var(--surface-2); stroke:var(--line); stroke-width:1.5; cursor:pointer}
-  .rz:hover{fill:var(--accent-wash)}
+  svg.rose, svg.wgrid, svg.corr{width:100%; max-width:330px; height:auto; touch-action:manipulation}
+
+  .rz{cursor:pointer}
   .rz:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
-  .rz.on{fill:var(--accent-wash); stroke:var(--accent-fill); stroke-width:2.5}
-  .rc{fill:var(--surface)}
-  .rc.on{fill:var(--accent-wash)}
-  .rzl{fill:var(--muted); font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
+  .rzl{font-family:Archivo, sans-serif; font-size:13px; font-weight:600; text-anchor:middle;
+    pointer-events:none; fill:#2b3a27}
+  .rzl.vert{font-size:11px}
+  .caption{pointer-events:none}
+  .cappill{fill:#ffffff; stroke:#c8d3c4; stroke-width:1}
+  .rcl, .gatelab{fill:#1f2a1c; font-family:Archivo, sans-serif; font-size:15px; font-weight:600;
     text-anchor:middle; pointer-events:none}
-  .rcl{fill:var(--ink); font-family:Archivo, sans-serif; font-size:16px; font-weight:600;
-    text-anchor:middle; pointer-events:none}
+  .gatelab{font-family:"IBM Plex Mono", ui-monospace, monospace}
+
+  /* the green */
+  .rbed{fill:#6e9c62}
+  .rose .rz{fill:url(#gRough); stroke:#5b8450; stroke-width:1.1}
+  .rose .rc{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
+  .fringe{fill:#94bd84; pointer-events:none}
+  .rose .rz:hover, .rose .rz.on{fill:#f0d69a; stroke:var(--accent-fill); stroke-width:2.6}
+  .pin{pointer-events:none}
+  .pin line{stroke:#f4f6f2; stroke-width:2.4}
+  .pinflag{fill:#c8402f}
+  .hole{fill:#33482c}
+
+  /* the fairway */
+  .corr .rz{stroke:#4f7347; stroke-width:1.1}
+  .corr .rz.fw{fill:url(#gFair)}
+  .corr .rz.semi{fill:url(#gSemi)}
+  .corr .rz.deep{fill:url(#gDeep)}
+  .corr .rz.sand{fill:url(#gSand); stroke:#a5803f}
+  .mow{fill:#ffffff; opacity:.30; pointer-events:none}
+  .bface{fill:url(#gFace); stroke:none; pointer-events:none}
+  .bshade{fill:#8d6a35; opacity:.22; pointer-events:none}
+  .fcut{stroke:#8a6a3c; stroke-width:1.2}
+  .treeline{fill:#3d6a36; pointer-events:none}
+  .fpole{stroke:#55624f; stroke-width:2.2}
+  .fflag{fill:#c8402f}
+  .fgate{stroke:#8d9a8a; stroke-width:1.2; stroke-dasharray:4 4}
+  .corr .rz:hover, .corr .rz.on{fill:#f0d69a; stroke:var(--accent-fill); stroke-width:2.6}
+  .corr .rzl.sandl{fill:#4a3a1e}
+
+  /* the window frame */
   .wframe{fill:none; stroke:var(--line); stroke-width:1.5; stroke-dasharray:5 5}
   .wcell{fill:var(--surface); stroke:var(--ink-2); stroke-width:1.6; cursor:pointer}
   .wc:hover .wcell{fill:var(--accent-wash)}
@@ -630,14 +663,17 @@
   .wc.on .wcell{fill:var(--accent-wash); stroke:var(--accent-fill); stroke-width:3}
   .wnum{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:21px;
     font-weight:600; text-anchor:middle; pointer-events:none}
-  .wovl{fill:var(--muted); font-family:Archivo, sans-serif; font-size:11px; font-weight:600;
-    letter-spacing:1.1px; text-anchor:middle; pointer-events:none}
   .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
-  .mk circle{fill:var(--ink); stroke:var(--surface); stroke-width:2}
-  .mk text{fill:var(--surface); font-family:"IBM Plex Mono", ui-monospace, monospace;
+
+  /* ball markers */
+  .mk{pointer-events:none}
+  .mk circle{fill:#1d2a19; stroke:#f2f6ef; stroke-width:2}
+  .mk text{fill:#f6f9f4; font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:13px; font-weight:600; text-anchor:middle}
+  .corr .mk text{font-size:12px}
   .mk.hit circle{fill:var(--accent)}
   .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
+
   .balls{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
     background:var(--surface-2); color:var(--muted); font-family:"IBM Plex Mono", ui-monospace, monospace;
@@ -654,30 +690,6 @@
   @media (max-width:520px){ .pastrose{grid-template-columns:1fr} }
   .pastrose .rz, .pastrose .wcell{cursor:default}
 
-  /* ---- the fairway corridor ---- */
-  svg.corr{width:100%; max-width:320px; height:auto; touch-action:manipulation}
-  /* Grass colours are fixed rather than themed: a fairway that inverted into the
-     darkest band in dark mode would read as the rough. */
-  .corr .rz{stroke:#5d8055; stroke-width:1.2}
-  .corr .rz.fw{fill:#d8e8d0}
-  .corr .rz.sand{fill:#e7d3a8; stroke:#b99a6a}
-  .bface{fill:#c8a271; stroke:#a8814f; stroke-width:1; pointer-events:none}
-  .corr .rzl.sandl{fill:#4a3a1e}
-  .corr .rz.semi{fill:#a3c697}
-  .corr .rz.deep{fill:#5f9455}
-  .fcut{stroke:#8f6d3f; stroke-width:1.4}
-  .corr .rz:hover, .corr .rz.on{fill:#f0d69a; stroke:var(--accent-fill); stroke-width:2.6}
-  .corr .rzl{fill:#2b3a27}
-  .corr .mk circle{fill:#22301e; stroke:#eef3ea; stroke-width:2}
-  .corr .mk text{fill:#f4f7f2; font-size:12px}
-  .corr .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
-  .fpole{stroke:var(--line-strong); stroke-width:2}
-  .fflag{fill:var(--accent-fill)}
-  .fgate{stroke:var(--line-strong); stroke-width:1; stroke-dasharray:4 4}
-  .gatelab{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:15px;
-    font-weight:600; text-anchor:middle; pointer-events:none}
-  .corr .rzl{font-size:12.5px}
-  .corr .rzl.vert{font-size:11px}
 
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
@@ -890,6 +902,25 @@
     </div>
     <p class="status" id="status"></p>
   </section>
+
+  <svg id="gfxDefs" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gFair" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#c6dfb8"/><stop offset="1" stop-color="#e3f1da"/></linearGradient>
+      <linearGradient id="gSemi" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8ab47e"/><stop offset="1" stop-color="#accd9f"/></linearGradient>
+      <linearGradient id="gDeep" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#47763e"/><stop offset="1" stop-color="#679a5b"/></linearGradient>
+      <linearGradient id="gSand" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#d7bc88"/><stop offset="1" stop-color="#f0dfba"/></linearGradient>
+      <linearGradient id="gFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a5803f"/><stop offset="1" stop-color="#c9a471"/></linearGradient>
+      <radialGradient id="gGreen" cx="40%" cy="32%" r="78%">
+        <stop offset="0" stop-color="#e6f4dc"/><stop offset="1" stop-color="#b5d9a2"/></radialGradient>
+      <radialGradient id="gRough" cx="50%" cy="34%" r="76%">
+        <stop offset="0" stop-color="#9cc48e"/><stop offset="1" stop-color="#6e9c62"/></radialGradient>
+    </defs>
+  </svg>
 
   <!-- COACH -->
   <section id="viewCoach" hidden>
@@ -2043,7 +2074,7 @@ function trackKind(a, s){
 function ballsIn(s){ return s.parts ? 5 : s.max; }
 
 /* ---- geometry ---- */
-var ROSE_C = 150, ROSE_R = 138, ROSE_IN = 52;
+var ROSE_CX = 150, ROSE_CY = 170, ROSE_R = 136, ROSE_IN = 54;
 function polar(cx, cy, rad, deg){
   var t = deg*Math.PI/180;
   return [cx + rad*Math.sin(t), cy - rad*Math.cos(t)];
@@ -2057,39 +2088,41 @@ function sectorPath(cx, cy, r0, r1, d0, d1){
          "L"+f1(c[0])+" "+f1(c[1])+
          "A"+r0+" "+r0+" 0 0 0 "+f1(e[0])+" "+f1(e[1])+"Z";
 }
+/* A pin, drawn small enough to sit inside the green without crowding the balls. */
+function pinAt(cx, cy, h){
+  return '<g class="pin"><line x1="'+cx+'" y1="'+(cy-h)+'" x2="'+cx+'" y2="'+(cy+2)+'"></line>'+
+         '<path class="pinflag" d="M'+cx+' '+(cy-h)+' L'+(cx+17)+' '+(cy-h+6)+' L'+cx+' '+(cy-h+12)+'Z"></path>'+
+         '<ellipse class="hole" cx="'+cx+'" cy="'+(cy+3)+'" rx="5" ry="2.4"></ellipse></g>';
+}
 function roseSvg(centreLabel, tappable){
-  var out = "";
+  var CX = ROSE_CX, CY = ROSE_CY, out = "";
+  out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
   ZONES.forEach(function(z, i){
-    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(ROSE_C,ROSE_C,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
+    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
            (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+'"' : '')+'></path>';
-    var p = polar(ROSE_C, ROSE_C, ROSE_IN+(ROSE_R-ROSE_IN)*0.80, i*45);
+    var p = polar(CX, CY, 114, i*45);
     out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
   });
-  out += '<circle class="rz rc" data-z="c" cx="'+ROSE_C+'" cy="'+ROSE_C+'" r="'+ROSE_IN+'"'+
+  out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
+  out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
          (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
-  out += '<text class="rcl" x="'+ROSE_C+'" y="'+(ROSE_C+ROSE_IN-11)+'">'+(centreLabel||"In")+'</text>';
-  return '<svg viewBox="0 0 300 300" class="rose" role="group" aria-label="Where the ball finished">'+
+  out += pinAt(CX, CY - 12, 30);
+  out += '<g class="caption"><rect class="cappill" x="86" y="3" width="128" height="26" rx="13"></rect>'+
+         '<text class="rcl" x="150" y="21">'+(centreLabel||"In")+'</text></g>';
+  return '<svg viewBox="0 0 300 318" class="rose" role="group" aria-label="Where the ball finished">'+
          out+'<g class="marks"></g></svg>';
 }
 /* Ball markers keep to the inner half of each ring segment; the labels have the outer
    half to themselves, so a busy zone never writes over its own name. */
-var ROSE_SPREAD = [[0,0.30],[-14,0.52],[14,0.52],[-14,0.10],[14,0.10],[0,0.06],[-24,0.34],[24,0.34],[0,0.56],[0,0.20]];
-var CENTRE_ANG = [0, -55, 55, -110, 110];
+var ROSE_SPREAD = [[0,81],[-17,75],[17,75],[-17,89],[17,89],[0,93],[-9,82],[9,82],[0,76],[0,87]];
+var CENTRE_ANG = [180, 120, 240, 90, 270, 150, 210];
 function roseMark(zoneId, n){
-  if(zoneId==="c"){
-    var ring = n < CENTRE_ANG.length ? ROSE_IN*0.50 : ROSE_IN*0.82;
-    return polar(ROSE_C, ROSE_C, ring, CENTRE_ANG[n % CENTRE_ANG.length]);
-  }
-  var i = zoneIndex(zoneId); if(i<0) return [ROSE_C, ROSE_C];
+  if(zoneId==="c") return polar(ROSE_CX, ROSE_CY, ROSE_IN*0.72, CENTRE_ANG[n % CENTRE_ANG.length]);
+  var i = zoneIndex(zoneId); if(i<0) return [ROSE_CX, ROSE_CY];
   var m = ROSE_SPREAD[n % ROSE_SPREAD.length];
-  return polar(ROSE_C, ROSE_C, ROSE_IN + (ROSE_R-ROSE_IN)*(0.08 + 0.52*m[1]), i*45 + m[0]);
+  return polar(ROSE_CX, ROSE_CY, m[1], i*45 + m[0]);
 }
 
-/* ---- the fairway, for tee shots ---- */
-/* A rosette is the wrong picture off the tee: nothing is "long" when the club is
-   the longest you own. The corridor is the gate between the two target flags,
-   drawn in perspective, with the five side misses and one more for the ball that
-   went straight but nowhere near far enough. */
 /* Half-widths at the far end. Every band widens by the same factor coming towards
    the player, so the semi and the deep rough run parallel to the fairway instead of
    fanning out from it. */
@@ -2128,10 +2161,9 @@ function corridorSvg(gate, tappable){
   var att = tappable ? ' role="button" tabindex="0"' : '', out = "";
 
   function band(id, wOuter, wInner, cls, label){
-    var sd = corrSide(id);
-    var xo = sd < 0 ? cxL : cxR, xi = sd < 0 ? cxL : cxR;
+    var sd = corrSide(id), x = sd < 0 ? cxL : cxR;
     out += '<polygon class="rz '+cls+'" data-z="'+id+'"'+att+' aria-label="'+label+'" points="'+
-           poly([[xo(wOuter,T),T],[xi(wInner,T),T],[xi(wInner,B),B],[xo(wOuter,B),B]])+'"></polygon>';
+           poly([[x(wOuter,T),T],[x(wInner,T),T],[x(wInner,B),B],[x(wOuter,B),B]])+'"></polygon>';
   }
   band("wayLeft",  K.hw.deep, K.hw.semi, "deep", "Deep rough, left");
   band("wayRight", K.hw.deep, K.hw.semi, "deep", "Deep rough, right");
@@ -2140,23 +2172,49 @@ function corridorSvg(gate, tappable){
 
   out += '<polygon class="rz fw" data-z="c"'+att+' aria-label="In the fairway" points="'+
          poly([[cxL(K.hw.fair,T),T],[cxR(K.hw.fair,T),T],[cxR(K.hw.fair,C),C],[cxL(K.hw.fair,C),C]])+'"></polygon>';
+
+  // mower stripes down the fairway, drawn over the tap target rather than in place of it
+  var n = 7, st = "";
+  for(var i=0;i<n;i++){
+    if(i%2) continue;
+    var y0 = T + (C-T)*(i/n), y1 = T + (C-T)*((i+1)/n);
+    st += '<polygon points="'+poly([[cxL(K.hw.fair,y0),y0],[cxR(K.hw.fair,y0),y0],
+                                   [cxR(K.hw.fair,y1),y1],[cxL(K.hw.fair,y1),y1]])+'"></polygon>';
+  }
+  out += '<g class="mow">'+st+'</g>';
+
+  // the bunker, and the face you have to carry
+  var F = C + K.face;
   out += '<polygon class="rz sand" data-z="short"'+att+' aria-label="Short, in the bunker" points="'+
          poly([[cxL(K.hw.fair,C),C],[cxR(K.hw.fair,C),C],[cxR(K.hw.fair,B),B],[cxL(K.hw.fair,B),B]])+'"></polygon>';
-  // the face you have to carry, along the top lip of the bunker
-  var F = C + K.face;
   out += '<polygon class="bface" points="'+
          poly([[cxL(K.hw.fair,C),C],[cxR(K.hw.fair,C),C],[cxR(K.hw.fair,F),F],[cxL(K.hw.fair,F),F]])+'"></polygon>';
+  out += '<polygon class="bshade" points="'+
+         poly([[cxL(K.hw.fair,F),F],[cxR(K.hw.fair,F),F],[cxR(K.hw.fair,F+9),F+9],[cxL(K.hw.fair,F+9),F+9]])+'"></polygon>';
   out += '<line class="fcut" x1="'+cxL(K.hw.fair,C).toFixed(1)+'" y1="'+C+
          '" x2="'+cxR(K.hw.fair,C).toFixed(1)+'" y2="'+C+'"></line>';
 
+  // a treeline along the far edge of the rough, purely for the horizon
+  function trees(x0, x1){
+    var t = "", w = 15;
+    for(var x = x0; x < x1 - 4; x += w){
+      var h = 13 + ((x*7) % 9);
+      t += '<path d="M'+f1(x)+' '+T+' q'+(w/2)+' '+(-h)+' '+w+' 0Z"></path>';
+    }
+    return t;
+  }
+  out += '<g class="treeline">'+trees(cxL(K.hw.deep,T), cxL(K.hw.fair,T)-2)+
+         trees(cxR(K.hw.fair,T)+2, cxR(K.hw.deep,T))+'</g>';
+
   // the two flags on the gate, and the gap between them
   var gl = cxL(K.hw.fair,T), gr = cxR(K.hw.fair,T);
+  out += '<line class="fgate" x1="'+gl+'" y1="'+(T-46)+'" x2="'+gr+'" y2="'+(T-46)+'"></line>';
   [gl, gr].forEach(function(x){
-    out += '<line class="fpole" x1="'+x+'" y1="'+(T-42)+'" x2="'+x+'" y2="'+T+'"></line>'+
-           '<path class="fflag" d="M'+x+' '+(T-42)+' L'+(x+20)+' '+(T-35)+' L'+x+' '+(T-28)+'Z"></path>';
+    out += '<line class="fpole" x1="'+x+'" y1="'+(T-44)+'" x2="'+x+'" y2="'+(T+1)+'"></line>'+
+           '<path class="fflag" d="M'+x+' '+(T-44)+' L'+(x+19)+' '+(T-37.5)+' L'+x+' '+(T-31)+'Z"></path>';
   });
-  out += '<line class="fgate" x1="'+gl+'" y1="'+(T-48)+'" x2="'+gr+'" y2="'+(T-48)+'"></line>';
-  out += '<text class="gatelab" x="'+K.cx+'" y="'+(T-56)+'">'+(gate||"")+'</text>';
+  out += '<g class="caption"><rect class="cappill" x="108" y="'+(T-70)+'" width="84" height="26" rx="13"></rect>'+
+         '<text class="gatelab" x="'+K.cx+'" y="'+(T-52)+'">'+(gate||"")+'</text></g>';
 
   // band names, sitting on each band's centre line near the bottom
   function nameAt(w, sd, a1, a2){
