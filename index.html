@@ -712,8 +712,8 @@
 
   <!-- HOME -->
   <section id="viewHome">
-    <h1>The four performance areas</h1>
-    <p class="lede">One hour, one area. Ten minutes warm-up, forty minutes of scored sets, ten minutes competing. Score every set and beat your last number.</p>
+    <h1>The five performance areas</h1>
+    <p class="lede">An hour an area, or pair a short one with another. Ten minutes warm-up, the scored sets, ten minutes competing. Score every set and beat your last number.</p>
     <div class="banner resume" id="resumeBar" hidden>
       <span id="resumeText"></span>
       <span class="resacts">
@@ -863,7 +863,42 @@
 
 /* ============ the programme ============ */
 var AREAS = [
-{ id:1, name:"Ball flight control", sub:"Tee shots & approach · off the tee and into greens", block:"long",
+{ id:10, no:1, name:"Tee shots", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long",
+  targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
+  hour:"10 min warm-up → 35 min benchmark (6 sets, 35 balls, full routine every ball) → 10 min compete",
+  sets:[
+    {id:"a", label:"Driver · 10 balls", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
+      max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
+    {id:"b", guide:"windows", label:"Driver · five windows", tgt:"Five balls: a point for the window, a point for the 40-yd target",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"c", label:"3-wood", tgt:"35-yd target (17 each side)", max:5},
+    {id:"d", guide:"windows", label:"3-wood · five windows", tgt:"Five balls: a point for the window, a point for the 35-yd target",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"e", label:"5-wood / 2 hybrid", tgt:"30-yd target (15 each side)", max:5},
+    {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tgt:"Five balls: a point for the window, a point for the 30-yd target",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+  ],
+  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+
+{ id:11, no:2, name:"Approach play", sub:"125, 150 and 175 yards · into greens", block:"long",
+  targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
+  hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
+  sets:[
+    {id:"a", label:"Approach 125y", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"c", label:"Approach 150y", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"d", guide:"windows", label:"Five windows · 150y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"e", label:"Approach 175y", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"f", guide:"windows", label:"Five windows · 175y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+  ],
+  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+
+/* Retired when tee shots and approach play were split apart. Kept so sessions
+   already scored under it still open and still chart. Not offered on the home page. */
+{ id:1, retired:true, name:"Ball flight control", sub:"Tee shots & approach · earlier format", block:"long",
   targets:"GIR 67 → 73% · driving accuracy 71 → 82% · driving distance 272+ · 150y ± 9 yd · club-head speed + 5 mph · a fade on demand",
   hour:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, full routine every ball) → 10 min compete",
   sets:[
@@ -883,7 +918,7 @@ var AREAS = [
   ],
   compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:2, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100",
+{ id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100",
   targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
   hour:"10 min warm-up → 40 min benchmark (8 sets, about 50 balls, full routine every ball) → 10 min compete",
   sets:[
@@ -901,7 +936,7 @@ var AREAS = [
   ],
   compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:3, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100",
+{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100",
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
   hour:"10 min warm-up → 40 min benchmark (75 shots in five-ball sets) → 10 min compete",
   sets:[
@@ -913,7 +948,7 @@ var AREAS = [
   ],
   compete:{max:30, label:"Compete · 15 shots", tgt:"Random targets with a partner, alternating shots and target choice, or 15 shots alone. In the target 1, holed 2."} },
 
-{ id:4, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100",
+{ id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
   hour:"10 min warm-up → 40 min benchmark (105 putts in five-ball sets) → 10 min compete",
   sets:[
@@ -1286,6 +1321,7 @@ function keyEx(g){ var k=null; g.blocks.forEach(function(b){ b.ex.forEach(functi
 var COND = {
   golf:[
     {id:"venue", label:"Where", opts:[["out","Outdoors"],["indoor","Indoor / sim"]]},
+    {id:"surface", label:"Off", opts:[["grass","Grass"],["mat","Mat"]], hide:{venue:["indoor"]}},
     {id:"temp", label:"Temperature", opts:[["hot","Hot"],["warm","Warm"],["mild","Mild"],["cold","Cold"],["freezing","Freezing"]], hide:{venue:["indoor"]}},
     {id:"windStr", label:"Wind", opts:[["calm","Calm"],["light","Light"],["med","Medium"],["strong","Strong"]], hide:{venue:["indoor"]}},
     {id:"windDir", label:"Direction", opts:[["into","Into"],["behind","Behind"],["lr","Left → right"],["rl","Right → left"],["swirl","Swirling"]], hide:{venue:["indoor"], windStr:["calm"]}},
@@ -1299,7 +1335,7 @@ var COND = {
 function condKind(areaId, kind){
   if(kind==="gym") return null;
   if(areaId===4) return "putt";
-  if(areaId===1||areaId===2||areaId===3) return "golf";
+  if([1,2,3,10,11].indexOf(areaId)!==-1) return "golf";
   return null;
 }
 function condLabel(kind, field, val){
@@ -1312,6 +1348,9 @@ function condLabel(kind, field, val){
 }
 
 function area(id){ for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; } return null; }
+function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
+function areaNo(a){ return a.no || a.id; }
+function areaTitle(a){ return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name; }
 function setParts(s){
   if(s.parts) return s.parts.map(function(p){ return { key:s.id+"_"+p.id, label:p.label, max:p.max }; });
   return [{ key:s.id, label:null, max:s.max }];
@@ -1366,22 +1405,25 @@ function makeSample(){
   var out=[], base=new Date();
   var G = ["venue","temp","windStr","windDir","rain"], P = ["venue","speed"];
   var plan = [
-    {a:1, s:36, c:["out","mild","med","into","dry"]},
-    {a:2, s:44, c:["out","warm","light","lr","dry"]},
-    {a:1, s:30, c:["out","cold","strong","rl","showers"]},
-    {a:4, s:62, c:["green","med"]},
-    {a:3, s:48, c:["out","mild","light","behind","dry"]},
-    {a:1, s:41, c:["out","warm","med","lr","dry"]},
-    {a:2, s:49, c:["indoor"]},
-    {a:1, s:31, c:["out","cold","med","rl","dry"]},
-    {a:4, s:68, c:["green","fast"]},
-    {a:3, s:52, c:["out","warm","light","into","dry"]},
-    {a:2, s:46, c:["out","mild","med","rl","dry"]},
-    {a:1, s:45, c:["out","warm","light","behind","dry"]},
-    {a:4, s:71, c:["green","slow"]},
-    {a:3, s:55, c:["out","mild","med","lr","dry"]},
-    {a:1, s:43, c:["out","mild","light","into","dry"]},
-    {a:2, s:42, c:["out","cold","strong","rl","wet"]}
+    {a:10, s:26, c:["out","mild","med","into","dry"]},
+    {a:11, s:24, c:["out","mild","med","into","dry"]},
+    {a:2,  s:44, c:["out","warm","light","lr","dry"]},
+    {a:10, s:22, c:["out","cold","strong","rl","showers"]},
+    {a:4,  s:62, c:["green","med"]},
+    {a:3,  s:48, c:["out","mild","light","behind","dry"]},
+    {a:11, s:29, c:["out","warm","med","lr","dry"]},
+    {a:2,  s:49, c:["indoor"]},
+    {a:10, s:30, c:["out","cold","med","rl","dry"]},
+    {a:4,  s:68, c:["green","fast"]},
+    {a:3,  s:52, c:["out","warm","light","into","dry"]},
+    {a:11, s:26, c:["out","mild","med","rl","dry"]},
+    {a:2,  s:46, c:["out","mild","med","rl","dry"]},
+    {a:10, s:33, c:["out","warm","light","behind","dry"]},
+    {a:4,  s:71, c:["green","slow"]},
+    {a:3,  s:55, c:["out","mild","med","lr","dry"]},
+    {a:11, s:31, c:["out","mild","light","into","dry"]},
+    {a:10, s:35, c:["out","warm","light","into","dry"]},
+    {a:2,  s:42, c:["out","cold","strong","rl","wet"]}
   ];
   plan.forEach(function(p,i){
     var a=area(p.a); var d=new Date(base.getTime()-(plan.length-i)*2*86400000);
@@ -1393,9 +1435,10 @@ function makeSample(){
     });
     var sum=0; for(var k in sc){ sum+=sc[k]; }
     var mt = {};
-    if(p.a===1){ var f = 95.5 + i*0.35; mt = { chsFast:Math.round(f), chsSlow:Math.round(f-4.5) }; }
+    if(p.a===10){ var f = 95.5 + i*0.35; mt = { chsFast:Math.round(f*10)/10, chsSlow:Math.round((f-4.5)*10)/10 }; }
     var keys = p.a===4 ? P : G, cond = {};
     p.c.forEach(function(v,ci){ if(keys[ci]) cond[keys[ci]] = v; });
+    if(cond.venue==="out") cond.surface = (i%3===0) ? "mat" : "grass";
     out.push({ id:"sample"+i, playerId:state.activePlayer, kind:"practice", areaId:p.a,
       date:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),
       scores:sc, metrics:mt, cond:cond, compete:Math.round(a.compete.max*0.5), won:(i%3!==0), notes:"", total:sum, max:areaMax(a), sample:true });
@@ -1518,12 +1561,12 @@ function sparkline(vals, max){
 
 function renderHome(){
   var host = $("areaList"); host.innerHTML = "";
-  AREAS.forEach(function(a){
+  liveAreas().forEach(function(a){
     var hist = sessionsFor(a.id);
     var b = document.createElement("button");
     b.className="area"; b.type="button";
     b.innerHTML =
-      '<div class="idx num">'+a.id+'</div>'+
+      '<div class="idx num">'+areaNo(a)+'</div>'+
       '<div><div class="nm">'+a.name+'</div><div class="sub">'+a.sub+'</div></div>'+
       '<div class="right">'+ sparkline(hist.map(function(s){return s.total;}), areaMax(a)) +
         '<div class="lastscore">'+
@@ -1600,7 +1643,7 @@ function renderBalance(){
   var cut = new Date(Date.now()-28*86400000);
   var cutStr = cut.getFullYear()+"-"+String(cut.getMonth()+1).padStart(2,"0")+"-"+String(cut.getDate()).padStart(2,"0");
   var recent = mine().filter(function(s){ return s.date >= cutStr; });
-  var counts = {1:0,2:0,3:0,4:0,6:0,7:0,8:0,9:0};
+  var counts = {1:0,2:0,3:0,4:0,6:0,7:0,8:0,9:0,10:0,11:0};
   recent.forEach(function(s){
     if(s.kind==="round") return;
     if(isSpeed(s)) counts[7]++;
@@ -1609,17 +1652,20 @@ function renderBalance(){
     else if(s.kind==="gym") counts[6]++;
     else counts[s.areaId]=(counts[s.areaId]||0)+1;
   });
-  var maxN = Math.max(1, counts[1],counts[2],counts[3],counts[4],counts[6],counts[7],counts[8],counts[9]);
-  var names = {1:"Ball flight",2:"Wedge play",3:"Short game",4:"Holing out",6:"S&C · gym",7:"Speed sticks",8:"Band session",9:"Movement prep"};
+  var BKEYS = [10,11,2,3,4,6,7,8,9];
+  if(counts[1]) BKEYS.push(1);   // only if there are sessions in the earlier format
+  var maxN = 1; BKEYS.forEach(function(k){ if(counts[k]>maxN) maxN = counts[k]; });
+  var names = {10:"Tee shots",11:"Approach play",2:"Wedge play",3:"Short game",4:"Holing out",
+               6:"S&C · gym",7:"Speed sticks",8:"Band session",9:"Movement prep",1:"Ball flight · earlier"};
   var host = $("balance"); host.innerHTML="";
-  [1,2,3,4,6,7,8,9].forEach(function(k){
+  BKEYS.forEach(function(k){
     var row = document.createElement("div"); row.className="brow";
     row.innerHTML = '<span>'+names[k]+'</span>'+
       '<span class="btrack"><span class="bfill" style="width:'+(counts[k]/maxN*100)+'%"></span></span>'+
       '<span class="n num">'+counts[k]+'</span>';
     host.appendChild(row);
   });
-  var lng = counts[1], in100 = counts[2]+counts[3]+counts[4], tot = lng+in100;
+  var lng = counts[10]+counts[11]+counts[1], in100 = counts[2]+counts[3]+counts[4], tot = lng+in100;
   $("split").innerHTML =
     '<div><b class="num">'+(tot? Math.round(lng/tot*100):0)+'%</b>long game · last 28 days</div>'+
     '<div><b class="num">'+(tot? Math.round(in100/tot*100):0)+'%</b>inside 100 · last 28 days</div>'+
@@ -1739,7 +1785,7 @@ function openSession(areaId, resume){
   }
   state.gymDraft = null;
   watchDraft();
-  $("sessArea").textContent = "Area "+a.id;
+  $("sessArea").textContent = a.retired ? "Earlier format" : "Area "+areaNo(a);
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
   renderSession();
@@ -1917,8 +1963,9 @@ function metricRow(s, last){
   var was = lm && (lm[s.metrics[0].id] || lm[s.metrics[1].id])
     ? '<br><b style="color:var(--ink-2)">Last session: fastest ' + (lm[s.metrics[0].id]||"–") + " mph, slowest " + (lm[s.metrics[1].id]||"–") + " mph</b>" : "";
   row.innerHTML = '<div><div class="lbl">'+s.metricLabel+'</div><div class="tgt">'+s.metricNote+was+
-    '<br>Whole mph, one a tap. Picks up from last session when there is one, otherwise + starts at 80 and − at 105. Type the figure straight in if the monitor gives it to you.</div></div>';
+    '<br>Type the figure straight in if the monitor gives it to you, to one decimal: 87.8, not 87 or 88. The buttons move a whole mph at a time, and pick up from last session when there is one, otherwise + starts at 80 and − at 105.</div></div>';
   var START_LO = 80, START_HI = 105, MIN = 40, MAX = 140, STEP = 1;
+  function round1(v){ return Math.round(v*10)/10; }
   var fields = document.createElement("div"); fields.className="mfields";
   s.metrics.forEach(function(m){
     var f = document.createElement("div"); f.className="mfield";
@@ -1928,7 +1975,7 @@ function metricRow(s, last){
     var minus = document.createElement("button"); minus.type="button"; minus.textContent="−";
     minus.setAttribute("aria-label","Lower "+m.label+" club head speed");
     var inp = document.createElement("input");
-    inp.type="number"; inp.min=String(MIN); inp.max=String(MAX); inp.step="1"; inp.inputMode="numeric";
+    inp.type="number"; inp.min=String(MIN); inp.max=String(MAX); inp.step="0.1"; inp.inputMode="decimal";
     inp.placeholder="—"; inp.id="m_"+m.id; inp.setAttribute("aria-label", s.metricLabel+" club head speed in mph");
     if(state.draft.metrics && state.draft.metrics[m.id]!=null) inp.value = String(state.draft.metrics[m.id]);
     var plus = document.createElement("button"); plus.type="button"; plus.textContent="+";
@@ -1936,9 +1983,10 @@ function metricRow(s, last){
 
     function commit(v){
       if(v==null || isNaN(v)){ inp.value=""; state.draft.metrics[m.id]=null; return; }
-      v = Math.max(MIN, Math.min(MAX, Math.round(v)));
+      v = round1(Math.max(MIN, Math.min(MAX, v)));
       inp.value = String(v);
       state.draft.metrics[m.id] = v;
+      saveDraft();
     }
     function nudge(dir){
       var cur = parseFloat(inp.value);
@@ -1952,10 +2000,11 @@ function metricRow(s, last){
     minus.addEventListener("click", function(){ nudge(-1); });
     plus.addEventListener("click", function(){ nudge(1); });
     inp.addEventListener("input", function(){
-      var v = parseInt(inp.value, 10);
-      state.draft.metrics[m.id] = isNaN(v) ? null : v;
+      var v = parseFloat(inp.value);
+      state.draft.metrics[m.id] = isNaN(v) ? null : round1(v);
+      saveDraft();
     });
-    inp.addEventListener("blur", function(){ if(inp.value!=="") commit(parseInt(inp.value, 10)); });
+    inp.addEventListener("blur", function(){ if(inp.value!=="") commit(parseFloat(inp.value)); });
     inp.addEventListener("focus", function(){ inp.select(); });
 
     spin.appendChild(minus); spin.appendChild(inp); spin.appendChild(plus);
@@ -2000,6 +2049,8 @@ function renderCourseRules(hostId){
 var ROUND_TARGETS = "Doubles \u2264 1 a round \u00b7 pin high on approaches, not short \u00b7 play away from the short side";
 var DECK_TARGETS = {
   charlotte:{
+    10:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed +5 mph",
+    11:"GIR 67 \u2192 73% \u00b7 pin high on approaches, not short",
     1:"GIR 67 \u2192 73% \u00b7 driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed +5 mph",
     2:"30y \u2192 7 ft \u00b7 50y \u2192 10 ft \u00b7 70y \u2192 12 ft \u00b7 90y \u2192 13 ft \u00b7 tighter 30\u201390y dispersion",
     3:"Up and down 50 \u2192 60%+ \u00b7 bunker save 40 \u2192 50%",
@@ -2007,6 +2058,8 @@ var DECK_TARGETS = {
     5:"Pin high on approaches, not short. Hit the flag \u00b7 play away from the short side"
   },
   annabel:{
+    10:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 a fade on demand, every time",
+    11:"GIR 67 \u2192 73% \u00b7 150y \u00b1 9 yd \u00b7 pin high on approaches, not short",
     1:"GIR 67 \u2192 73% \u00b7 driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 150y \u00b1 9 yd \u00b7 a fade on demand, every time",
     2:"30y \u2192 7 ft \u00b7 50y \u2192 10 ft \u00b7 70y \u2192 12 ft \u00b7 90y \u2192 13 ft \u00b7 tighter 30\u201390y dispersion",
     3:"Up and down 50 \u2192 60%+",
@@ -2131,6 +2184,7 @@ function renderCond(hostId, draft, kind){
       b.addEventListener("click", function(){
         draft.cond[f.id] = draft.cond[f.id]===o[0] ? null : o[0];
         renderCond(hostId, draft, kind);
+        saveDraft();
       });
       chips.appendChild(b);
     });
@@ -2672,7 +2726,9 @@ function speedChart(rows){
 }
 
 function speedRows(){
-  return sessionsFor(1).filter(function(s){ return s.metrics && s.metrics.chsFast; })
+  return sessionsFor(10).concat(sessionsFor(1))
+    .filter(function(s){ return s.metrics && s.metrics.chsFast; })
+    .sort(function(a,b){ return a.date<b.date?-1:1; })
     .map(function(s){ return { d:fmtDate(s.date), f:s.metrics.chsFast, s:s.metrics.chsSlow||0 }; });
 }
 
@@ -2803,7 +2859,7 @@ function renderConditions(){
 
   // area filter
   var seg = document.createElement("div"); seg.className="cseg";
-  [["all","All three"],["1","Ball flight"],["2","Wedge play"],["3","Short game"]].forEach(function(o){
+  [["all","All"],["10","Tee"],["11","Approach"],["2","Wedge"],["3","Short game"]].forEach(function(o){
     var b = document.createElement("button"); b.type="button"; b.textContent=o[1];
     b.setAttribute("aria-selected", sel===o[0] ? "true":"false");
     b.addEventListener("click", function(){ state.condArea = o[0]; renderConditions(); });
@@ -2812,7 +2868,7 @@ function renderConditions(){
   host.appendChild(seg);
 
   var pool = mine().filter(function(s){
-    return s.kind==="practice" && [1,2,3].indexOf(s.areaId)!==-1 && s.cond && s.cond.venue==="out" && s.max;
+    return s.kind==="practice" && [1,2,3,10,11].indexOf(s.areaId)!==-1 && s.cond && s.cond.venue==="out" && s.max;
   });
   if(sel!=="all") pool = pool.filter(function(s){ return s.areaId===+sel; });
   var pct = function(s){ return s.total/s.max*100; };
@@ -2828,9 +2884,10 @@ function renderConditions(){
       barBlock("Wind direction", wd, "golf","windDir", overall, ["into","behind","lr","rl","swirl"]) +
       barBlock("Wind strength", groupStats(pool,"windStr",pct), "golf","windStr", overall, ["calm","light","med","strong"]) +
       barBlock("Temperature", groupStats(pool,"temp",pct), "golf","temp", overall, ["hot","warm","mild","cold","freezing"]) +
-      barBlock("Rain", groupStats(pool,"rain",pct), "golf","rain", overall, ["dry","showers","wet"]));
+      barBlock("Rain", groupStats(pool,"rain",pct), "golf","rain", overall, ["dry","showers","wet"]) +
+      barBlock("Off grass or mat", groupStats(pool,"surface",pct), "golf","surface", overall, ["grass","mat"]));
     host.insertAdjacentHTML("beforeend",
-      '<p class="note">Bars are the average session score as a percentage of that area\'s maximum, so the three areas are comparable. The vertical mark is the overall average across every outdoor session in this filter, currently '+Math.round(overall)+'%.</p>');
+      '<p class="note">Bars are the average session score as a percentage of that area\'s maximum, so the areas are comparable. The vertical mark is the overall average across every outdoor session in this filter, currently '+Math.round(overall)+'%.</p>');
   }
 
   // putting by green speed
@@ -2856,7 +2913,7 @@ function renderHistory(){
     var card = document.createElement("div"); card.className="chartcard";
     var played = hist.filter(function(s){ return s.won!=null; });
     var wonN = played.filter(function(s){ return s.won; }).length;
-    card.innerHTML = '<div class="hd"><span class="nm">'+a.id+' · '+a.name+'</span><span class="pb num">best '+best+' / '+areaMax(a)+
+    card.innerHTML = '<div class="hd"><span class="nm">'+areaTitle(a)+'</span><span class="pb num">best '+best+' / '+areaMax(a)+
                      (played.length ? ' · compete won '+wonN+'/'+played.length : '')+'</span></div>'+
                      lineChart(hist, areaMax(a), a.name);
     host.appendChild(card);
@@ -2900,7 +2957,7 @@ function renderHistory(){
               : isBand(s) ? "Band session"
               : isPrep(s) ? "Movement prep"
               : s.kind==="gym" ? "S&C · "+gym(s.gymId).name+" · "+gym(s.gymId).lift
-              : area(s.areaId).id+" · "+area(s.areaId).name;
+              : areaTitle(area(s.areaId));
     var row = document.createElement("div"); row.className="hrow";
     row.setAttribute("role","button"); row.setAttribute("tabindex","0");
     row.setAttribute("aria-label","Open the "+label+" session from "+fmtDate(s.date));
@@ -2948,7 +3005,7 @@ function openPast(s){
   var name = isGym
     ? (isSpeed(s) ? "Speed sticks" : isBand(s) ? "Band session" : isPrep(s) ? "Movement prep"
        : gym(s.gymId).name + " \u00b7 " + gym(s.gymId).lift)
-    : (area(s.areaId) ? area(s.areaId).name : "Practice");
+    : (area(s.areaId) ? (area(s.areaId).retired ? areaTitle(area(s.areaId)) : area(s.areaId).name) : "Practice");
   var who = (state.players.filter(function(p){ return p.id===s.playerId; })[0] || {}).name || "";
 
   $("pastKind").textContent = isGym ? "Strength & conditioning" : "Area " + s.areaId;
@@ -3014,7 +3071,7 @@ function openPast(s){
 
 /* ---------- export ---------- */
 function csv(){
-  var head = ["player","date","area","kind","total","max","pct","venue","temperature","wind_strength","wind_direction","rain","green_speed",
+  var head = ["player","date","area","kind","total","max","pct","venue","surface","temperature","wind_strength","wind_direction","rain","green_speed",
               "compete","won","chs_fastest_mph","chs_slowest_mph","key_lift_kg","notes"];
   var lines = [head.join(",")];
   var pname = {}; state.players.forEach(function(p){ pname[p.id]=p.name; });
@@ -3023,14 +3080,14 @@ function csv(){
               : isBand(s) ? "Band session"
               : isPrep(s) ? "Movement prep"
               : s.kind==="gym" ? "S&C "+gym(s.gymId).name+" "+gym(s.gymId).lift
-              : area(s.areaId).id+" "+area(s.areaId).name;
+              : areaTitle(area(s.areaId));
     var kl = "";
     if(s.kind==="gym"){ var k=keyEx(gym(s.gymId)); if(k && s.ex && s.ex[k.id]) kl = s.ex[k.id].load||""; }
     var c = s.cond || {};
     lines.push([
       q(pname[s.playerId]||""), s.date, q(label), s.kind,
       s.total||0, s.max||0, s.max ? Math.round(s.total/s.max*100) : "",
-      c.venue||"", c.temp||"", c.windStr||"", c.windDir||"", c.rain||"", c.speed||"",
+      c.venue||"", c.surface||"", c.temp||"", c.windStr||"", c.windDir||"", c.rain||"", c.speed||"",
       s.compete||0, s.won==null?"":(s.won?"yes":"no"),
       (s.metrics&&s.metrics.chsFast)||"", (s.metrics&&s.metrics.chsSlow)||"", kl, q(s.notes||"")
     ].join(","));
@@ -3044,9 +3101,9 @@ function summary(){
   out.push("Longer · Closer · Lower — " + (p?p.name:"") );
   AREAS.forEach(function(a){
     var h = sessionsFor(a.id);
-    if(!h.length){ out.push(a.id+" "+a.name+": no sessions"); return; }
+    if(!h.length){ if(!a.retired) out.push(areaTitle(a)+": no sessions"); return; }
     var best=0; h.forEach(function(s){ if(s.total>best) best=s.total; });
-    out.push(a.id+" "+a.name+": last "+h[h.length-1].total+"/"+areaMax(a)+", best "+best+", "+h.length+" sessions");
+    out.push(areaTitle(a)+": last "+h[h.length-1].total+"/"+areaMax(a)+", best "+best+", "+h.length+" sessions");
   });
   var sr = speedRows();
   if(sr.length){
