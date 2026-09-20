@@ -634,6 +634,10 @@
   .rose .rz{fill:url(#gRough); stroke:#5b8450; stroke-width:1.1}
   .rose .rc{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
   .fringe{fill:#94bd84; pointer-events:none}
+  .rose .rb{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.6; stroke-dasharray:5 4}
+  .rose .rb:hover, .rose .rb.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-dasharray:none; stroke-width:2.6}
+  .rbl{fill:#3c4a38; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+    text-anchor:middle; pointer-events:none}
   .rose .rz:hover, .rose .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
   .pin{pointer-events:none}
   .pin line{stroke:#f4f6f2; stroke-width:2.4}
@@ -676,6 +680,43 @@
   .slopebox{margin:12px 0 2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
     background:var(--surface-2)}
   .slopebox .eyebrow{display:block; margin-bottom:7px}
+  /* the run, at the top of every page of the session */
+  .runbar{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:0 0 14px}
+  .runbox{background:var(--surface); border:1px solid var(--line); border-radius:11px;
+    padding:9px 8px 8px; text-align:center}
+  .runbox b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:27px;
+    line-height:1.05; color:var(--ink)}
+  .runbox span{display:block; font-size:10.5px; letter-spacing:0.6px; text-transform:uppercase;
+    color:var(--muted); margin-top:3px; font-weight:600}
+  .runbox.now{border-color:var(--ink-2)}
+  .runbar.hot .runbox.now{background:var(--accent-fill); border-color:var(--accent-fill)}
+  .runbar.hot .runbox.now b{color:#ffffff}
+  .runbar.hot .runbox.now span{color:#ffe3f1}
+  .runflash{position:fixed; left:50%; top:40%; transform:translate(-50%,-50%); z-index:60;
+    background:var(--accent-fill); color:#ffffff; border-radius:16px; padding:16px 22px;
+    text-align:center; pointer-events:none; box-shadow:0 12px 34px rgba(0,0,0,.30)}
+  .runflash b{display:block; font-family:Archivo, sans-serif; font-size:26px; font-weight:700; line-height:1.1}
+  .runflash .star{display:block; font-size:30px; line-height:1}
+  .runflash .sub{display:block; font-size:13px; margin-top:3px; opacity:.92}
+  .runflash.go{animation:runpop .42s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes runpop{ from{ transform:translate(-50%,-50%) scale(.5); opacity:0 } to{ transform:translate(-50%,-50%) scale(1); opacity:1 } }
+  @media (prefers-reduced-motion: reduce){ .runflash.go{animation:none} }
+
+  .placing{margin-bottom:16px; padding:13px 15px; border:1px solid var(--accent-fill);
+    border-radius:12px; background:var(--accent-wash)}
+  .placing .eyebrow{display:block; margin-bottom:6px}
+  .plbig{display:flex; align-items:baseline; gap:9px}
+  .plbig b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:40px; line-height:1; color:var(--ink)}
+  .plbig span{font-size:13.5px; color:var(--ink-2)}
+  .plread{margin:8px 0 0; font-size:15px; color:var(--ink); line-height:1.4}
+  .plread b{font-family:Archivo, sans-serif; font-weight:700; color:var(--accent)}
+  .plrow{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:9px; font-size:12.5px; color:var(--ink-2)}
+  .plrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px; color:var(--ink)}
+  .runline{margin-bottom:14px}
+  .runline .eyebrow{display:block; margin-bottom:4px}
+  .runline p{margin:0; font-size:14.5px; color:var(--ink-2); line-height:1.45}
+  .runline b{color:var(--ink)}
+
   .modes{margin-bottom:14px}
   .modes .eyebrow{display:block; margin-bottom:8px}
   .mrow{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px}
@@ -1011,6 +1052,11 @@
     </div>
     <div class="modebar"><button class="modetoggle" id="sessMode">Show all sets</button></div>
     <div class="prog" id="sessProg"></div>
+    <div class="runbar" id="runBar" hidden>
+      <div class="runbox now"><b id="runNow">0</b><span>On a run</span></div>
+      <div class="runbox"><b id="runToday">0</b><span>Best today</span></div>
+      <div class="runbox"><b id="runEver">0</b><span id="runEverLab">Best ever</span></div>
+    </div>
     <div id="sessCards"></div>
     <div class="pad"></div>
   </section>
@@ -1144,6 +1190,8 @@
   </div>
 </div>
 
+<div class="runflash" id="runFlash" hidden aria-live="polite"></div>
+
 <div class="totalbar" id="totalBar" hidden>
   <div class="totalin">
     <button class="nav back" id="navBack" aria-label="Previous page">← Back</button>
@@ -1164,7 +1212,7 @@
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
-  hour:"10 min warm-up → 35 min benchmark (6 sets, 35 balls, full routine every ball) → 10 min compete",
+  hour:"10 min warm-up → 45 min: 6 sets, 35 balls, full routine every ball, then ten the app calls",
   sets:[
     {id:"a", label:"Driver · 10 balls", short:"Driver", tc:"40 yd", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
       max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
@@ -1175,25 +1223,35 @@ var AREAS = [
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"e", label:"5-wood / 2 hybrid", short:"5-wood / 2H", tc:"30 yd", tgt:"30-yd target (15 each side)", max:5},
     {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tc:"30 yd", tgt:"Five balls: a point for the window, a point for the 30-yd target",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
-  ],
-  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"r", rot:true, balls:10, guide:"windows", label:"Rotation · ten balls, the app calls it",
+      tgt:"The club is drawn at random and five of the ten name a window as well. Nothing to set up, everything to lose.",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:10}]}
+  ] },
 
-{ id:11, no:2, name:"Approach (Ball flight control)", sub:"125, 150 and 175 yards · into greens", block:"long", track:true,
-  targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
-  hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
+{ id:11, no:2, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
+  targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
+  /* The circle is the LPGA 66% circle for that carry, read off the club-matched
+     proximity curve. The bullseye is the PGA circle from the same yardage: inside it
+     the ball was tour standard for a man playing a shorter club from the same spot. */
+  hour:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"Approach 125y", short:"125 yards", tc:"15 ft", dist:125, tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"b", guide:"windows", label:"Five windows · 125y", tc:"15 ft", dist:125, tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
+    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"Approach 150y", short:"150 yards", tc:"20 ft", dist:150, tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"d", guide:"windows", label:"Five windows · 150y", tc:"20 ft", dist:150, tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
+    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", bull:"25 ft", dist:145, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", bull:"25 ft", dist:145, tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"Approach 175y", short:"175 yards", tc:"24 ft", dist:175, tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", dist:175, tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", bull:"28 ft", dist:165, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", bull:"28 ft", dist:165, tgt:"Same club, same target. A point for the window, a point for the circle",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", bull:"33 ft", dist:185, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", bull:"33 ft", dist:185, tgt:"Same club, same target. A point for the window, a point for the circle",
+      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
+      tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
   ],
-  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+  placing:"lpga60" },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -1219,7 +1277,7 @@ var AREAS = [
 
 { id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
   targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
-  hour:"10 min warm-up → 40 min benchmark (9 sets, about 55 balls, full routine every ball) → 10 min compete",
+  hour:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
     {id:"a", label:"30y", short:"30 yards", tc:"7 ft", dist:30, tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
     {id:"b", guide:"heights", label:"30y · five heights", tc:"7 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
@@ -1233,14 +1291,13 @@ var AREAS = [
     {id:"f", label:"90y", short:"90 yards", tc:"13 ft", dist:90, tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
     {id:"g", guide:"heights", label:"90y · five heights", tc:"13 ft", dist:90, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"h", label:"Rotation · 30 / 50 / 70 / 90", tgt:"20 balls, cycle the four targets five times. A point inside each target", max:20,
-      cycle:[{label:"30 yards",tc:"7 ft",dist:30},{label:"50 yards",tc:"10 ft",dist:50},{label:"70 yards",tc:"12 ft",dist:70},{label:"90 yards",tc:"13 ft",dist:90}]}
-  ],
-  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+    {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
+      tgt:"The number is drawn at random every ball. A point inside each target", max:20}
+  ] },
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
-  hour:"10 min warm-up → 40 min benchmark (75 shots in five-ball sets) → 10 min compete",
+  hour:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
   /* Five balls a page. The old sets said "4 sets of 5" on one card; they are now four
      cards of five, which is how they are actually hit. */
   sets:[
@@ -1260,11 +1317,11 @@ var AREAS = [
     {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"3 ft", tgt:"Set 1 of 2 · within 3 ft", max:5},
     {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"3 ft", tgt:"Set 2 of 2 · within 3 ft", max:5}
   ],
-  compete:{max:30, label:"Compete · 15 shots", tgt:"Random targets with a partner, alternating shots and target choice, or 15 shots alone. In the target 1, holed 2."} },
+  } ,
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
-  hour:"10 min warm-up → 40 min benchmark (105 putts in five-ball sets) → 10 min compete",
+  hour:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
   sets:[
     {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", max:20},
     {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", max:15},
@@ -1273,7 +1330,7 @@ var AREAS = [
     {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", tgt:"50 putts", max:50}
   ],
   setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Each round, putt five balls from one launch target to the five at the far end, then rotate the launch target and swap ends: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Ten rounds is 50 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break.",
-  compete:{max:30, min:-15, label:"Compete · 15 putts", tgt:"Random targets with a partner, alternating putts and target choice, or 15 putts alone. Holed 2, two putt 0, three putt −1. No gimmes."} }
+  }
 ];
 
 var GUIDES = {
@@ -1783,7 +1840,7 @@ function loadLocal(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, train:s.train||null, stats:s.stats||{}, shots:s.shots||{}, slope:s.slope||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, train:s.train||null, stats:s.stats||{}, shots:s.shots||{}, slope:s.slope||{}, rot:s.rot||{}, bestRun:s.bestRun||0, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1982,16 +2039,22 @@ function sessionPraise(sess){
       return "Fastest you have logged: " + sess.metrics.chsFast + " mph.";
   }
 
+  if(a && sess.bestRun && sess.bestRun >= 4){
+    var everRun = bestRunEver(sess.areaId, sess.id);
+    if(sess.bestRun > everRun)
+      return "Longest run yet on " + areaWord(a) + ": " + sess.bestRun + " in a row.";
+  }
+
   if(a && sess.shots){
     var best = null;
     a.sets.forEach(function(set){
       var list = sess.shots[set.id]; if(!list) return;
-      var k = list.filter(function(x){ return x && x.z === "c"; }).length;
+      var k = list.filter(function(x){ return x && isIn(x.z); }).length;
       if(!k) return;
       var was = 0;
       prev.forEach(function(s){
         var l2 = s.shots && s.shots[set.id]; if(!l2) return;
-        var k2 = l2.filter(function(x){ return x && x.z === "c"; }).length;
+        var k2 = l2.filter(function(x){ return x && isIn(x.z); }).length;
         if(k2 > was) was = k2;
       });
       if(k > was && (!best || k > best.k)) best = {k:k, of:list.length, label:set.label};
@@ -2363,10 +2426,11 @@ function openSession(areaId, resume){
     state.draft = resume;
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
-                    date:today(), scores:{}, metrics:{}, shots:{}, slope:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
+                    date:today(), scores:{}, metrics:{}, shots:{}, slope:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : (a.compete ? a.compete.max : 0)), won:null, notes:"", max:areaMax(a) };
     a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
+  state.runShown = 0;
   watchDraft();
   $("sessArea").textContent = a.retired ? "Earlier format" : "Area "+areaNo(a);
   $("sessName").textContent = a.name;
@@ -2504,7 +2568,7 @@ function buildSessionCards(a, last){
     }
   });
 
-  cards.push(pcard(a.compete.label, competeBlock(a)));
+  if(a.compete) cards.push(pcard(a.compete.label, competeBlock(a)));
 
   var nb = document.createElement("div");
   nb.appendChild(notesBlock("sessNotes", "What worked \u00b7 one thing to fix"));
@@ -2527,6 +2591,67 @@ function monitorNote(){
   d.innerHTML = '<b>Use the launch monitor for this set only.</b> Get it running before ball one. '+
     'You enter the fastest and slowest of the ten on the next screen.';
   return d;
+}
+
+/* ---------- runs ----------
+   Every captured ball in the hour, in the order she hit them, as a pass or a miss.
+   The run carries across sets: changing club and walking to the next target is part
+   of it. Recomputed from scratch whenever anything changes, so correcting a ball
+   three sets back fixes the run rather than leaving a phantom streak. */
+function sessionBalls(a, sess){
+  var out = [];
+  a.sets.forEach(function(s){
+    var kind = trackKind(a, s); if(!kind) return;
+    var list = (sess.shots||{})[s.id]; if(!list) return;
+    var calls = callsFor(a, s, null, sess);
+    list.forEach(function(x, i){
+      if(!x || !shotDone(s, x, calls[i])) return;
+      out.push(!!shotPoint(calls[i], x));
+    });
+  });
+  return out;
+}
+function runStats(a, sess){
+  var cur = 0, best = 0;
+  sessionBalls(a, sess).forEach(function(ok){
+    if(ok){ cur++; if(cur > best) best = cur; } else cur = 0;
+  });
+  return {cur:cur, best:best};
+}
+function bestRunEver(areaId, skipId){
+  var b = 0;
+  mine().forEach(function(s){
+    if(s.kind !== "practice" || s.areaId !== areaId) return;
+    if(skipId && s.id === skipId) return;
+    if((s.bestRun||0) > b) b = s.bestRun;
+  });
+  return b;
+}
+function flashRun(n, beatsEver, word){
+  var el = $("runFlash"); if(!el) return;
+  el.innerHTML = '<span class="star">\u2605</span><b>'+n+' in a row</b>'+
+                 (beatsEver ? '<span class="sub">best on '+word+' ever</span>' : '');
+  el.hidden = false;
+  el.classList.remove("go");
+  void el.offsetWidth;                 // restart the animation
+  el.classList.add("go");
+  clearTimeout(el.__t);
+  el.__t = setTimeout(function(){ el.hidden = true; }, 2400);
+}
+function renderRun(){
+  var d = state.draft; if(!d || !$("runBar")) return;
+  var a = area(d.areaId); if(!a) return;
+  var r = runStats(a, d);
+  d.bestRun = r.best;
+  var ever = bestRunEver(a.id, d.id);
+  $("runNow").textContent = String(r.cur);
+  $("runToday").textContent = String(r.best);
+  $("runEver").textContent = String(Math.max(ever, r.best));
+  $("runEverLab").textContent = "Best on " + areaWord(a);
+  $("runBar").hidden = !a.track;
+  $("runBar").classList.toggle("hot", r.cur >= 3);
+  if(r.cur > (state.runShown || 0) && r.cur >= 4) flashRun(r.cur, r.cur > ever, areaWord(a));
+  state.runShown = r.cur;
 }
 
 /* ---------- session summary ---------- */
@@ -2635,6 +2760,65 @@ function slopeRows(stats){
   return out;
 }
 
+/* Where sixty balls at a 66% circle would finish among a hundred tour players.
+   Beta-binomial, mean .66, sd .05 for the spread between players, which is the
+   correction that matters here: it widens the spread from 3.7 to 4.7. Partial
+   sessions get no placing at all rather than a scaled one. */
+var PLACE60 = [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,
+100,100,100,100,100,100,100,100,100,99,98,96,94,91,87,82,76,69,61,53,45,36,29,22,16,11,8,5,3,2,
+2,1,1,1,1,1,1,1,1,1,1];
+function ordinalPlace(n){
+  var t = n % 100;
+  if(t >= 11 && t <= 13) return n + "th";
+  return n + ["th","st","nd","rd","th","th","th","th","th","th"][n % 10];
+}
+/* Balls that are straight full shots, and balls where a shape was called. Both count
+   towards the score; the split is the diagnostic. */
+function testSplit(a, sess){
+  var out = {n:0, in_:0, bull:0, straight:{n:0, in_:0}, shaped:{n:0, in_:0}};
+  a.sets.forEach(function(st){
+    var kind = trackKind(a, st); if(!kind) return;
+    var list = (sess.shots||{})[st.id]; if(!list) return;
+    var calls = callsFor(a, st, null, sess);
+    var bucket = (kind === "grid") ? out.shaped : out.straight;
+    list.forEach(function(x, i){
+      if(!x || !shotDone(st, x, calls[i])) return;
+      out.n++; bucket.n++;
+      if(isIn(x.z)){ out.in_++; bucket.in_++; }
+      if(x.z === "b") out.bull++;
+    });
+  });
+  return out;
+}
+function placingBlock(a, sess){
+  if(a.placing !== "lpga60") return "";
+  var t = testSplit(a, sess);
+  if(!t.n) return "";
+  var full = t.n >= 60;
+  var place = full ? PLACE60[Math.min(60, t.in_)] : null;
+  return '<div class="placing">'+
+    '<span class="eyebrow">The test</span>'+
+    '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' inside the circle</span></div>'+
+    (full
+      ? '<p class="plread">On this test, <b>'+ordinalPlace(place)+'</b> of 100 tour players.</p>'
+      : '<p class="plread">'+(60 - t.n)+' balls still to hit. The placing needs all sixty.</p>')+
+    '<div class="plrow">'+
+      '<span>Straight <b>'+pctText(t.straight.in_, t.straight.n)+'</b> ('+t.straight.in_+' of '+t.straight.n+')</span>'+
+      '<span>Shaped <b>'+pctText(t.shaped.in_, t.shaped.n)+'</b> ('+t.shaped.in_+' of '+t.shaped.n+')</span>'+
+      '<span>Bullseye <b>'+t.bull+'</b> of '+t.n+'</span>'+
+    '</div></div>';
+}
+function runLine(a, sess){
+  var r = runStats(a, sess);
+  if(!r.best) return "";
+  var ever = bestRunEver(a.id, sess.id);
+  return '<div class="runline"><span class="eyebrow">The run</span>'+
+    '<p><b>'+r.best+' in a row</b> was the best of the session'+
+    (r.best > ever ? ' \u2014 and the best on ' + areaWord(a) + ' you have logged.'
+                   : (ever ? ' \u00b7 your best on ' + areaWord(a) + ' is ' + ever + '.' : '.'))+
+    '</p></div>';
+}
+
 function sumCard(eyebrow, svg, note){
   return '<div class="sumcard"><span class="eyebrow">'+eyebrow+'</span>'+svg+
          (note ? '<p class="note">'+note+'</p>' : '')+'</div>';
@@ -2644,7 +2828,7 @@ function sumCard(eyebrow, svg, note){
    moving, and when it counts. */
 var MODE_ORDER = ["repeat", "shape", "vary", "compete"];
 function modeOf(a, s){
-  if(s.cycle || s.guide === "ladder") return "vary";
+  if(s.rot || s.guide === "ladder") return "vary";
   if(s.parts && (s.guide === "windows" || s.guide === "heights")) return "shape";
   return "repeat";
 }
@@ -2683,19 +2867,23 @@ function modeBlock(a, sess){
 function summaryBlock(a, sess){
   var pool = poolShots(a, sess);
   var anyPlot = pool.n || pool.wn || pool.cn || pool.ln;
-  if(!anyPlot && !(sess.total || sess.compete)) return null;
+  if(!anyPlot && !(sess.total || sess.compete || sess.bestRun)) return null;
   var wrap = document.createElement("div"); wrap.className="sumwrap";
-  var html = modeBlock(a, sess);
+  var html = placingBlock(a, sess) + runLine(a, sess) + modeBlock(a, sess);
 
   if(pool.n){
     var ids = shapeZones(a).map(function(z){ return z.id; });
     if(ids.indexOf("c") === -1) ids.unshift("c");
+    if(ids.indexOf("b") === -1) ids.unshift("b");
     var svg = heatSvg(shapeSvg(a, {tc:""}, false), ids, pool.t, pool.n, function(id){
-      if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 26];
+      if(id === "b") return [ROSE_CX, ROSE_CY - 26];
+      if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 40];
       return shapeMark(a, id, 0);
     });
+    var inN = (pool.t.c||0) + (pool.t.b||0);
     html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
-      'In the target ' + pctText(pool.t.c||0, pool.n) + ' of the time.');
+      'In the target ' + pctText(inN, pool.n) + ' of the time' +
+      (pool.t.b ? ' · inside the bullseye ' + pctText(pool.t.b, pool.n) : '') + '.');
   }
 
   /* The clock is drawn straight, as if every putt came from the bottom, so a session
@@ -2776,11 +2964,13 @@ function buildSessionList(a, last){
     wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, s.guide));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
-  var cg = document.createElement("div"); cg.className="setgroup";
-  cg.innerHTML = '<span class="eyebrow">'+a.compete.label+'</span>';
-  var cw = document.createElement("div"); cw.className="sets";
-  cw.appendChild(competeBlock(a));
-  cg.appendChild(cw); host.appendChild(cg);
+  if(a.compete){
+    var cg = document.createElement("div"); cg.className="setgroup";
+    cg.innerHTML = '<span class="eyebrow">'+a.compete.label+'</span>';
+    var cw = document.createElement("div"); cw.className="sets";
+    cw.appendChild(competeBlock(a));
+    cg.appendChild(cw); host.appendChild(cg);
+  }
   var nb = notesBlock("sessNotes", "Session notes \u2014 what worked \u00b7 one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
@@ -2851,9 +3041,13 @@ ZONES.forEach(function(z){ ZONE_LABEL[z.id] = z.lab; });
 ZONE_LABEL.wayLeft = "Deep rough, left"; ZONE_LABEL.wayRight = "Deep rough, right";
 ZONE_LABEL.bunker = "Short, in the bunker";
 ZONE_LABEL.l = "Missed left"; ZONE_LABEL.r = "Missed right";
+ZONE_LABEL.b = "In the bullseye";
 var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
                  g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
 for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
+/* Two rings now: "b" is the bullseye inside "c". Both are a pass; only "b" is a
+   tour-standard ball. Everything that used to ask z === "c" asks this instead. */
+function isIn(z){ return z === "c" || z === "b"; }
 function zoneIndex(id){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].id===id) return i; } return -1; }
 function zoneLabel(a, z){
   if(z == null) return "not logged";
@@ -2870,7 +3064,7 @@ function trackKind(a, s){
   if(s.max && s.max <= 20) return "shot";
   return null;
 }
-function ballsIn(s){ return s.parts ? 5 : s.max; }
+function ballsIn(s){ return s.balls || (s.parts ? 5 : s.max); }
 function hitWord(a, s){
   if(trackKind(a, s) === "lag") return "Inside one step";
   return areaShape(a) === "clock" ? "Holed" : "In the target";
@@ -2897,7 +3091,8 @@ function pinAt(cx, cy, h){
          '<path class="pinflag" d="M'+cx+' '+(cy-h)+' L'+(cx+17)+' '+(cy-h+6)+' L'+cx+' '+(cy-h+12)+'Z"></path>'+
          '<ellipse class="hole" cx="'+cx+'" cy="'+(cy+3)+'" rx="5" ry="2.4"></ellipse></g>';
 }
-function roseSvg(centreLabel, tappable){
+var ROSE_BULL = 31;
+function roseSvg(centreLabel, tappable, bull){
   var CX = ROSE_CX, CY = ROSE_CY, out = "";
   out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
   ZONES.forEach(function(z, i){
@@ -2909,9 +3104,16 @@ function roseSvg(centreLabel, tappable){
   out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
   out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
          (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
+  if(bull){
+    out += '<circle class="rz rb" data-z="b" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_BULL+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="In the bullseye"' : '')+'></circle>';
+  }
   out += pinAt(CX, CY - 3, 30);   // the hole itself lands on the centre
-  out += '<g class="caption"><rect class="cappill" x="86" y="3" width="128" height="26" rx="13"></rect>'+
-         '<text class="rcl" x="150" y="21">'+(centreLabel||"In")+'</text></g>';
+  // both numbers live in the pill, where no marker can land on them
+  var cap = (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
+  var capW = bull ? 208 : 128;
+  out += '<g class="caption"><rect class="cappill" x="'+(150-capW/2)+'" y="3" width="'+capW+'" height="26" rx="13"></rect>'+
+         '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
   return '<svg viewBox="0 0 300 318" class="rose" role="group" aria-label="Where the ball finished">'+
          out+'<g class="marks"></g></svg>';
 }
@@ -2920,7 +3122,8 @@ function roseSvg(centreLabel, tappable){
 var ROSE_SPREAD = [[0,81],[-17,75],[17,75],[-17,89],[17,89],[0,93],[-9,82],[9,82],[0,76],[0,87]];
 var CENTRE_ANG = [180, 120, 240, 90, 270, 150, 210];
 function roseMark(zoneId, n){
-  if(zoneId==="c") return polar(ROSE_CX, ROSE_CY, ROSE_IN*0.72, CENTRE_ANG[n % CENTRE_ANG.length]);
+  if(zoneId==="b") return polar(ROSE_CX, ROSE_CY, 15, CENTRE_ANG[n % CENTRE_ANG.length]);
+  if(zoneId==="c") return polar(ROSE_CX, ROSE_CY, ROSE_IN*0.80, CENTRE_ANG[n % CENTRE_ANG.length]);
   var i = zoneIndex(zoneId); if(i<0) return [ROSE_CX, ROSE_CY];
   var m = ROSE_SPREAD[n % ROSE_SPREAD.length];
   return polar(ROSE_CX, ROSE_CY, m[1], i*45 + m[0]);
@@ -3044,7 +3247,7 @@ function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
-  return roseSvg(set.tc || "In", tappable);
+  return roseSvg(set.tc || "In", tappable, set.bull);
 }
 function markR(a){
   var sh = areaShape(a);
@@ -3282,21 +3485,53 @@ function draftShots(s){
 function lagFrom(round){
   return (round % 2 ? "A" : "B") + Math.ceil(round/2);
 }
-function callsFor(a, s, cfg){
+/* The rotation draws its own calls, once, and keeps them with the session so a phone
+   that sleeps comes back to the same sequence rather than reshuffling under the balls
+   already logged. */
+function rotPool(a){
+  var pool = [], windowed = false, gk = "windows";
+  a.sets.forEach(function(x){
+    if(x.rot || x.guide === "ladder") return;
+    if(x.parts && (x.guide === "windows" || x.guide === "heights")){ windowed = true; gk = x.guide; }
+    else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist});
+  });
+  return {pool:pool, windowed:windowed, grid:gk};
+}
+function makeRotCalls(a, s){
+  var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && spec.windowed), calls = [];
+  var order = gridOrder(spec.grid);
+  for(var i=0;i<n;i++){
+    var p = spec.pool.length ? spec.pool[Math.floor(Math.random()*spec.pool.length)] : {label:"", tc:s.tc};
+    var isWin = wantWin && i >= n/2;
+    calls.push({ kind: isWin ? "w" : "t", grid: spec.grid,
+                 win: isWin ? order[Math.floor(Math.random()*order.length)] : null,
+                 label:p.label, tc:p.tc, bull:p.bull, dist:p.dist });
+  }
+  for(var j=calls.length-1;j>0;j--){          // shuffle so the windows are not all last
+    var k = Math.floor(Math.random()*(j+1)), t = calls[j]; calls[j]=calls[k]; calls[k]=t;
+  }
+  return calls;
+}
+function rotCalls(a, s, store){
+  store = store || state.draft || {};
+  store.rot = store.rot || {};
+  var n = ballsIn(s), cur = store.rot[s.id];
+  if(!cur || cur.length !== n){ cur = makeRotCalls(a, s); store.rot[s.id] = cur; }
+  return cur;
+}
+function callsFor(a, s, cfg, store){
   if(cfg && cfg.calls) return cfg.calls;
+  if(s.rot) return rotCalls(a, s, store);
   var n = ballsIn(s), kind = trackKind(a, s), out = [];
   for(var i=0;i<n;i++){
     if(kind === "lag"){
       out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
     } else if(kind === "grid"){
-      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc});
-    } else if(s.cycle){
-      var c = s.cycle[i % s.cycle.length];
-      out.push({kind:"t", label:c.label, tc:c.tc, dist:c.dist, quiet:true});
+      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull});
     } else if(areaShape(a) === "clock"){
       out.push({kind:"t", st:(i%5)+1, tc:s.tc});
     } else {
-      out.push({kind:"t", tc:s.tc});
+      out.push({kind:"t", tc:s.tc, bull:s.bull});
     }
   }
   return out;
@@ -3304,7 +3539,7 @@ function callsFor(a, s, cfg){
 function shotPoint(call, sh){
   if(!sh || sh.z == null) return false;
   if(call && call.kind === "lag") return lagHit(call.t, sh.z);
-  return sh.z === "c";
+  return isIn(sh.z);
 }
 function tallyShots(calls, shots){
   var w = 0, t = 0;
@@ -3418,10 +3653,10 @@ function shotRow(a, s, last, cfg){
     var seen = {}, out = "", st = call().st, holed = 0, isClock = areaShape(a) === "clock";
     shots.forEach(function(x, i){
       if(!x || x.z == null) return;
-      if(isClock && x.z === "c"){ holed++; return; }
+      if(isClock && isIn(x.z)){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n, st);
-      out += '<g class="mk'+(x.z==="c"?" hit":"")+(i===cur?" now":"")+'">'+
+      out += '<g class="mk'+(isIn(x.z)?" hit":"")+(i===cur?" now":"")+'">'+
              '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
@@ -3474,12 +3709,13 @@ function shotRow(a, s, last, cfg){
     // only redraw the frame when the picture itself changes; repeated taps on the
     // same diagram just move markers, which keeps focus and avoids churn
     var key = st + "|" + (c.tc||"") + "|" + (wantSide ? 1 : 0) + "|" + (c.grid||"") +
-              "|" + (c.st||"") + "|" + (c.t||"") + "|" + (c.from||"") + "|" + (slopeNow()||"");
+              "|" + (c.st||"") + "|" + (c.t||"") + "|" + (c.from||"") + "|" + (slopeNow()||"") +
+              "|" + (c.bull||"");
     if(key !== diag.__key){
       var low = slopeNow();
-      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low}, true);
+      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull}, true);
       var main = st === "w" ? gridSvg(gridOf(c), true) : pic;
-      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low}, false) : gridSvg(gridOf(c), false));
+      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull}, false) : gridSvg(gridOf(c), false));
       diag.innerHTML = '<div class="diagmain">'+main+'</div>'+
         (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":word||"grid")+'">'+side+'</button>' : '');
       diag.__key = key;
@@ -3509,7 +3745,7 @@ function shotRow(a, s, last, cfg){
         var b = document.createElement("button"); b.type="button"; b.className="ballchip";
         if(i===cur) b.classList.add("now");
         if(shotDone(s, x, calls[i])) b.classList.add("done");
-        if(x && x.z === "c") b.classList.add("good");
+        if(x && isIn(x.z)) b.classList.add("good");
         if(calls[i].kind === "w") b.classList.add("win");
         b.textContent = String(i+1);
         b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+zoneLabel(a, x.z) : ", not logged"));
@@ -3898,6 +4134,7 @@ function updateTotal(){
   $("totFig").textContent = String(t);
   $("totOf").textContent = "/ " + d.max;
   $("totVs").innerHTML = "";
+  renderRun();
   $("saveBtn").textContent = "Save session";
   $("saveBtn").disabled = false;
   saveDraft();
@@ -3950,7 +4187,9 @@ function openGym(id, resume){
   renderGym();
   show("gym");
 }
+function hideRunBar(){ if($("runBar")) $("runBar").hidden = true; }
 function renderGym(){
+  hideRunBar();
   var g = gym(state.gymDraft.gymId);
   var last = gymSessions(g.id).slice(-1)[0];
   stashNotes();
@@ -4803,10 +5042,10 @@ function pastShots(a, set, sess){
     var seen = {}, out = "", holed = 0, isClock = areaShape(a) === "clock" && kind !== "lag";
     list.forEach(function(x, i){
       if(!x || x.z == null) return;
-      if(isClock && x.z === "c"){ holed++; return; }
+      if(isClock && isIn(x.z)){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = kind === "lag" ? lagMark(x.z, n) : shapeMark(a, x.z, n, null);
-      var hit = kind === "lag" ? shotPoint(calls[i], x) : (x.z === "c");
+      var hit = kind === "lag" ? shotPoint(calls[i], x) : isIn(x.z);
       out += '<g class="mk'+(hit ? " hit" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+
              (kind === "lag" ? 10 : markR(a))+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
@@ -4913,12 +5152,13 @@ function openPast(s){
 
 /* ---------- export ---------- */
 function sessionZones(sess){
-  var t = {c:0, wayLeft:0, wayRight:0};
+  var t = {c:0, b:0, wayLeft:0, wayRight:0};
   ZONES.forEach(function(z){ t[z.id] = 0; });
   if(!sess.shots) return t;
   for(var k in sess.shots){
     (sess.shots[k]||[]).forEach(function(x){
       if(!x || x.z == null) return;
+      if(x.z === "b"){ t.b++; t.c++; return; }     // the bullseye is inside the circle
       if(t[x.z] != null) t[x.z]++;
     });
   }
@@ -4926,8 +5166,8 @@ function sessionZones(sess){
 }
 function csv(){
   var head = ["player","date","area","kind","total","max","pct","venue","surface","temperature","wind_strength","wind_direction","rain","green_speed",
-              "compete","won","chs_fastest_mph","chs_slowest_mph","key_lift_kg",
-              "in_target","miss_long","miss_long_right","miss_right","miss_short_right","miss_short","miss_short_left","miss_left","miss_long_left","miss_deep_left","miss_deep_right",
+              "best_run","compete","won","chs_fastest_mph","chs_slowest_mph","key_lift_kg",
+              "in_target","in_bullseye","miss_long","miss_long_right","miss_right","miss_short_right","miss_short","miss_short_left","miss_left","miss_long_left","miss_deep_left","miss_deep_right",
               "notes"];
   var lines = [head.join(",")];
   var pname = {}; state.players.forEach(function(p){ pname[p.id]=p.name; });
@@ -4944,9 +5184,9 @@ function csv(){
       q(pname[s.playerId]||""), s.date, q(label), s.kind,
       s.total||0, s.max||0, s.max ? Math.round(s.total/s.max*100) : "",
       c.venue||"", c.surface||"", c.temp||"", c.windStr||"", c.windDir||"", c.rain||"", c.speed||"",
-      s.compete||0, s.won==null?"":(s.won?"yes":"no"),
+      s.bestRun||"", s.compete||0, s.won==null?"":(s.won?"yes":"no"),
       (s.metrics&&s.metrics.chsFast)||"", (s.metrics&&s.metrics.chsSlow)||"", kl,
-      zt.c, zt.long, zt.longR, zt.right, zt.shortR, zt.short, zt.shortL, zt.left, zt.longL, zt.wayLeft, zt.wayRight,
+      zt.c, zt.b, zt.long, zt.longR, zt.right, zt.shortR, zt.short, zt.shortL, zt.left, zt.longL, zt.wayLeft, zt.wayRight,
       q(s.notes||"")
     ].join(","));
   });
