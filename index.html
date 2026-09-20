@@ -614,7 +614,7 @@
   .shotset{display:block}
   .shotask{margin:12px 0 10px; font-size:13.5px; color:var(--ink-2); line-height:1.45; min-height:2.6em}
   .shotask b{color:var(--ink)}
-  svg.rose, svg.wgrid, svg.corr{width:100%; max-width:330px; height:auto; touch-action:manipulation}
+  svg.rose, svg.wgrid, svg.corr, svg.clock, svg.lag{width:100%; max-width:330px; height:auto; touch-action:manipulation}
 
   .rz{cursor:pointer}
   .rz:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
@@ -660,11 +660,63 @@
   .wcell{fill:var(--surface); stroke:var(--ink-2); stroke-width:1.6; cursor:pointer}
   .wc:hover .wcell{fill:var(--accent-wash)}
   .wc:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
-  .wc.called .wcell{fill:#f6e27a; stroke:#c9a227; stroke-width:2.4}
+  .wc.called .wcell{fill:#f9b6d6; stroke:#d2006a; stroke-width:2.4}
+  .wc.called .wnum{fill:#7a0038}
   .wc.on .wcell{stroke:var(--ink); stroke-width:3.2}
   .wnum{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:21px;
     font-weight:600; text-anchor:middle; pointer-events:none}
+  .wlab{fill:var(--ink); font-family:Archivo, sans-serif; font-size:18px; font-weight:600; pointer-events:none}
+  .wsub{fill:var(--muted); font-family:Archivo, sans-serif; font-size:12.5px; pointer-events:none}
+  .wc.called .wlab{fill:#7a0038}
+  .wc.called .wsub{fill:#a80050}
   .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
+
+  .slopebox{margin:12px 0 2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--surface-2)}
+  .slopebox .eyebrow{display:block; margin-bottom:7px}
+  .slopetab{margin-top:12px}
+  .slopetab .eyebrow{display:block; margin-bottom:6px}
+  .strow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:7px 0;
+    border-bottom:1px solid var(--line); font-size:13.5px}
+  .strow:last-child{border-bottom:0}
+  .strow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:15px}
+  .strow .sp{grid-column:1 / -1; font-size:12px; color:var(--muted)}
+  .fall{pointer-events:none}
+  .fall line, .fall path{stroke:#ffffff; stroke-width:5; stroke-opacity:.72; fill:none; stroke-linecap:round}
+
+  /* the clock: five stations round the hole, left and right turning with the station */
+  .cbed{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
+  .cpent{fill:none; stroke:#7ba86c; stroke-width:1.4; stroke-dasharray:6 5; pointer-events:none}
+  .cz{fill:rgba(255,255,255,.42); stroke:#7ba86c; stroke-width:1.2}
+  .cin{fill:rgba(255,255,255,.6); stroke:#7ba86c; stroke-width:1.4}
+  .clock .rz:hover, .clock .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  /* a white halo so the label stays readable wherever the slope arrow lands */
+  .czl{fill:#2b3a27; font-family:Archivo, sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:1.1; text-anchor:middle; pointer-events:none;
+    stroke:#eef5e9; stroke-width:3.2; paint-order:stroke fill}
+  .chole{fill:#22331d; pointer-events:none}
+  .cline{stroke:#33482c; stroke-width:1.8; stroke-dasharray:6 4; pointer-events:none}
+  .stn{pointer-events:none}
+  .stn circle{fill:#ffffff; stroke:#6e9c62; stroke-width:1.6}
+  .stn text{fill:#1f2a1c; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px;
+    font-weight:600; text-anchor:middle}
+  .stn.on circle{fill:#f9b6d6; stroke:#d2006a; stroke-width:2.4}
+  .stn.on text{fill:#7a0038}
+
+  /* the lag ladder: the gaps are what gets tapped, not the targets */
+  .lagedge{stroke:#8d9a8a; stroke-width:1.5; stroke-dasharray:6 5}
+  .lz{fill:#e2efd9; stroke:#bcd3b0; stroke-width:1}
+  .lz.good{fill:#d8ebcb; stroke:#d2006a; stroke-width:1.6; stroke-dasharray:5 4}
+  .lag .rz:hover, .lag .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  .lagt{stroke:#4f7347; stroke-width:2; pointer-events:none}
+  .lagt.on{stroke:#d2006a; stroke-width:3.4}
+  .lagdot{fill:#6e9c62; pointer-events:none}
+  .lagdot.on{fill:#d2006a}
+  /* these two sit off the grass, on the page, so they follow the theme */
+  .lagn{fill:var(--ink-2); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px;
+    font-weight:600; text-anchor:end; pointer-events:none}
+  .lagn.on{fill:var(--accent-fill)}
+  .lagfrom{fill:var(--muted); font-family:Archivo, sans-serif; font-size:12.5px; pointer-events:none}
 
   /* ball markers */
   .mk{pointer-events:none}
@@ -1078,7 +1130,7 @@
 
 /* ============ the programme ============ */
 var AREAS = [
-{ id:10, no:1, name:"Tee shots", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long", track:true, shape:"corridor",
+{ id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 35 balls, full routine every ball) → 10 min compete",
   sets:[
@@ -1093,9 +1145,9 @@ var AREAS = [
     {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tc:"30 yd", tgt:"Five balls: a point for the window, a point for the 30-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:11, no:2, name:"Approach play", sub:"125, 150 and 175 yards · into greens", block:"long", track:true,
+{ id:11, no:2, name:"Approach (Ball flight control)", sub:"125, 150 and 175 yards · into greens", block:"long", track:true,
   targets:"GIR 67 → 73% · 150y ± 9 yd · pin high on approaches, not short",
   hour:"10 min warm-up → 35 min benchmark (6 sets, 30 balls, full routine every ball) → 10 min compete. Short enough to pair with putting or short game when range time is tight",
   sets:[
@@ -1109,7 +1161,7 @@ var AREAS = [
     {id:"f", guide:"windows", label:"Five windows · 175y", tc:"24 ft", tgt:"Same club, same target. Five balls: a point for the window, a point for within 24 ft",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -1131,46 +1183,47 @@ var AREAS = [
     {id:"h", guide:"windows", label:"Driver · five windows", tgt:"Five balls: a point for the window, a point for the 40-yd target",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
 { id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
   targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
   hour:"10 min warm-up → 40 min benchmark (8 sets, about 50 balls, full routine every ball) → 10 min compete",
   sets:[
     {id:"a", label:"30y", short:"30 yards", tc:"7 ft", tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"7 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"c", label:"50y", short:"50 yards", tc:"10 ft", tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"10 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"e", label:"70y", short:"70 yards", tc:"12 ft", tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
     {id:"f", label:"90y", short:"90 yards", tc:"13 ft", tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"13 ft", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"h", label:"Rotation · 30 / 50 / 70 / 90", tgt:"20 balls, cycle the four targets five times. A point inside each target", max:20}
+    {id:"h", label:"Rotation · 30 / 50 / 70 / 90", tgt:"20 balls, cycle the four targets five times. A point inside each target", max:20,
+      cycle:[{label:"30 yards",tc:"7 ft"},{label:"50 yards",tc:"10 ft"},{label:"70 yards",tc:"12 ft"},{label:"90 yards",tc:"13 ft"}]}
   ],
-  compete:{max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
+  compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100",
+{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
   hour:"10 min warm-up → 40 min benchmark (75 shots in five-ball sets) → 10 min compete",
   sets:[
-    {id:"a", group:"Pitching & chipping", label:"Release 1 · 50°, good lie, four distances", tgt:"4 sets of 5 · within 3 ft", max:20},
-    {id:"b", label:"Release 2 · good lie, two distances (54° and 58°)", tgt:"3 sets of 5 · within 3 ft", max:15},
-    {id:"c", label:"Tricky lies · downhill, rough, bare", tgt:"3 sets of 5 · within 3 ft · you choose the loft", max:15},
-    {id:"d", group:"Bunkers", label:"Good lie · three targets", tgt:"3 sets of 5 · within 3 ft", max:15},
-    {id:"e", label:"Bad lie · downhill or plugged", tgt:"2 sets of 5 · within 3 ft", max:10}
+    {id:"a", group:"Pitching & chipping", label:"Release 1 · 50°, good lie, four distances", tc:"3 ft", tgt:"4 sets of 5 · within 3 ft", max:20},
+    {id:"b", label:"Release 2 · good lie, two distances (54° and 58°)", tc:"3 ft", tgt:"3 sets of 5 · within 3 ft", max:15},
+    {id:"c", label:"Tricky lies · downhill, rough, bare", tc:"3 ft", tgt:"3 sets of 5 · within 3 ft · you choose the loft", max:15},
+    {id:"d", group:"Bunkers", label:"Good lie · three targets", tc:"3 ft", tgt:"3 sets of 5 · within 3 ft", max:15},
+    {id:"e", label:"Bad lie · downhill or plugged", tc:"3 ft", tgt:"2 sets of 5 · within 3 ft", max:10}
   ],
   compete:{max:30, label:"Compete · 15 shots", tgt:"Random targets with a partner, alternating shots and target choice, or 15 shots alone. In the target 1, holed 2."} },
 
-{ id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100",
+{ id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
   hour:"10 min warm-up → 40 min benchmark (105 putts in five-ball sets) → 10 min compete",
   sets:[
-    {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tgt:"4 sets of 5 (one club plus grip)", max:20},
-    {id:"b", label:"6 ft", tgt:"3 sets of 5 (two clubs)", max:15},
-    {id:"c", label:"9 ft", tgt:"2 sets of 5 (three clubs)", max:10},
-    {id:"e", label:"12 ft", tgt:"2 sets of 5 (four clubs)", max:10},
+    {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", max:20},
+    {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", max:15},
+    {id:"c", label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", max:10},
+    {id:"e", label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", max:10},
     {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", tgt:"50 putts", max:50}
   ],
   setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Each round, putt five balls from one launch target to the five at the far end, then rotate the launch target and swap ends: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Ten rounds is 50 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break.",
@@ -1565,6 +1618,8 @@ function condLabel(kind, field, val){
 function area(id){ for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; } return null; }
 function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
 function areaNo(a){ return a.no || a.id; }
+/* The name in prose, without the bracket: "approach", not "approach (ball flight control)". */
+function areaWord(a){ return String(a.name||"").replace(/\s*\(.*\)\s*$/, "").toLowerCase(); }
 function areaTitle(a){ return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name; }
 function setParts(s){
   if(s.parts) return s.parts.map(function(p){ return { key:s.id+"_"+p.id, label:p.label, max:p.max }; });
@@ -1620,7 +1675,7 @@ function loadLocal(){
 function docBody(s){
   return { playerId:s.playerId, kind:s.kind, areaId:s.areaId, date:s.date,
            scores:s.scores||{}, metrics:s.metrics||{}, holes:s.holes||null, gymId:s.gymId||null,
-           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, train:s.train||null, stats:s.stats||{}, shots:s.shots||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
+           ex:s.ex||null, prep:!!s.prep, cond:s.cond||{}, train:s.train||null, stats:s.stats||{}, shots:s.shots||{}, slope:s.slope||{}, checks:s.checks||null, competeCalls:s.competeCalls||null, competeShots:s.competeShots||null, competeMax:s.competeMax||0, compete:s.compete||0, won:(s.won==null?null:!!s.won),
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
@@ -1794,7 +1849,7 @@ function helloLine(){
 function sessionPraise(sess){
   var p = playerObj(), name = (p && p.name) || "";
   var a = area(sess.areaId);
-  var label = a ? a.name.toLowerCase() : "practice";
+  var label = a ? areaWord(a) : "practice";
   var all = mine().filter(function(s){ return !s.sample && s.kind === "practice"; });
   var inArea = all.filter(function(s){ return s.areaId === sess.areaId; });
   var prev = inArea.filter(function(s){ return s.id !== sess.id; });
@@ -2065,7 +2120,7 @@ function renderBalance(){
   var BKEYS = [10,11,2,3,4,6,7,8,9];
   if(counts[1]) BKEYS.push(1);   // only if there are sessions in the earlier format
   var maxN = 1; BKEYS.forEach(function(k){ if(counts[k]>maxN) maxN = counts[k]; });
-  var names = {10:"Tee shots",11:"Approach play",2:"Wedge play",3:"Short game",4:"Holing out",
+  var names = {10:"Tee shots",11:"Approach",2:"Wedge play",3:"Short game",4:"Holing out",
                6:"S&C · gym",7:"Speed sticks",8:"Band session",9:"Movement prep",1:"Ball flight · earlier"};
   var host = $("balance"); host.innerHTML="";
   BKEYS.forEach(function(k){
@@ -2191,7 +2246,7 @@ function openSession(areaId, resume){
     state.draft = resume;
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
-                    date:today(), scores:{}, metrics:{}, shots:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
+                    date:today(), scores:{}, metrics:{}, shots:{}, slope:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : a.compete.max), won:null, notes:"", max:areaMax(a) };
     a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
@@ -2230,7 +2285,7 @@ function condPage(){
 
 function fillIntro(a){
   renderTargets("sessTargetBox", a.id);
-  renderChecks("sessChecks");
+  renderChecks("sessChecks", a.id);
   $("sessHour").textContent = a.hour;
   renderCond("sessCond", state.draft, condKind(a.id, "practice"));
 }
@@ -2248,7 +2303,7 @@ function notesBlock(id, label){
    and kept with the draft, so a phone that sleeps mid-block comes back to the same
    sequence rather than reshuffling under the balls already logged. */
 function competeSpec(a){
-  if(!a || !a.track) return null;
+  if(!a || !a.track || !a.compete || !a.compete.calls) return null;
   var plain = [], windowed = false;
   a.sets.forEach(function(s){
     if(s.parts && s.guide === "windows") windowed = true;
@@ -2347,7 +2402,7 @@ function buildSessionCards(a, last){
 
   cards.forEach(function(c){ host.appendChild(c); });
   fillIntro(a);
-  renderChecks("sessChecksEnd", {prompt:"Any swing checks to carry into the next session? Edit them here and they come with you."});
+  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this area? Edit it here and it comes with you."});
   deckInit(cards, "sessProg");
 }
 function monitorNote(){
@@ -2362,21 +2417,36 @@ function monitorNote(){
    percentage per zone and a wash whose strength follows it, so the pattern reads
    before you read a figure. Same drawing serves History later, different pool. */
 function poolShots(a, sess){
-  var t = {}, w = {}, n = 0, wn = 0;
-  function eat(list, calls){
+  var t = {}, n = 0, w = {}, wn = 0, gk = null, cl = {}, cn = 0, lg = {}, ln = 0, lhit = 0;
+  function eat(list, calls, kind, gkind){
     (list||[]).forEach(function(x, i){
       if(!x) return;
-      if(x.z != null){ t[x.z] = (t[x.z]||0)+1; n++; }
+      var c = calls ? (calls[i]||{}) : null;
+      if(kind === "lag"){
+        if(x.z == null) return;
+        lg[x.z] = (lg[x.z]||0)+1; ln++;
+        if(lagHit(c ? c.t : (i%5)+1, x.z)) lhit++;
+        return;
+      }
+      if(x.z != null){
+        if(kind === "clock"){ cl[x.z] = (cl[x.z]||0)+1; cn++; }
+        else { t[x.z] = (t[x.z]||0)+1; n++; }
+      }
       if(x.w != null){
         w[x.w] = (w[x.w]||0)+1; wn++;
-        var want = calls ? (calls[i]||{}).win : i+1;
+        if(gkind) gk = gkind;
+        var want = c ? c.win : gridOrder(gkind || "windows")[i % gridOrder(gkind || "windows").length];
         if(x.w === want) w.__hit = (w.__hit||0)+1;
       }
     });
   }
-  if(sess.shots) a.sets.forEach(function(s){ eat(sess.shots[s.id], null); });
-  eat(sess.competeShots, sess.competeCalls);
-  return {t:t, n:n, w:w, wn:wn};
+  if(sess.shots) a.sets.forEach(function(s){
+    var k = trackKind(a, s);
+    var kind = k === "lag" ? "lag" : (areaShape(a) === "clock" ? "clock" : "target");
+    eat(sess.shots[s.id], null, kind, s.guide);
+  });
+  eat(sess.competeShots, sess.competeCalls, areaShape(a) === "clock" ? "clock" : "target", "windows");
+  return {t:t, n:n, w:w, wn:wn, grid:gk || "windows", clock:cl, cn:cn, lag:lg, ln:ln, lhit:lhit};
 }
 function pctText(c, n){ return n ? Math.round(c/n*100)+"%" : ""; }
 function heatFill(c, n){
@@ -2396,9 +2466,65 @@ function heatSvg(svg, ids, counts, n, markFn){
   });
   return svg.replace('<g class="marks"></g>', '<g class="marks">'+out+'</g>');
 }
+/* Every putt carries its own break once the set says which way the green falls, so
+   the same tally serves the session summary and the run of sessions in History. */
+function puttSlopeStats(sessions){
+  var cl = {}, lg = {};
+  sessions.forEach(function(sess){
+    var a = area(sess.areaId);
+    if(!a || areaShape(a) !== "clock") return;
+    var sl = sess.slope || {};
+    a.sets.forEach(function(st){
+      var kind = trackKind(a, st), list = (sess.shots || {})[st.id];
+      if(!kind || !list) return;
+      var calls = callsFor(a, st);
+      list.forEach(function(x, i){
+        if(!x || x.z == null) return;
+        var c = calls[i], br = breakOf(kind, sl[st.id], c);
+        if(!br) return;
+        if(kind === "lag"){
+          var e = lg[br] || (lg[br] = {n:0, hit:0, sh:0, lo:0});
+          e.n++;
+          if(shotPoint(c, x)) e.hit++;
+          else if(+String(x.z).slice(1) < c.t - 1) e.sh++;
+          else e.lo++;
+        } else {
+          var k = cl[br] || (cl[br] = {n:0, c:0, l:0, r:0});
+          k.n++; if(k[x.z] != null) k[x.z]++;
+        }
+      });
+    });
+  });
+  return {clock:cl, lag:lg};
+}
+function putts(n){ return n + (n === 1 ? ' putt' : ' putts'); }
+function slopeRows(stats){
+  var out = "";
+  BREAK_ORDER.forEach(function(k){
+    var c = stats.clock[k];
+    if(!c || !c.n) return;
+    out += '<div class="strow"><span>'+BREAK_LAB[k]+'</span><b>'+pctText(c.c, c.n)+'</b>'+
+           '<span class="sp">'+putts(c.n)+' \u00b7 left '+c.l+' \u00b7 right '+c.r+'</span></div>';
+  });
+  if(out) out = '<div class="slopetab"><span class="eyebrow">Holed, by the way it broke</span>'+out+'</div>';
+  var lag = "";
+  BREAK_ORDER.forEach(function(k){
+    var e = stats.lag[k];
+    if(!e || !e.n) return;
+    lag += '<div class="strow"><span>'+BREAK_LAB[k]+'</span><b>'+pctText(e.hit, e.n)+'</b>'+
+           '<span class="sp">'+putts(e.n)+' \u00b7 short '+e.sh+' \u00b7 long '+e.lo+'</span></div>';
+  });
+  if(lag) out += '<div class="slopetab"><span class="eyebrow">Inside one step, by the way it ran</span>'+lag+'</div>';
+  return out;
+}
+
+function sumCard(eyebrow, svg, note){
+  return '<div class="sumcard"><span class="eyebrow">'+eyebrow+'</span>'+svg+
+         (note ? '<p class="note">'+note+'</p>' : '')+'</div>';
+}
 function summaryBlock(a, sess){
   var pool = poolShots(a, sess);
-  if(!pool.n && !pool.wn) return null;
+  if(!pool.n && !pool.wn && !pool.cn && !pool.ln) return null;
   var wrap = document.createElement("div"); wrap.className="sumwrap";
   var html = '';
 
@@ -2409,25 +2535,48 @@ function summaryBlock(a, sess){
       if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 26];
       return shapeMark(a, id, 0);
     });
-    html += '<div class="sumcard"><span class="eyebrow">Where every ball finished \u00b7 '+pool.n+' balls</span>'+
-            svg + '<p class="note">In the target ' + pctText(pool.t.c||0, pool.n) + ' of the time.</p></div>';
+    html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
+      'In the target ' + pctText(pool.t.c||0, pool.n) + ' of the time.');
+  }
+
+  /* The clock is drawn straight, as if every putt came from the bottom, so a session
+     of misses from five stations still reads as one pattern. */
+  if(pool.cn){
+    var csvg = heatSvg(clockSvg(null, false, "Holed", null), ["c","l","r"], pool.clock, pool.cn, function(id){
+      return id === "c" ? [CLOCK.cx, CLOCK.cy + 24] : polar(CLOCK.cx, CLOCK.cy, 76, id === "l" ? 310 : 50);
+    });
+    html += sumCard('Every putt · '+pool.cn+' of them', csvg,
+      'Holed ' + pctText(pool.clock.c||0, pool.cn) + ' of the time · missed left ' +
+      pctText(pool.clock.l||0, pool.cn) + ', right ' + pctText(pool.clock.r||0, pool.cn) + '.');
+  }
+
+  if(pool.ln){
+    var lids = LAG_ZONES.map(function(z){ return z.id; });
+    var lsvg = heatSvg(lagSvg(null, false), lids, pool.lag, pool.ln, function(id){
+      var m = lagMark(id, 0); return [LAG.x1 - 46, m[1] + 4];
+    });
+    var shortN = (pool.lag.g0||0), longN = (pool.lag.g4||0) + (pool.lag.g5||0);
+    html += sumCard('The lag ladder · '+pool.ln+' putts', lsvg,
+      'Inside one step ' + pctText(pool.lhit, pool.ln) + ' of the time' +
+      (shortN || longN ? ' · ' + (shortN >= longN ? 'the misses run short' : 'the misses run long') : '') + '.');
   }
 
   if(pool.wn){
-    var wsvg = windowSvg(false), wout = "";
-    WCELL.forEach(function(c){
+    var g = grid(pool.grid), wsvg = gridSvg(pool.grid, false), wout = "";
+    g.cells.forEach(function(c){
       var n2 = pool.w[c.w] || 0;
       wsvg = wsvg.replace('class="wcell" x="'+c.x+'" y="'+c.y+'"',
                           'class="wcell" style="'+heatFill(n2, pool.wn)+'" x="'+c.x+'" y="'+c.y+'"');
       if(!n2) return;
-      var p = wMark(c.w, 0);
+      var p = gridMark(pool.grid, c.w, 0);
       wout += '<g class="pctmk"><text x="'+p[0]+'" y="'+(p[1]-2)+'">'+pctText(n2, pool.wn)+'</text>'+
               '<text class="pctn" x="'+p[0]+'" y="'+(p[1]+13)+'">'+n2+'</text></g>';
     });
     wsvg = wsvg.replace('<g class="marks"></g>', '<g class="marks">'+wout+'</g>');
-    html += '<div class="sumcard"><span class="eyebrow">Which windows \u00b7 '+pool.wn+' balls</span>'+ wsvg +
-            '<p class="note">Through the window that was called ' + pctText(pool.w.__hit||0, pool.wn) + ' of the time.</p></div>';
+    html += sumCard(g.heading+' · '+pool.wn+' balls', wsvg,
+      'Through the ' + g.word + ' that was called ' + pctText(pool.w.__hit||0, pool.wn) + ' of the time.');
   }
+  if(pool.cn || pool.ln) html += slopeRows(puttSlopeStats([sess]));
   wrap.innerHTML = html;
   return wrap;
 }
@@ -2478,7 +2627,7 @@ function buildSessionList(a, last){
   var ce = document.createElement("div"); ce.id = "sessChecksEnd"; ce.style.marginTop = "16px";
   host.appendChild(ce);
   fillIntro(a);
-  renderChecks("sessChecksEnd", {prompt:"Any swing checks to carry into the next session? Edit them here and they come with you."});
+  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this area? Edit it here and it comes with you."});
   state.deck = null;
   $("sessProg").innerHTML = "";
   updateNav();
@@ -2541,15 +2690,31 @@ var ZONE_LABEL = {c:"In the target"};
 ZONES.forEach(function(z){ ZONE_LABEL[z.id] = z.lab; });
 ZONE_LABEL.wayLeft = "Deep rough, left"; ZONE_LABEL.wayRight = "Deep rough, right";
 ZONE_LABEL.bunker = "Short, in the bunker";
+ZONE_LABEL.l = "Missed left"; ZONE_LABEL.r = "Missed right";
+var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
+                 g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
+for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
 function zoneIndex(id){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].id===id) return i; } return -1; }
+function zoneLabel(a, z){
+  if(z == null) return "not logged";
+  if(z === "c" && areaShape(a) === "clock") return "Holed";
+  return ZONE_LABEL[z] || z;
+}
 
+/* What a set is captured with: a grid then a picture, a picture on its own, or the
+   ladder. Everything else is still a pair of steppers. */
 function trackKind(a, s){
   if(!a || !a.track) return null;
-  if(s.parts && s.guide==="windows") return "windows";
-  if(!s.parts && s.max && s.max<=10) return "target";
+  if(s.guide === "ladder") return "lag";
+  if(s.parts) return (s.guide === "windows" || s.guide === "heights") ? "grid" : null;
+  if(s.max && s.max <= 20) return "shot";
   return null;
 }
 function ballsIn(s){ return s.parts ? 5 : s.max; }
+function hitWord(a, s){
+  if(trackKind(a, s) === "lag") return "Inside one step";
+  return areaShape(a) === "clock" ? "Holed" : "In the target";
+}
 
 /* ---- geometry ---- */
 var ROSE_CX = 150, ROSE_CY = 170, ROSE_R = 136, ROSE_IN = 54;
@@ -2712,33 +2877,214 @@ function corridorSvg(gate, tappable){
 }
 
 /* one place that knows which picture an area uses */
+var CLOCK_ZONES = [{id:"l", lab:"Missed left"}, {id:"r", lab:"Missed right"}];
+var LAG_ZONES = [{id:"g0"},{id:"g1"},{id:"g2"},{id:"g3"},{id:"g4"},{id:"g5"}];
 function areaShape(a){ return (a && a.shape) || "rose"; }
 function shapeSvg(a, set, tappable){
-  return areaShape(a)==="corridor" ? corridorSvg(set.tc || "", tappable) : roseSvg(set.tc || "In", tappable);
+  var sh = areaShape(a);
+  if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
+  if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
+  return roseSvg(set.tc || "In", tappable);
 }
-function markR(a){ return areaShape(a)==="corridor" ? 11 : 13; }
-function shapeMark(a, zoneId, n){
-  return areaShape(a)==="corridor" ? corrMark(zoneId, n) : roseMark(zoneId, n);
+function markR(a){
+  var sh = areaShape(a);
+  return sh === "corridor" ? 11 : (sh === "clock" ? 11 : 13);
 }
-function shapeZones(a){ return areaShape(a)==="corridor" ? CORR_ZONES : ZONES; }
+function shapeMark(a, zoneId, n, st){
+  var sh = areaShape(a);
+  if(sh === "corridor") return corrMark(zoneId, n);
+  if(sh === "clock") return clockMark(zoneId, n, st);
+  return roseMark(zoneId, n);
+}
+function shapeZones(a){
+  var sh = areaShape(a);
+  if(sh === "corridor") return CORR_ZONES;
+  if(sh === "clock") return CLOCK_ZONES;
+  return ZONES;
+}
 
-var WCELL = [{w:1,x:48,y:16},{w:2,x:160,y:16},{w:3,x:104,y:88},{w:4,x:48,y:160},{w:5,x:160,y:160}];
-function windowSvg(tappable){
-  var att = tappable ? ' role="button" tabindex="0"' : '';
-  var out = '<rect class="wframe" x="34" y="8" width="232" height="230" rx="7"></rect>';
-  WCELL.forEach(function(c){
-    out += '<g class="wc" data-w="'+c.w+'"'+att+' aria-label="Window '+c.w+'">'+
-           '<rect class="wcell" x="'+c.x+'" y="'+c.y+'" width="92" height="64" rx="4"></rect>'+
-           '<text class="wnum" x="'+(c.x+46)+'" y="'+(c.y+42)+'">'+c.w+'</text></g>';
+/* ---- the grids: five windows for the long game, three heights for the wedges ----
+   One cell layout, two shapes. The called cell is lit; the tap says which one the
+   ball actually went through. */
+var GRIDS = {
+  windows:{
+    vb:"0 0 300 258", frame:{x:34, y:8, w:232, h:230}, ball:{cx:150, cy:248},
+    word:"window", heading:"Which windows", title:"Which window the ball flew through",
+    cols:3, dx:26, dy:24, mx:20, my:22,
+    cells:[{w:1,x:48,y:16,W:92,H:64},{w:2,x:160,y:16,W:92,H:64},{w:3,x:104,y:88,W:92,H:64},
+           {w:4,x:48,y:160,W:92,H:64},{w:5,x:160,y:160,W:92,H:64}],
+    order:[1,2,3,4,5]
+  },
+  heights:{
+    vb:"0 0 300 258", frame:null, ball:{cx:150, cy:250},
+    word:"height", heading:"Which heights", title:"Which height the ball came out at",
+    cols:4, dx:28, dy:26, mx:74, my:26,
+    cells:[{w:1,x:56,y:8,W:188,H:72,lab:"Higher",sub:"balls 3 + 5"},
+           {w:2,x:56,y:86,W:188,H:72,lab:"Normal",sub:"ball 1"},
+           {w:3,x:56,y:164,W:188,H:72,lab:"Lower",sub:"balls 2 + 4"}],
+    order:[2,3,1,3,1]
+  }
+};
+function grid(kind){ return GRIDS[kind] || GRIDS.windows; }
+function gridOrder(kind){ return grid(kind).order; }
+function gridCell(kind, w){
+  var c = null; grid(kind).cells.forEach(function(x){ if(x.w===w) c = x; });
+  return c;
+}
+function gridLabel(kind, w){
+  var c = gridCell(kind, w);
+  return c ? (c.lab || ("Window " + c.w)) : "";
+}
+function gridSvg(kind, tappable){
+  var g = grid(kind), att = tappable ? ' role="button" tabindex="0"' : '', out = "";
+  if(g.frame) out += '<rect class="wframe" x="'+g.frame.x+'" y="'+g.frame.y+'" width="'+g.frame.w+'" height="'+g.frame.h+'" rx="7"></rect>';
+  g.cells.forEach(function(c){
+    out += '<g class="wc" data-w="'+c.w+'"'+att+' aria-label="'+(c.lab || ("Window "+c.w))+'">'+
+           '<rect class="wcell" x="'+c.x+'" y="'+c.y+'" width="'+c.W+'" height="'+c.H+'" rx="4"></rect>'+
+           (c.lab
+             ? '<text class="wlab" x="'+(c.x+16)+'" y="'+(c.y+c.H/2-2)+'">'+c.lab+'</text>'+
+               '<text class="wsub" x="'+(c.x+16)+'" y="'+(c.y+c.H/2+17)+'">'+c.sub+'</text>'
+             : '<text class="wnum" x="'+(c.x+c.W/2)+'" y="'+(c.y+c.H/2+10)+'">'+c.w+'</text>')+
+           '</g>';
   });
-  out += '<circle class="wball" cx="150" cy="248" r="6"></circle>';
-  return '<svg viewBox="0 0 300 258" class="wgrid" role="group" aria-label="Which window the ball flew through">'+
+  if(g.ball) out += '<circle class="wball" cx="'+g.ball.cx+'" cy="'+g.ball.cy+'" r="6"></circle>';
+  return '<svg viewBox="'+g.vb+'" class="wgrid" role="group" aria-label="'+g.title+'">'+
          out+'<g class="marks"></g></svg>';
 }
-function wMark(wid, n){
-  var c=null; WCELL.forEach(function(x){ if(x.w===wid) c=x; });
+function gridMark(kind, wid, n){
+  var g = grid(kind), c = gridCell(kind, wid);
   if(!c) return [150,150];
-  return [c.x + 20 + (n%3)*26, c.y + 22 + Math.floor(n/3)*24];
+  return [c.x + g.mx + (n % g.cols)*g.dx, c.y + g.my + Math.floor(n / g.cols)*g.dy];
+}
+
+/* ---- the clock: five stations round the hole ----
+   Left and right are only meaningful from where you are standing, so the two halves
+   turn with the station the app has called and the putt line is drawn in. */
+var CLOCK = { cx:150, cy:170, R:112, bed:134, hole:12, r0:42, r1:100, stn:15 };
+var ST_ANG = {1:288, 2:0, 3:72, 4:144, 5:216};
+function clockB(st){ return (ST_ANG[st] != null ? ST_ANG[st] + 180 : 0); }
+function clockSvg(st, tappable, label, low){
+  var K = CLOCK, att = tappable ? ' role="button" tabindex="0"' : '', out = "";
+  var B = clockB(st), pts = [];
+  [1,2,3,4,5].forEach(function(i){ pts.push(polar(K.cx, K.cy, K.R, ST_ANG[i])); });
+  out += '<circle class="cbed" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.bed+'"></circle>';
+  if(low && low !== "flat"){
+    // the head stops short of the low station, which would otherwise sit on top of it
+    var F = ST_ANG[+low], hi = polar(K.cx, K.cy, K.bed-8, F+180), lo = polar(K.cx, K.cy, 92, F);
+    var hd1 = polar(lo[0], lo[1], 17, F+145), hd2 = polar(lo[0], lo[1], 17, F-145);
+    out += '<g class="fall"><line x1="'+f1(hi[0])+'" y1="'+f1(hi[1])+'" x2="'+f1(lo[0])+'" y2="'+f1(lo[1])+'"></line>'+
+           '<path d="M'+f1(lo[0])+' '+f1(lo[1])+' L'+f1(hd1[0])+' '+f1(hd1[1])+' M'+f1(lo[0])+' '+f1(lo[1])+
+           ' L'+f1(hd2[0])+' '+f1(hd2[1])+'"></path></g>';
+  }
+  out += '<polygon class="cpent" points="'+poly(pts)+'"></polygon>';
+  out += '<path class="rz cz" data-z="l"'+att+' aria-label="Missed left" d="'+
+         sectorPath(K.cx, K.cy, K.r0, K.r1, B-177, B-3)+'"></path>';
+  out += '<path class="rz cz" data-z="r"'+att+' aria-label="Missed right" d="'+
+         sectorPath(K.cx, K.cy, K.r0, K.r1, B+3, B+177)+'"></path>';
+  // the line of the putt, carried through the hole so the two halves read at a glance
+  var a0 = polar(K.cx, K.cy, st ? K.R : K.r1, B+180), a1 = polar(K.cx, K.cy, K.r1, B);
+  out += '<line class="cline" x1="'+f1(a0[0])+'" y1="'+f1(a0[1])+'" x2="'+f1(a1[0])+'" y2="'+f1(a1[1])+'"></line>';
+  var pl = polar(K.cx, K.cy, 96, B-90), pr = polar(K.cx, K.cy, 96, B+90);
+  out += '<text class="czl" x="'+f1(pl[0])+'" y="'+f1(pl[1]+4)+'">LEFT</text>';
+  out += '<text class="czl" x="'+f1(pr[0])+'" y="'+f1(pr[1]+4)+'">RIGHT</text>';
+  out += '<circle class="rz rc cin" data-z="c" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.r0+'"'+
+         (tappable ? ' role="button" tabindex="0" aria-label="Holed"' : '')+'></circle>';
+  out += '<circle class="chole" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.hole+'"></circle>';
+  [1,2,3,4,5].forEach(function(i){
+    var p = polar(K.cx, K.cy, K.R, ST_ANG[i]);
+    out += '<g class="stn'+(i===st ? " on" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+K.stn+'"></circle>'+
+           '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+i+'</text></g>';
+  });
+  out += '<g class="caption"><rect class="cappill" x="86" y="3" width="128" height="26" rx="13"></rect>'+
+         '<text class="rcl" x="150" y="21">'+(label || "Holed")+'</text></g>';
+  return '<svg viewBox="0 0 300 318" class="clock" role="group" aria-label="Where the putt finished">'+
+         out+'<g class="marks"></g></svg>';
+}
+/* The slope belongs to the drill, not to the day: the circle at one hole and the
+   ladder across the green can fall in different directions. One answer per set is
+   enough, because the break of every putt in that set follows from it. Say which
+   station is the low side and the five putts label themselves: the one from the low
+   side is uphill, the one opposite is downhill, the two across it break each way. */
+var SLOPE_CLOCK = [{id:"flat", lab:"Flat"}, {id:"1", lab:"1"}, {id:"2", lab:"2"},
+                   {id:"3", lab:"3"}, {id:"4", lab:"4"}, {id:"5", lab:"5"}];
+var SLOPE_LAG = [{id:"flat", lab:"Flat"}, {id:"upA", lab:"Uphill from A"},
+                 {id:"upB", lab:"Uphill from B"}, {id:"across", lab:"Across the slope"}];
+var BREAK_LAB = {up:"Uphill", down:"Downhill", lr:"Left to right", rl:"Right to left",
+                 flat:"Flat", across:"Across the slope"};
+var BREAK_ORDER = ["lr","rl","up","down","across","flat"];
+function norm180(d){ d = ((d % 360) + 360) % 360; return d > 180 ? d - 360 : d; }
+function clockBreak(low, st){
+  if(!low || !st) return null;
+  if(low === "flat") return "flat";
+  var th = norm180(clockB(st) - ST_ANG[+low]);   // the putt against the fall line
+  if(Math.abs(th) <= 45) return "down";
+  if(Math.abs(th) >= 135) return "up";
+  return th > 0 ? "rl" : "lr";
+}
+function lagBreak(sl, from){
+  if(!sl) return null;
+  if(sl === "flat" || sl === "across") return sl;
+  var end = String(from||"").charAt(0);
+  return (sl === "upA" ? end === "A" : end === "B") ? "up" : "down";
+}
+function slopeOpts(kind){ return kind === "lag" ? SLOPE_LAG : SLOPE_CLOCK; }
+function breakOf(kind, sl, call){
+  if(!call) return null;
+  return kind === "lag" ? lagBreak(sl, call.from) : clockBreak(sl, call.st);
+}
+function slopeAsk(kind){
+  return kind === "lag" ? "Which way does the ladder run?" : "Which station is the low side?";
+}
+
+var CLOCK_SPREAD = [[0,25],[180,25],[90,25],[270,25],[45,25],[225,25],[135,25],[315,25]];
+var CLOCK_COLS = [-36,-12,12,36], CLOCK_RINGS = [56,78];
+function clockMark(zoneId, n, st){
+  var K = CLOCK, B = clockB(st);
+  if(zoneId === "c"){
+    var m = CLOCK_SPREAD[n % CLOCK_SPREAD.length];
+    return polar(K.cx, K.cy, m[1], m[0]);
+  }
+  var side = zoneId === "l" ? -90 : 90;
+  var slot = n % (CLOCK_COLS.length * CLOCK_RINGS.length);
+  return polar(K.cx, K.cy, CLOCK_RINGS[Math.floor(slot/CLOCK_COLS.length)],
+               B + side + CLOCK_COLS[slot % CLOCK_COLS.length]);
+}
+
+/* ---- the lag ladder: five targets away from you, one step apart ----
+   A point is the gap either side of the target that was called, so what gets
+   tapped is the gap the ball finished in, not the target it was aimed at. */
+var LAG = { x0:74, x1:252, top:32, gap:44, base:296, n:5 };
+function lagY(i){ return LAG.base - LAG.gap - i*LAG.gap; }   // the line for target i (1..5)
+function lagHit(t, z){ var g = +String(z||"").slice(1); return g === t-1 || g === t; }
+function lagSvg(call, tappable){
+  var K = LAG, att = tappable ? ' role="button" tabindex="0"' : '', out = "";
+  var t = call && call.t;
+  out += '<line class="lagedge" x1="'+(K.x0-24)+'" y1="18" x2="'+(K.x0-24)+'" y2="'+(K.base+12)+'"></line>';
+  for(var g=0; g<=5; g++){
+    var yb = (g === 0) ? K.base : lagY(g), yt = lagY(g+1);
+    if(g === 5) yt = K.top;
+    var good = t != null && lagHit(t, "g"+g);
+    out += '<rect class="rz lz'+(good ? " good" : "")+'" data-z="g'+g+'"'+att+
+           ' aria-label="'+LAG_LABEL["g"+g]+'" x="'+K.x0+'" y="'+yt+'" width="'+(K.x1-K.x0)+'" height="'+(yb-yt)+'"></rect>';
+  }
+  for(var i=1;i<=K.n;i++){
+    var y = lagY(i), on = (t === i);
+    out += '<line class="lagt'+(on ? " on" : "")+'" x1="'+K.x0+'" y1="'+y+'" x2="'+K.x1+'" y2="'+y+'"></line>'+
+           '<circle class="lagdot'+(on ? " on" : "")+'" cx="'+(K.x0+22)+'" cy="'+y+'" r="7"></circle>'+
+           '<text class="lagn'+(on ? " on" : "")+'" x="'+(K.x0-8)+'" y="'+(y+5)+'">'+i+'</text>';
+  }
+  out += '<circle class="wball" cx="'+(K.x0+22)+'" cy="'+(K.base+14)+'" r="7"></circle>';
+  out += '<text class="lagfrom" x="'+(K.x0+40)+'" y="'+(K.base+19)+'">'+
+         (call && call.from ? "from "+call.from : "you")+'</text>';
+  return '<svg viewBox="0 0 300 330" class="lag" role="group" aria-label="Where the putt finished on the ladder">'+
+         out+'<g class="marks"></g></svg>';
+}
+function lagMark(zoneId, n){
+  var K = LAG, g = +String(zoneId||"").slice(1);
+  var yb = (g === 0) ? K.base : lagY(g), yt = (g === 5) ? K.top : lagY(g+1);
+  var cols = 4, rows = Math.max(1, Math.floor((yb-yt-8)/22));
+  var slot = n % (cols*rows);
+  return [K.x0 + 34 + (slot % cols)*36, yt + 16 + Math.floor(slot/cols)*22];
 }
 
 /* ---- reading the taps back as scores ---- */
@@ -2759,11 +3105,34 @@ function draftShots(s){
    window is tapped it folds into a corner and the target takes the page. The inset
    stays live, so changing your mind about the window costs a tap, not the ball.
    `cfg.calls` turns the same row into the compete block, where the app makes the call. */
-function callsFor(s, cfg){
+/* The lag ladder rotates its launch point: five balls to targets 1 to 5, then the
+   next round starts from the next target at the other end. */
+function lagFrom(round){
+  return (round % 2 ? "A" : "B") + Math.ceil(round/2);
+}
+function callsFor(a, s, cfg){
   if(cfg && cfg.calls) return cfg.calls;
-  var n = ballsIn(s), out = [];
-  for(var i=0;i<n;i++) out.push(s.parts ? {kind:"w", win:i+1, tc:s.tc} : {kind:"t", tc:s.tc});
+  var n = ballsIn(s), kind = trackKind(a, s), out = [];
+  for(var i=0;i<n;i++){
+    if(kind === "lag"){
+      out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
+    } else if(kind === "grid"){
+      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc});
+    } else if(s.cycle){
+      var c = s.cycle[i % s.cycle.length];
+      out.push({kind:"t", label:c.label, tc:c.tc, quiet:true});
+    } else if(areaShape(a) === "clock"){
+      out.push({kind:"t", st:(i%5)+1, tc:s.tc});
+    } else {
+      out.push({kind:"t", tc:s.tc});
+    }
+  }
   return out;
+}
+function shotPoint(call, sh){
+  if(!sh || sh.z == null) return false;
+  if(call && call.kind === "lag") return lagHit(call.t, sh.z);
+  return sh.z === "c";
 }
 function tallyShots(calls, shots){
   var w = 0, t = 0;
@@ -2771,7 +3140,7 @@ function tallyShots(calls, shots){
     if(!sh) return;
     var c = calls[i] || {};
     if(c.kind === "w" && sh.w === c.win) w++;
-    if(sh.z === "c") t++;
+    if(shotPoint(c, sh)) t++;
   });
   return {w:w, t:t, total:w+t};
 }
@@ -2780,27 +3149,58 @@ function shotDone(s, sh, call){
   var needsWindow = call ? call.kind === "w" : !!(s && s.parts);
   return needsWindow ? (sh.w != null && sh.z != null) : (sh.z != null);
 }
-function shotScores(s, shots){ return tallyShots(callsFor(s), shots); }
-function applyShots(s, shots){
-  var sc = shotScores(s, shots);
+function shotScores(a, s, shots){ return tallyShots(callsFor(a, s), shots); }
+function applyShots(a, s, shots){
+  var sc = shotScores(a, s, shots);
   if(s.parts){
-    state.draft.scores[s.id+"_w"] = sc.w;
-    state.draft.scores[s.id+"_t"] = sc.t;
+    // the two halves are named by the set: window and target, or height and target
+    state.draft.scores[s.id+"_"+s.parts[0].id] = sc.w;
+    state.draft.scores[s.id+"_"+s.parts[1].id] = sc.t;
   } else {
     state.draft.scores[s.id] = sc.t;
   }
   updateTotal();
 }
 
+/* One tap before the first ball. It is optional: skip it and everything still
+   scores, you just do not learn which way the misses went. */
+function slopeBox(kind, s, onPick){
+  var box = document.createElement("div"); box.className = "slopebox";
+  function paint(){
+    box.innerHTML = '<span class="eyebrow">The slope</span>';
+    var row = document.createElement("div"); row.className = "condrow";
+    row.innerHTML = '<span>'+slopeAsk(kind)+'</span>';
+    var chips = document.createElement("div"); chips.className = "chips";
+    var cur = (state.draft.slope || {})[s.id] || null;
+    slopeOpts(kind).forEach(function(o){
+      var b = document.createElement("button"); b.type = "button"; b.textContent = o.lab;
+      b.setAttribute("aria-pressed", cur === o.id ? "true" : "false");
+      b.addEventListener("click", function(){
+        state.draft.slope = state.draft.slope || {};
+        state.draft.slope[s.id] = (cur === o.id) ? null : o.id;
+        paint(); saveDraft(); onPick();
+      });
+      chips.appendChild(b);
+    });
+    row.appendChild(chips); box.appendChild(row);
+  }
+  paint();
+  return box;
+}
+
 function shotRow(a, s, last, cfg){
-  var calls = callsFor(s, cfg);
+  var calls = callsFor(a, s, cfg);
   var nb = calls.length;
   var anyWindow = calls.some(function(c){ return c.kind === "w"; });
   var shots = cfg ? cfg.shots : draftShots(s);
   var parts = cfg ? null : setParts(s);
 
+  var kind = trackKind(a, s);
+  var wantsSlope = !cfg && (kind === "lag" || areaShape(a) === "clock");
+
   var row = document.createElement("div"); row.className = "set shotset";
   if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+s.tgt+'</div></div>';
+  if(wantsSlope) row.appendChild(slopeBox(kind, s, function(){ diag.__key = null; paint(); }));
 
   var ask = document.createElement("p"); ask.className = "shotask";
   var diag = document.createElement("div"); diag.className = "shotdiag";
@@ -2824,46 +3224,73 @@ function shotRow(a, s, last, cfg){
   }
   function rescore(){
     if(cfg) cfg.onScore(tallyShots(calls, shots));
-    else applyShots(s, shots);
+    else applyShots(a, s, shots);
   }
 
+  function gridOf(c){ return (c && c.grid) || "windows"; }
   function windowMarks(){
     var seen = {}, out = "";
     shots.forEach(function(x, i){
       if(!x || x.w == null) return;
       var n = seen[x.w] || 0; seen[x.w] = n+1;
-      var p = wMark(x.w, n);
+      var p = gridMark(gridOf(calls[i] || call()), x.w, n);
       out += '<g class="mk'+(calls[i] && x.w===calls[i].win ? " hit" : "")+(i===cur?" now":"")+'">'+
              '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
              '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     return out;
   }
+  /* On the clock the picture turns with the station, so every ball already logged is
+     drawn in the frame on the screen now: left still means left as you stood over it. */
   function targetMarks(){
-    var seen = {}, out = "";
+    var seen = {}, out = "", st = call().st;
     shots.forEach(function(x, i){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
-      var p = shapeMark(a, x.z, n);
+      var p = shapeMark(a, x.z, n, st);
       out += '<g class="mk'+(x.z==="c"?" hit":"")+(i===cur?" now":"")+'">'+
              '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     return out;
   }
+  function lagMarks(){
+    var seen = {}, out = "";
+    shots.forEach(function(x, i){
+      if(!x || x.z == null) return;
+      var n = seen[x.z] || 0; seen[x.z] = n+1;
+      var p = lagMark(x.z, n);
+      out += '<g class="mk'+(shotPoint(calls[i], x) ? " hit" : "")+(i===cur?" now":"")+'">'+
+             '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="11"></circle>'+
+             '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
+    });
+    return out;
+  }
 
+  function slopeNow(){ return wantsSlope ? (state.draft.slope || {})[s.id] : null; }
+  function brk(c){
+    var b = breakOf(kind, slopeNow(), c);
+    return (b && b !== "flat") ? ', <b>' + BREAK_LAB[b].toLowerCase() + '</b>' : '';
+  }
   function paint(){
     var sh = shots[cur] || {}, c = call(), st = stage();
+    var word = st === "w" ? grid(gridOf(c)).word : "";
     if(c.label){
       // on compete the call is the instruction, so it is said loudly and first
       ask.innerHTML = '<span class="callnum">Ball '+(cur+1)+' of '+nb+'</span>'+
         '<span class="callclub">'+c.label+'</span>'+
-        '<span class="callwin">'+(c.kind === "w" ? 'through window '+c.win : 'find the target')+'</span>'+
-        '<span class="calldo">'+(c.kind === "w" && st === "w" ? 'Tap the window it went through.'
+        (c.quiet ? '' : '<span class="callwin">'+(c.kind === "w" ? 'through window '+c.win : 'find the target')+'</span>')+
+        '<span class="calldo">'+(c.kind === "w" && st === "w" ? 'Tap the '+word+' it went through.'
           : (shotDone(s, sh, c) ? 'Logged. Tap a ball below to change it.' : 'Tap where it finished.'))+'</span>';
     } else if(c.kind === "w"){
-      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' \u00b7 called at window <b>'+c.win+'</b>. '+
-        (st === "w" ? 'Tap the window it went through.' : 'Now tap where it finished.');
+      ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' \u00b7 called at <b>'+gridLabel(gridOf(c), c.win).toLowerCase()+'</b>. '+
+        (st === "w" ? 'Tap the '+word+' it came out at.' : 'Now tap where it finished.');
+    } else if(c.kind === "lag"){
+      ask.innerHTML = 'Putt <b>'+(cur+1)+'</b> of '+nb+' \u00b7 from <b>'+c.from+'</b> to target <b>'+c.t+'</b>'+brk(c)+'. '+
+        (sh.z == null ? 'Tap the gap it finished in.' : 'Logged. Tap a ball below to change it.');
+    } else if(c.st){
+      ask.innerHTML = 'Putt <b>'+(cur+1)+'</b> of '+nb+' \u00b7 from station <b>'+c.st+'</b>'+brk(c)+'. '+
+        (sh.z == null ? 'Tap the hole if it went in, or the side it missed.' : 'Logged. Tap a ball below to change it.');
     } else {
       ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+'. '+
         (sh.z == null ? 'Tap where it finished.' : 'Logged. Tap a ball below to change it.');
@@ -2872,18 +3299,23 @@ function shotRow(a, s, last, cfg){
     var wantSide = c.kind === "w" && (st === "t" || sh.z != null);
     // only redraw the frame when the picture itself changes; repeated taps on the
     // same diagram just move markers, which keeps focus and avoids churn
-    var key = st + "|" + (c.tc||"") + "|" + (wantSide ? 1 : 0);
+    var key = st + "|" + (c.tc||"") + "|" + (wantSide ? 1 : 0) + "|" + (c.grid||"") +
+              "|" + (c.st||"") + "|" + (c.t||"") + "|" + (c.from||"") + "|" + (slopeNow()||"");
     if(key !== diag.__key){
-      var main = st === "w" ? windowSvg(true) : shapeSvg(a, {tc: c.tc}, true);
-      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc: c.tc}, false) : windowSvg(false));
+      var low = slopeNow();
+      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low}, true);
+      var main = st === "w" ? gridSvg(gridOf(c), true) : pic;
+      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low}, false) : gridSvg(gridOf(c), false));
       diag.innerHTML = '<div class="diagmain">'+main+'</div>'+
-        (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":"windows")+'">'+side+'</button>' : '');
+        (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":word||"grid")+'">'+side+'</button>' : '');
       diag.__key = key;
     }
-    var mainMarks = diag.querySelector(".diagmain .marks");
-    if(mainMarks) mainMarks.innerHTML = st === "w" ? windowMarks() : targetMarks();
-    var sideMarks = diag.querySelector(".inset .marks");
-    if(sideMarks) sideMarks.innerHTML = st === "w" ? targetMarks() : windowMarks();
+    function marksIn(sel, which){
+      var g = diag.querySelector(sel); if(!g) return;
+      g.innerHTML = which === "w" ? windowMarks() : (c.kind === "lag" ? lagMarks() : targetMarks());
+    }
+    marksIn(".diagmain .marks", st);
+    marksIn(".inset .marks", st === "w" ? "t" : "w");
 
     if(st === "w"){
       diag.querySelectorAll(".diagmain .wc").forEach(function(g){
@@ -2906,7 +3338,7 @@ function shotRow(a, s, last, cfg){
         if(x && x.z === "c") b.classList.add("good");
         if(calls[i].kind === "w") b.classList.add("win");
         b.textContent = String(i+1);
-        b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+ZONE_LABEL[x.z] : ", not logged"));
+        b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+zoneLabel(a, x.z) : ", not logged"));
         b.addEventListener("click", function(){ cur = i; phase = null; paint(); });
         chips.appendChild(b);
       })(i);
@@ -2916,8 +3348,8 @@ function shotRow(a, s, last, cfg){
     tally.innerHTML = cfg
       ? '<span>Compete <b>'+sc.total+'</b>/'+cfg.max+'</span>'
       : (anyWindow
-          ? '<span>Window <b>'+sc.w+'</b>/'+parts[0].max+'</span><span>Target <b>'+sc.t+'</b>/'+parts[1].max+'</span>'
-          : '<span>In the target <b>'+sc.t+'</b>/'+s.max+'</span>');
+          ? '<span>'+parts[0].label+' <b>'+sc.w+'</b>/'+parts[0].max+'</span><span>Target <b>'+sc.t+'</b>/'+parts[1].max+'</span>'
+          : '<span>'+hitWord(a, s)+' <b>'+sc.t+'</b>/'+s.max+'</span>');
   }
 
   function advance(){
@@ -3107,23 +3539,33 @@ var DECK_CHECKS = {
   annabel:["Closed clubface", "Away takeaway and standing up", "Always be checking alignment"]
 };
 var DEFAULT_CHECKS = ["Always be checking alignment", "", ""];
+/* Checks belong to the area, not to the player: what you are working on with a
+   driver has nothing to say about a four-footer. Anything saved under the old
+   single set stays as the checks for the full-swing areas and nowhere else. */
+var SWING_AREAS = [1, 2, 10, 11];
+var CHECK_TITLE = {10:"Tee shot checks", 11:"Approach checks", 2:"Wedge checks",
+                   3:"Short game checks", 4:"Putting checks", 5:"Course checks"};
+function checkTitle(areaId){ return CHECK_TITLE[areaId] || "Swing checks"; }
 
-function checksFor(){
+function checksFor(areaId){
   var p = playerObj();
-  return toBullets((p && p.checks) ? p.checks : DEFAULT_CHECKS);
+  var by = p && p.checksByArea;
+  if(by && by[areaId] != null && by[areaId] !== "") return toBullets(by[areaId]);
+  if(p && p.checks && SWING_AREAS.indexOf(+areaId) !== -1) return toBullets(p.checks);
+  return toBullets(DEFAULT_CHECKS);
 }
 
 
-function renderChecks(hostId, opts){
+function renderChecks(hostId, areaId, opts){
   var host = $(hostId); if(!host) return;
   opts = opts || {};
   var box = bulletBox({
-    eyebrow:"Swing checks \u00b7 " + (playerObj() ? playerObj().name : ""),
-    lines: checksFor,
+    eyebrow:checkTitle(areaId) + " \u00b7 " + (playerObj() ? playerObj().name : ""),
+    lines: function(){ return checksFor(areaId); },
     onSave: function(v){
       var pl = playerObj();
-      if(pl){ pl.checks = v; saveLocal(); pushMeta(); }
-      if(state.draft) state.draft.checks = checksFor();
+      if(pl){ pl.checksByArea = pl.checksByArea || {}; pl.checksByArea[areaId] = v; saveLocal(); pushMeta(); }
+      if(state.draft) state.draft.checks = checksFor(areaId);
       if(opts.after) opts.after();
     }
   });
@@ -3164,7 +3606,7 @@ function seedByName(p){
   else if(n.indexOf("annabel")===0) key = "annabel";
   if(!key) return false;
   p.targets = JSON.parse(JSON.stringify(DECK_TARGETS[key]));
-  if(!p.checks) p.checks = DECK_CHECKS[key].slice();
+  if(!p.checksByArea){ p.checksByArea = {}; SWING_AREAS.forEach(function(id){ p.checksByArea[id] = DECK_CHECKS[key].slice(); }); }
   if(!p.project) p.project = DECK_PROJECT[key];
   if(!p.outcomes) p.outcomes = DECK_OUTCOMES[key].slice();
   if(!p.process) p.process = JSON.parse(JSON.stringify(DECK_PROCESS));
@@ -3733,7 +4175,7 @@ function saveCurrent(){
     }
     s.date = $("sessDate").value || today();
     s.notes = $("sessNotes").value.trim();
-    s.checks = checksFor();
+    s.checks = checksFor(s.areaId);
   } else if(state.view==="gym"){
     s = state.gymDraft;
     s.date = $("gymDate").value || today();
@@ -3991,6 +4433,16 @@ function renderConditions(){
       barBlock("Green speed", groupStats(putts,"speed",pct), "putt","speed", pm, ["fast","med","slow"]));
   }
 
+  // every putt ever logged, sorted by the way the green ran
+  var allPutts = mine().filter(function(s){ return s.kind==="practice" && s.areaId===4 && s.slope; });
+  var srows = allPutts.length ? slopeRows(puttSlopeStats(allPutts)) : "";
+  if(srows){
+    host.insertAdjacentHTML("beforeend",
+      '<h2 style="margin-top:18px">Putting by slope</h2>'+srows+
+      '<p class="note">Every putt from every session, sorted by the way the green ran under it. '+
+      'Set the slope on a drill and its putts label themselves.</p>');
+  }
+
 }
 
 function renderHistory(){
@@ -4099,15 +4551,19 @@ function pastShots(a, set, sess){
   if(!shots || !shots.length) return "";
   var any = false; shots.forEach(function(x){ if(x && (x.z || x.w != null)) any = true; });
   if(!any) return "";
-  var isWin = !!set.parts;
+  var kind = trackKind(a, set) || (set.parts ? "grid" : "shot");
+  var gkind = set.guide === "heights" ? "heights" : "windows";
+  var calls = callsFor(a, set);
 
   function marks(list){
     var seen = {}, out = "";
     list.forEach(function(x, i){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
-      var p = shapeMark(a, x.z, n);
-      out += '<g class="mk'+(x.z==="c"?" hit":"")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
+      var p = kind === "lag" ? lagMark(x.z, n) : shapeMark(a, x.z, n, null);
+      var hit = kind === "lag" ? shotPoint(calls[i], x) : (x.z === "c");
+      out += '<g class="mk'+(hit ? " hit" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+
+             (kind === "lag" ? 11 : markR(a))+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     return out;
@@ -4117,8 +4573,8 @@ function pastShots(a, set, sess){
     list.forEach(function(x, i){
       if(!x || x.w == null) return;
       var n = seen[x.w] || 0; seen[x.w] = n+1;
-      var p = wMark(x.w, n);
-      out += '<g class="mk'+(x.w===i+1?" hit":"")+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
+      var p = gridMark(gkind, x.w, n);
+      out += '<g class="mk'+(x.w === (calls[i]||{}).win ? " hit" : "")+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="12"></circle>'+
              '<text x="'+p[0]+'" y="'+(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
     return out;
@@ -4128,8 +4584,8 @@ function pastShots(a, set, sess){
   }
 
   var html = '<div class="pastrose">';
-  if(isWin) html += '<div>'+put(windowSvg(false), wmarks(shots))+'</div>';
-  html += '<div>'+put(shapeSvg(a, set, false), marks(shots))+'</div>';
+  if(kind === "grid") html += '<div>'+put(gridSvg(gkind, false), wmarks(shots))+'</div>';
+  html += '<div>'+put(kind === "lag" ? lagSvg(null, false) : shapeSvg(a, set, false), marks(shots))+'</div>';
   html += '</div>';
   return html;
 }
