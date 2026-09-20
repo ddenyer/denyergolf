@@ -712,6 +712,8 @@
   .plread b{font-family:Archivo, sans-serif; font-weight:700; color:var(--accent)}
   .plrow{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:9px; font-size:12.5px; color:var(--ink-2)}
   .plrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px; color:var(--ink)}
+  .plrow.tgt{margin-top:6px; padding-top:8px; border-top:1px solid var(--accent-fill)}
+  .plnote{margin:8px 0 0; font-size:12px; color:var(--ink-2); line-height:1.45}
   .runline{margin-bottom:14px}
   .runline .eyebrow{display:block; margin-bottom:4px}
   .runline p{margin:0; font-size:14.5px; color:var(--ink-2); line-height:1.45}
@@ -1251,7 +1253,7 @@ var AREAS = [
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
   ],
-  placing:"lpga60" },
+  placing:{n:60, p:0.66, sd:0.05, field:"tour players"} },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -1276,24 +1278,25 @@ var AREAS = [
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
 { id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
-  targets:"30y → 7 ft · 50y → 10 ft · 70y → 12 ft · 90y → 13 ft · tighter dispersion · low, normal and high on command",
+  targets:"30y → 11 ft · 50y → 17 ft · 70y → 19 ft · 90y → 20 ft · tighter dispersion · low, normal and high on command",
   hour:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"7 ft", dist:30, tgt:"Within 7 ft. Tour average from here is about 10 ft", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tc:"7 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 7 ft",
+    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, tgt:"Inside 11 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"10 ft", dist:50, tgt:"Within 10 ft. Tour average from here is about 14 ft", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tc:"10 ft", dist:50, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 10 ft",
+    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, tgt:"Inside 17 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"12 ft", dist:70, tgt:"Within 12 ft. Tour average from here is about 16 ft", max:5},
-    {id:"i", guide:"heights", label:"70y · five heights", tc:"12 ft", dist:70, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 12 ft",
+    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, tgt:"Inside 19 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"f", label:"90y", short:"90 yards", tc:"13 ft", dist:90, tgt:"Within 13 ft. Tour average from here is about 17 ft", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tc:"13 ft", dist:90, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for within 13 ft",
+    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, tgt:"Inside 20 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. A point inside each target", max:20}
-  ] },
+  ],
+  placing:{n:60, p:0.66, sd:0.05, field:"tour players"} },
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
@@ -2767,6 +2770,101 @@ function slopeRows(stats){
 var PLACE60 = [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,
 100,100,100,100,100,100,100,100,100,99,98,96,94,91,87,82,76,69,61,53,45,36,29,22,16,11,8,5,3,2,
 2,1,1,1,1,1,1,1,1,1,1];
+/* ---- the model, generated rather than hard-coded ----
+   A test is n balls, every one a trial the tour passes with probability p. Tour
+   players are not identical, so p is drawn from a Beta with that mean and a spread
+   sd, and the binomials are mixed. That correction is the whole game here: at n=60
+   it widens the spread from 3.7 to 4.7, about 40% of the variance.
+   Tables are built from the area's own constants at first use and cached. */
+function lgammaJS(x){
+  var g = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+           -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+           9.9843695780195716e-6, 1.5056327351493116e-7];
+  if(x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI*x)) - lgammaJS(1-x);
+  x -= 1;
+  var a = 0.99999999999980993, t = x + 7.5;
+  for(var i=0;i<g.length;i++) a += g[i] / (x + i + 1);
+  return 0.5*Math.log(2*Math.PI) + (x+0.5)*Math.log(t) - t + Math.log(a);
+}
+function logChoose(n, k){ return lgammaJS(n+1) - lgammaJS(k+1) - lgammaJS(n-k+1); }
+/* Beta(mean m, sd s) as a weighted grid, which is all the quadrature this needs. */
+function betaNodes(m, sd, N){
+  N = N || 200;
+  var s = m*(1-m)/(sd*sd) - 1, a = m*s, b = (1-m)*s, xs = [], lw = [], i, mx = -Infinity;
+  for(i=0;i<N;i++){
+    var x = (i + 0.5)/N;
+    xs.push(x);
+    var v = (a-1)*Math.log(x) + (b-1)*Math.log(1-x);
+    lw.push(v); if(v > mx) mx = v;
+  }
+  var tot = 0, ws = [];
+  for(i=0;i<N;i++){ var w = Math.exp(lw[i]-mx); ws.push(w); tot += w; }
+  var out = [];
+  for(i=0;i<N;i++) out.push([xs[i], ws[i]/tot]);
+  return out;
+}
+function mixedBinom(n, m, sd){
+  var s = m*(1-m)/(sd*sd) - 1, a = m*s, b = (1-m)*s, out = [], k;
+  var base = lgammaJS(a) + lgammaJS(b) - lgammaJS(a+b);
+  for(k=0;k<=n;k++){
+    out.push(Math.exp(logChoose(n,k) + lgammaJS(k+a) + lgammaJS(n-k+b) - lgammaJS(n+a+b) - base));
+  }
+  return out;
+}
+/* Longest run of passes in n trials, by DP over (current run, best run), then mixed
+   over player ability the same way the count is. A plain longest run: no retry
+   mechanic and no cap, so this is not the short-game matrix's distribution. */
+function runDist(n, p){
+  var cur = {}, key = "0|0";
+  cur[key] = 1;
+  for(var i=0;i<n;i++){
+    var nx = {};
+    for(var k in cur){
+      var parts = k.split("|"), c = +parts[0], b = +parts[1], w = cur[k];
+      var c2 = c + 1, b2 = c2 > b ? c2 : b, k1 = c2 + "|" + b2, k0 = "0|" + b;
+      nx[k1] = (nx[k1] || 0) + w*p;
+      nx[k0] = (nx[k0] || 0) + w*(1-p);
+    }
+    cur = nx;
+  }
+  var out = []; for(var j=0;j<=n;j++) out.push(0);
+  for(var k2 in cur){ out[+k2.split("|")[1]] += cur[k2]; }
+  return out;
+}
+function mixedRun(n, m, sd){
+  var out = [], i;
+  for(i=0;i<=n;i++) out.push(0);
+  betaNodes(m, sd, 64).forEach(function(node){
+    var d = runDist(n, node[0]);
+    for(var j=0;j<=n;j++) out[j] += node[1]*d[j];
+  });
+  return out;
+}
+function placeFrom(pmf){
+  var n = pmf.length - 1, out = [], tail = 0, k;
+  for(k=n;k>=0;k--){
+    var pl = Math.round(1 + 100*tail);
+    out[k] = pl < 1 ? 1 : (pl > 100 ? 100 : pl);
+    tail += pmf[k];
+  }
+  return out;
+}
+var TABLES = {};
+function tablesFor(spec){
+  var key = spec.n + "|" + spec.p + "|" + spec.sd;
+  if(!TABLES[key]){
+    TABLES[key] = { count: placeFrom(mixedBinom(spec.n, spec.p, spec.sd)),
+                    run:   placeFrom(mixedRun(spec.n, spec.p, spec.sd)) };
+  }
+  return TABLES[key];
+}
+/* The longest run you would expect from that many hits if they fell in a random
+   order. Computed offline by exact enumeration over arrangements, because the
+   inclusion-exclusion form of it cancels badly in floating point. n = 60. */
+var EXPRUN60 = [0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
+2.79,2.93,3.07,3.22,3.37,3.52,3.68,3.85,4.01,4.19,4.37,4.56,4.76,4.97,5.18,5.41,5.65,5.90,6.16,
+6.45,6.74,7.06,7.40,7.76,8.14,8.56,9.01,9.50,10.03,10.62,11.26,11.98,12.77,13.67,14.69,15.86,
+17.23,18.84,20.78,23.17,26.20,30.22,35.86,44.50,60];
 function ordinalPlace(n){
   var t = n % 100;
   if(t >= 11 && t <= 13) return n + "th";
@@ -2790,23 +2888,64 @@ function testSplit(a, sess){
   });
   return out;
 }
+/* Pass rate at each distance. Fifteen balls a target means a standard error of about
+   twelve points, so one session's reading is a hint, not a finding. */
+function targetRates(a, sess){
+  var by = {}, order = [];
+  a.sets.forEach(function(st){
+    var kind = trackKind(a, st); if(!kind) return;
+    var list = (sess.shots||{})[st.id]; if(!list) return;
+    var calls = callsFor(a, st, null, sess);
+    list.forEach(function(x, i){
+      if(!x || !shotDone(st, x, calls[i])) return;
+      var dist = (calls[i] && calls[i].dist) || st.dist;
+      if(!dist) return;
+      if(!by[dist]){ by[dist] = {n:0, in_:0}; order.push(dist); }
+      by[dist].n++;
+      if(isIn(x.z)) by[dist].in_++;
+    });
+  });
+  order.sort(function(x, y){ return x - y; });
+  return {by:by, order:order};
+}
 function placingBlock(a, sess){
-  if(a.placing !== "lpga60") return "";
+  var spec = a.placing; if(!spec) return "";
   var t = testSplit(a, sess);
   if(!t.n) return "";
-  var full = t.n >= 60;
-  var place = full ? PLACE60[Math.min(60, t.in_)] : null;
+  var full = t.n >= spec.n, tab = full ? tablesFor(spec) : null;
+  var r = runStats(a, sess);
+  var tg = targetRates(a, sess);
+  var rows = tg.order.map(function(dv){
+    var e = tg.by[dv];
+    return '<span>'+dv+'y <b>'+pctText(e.in_, e.n)+'</b> ('+e.in_+'/'+e.n+')</span>';
+  }).join("");
+  var resid = "";
+  if(full && spec.n === 60){
+    var want = EXPRUN60[Math.min(60, t.in_)] || 0;
+    var gap = r.best - want;
+    if(Math.abs(gap) >= 1.5){
+      resid = '<p class="plnote">A run of '+r.best+' against '+want.toFixed(1)+' expected from '+t.in_+
+        ' in the target, so ' + (gap > 0 ? 'the good ones came in clusters' : 'they came scattered through the hour') +
+        ' (' + (gap > 0 ? '+' : '') + gap.toFixed(1) + ').</p>';
+    }
+  }
   return '<div class="placing">'+
     '<span class="eyebrow">The test</span>'+
     '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' inside the circle</span></div>'+
     (full
-      ? '<p class="plread">On this test, <b>'+ordinalPlace(place)+'</b> of 100 tour players.</p>'
-      : '<p class="plread">'+(60 - t.n)+' balls still to hit. The placing needs all sixty.</p>')+
+      ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
+        (r.best ? '<p class="plread">Your run of '+r.best+' places <b>'+
+          ordinalPlace(tab.run[Math.min(spec.n, r.best)])+'</b> of the same hundred.</p>' : '')
+      : '<p class="plread">'+(spec.n - t.n)+' balls still to hit. The placing needs all '+spec.n+'.</p>')+
+    resid+
     '<div class="plrow">'+
-      '<span>Straight <b>'+pctText(t.straight.in_, t.straight.n)+'</b> ('+t.straight.in_+' of '+t.straight.n+')</span>'+
-      '<span>Shaped <b>'+pctText(t.shaped.in_, t.shaped.n)+'</b> ('+t.shaped.in_+' of '+t.shaped.n+')</span>'+
-      '<span>Bullseye <b>'+t.bull+'</b> of '+t.n+'</span>'+
-    '</div></div>';
+      (t.straight.n ? '<span>Straight <b>'+pctText(t.straight.in_, t.straight.n)+'</b> ('+t.straight.in_+' of '+t.straight.n+')</span>' : '')+
+      (t.shaped.n ? '<span>Shaped <b>'+pctText(t.shaped.in_, t.shaped.n)+'</b> ('+t.shaped.in_+' of '+t.shaped.n+')</span>' : '')+
+      (a.sets.some(function(x){ return x.bull; }) ? '<span>Bullseye <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
+    '</div>'+
+    (rows ? '<div class="plrow tgt">'+rows+'</div>'+
+            '<p class="plnote">Each target is about fifteen balls, so a single session reads to within about twelve points either way. Treat one bad number as a hint, not a finding.</p>' : '')+
+    '</div>';
 }
 function runLine(a, sess){
   var r = runStats(a, sess);
@@ -3497,18 +3636,31 @@ function rotPool(a){
   });
   return {pool:pool, windowed:windowed, grid:gk};
 }
+function shuffle(list){
+  for(var j=list.length-1;j>0;j--){
+    var k = Math.floor(Math.random()*(j+1)), t = list[j]; list[j]=list[k]; list[k]=t;
+  }
+  return list;
+}
+/* Random order, even allocation. Drawing each ball independently would leave one
+   target with eighteen balls and another with thirteen, which makes the per-target
+   rates wobble for no reason; cycling the targets and shuffling the order keeps the
+   pressure and keeps the count even. */
 function makeRotCalls(a, s){
-  var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && spec.windowed), calls = [];
-  var order = gridOrder(spec.grid);
-  for(var i=0;i<n;i++){
-    var p = spec.pool.length ? spec.pool[Math.floor(Math.random()*spec.pool.length)] : {label:"", tc:s.tc};
-    var isWin = wantWin && i >= n/2;
-    calls.push({ kind: isWin ? "w" : "t", grid: spec.grid,
-                 win: isWin ? order[Math.floor(Math.random()*order.length)] : null,
+  var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && spec.windowed);
+  var order = gridOrder(spec.grid), calls = [], i;
+  for(i=0;i<n;i++){
+    var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
+    calls.push({ kind:"t", grid:spec.grid, win:null,
                  label:p.label, tc:p.tc, bull:p.bull, dist:p.dist });
   }
-  for(var j=calls.length-1;j>0;j--){          // shuffle so the windows are not all last
-    var k = Math.floor(Math.random()*(j+1)), t = calls[j]; calls[j]=calls[k]; calls[k]=t;
+  shuffle(calls);
+  if(wantWin){
+    var slots = []; for(i=0;i<n;i++) slots.push(i);
+    shuffle(slots).slice(0, Math.floor(n/2)).forEach(function(ix){
+      calls[ix].kind = "w";
+      calls[ix].win = order[Math.floor(Math.random()*order.length)];
+    });
   }
   return calls;
 }
@@ -3930,7 +4082,7 @@ var DECK_TARGETS = {
   charlotte:{
     10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "Club-head speed +5 mph"],
     11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
-    2:["30y \u2192 7 ft \u00b7 50y \u2192 10 ft", "70y \u2192 12 ft \u00b7 90y \u2192 13 ft", "Tighter 30\u201390y dispersion"],
+    2:["30y \u2192 11 ft \u00b7 50y \u2192 17 ft", "70y \u2192 19 ft \u00b7 90y \u2192 20 ft", "Tighter 30\u201390y dispersion"],
     3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
     4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
     5:["Pin high on approaches, not short", "Hit the flag", "Play away from the short side"]
@@ -3938,7 +4090,7 @@ var DECK_TARGETS = {
   annabel:{
     10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "A fade on demand, every time"],
     11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
-    2:["30y \u2192 7 ft \u00b7 50y \u2192 10 ft", "70y \u2192 12 ft \u00b7 90y \u2192 13 ft", "Tighter 30\u201390y dispersion"],
+    2:["30y \u2192 11 ft \u00b7 50y \u2192 17 ft", "70y \u2192 19 ft \u00b7 90y \u2192 20 ft", "Tighter 30\u201390y dispersion"],
     3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
     4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
     5:["Doubles \u2264 1 a round", "Think avoid double, not miracle", "Play away from the short side"]
