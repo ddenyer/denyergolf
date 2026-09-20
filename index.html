@@ -1212,24 +1212,24 @@
 
 /* ============ the programme ============ */
 var AREAS = [
-{ id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid · off the tee", block:"long", track:true, shape:"corridor",
-  targets:"Driving accuracy 71 → 82% · driving distance 272+ · club-head speed + 5 mph · a fade on demand",
-  hour:"10 min warm-up → 45 min: 6 sets, 35 balls, full routine every ball, then ten the app calls",
+{ id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
+  targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
+  /* The corridor is the LPGA 66% corridor for that club: at a lateral spread of about
+     6% of distance, 26 yards passes two in three with a driver. A typical tour fairway
+     is 30 yards, which is the 72% figure, so this is tighter than a fairway on purpose.
+     No second ring: the PGA corridor is wider, not tighter, because the men miss by
+     more yards at the same angle. */
+  hour:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
   sets:[
-    {id:"a", label:"Driver · 10 balls", short:"Driver", tc:"40 yd", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
-      max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
-    {id:"b", guide:"windows", label:"Driver · five windows", tc:"40 yd", tgt:"Five balls: a point for the window, a point for the 40-yd target",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"3-wood", short:"3-wood", tc:"35 yd", tgt:"35-yd target (17 each side)", max:5},
-    {id:"d", guide:"windows", label:"3-wood · five windows", tc:"35 yd", tgt:"Five balls: a point for the window, a point for the 35-yd target",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"5-wood / 2 hybrid", short:"5-wood / 2H", tc:"30 yd", tgt:"30-yd target (15 each side)", max:5},
-    {id:"f", guide:"windows", label:"5-wood / 2 hybrid · five windows", tc:"30 yd", tgt:"Five balls: a point for the window, a point for the 30-yd target",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"r", rot:true, balls:10, guide:"windows", label:"Rotation · ten balls, the app calls it",
-      tgt:"The club is drawn at random and five of the ten name a window as well. Nothing to set up, everything to lose.",
-      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:10}]}
-  ] },
+    {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
+      max:15, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"Fastest and slowest of the fifteen"},
+    {id:"c", label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
+    {id:"e", label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
+    {id:"r", rot:true, allWin:true, balls:10, guide:"windows", label:"Rotation \u00b7 ten balls, the app calls the club and the window",
+      tgt:"Club and window drawn at random every ball. A point for the window, a point for the corridor",
+      parts:[{id:"w", label:"Window", max:10},{id:"t", label:"Target", max:10}]}
+  ],
+  placing:{n:45, p:0.66, sd:0.065, field:"tour players"} },
 
 { id:11, no:2, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
@@ -2592,7 +2592,7 @@ function buildSessionCards(a, last){
 function monitorNote(){
   var d = document.createElement("div"); d.className="banner monitor";
   d.innerHTML = '<b>Use the launch monitor for this set only.</b> Get it running before ball one. '+
-    'You enter the fastest and slowest of the ten on the next screen.';
+    'You enter the fastest and slowest of the fifteen on the next screen.';
   return d;
 }
 
@@ -2861,10 +2861,11 @@ function tablesFor(spec){
 /* The longest run you would expect from that many hits if they fell in a random
    order. Computed offline by exact enumeration over arrangements, because the
    inclusion-exclusion form of it cancels badly in floating point. n = 60. */
-var EXPRUN60 = [0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
+var EXPRUN = {45:[0,1.00,1.04,1.13,1.26,1.42,1.59,1.77,1.94,2.11,2.27,2.43,2.58,2.75,2.92,3.10,3.29,3.49,3.70,3.91,4.14,4.38,4.63,4.90,5.18,5.49,5.81,6.17,6.55,6.96,7.42,7.92,8.47,9.08,9.77,10.56,11.46,12.50,13.73,15.21,17.03,19.35,22.40,26.69,33.24,45],
+60:[0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
 2.79,2.93,3.07,3.22,3.37,3.52,3.68,3.85,4.01,4.19,4.37,4.56,4.76,4.97,5.18,5.41,5.65,5.90,6.16,
 6.45,6.74,7.06,7.40,7.76,8.14,8.56,9.01,9.50,10.03,10.62,11.26,11.98,12.77,13.67,14.69,15.86,
-17.23,18.84,20.78,23.17,26.20,30.22,35.86,44.50,60];
+17.23,18.84,20.78,23.17,26.20,30.22,35.86,44.50,60]};
 function ordinalPlace(n){
   var t = n % 100;
   if(t >= 11 && t <= 13) return n + "th";
@@ -2882,7 +2883,7 @@ function testSplit(a, sess){
     list.forEach(function(x, i){
       if(!x || !shotDone(st, x, calls[i])) return;
       out.n++; bucket.n++;
-      if(isIn(x.z)){ out.in_++; bucket.in_++; }
+      if(inFor(calls[i], x.z)){ out.in_++; bucket.in_++; }
       if(x.z === "b") out.bull++;
     });
   });
@@ -2902,7 +2903,7 @@ function targetRates(a, sess){
       if(!dist) return;
       if(!by[dist]){ by[dist] = {n:0, in_:0}; order.push(dist); }
       by[dist].n++;
-      if(isIn(x.z)) by[dist].in_++;
+      if(inFor(calls[i], x.z)) by[dist].in_++;
     });
   });
   order.sort(function(x, y){ return x - y; });
@@ -2920,8 +2921,8 @@ function placingBlock(a, sess){
     return '<span>'+dv+'y <b>'+pctText(e.in_, e.n)+'</b> ('+e.in_+'/'+e.n+')</span>';
   }).join("");
   var resid = "";
-  if(full && spec.n === 60){
-    var want = EXPRUN60[Math.min(60, t.in_)] || 0;
+  if(full && EXPRUN[spec.n]){
+    var want = EXPRUN[spec.n][Math.min(spec.n, t.in_)] || 0;
     var gap = r.best - want;
     if(Math.abs(gap) >= 1.5){
       resid = '<p class="plnote">A run of '+r.best+' against '+want.toFixed(1)+' expected from '+t.in_+
@@ -3019,7 +3020,7 @@ function summaryBlock(a, sess){
       if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 40];
       return shapeMark(a, id, 0);
     });
-    var inN = (pool.t.c||0) + (pool.t.b||0);
+    var inN = (pool.t.c||0) + (pool.t.b||0) + (areaShape(a) === "corridor" ? (pool.t.short||0) : 0);
     html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
       'In the target ' + pctText(inN, pool.n) + ' of the time' +
       (pool.t.b ? ' · inside the bullseye ' + pctText(pool.t.b, pool.n) : '') + '.');
@@ -3647,17 +3648,18 @@ function shuffle(list){
    rates wobble for no reason; cycling the targets and shuffling the order keeps the
    pressure and keeps the count even. */
 function makeRotCalls(a, s){
-  var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && spec.windowed);
+  var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && (spec.windowed || s.allWin));
   var order = gridOrder(spec.grid), calls = [], i;
   for(i=0;i<n;i++){
     var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
-    calls.push({ kind:"t", grid:spec.grid, win:null,
+    calls.push({ kind:"t", grid:spec.grid, win:null, lat:areaShape(a) === "corridor",
                  label:p.label, tc:p.tc, bull:p.bull, dist:p.dist });
   }
   shuffle(calls);
   if(wantWin){
     var slots = []; for(i=0;i<n;i++) slots.push(i);
-    shuffle(slots).slice(0, Math.floor(n/2)).forEach(function(ix){
+    var take = s.allWin ? n : Math.floor(n/2);
+    shuffle(slots).slice(0, take).forEach(function(ix){
       calls[ix].kind = "w";
       calls[ix].win = order[Math.floor(Math.random()*order.length)];
     });
@@ -3674,24 +3676,31 @@ function rotCalls(a, s, store){
 function callsFor(a, s, cfg, store){
   if(cfg && cfg.calls) return cfg.calls;
   if(s.rot) return rotCalls(a, s, store);
-  var n = ballsIn(s), kind = trackKind(a, s), out = [];
+  var n = ballsIn(s), kind = trackKind(a, s), out = [], lat = areaShape(a) === "corridor";
   for(var i=0;i<n;i++){
     if(kind === "lag"){
       out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
     } else if(kind === "grid"){
-      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull});
+      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull, lat:lat});
     } else if(areaShape(a) === "clock"){
       out.push({kind:"t", st:(i%5)+1, tc:s.tc});
     } else {
-      out.push({kind:"t", tc:s.tc, bull:s.bull});
+      out.push({kind:"t", tc:s.tc, bull:s.bull, lat:lat});
     }
   }
   return out;
 }
+/* The corridor measures line, not carry, so a ball that is straight but short is
+   still inside it. It keeps its own zone on the picture, so the fault still shows. */
+function inFor(call, z){
+  if(z == null) return false;
+  if(call && call.lat && z === "short") return true;
+  return isIn(z);
+}
 function shotPoint(call, sh){
   if(!sh || sh.z == null) return false;
   if(call && call.kind === "lag") return lagHit(call.t, sh.z);
-  return isIn(sh.z);
+  return inFor(call, sh.z);
 }
 function tallyShots(calls, shots){
   var w = 0, t = 0;
@@ -3808,7 +3817,7 @@ function shotRow(a, s, last, cfg){
       if(isClock && isIn(x.z)){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n, st);
-      out += '<g class="mk'+(isIn(x.z)?" hit":"")+(i===cur?" now":"")+'">'+
+      out += '<g class="mk'+(inFor(calls[i], x.z)?" hit":"")+(i===cur?" now":"")+'">'+
              '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
@@ -3897,7 +3906,7 @@ function shotRow(a, s, last, cfg){
         var b = document.createElement("button"); b.type="button"; b.className="ballchip";
         if(i===cur) b.classList.add("now");
         if(shotDone(s, x, calls[i])) b.classList.add("done");
-        if(x && isIn(x.z)) b.classList.add("good");
+        if(x && inFor(calls[i], x.z)) b.classList.add("good");
         if(calls[i].kind === "w") b.classList.add("win");
         b.textContent = String(i+1);
         b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+zoneLabel(a, x.z) : ", not logged"));
@@ -5197,7 +5206,7 @@ function pastShots(a, set, sess){
       if(isClock && isIn(x.z)){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = kind === "lag" ? lagMark(x.z, n) : shapeMark(a, x.z, n, null);
-      var hit = kind === "lag" ? shotPoint(calls[i], x) : isIn(x.z);
+      var hit = kind === "lag" ? shotPoint(calls[i], x) : inFor(calls[i], x.z);
       out += '<g class="mk'+(hit ? " hit" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+
              (kind === "lag" ? 10 : markR(a))+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
