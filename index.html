@@ -581,6 +581,61 @@
   ol.lmsteps b{font-weight:600}
   .lmlink{margin:12px 0 0}
   .lmlink a{font-family:Archivo, sans-serif; font-size:14px; font-weight:600; color:var(--accent)}
+  .tourbox{margin-top:16px; border:1px solid var(--line-strong); border-radius:11px; overflow:hidden}
+  .tourhd{width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--surface-2); border:0; padding:12px 14px; cursor:pointer; text-align:left;
+    font-family:Archivo, sans-serif; font-size:13.5px; font-weight:600; color:var(--ink)}
+  .tourhd .tchev{color:var(--muted); font-size:17px; transition:transform .15s}
+  .tourbox.open .tourhd .tchev{transform:rotate(90deg)}
+  .tourbody{padding:4px 14px 12px}
+  table.tmini{width:100%; margin-top:8px}
+  table.tmini td{padding:5px 0; font-size:13px; border-bottom:1px solid var(--line)}
+  table.tmini td.key{text-align:right; font-family:"IBM Plex Mono", ui-monospace, monospace; color:var(--ink)}
+  .tourbody .note{margin-top:9px}
+
+  /* ---- tests ---- */
+  .testcard{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:14px 15px; margin-bottom:12px}
+  .tchd{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
+  .tchd .nm{font-family:Archivo, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
+  .tchd .sub{font-size:12.5px; color:var(--muted); margin-top:2px}
+  .tcn{text-align:right; flex:none}
+  .tcn b{display:block; font-size:22px; line-height:1; color:var(--ink)}
+  .tcn span{font-size:11px; color:var(--muted)}
+  .tbar{height:7px; border-radius:4px; background:var(--surface-2); border:1px solid var(--line);
+    overflow:hidden; margin-top:12px}
+  .tbar span{display:block; height:100%; background:var(--accent-fill)}
+  .tstat{font-size:12.5px; color:var(--ink-2); margin:7px 0 0}
+  .tstat b{font-family:"IBM Plex Mono", ui-monospace, monospace; color:var(--ink)}
+  .tacts{display:flex; align-items:center; gap:11px; margin-top:12px; flex-wrap:wrap}
+  .tacts button.pri{background:var(--accent-fill); border:1px solid var(--accent-fill); color:#ffffff;
+    border-radius:8px; padding:8px 15px; font-family:Archivo, sans-serif; font-size:13.5px;
+    font-weight:600; cursor:pointer}
+  .twhere{font-size:12px; color:var(--muted)}
+  .benchlink{background:var(--surface); border:1px solid var(--line-strong); border-radius:9px;
+    padding:11px 15px; font-family:Archivo, sans-serif; font-size:14px; font-weight:600;
+    color:var(--accent); cursor:pointer}
+  .testpick .testrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px}
+  .tsel{flex:1 1 150px; min-width:140px; background:var(--surface); color:var(--ink);
+    border:1px solid var(--line-strong); border-radius:8px; padding:8px 9px; font-size:13.5px}
+  .tstep{flex:none}
+  .tstep .tevery{width:44px; text-align:center}
+  .tlab{font-size:13px; color:var(--muted)}
+  .tnote{margin-top:8px}
+  .duechip{display:inline-block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.7px; text-transform:uppercase; padding:2px 7px; border-radius:999px;
+    background:var(--accent-fill); color:#ffffff; vertical-align:2px; margin-left:5px}
+  .duewrap{position:fixed; inset:0; z-index:80; background:rgba(0,0,0,.45);
+    display:flex; align-items:center; justify-content:center; padding:20px}
+  .duecard{background:var(--surface); border-radius:16px; padding:22px 20px; max-width:400px;
+    width:100%; max-height:88vh; overflow:auto; box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .duecard h2{margin:6px 0 4px; font-size:23px; line-height:1.15}
+  .duecard p{margin:0 0 6px; font-size:14.5px; color:var(--ink-2)}
+  .dueacts{display:flex; gap:9px; margin-top:16px; flex-wrap:wrap}
+  .dueacts button{border-radius:9px; padding:11px 17px; font-family:Archivo, sans-serif;
+    font-size:14.5px; font-weight:600; cursor:pointer;
+    background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink)}
+  .dueacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
   .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px;
     padding:8px 14px; font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
@@ -1046,7 +1101,7 @@
     <nav class="tabs" role="tablist">
       <button id="tabPractice" role="tab" aria-selected="true">Practice</button>
       <button id="tabSC" role="tab" aria-selected="false">S&amp;C</button>
-      <button id="tabBench" role="tab" aria-selected="false">Tour</button>
+      <button id="tabTests" role="tab" aria-selected="false">Tests</button>
       <button id="tabSessions" role="tab" aria-selected="false">Sessions</button>
       <button id="tabHistory" role="tab" aria-selected="false">Progress</button>
       <button id="tabGoals" role="tab" aria-selected="false">Goals</button>
@@ -1119,6 +1174,12 @@
   <!-- ROUND -->
 
   <!-- BENCHMARKS -->
+  <section id="viewTests" hidden>
+    <h1>Tests</h1>
+    <p class="lede">Fixed tests, run every so often, under the same conditions every time. That is what makes them comparable. A test never changes once it has results against it.</p>
+    <div id="testList"></div>
+  </section>
+
   <section id="viewSC" hidden>
     <h1>Strength &amp; conditioning</h1>
     <p class="lede">The gym and everything that goes with it. Movement prep before every session, speed work alongside.</p>
@@ -1126,6 +1187,7 @@
   </section>
 
   <section id="viewBench" hidden>
+    <button class="back" id="benchBack">&larr; Back to goals</button>
     <h1>LPGA Tour averages</h1>
     <p class="lede">What the numbers look like at the top of the women's game. Use them to set the next target, not to judge today's session.</p>
     <div id="benchYou"></div>
@@ -1239,6 +1301,20 @@
 </div>
 
 <div class="runflash" id="runFlash" hidden aria-live="polite"></div>
+
+<div class="duewrap" id="dueWrap" hidden>
+  <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="dueTitle">
+    <span class="eyebrow" id="dueCount"></span>
+    <h2 id="dueTitle"></h2>
+    <p id="dueSub"></p>
+    <p class="note" id="dueWhy"></p>
+    <p class="note" id="dueRule"></p>
+    <div class="dueacts">
+      <button type="button" class="pri" id="dueGo">Do it now</button>
+      <button type="button" id="dueLater">Not today</button>
+    </div>
+  </div>
+</div>
 
 <div class="totalbar" id="totalBar" hidden>
   <div class="totalin">
@@ -1782,7 +1858,10 @@ function condLabel(kind, field, val){
   return val;
 }
 
-function area(id){ for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; } return null; }
+function area(id){
+  for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; }
+  return testById(id);          // a test is an area as far as the session machinery cares
+}
 function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
 function areaNo(a){ return a.no || a.id; }
 /* The name in prose, without the bracket: "approach", not "approach (ball flight control)". */
@@ -1808,6 +1887,55 @@ function setParts(s){
 }
 function setMax(s){ var m=0; setParts(s).forEach(function(p){ m+=p.max; }); return m; }
 function areaMax(a){ var m=0; a.sets.forEach(function(s){ m+=setMax(s); }); return m; }
+
+/* ============ conditional drill tests ============
+   A test is a small area: same sets, same capture, same scoring, so it inherits the
+   whole session machinery. What makes it a test rather than a drill is that it never
+   changes. Once results exist against one, supersede it with a new id rather than
+   editing it, or the series before and after stop being comparable.
+
+   Anything added to this list appears in the Goals dropdown on its own, for the area
+   it names. Nothing else has to be touched. */
+var TESTS = [
+{ id:"t-approach-pinhigh", area:11, isTest:true, track:true, name:"Pin high or past",
+  sub:"Never short from 125 to 185",
+  why:"Short is the miss that costs most: it brings the front bunker and the false front into play and leaves the longest putt. This test scores the one thing, whether the ball got there.",
+  where:"Range or sim", balls:20, target:120,
+  rule:"pinhigh",
+  ruleText:"A point for any ball pin high or past, wherever it finishes left or right. Short of the flag scores nothing.",
+  sets:[
+    {id:"a", label:"125y \u00b7 five balls", short:"125 yards", tc:"Pin high", dist:125, balls:5, max:5,
+     tgt:"Five balls. A point for pin high or past"},
+    {id:"b", label:"145y \u00b7 five balls", short:"145 yards", tc:"Pin high", dist:145, balls:5, max:5,
+     tgt:"Five balls. A point for pin high or past"},
+    {id:"c", label:"165y \u00b7 five balls", short:"165 yards", tc:"Pin high", dist:165, balls:5, max:5,
+     tgt:"Five balls. A point for pin high or past"},
+    {id:"d", label:"185y \u00b7 five balls", short:"185 yards", tc:"Pin high", dist:185, balls:5, max:5,
+     tgt:"Five balls. A point for pin high or past"}
+  ]},
+{ id:"t-approach-fade", area:11, isTest:true, track:true, name:"Fade on demand",
+  sub:"Start it left, finish it at the flag",
+  why:"A fade is only worth having if it works when it is called for. The window makes her start the ball left; the circle makes it come back. Both on the same ball, or it does not count.",
+  where:"Range or sim", balls:20, target:120,
+  rule:"fade",
+  ruleText:"The app calls a left-hand window, 1 or 4. A point for the window, a point for finishing inside the circle, and the test counts the balls that did both.",
+  sets:[
+    {id:"a", guide:"windows", label:"125y \u00b7 fade", tc:"26 ft", dist:125, balls:5, fade:true,
+     tgt:"Window 1 or 4, then back to the flag",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"b", guide:"windows", label:"145y \u00b7 fade", tc:"32 ft", dist:145, balls:5, fade:true,
+     tgt:"Window 1 or 4, then back to the flag",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"c", guide:"windows", label:"165y \u00b7 fade", tc:"38 ft", dist:165, balls:5, fade:true,
+     tgt:"Window 1 or 4, then back to the flag",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"d", guide:"windows", label:"185y \u00b7 fade", tc:"43 ft", dist:185, balls:5, fade:true,
+     tgt:"Window 1 or 4, then back to the flag",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+  ]}
+];
+function testById(id){ for(var i=0;i<TESTS.length;i++){ if(TESTS[i].id===id) return TESTS[i]; } return null; }
+function testsFor(areaId){ return TESTS.filter(function(t){ return t.area === areaId; }); }
 
 /* ============ state ============ */
 var state = {
@@ -1964,6 +2092,7 @@ function show(view){
   $("viewGym").hidden = view!=="gym";
   $("viewBench").hidden = view!=="bench";
   $("viewSC").hidden = view!=="sc";
+  $("viewTests").hidden = view!=="tests";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
   $("viewSessions").hidden = view!=="sessions";
@@ -1971,11 +2100,11 @@ function show(view){
   $("viewPast").hidden = view!=="past";
   $("viewGoals").hidden = view!=="goals";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
-  $("tabBench").setAttribute("aria-selected", view==="bench"?"true":"false");
+  $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
   $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
   $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
-  $("tabGoals").setAttribute("aria-selected", view==="goals"?"true":"false");
+  $("tabGoals").setAttribute("aria-selected", (view==="goals"||view==="bench")?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
   if(view!=="session" && view!=="gym"){
     state.deck = null; clearRest();
@@ -2171,6 +2300,124 @@ function renderHello(){
   bar.hidden = !text;
 }
 
+/* A test she is past due sits in front of the area she just tapped. It is unmissable
+   and it keeps coming back, but it is not a lock: she may be at the range with twenty
+   minutes, and a wall she cannot get past is a wall she learns to work around. */
+function showDue(due, areaId){
+  var t = due.test; if(!t) return false;
+  $("dueCount").textContent = due.over > 0
+    ? due.n + " sessions since the last test, " + due.over + " past due"
+    : due.n + " sessions done";
+  $("dueTitle").textContent = t.name;
+  $("dueSub").textContent = t.sub + " \u00b7 " + t.balls + " balls \u00b7 " + t.where;
+  $("dueWhy").textContent = t.why;
+  $("dueRule").textContent = t.ruleText;
+  $("dueWrap").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("dueGo").focus();
+  state.dueArea = areaId;
+  state.dueTest = t.id;
+  return true;
+}
+function closeDue(){
+  $("dueWrap").hidden = true;
+  document.body.style.overflow = "";
+}
+
+/* ---------- tests ---------- */
+function testSessions(testId, playerId){
+  return state.sessions.filter(function(x){
+    return x.kind === "test" && x.testId === testId &&
+           x.playerId === (playerId || state.activePlayer);
+  }).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+}
+function testPlan(areaId){
+  var p = playerObj();
+  var t = p && p.tests ? p.tests[areaId] : null;
+  return t && t.id ? t : null;
+}
+function testsDoneFor(areaId){
+  return state.sessions.filter(function(x){
+    var t = x.kind === "test" ? testById(x.testId) : null;
+    return t && t.area === areaId && x.playerId === state.activePlayer;
+  }).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+}
+/* Practice sessions in that area since the last test of that area. A test is not a
+   practice session, so it resets the count without counting towards the next one. */
+function sinceLastTest(areaId){
+  var done = testsDoneFor(areaId), from = done.length ? done[done.length-1].date : "";
+  return sessionsFor(areaId).filter(function(x){ return x.date >= from; }).length -
+         (done.length ? 0 : 0);
+}
+function testDue(areaId){
+  var plan = testPlan(areaId); if(!plan) return null;
+  var every = Math.max(1, plan.every || 5), n = sinceLastTest(areaId);
+  if(n < every) return null;
+  return { test:testById(plan.id), n:n, every:every, over:n - every };
+}
+function testCount(t){
+  /* Balls that met the rule. On the fade test that is the window and the circle on the
+     same ball, which is stricter than the card, because half a fade is not a fade. */
+  var got = 0, n = 0;
+  (t.sets || []).forEach(function(st){
+    var list = (state.draft.shots || {})[st.id] || [];
+    var calls = callsFor(t, st, null, state.draft);
+    list.forEach(function(x, i){
+      if(!x || !shotDone(st, x, calls[i])) return;
+      n++;
+      var c = calls[i] || {};
+      var ring = inFor(c, x.z);
+      if(c.kind === "w") { if(x.w === c.win && ring) got++; }
+      else if(ring) got++;
+    });
+  });
+  return {n:n, got:got};
+}
+function testTally(t, sess){
+  var got = 0, n = 0;
+  (t.sets || []).forEach(function(st){
+    var list = (sess.shots || {})[st.id] || [];
+    var calls = callsFor(t, st, null, sess);
+    list.forEach(function(x, i){
+      if(!x || !shotDone(st, x, calls[i])) return;
+      n++;
+      var c = calls[i] || {};
+      var ring = inFor(c, x.z);
+      if(c.kind === "w"){ if(x.w === c.win && ring) got++; }
+      else if(ring) got++;
+    });
+  });
+  return {n:n, got:got};
+}
+function renderTests(){
+  var host = $("testList"); if(!host) return;
+  host.innerHTML = "";
+  TESTS.forEach(function(t){
+    var a = area(t.area), runs = testSessions(t.id);
+    var tot = {n:0, got:0};
+    runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
+    var pct = tot.n ? Math.round(100*tot.got/tot.n) : null;
+    var fill = Math.min(100, Math.round(100*tot.n/(t.target||100)));
+    var card = document.createElement("div"); card.className = "testcard";
+    card.innerHTML =
+      '<div class="tchd"><div><div class="nm">'+t.name+'</div>'+
+        '<div class="sub">'+(a ? a.name : "")+' \u00b7 '+t.sub+'</div></div>'+
+        '<div class="tcn"><b class="num">'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span></div></div>'+
+      '<p class="note">'+t.why+'</p>'+
+      '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
+      '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
+      '<p class="tstat">'+
+        (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
+               : 'Nothing logged yet')+
+        ' \u00b7 aiming for '+(t.target||100)+'</p>'+
+      '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
+        '<span class="twhere">'+t.balls+' balls \u00b7 '+t.where+'</span></div>';
+    card.querySelector("[data-run]").addEventListener("click", function(){ openTest(t.id); });
+    host.appendChild(card);
+  });
+  if(!TESTS.length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
+}
+
 /* ---------- goals ---------- */
 /* Outcome, performance, process, the same three columns as the wall chart.
    Performance is the targets that already drive each session, given a home of
@@ -2215,6 +2462,72 @@ function areaLive(a){
   }
   return bits.join(" · ");
 }
+/* The dropdown is built from the catalogue every time it is drawn, so a test added to
+   TESTS later turns up here on its own with nothing else to change. */
+function testBox(a){
+  var box = document.createElement("div"); box.className = "gabox testpick";
+  var avail = testsFor(a.id);
+  box.innerHTML = '<span class="eyebrow">Test \u00b7 every so many sessions</span>';
+  if(!avail.length){
+    box.innerHTML += '<p class="note">No tests in the library for this area yet.</p>';
+    return box;
+  }
+  var plan = testPlan(a.id) || {};
+  var row = document.createElement("div"); row.className = "testrow";
+
+  var sel = document.createElement("select"); sel.className = "tsel";
+  sel.setAttribute("aria-label", "Which test to run for " + a.name);
+  sel.innerHTML = '<option value="">No test</option>' +
+    avail.map(function(t){
+      return '<option value="'+t.id+'"'+(plan.id===t.id?' selected':'')+'>'+t.name+'</option>';
+    }).join("");
+
+  var stp = document.createElement("div"); stp.className = "mspin tstep";
+  var minus = document.createElement("button"); minus.type="button"; minus.textContent="\u2212";
+  minus.setAttribute("aria-label","Run the test less often");
+  var inp = document.createElement("input");
+  inp.type="number"; inp.min="1"; inp.max="30"; inp.step="1"; inp.inputMode="numeric";
+  inp.className="tevery"; inp.value = String(plan.every || 5);
+  inp.setAttribute("aria-label","Run the test every this many sessions");
+  var plus = document.createElement("button"); plus.type="button"; plus.textContent="+";
+  plus.setAttribute("aria-label","Run the test more often");
+
+  function save(){
+    var pl = playerObj(); if(!pl) return;
+    pl.tests = pl.tests || {};
+    var id = sel.value, every = Math.max(1, Math.min(30, parseInt(inp.value,10) || 5));
+    inp.value = String(every);
+    if(!id) delete pl.tests[a.id];
+    else pl.tests[a.id] = { id:id, every:every };
+    saveLocal(); pushMeta();
+    paintWhen();
+  }
+  function nudge(d){ inp.value = String(Math.max(1, Math.min(30, (parseInt(inp.value,10)||5) + d))); save(); }
+  minus.addEventListener("click", function(){ nudge(-1); });
+  plus.addEventListener("click", function(){ nudge(1); });
+  inp.addEventListener("change", save);
+  sel.addEventListener("change", save);
+
+  stp.appendChild(minus); stp.appendChild(inp); stp.appendChild(plus);
+  var lab = document.createElement("span"); lab.className="tlab"; lab.textContent = "every";
+  row.appendChild(sel); row.appendChild(lab); row.appendChild(stp);
+  var unit = document.createElement("span"); unit.className="tlab"; unit.textContent = "sessions";
+  row.appendChild(unit);
+  box.appendChild(row);
+
+  var when = document.createElement("p"); when.className = "note tnote";
+  function paintWhen(){
+    var plan2 = testPlan(a.id);
+    if(!plan2){ when.textContent = "No test set for this area."; return; }
+    var due = testDue(a.id), n = sinceLastTest(a.id);
+    when.textContent = due
+      ? "Due now: " + n + " sessions since the last one."
+      : n + " of " + (plan2.every||5) + " sessions done since the last test.";
+  }
+  paintWhen();
+  box.appendChild(when);
+  return box;
+}
 function renderGoals(){
   var host = $("goalsBody"); if(!host) return;
   host.innerHTML = "";
@@ -2246,6 +2559,7 @@ function renderGoals(){
     }));
     var live = document.createElement("p"); live.className="galive"; live.textContent = areaLive(a);
     card.appendChild(live);
+    card.appendChild(testBox(a));
     card.appendChild(bulletBox({
       eyebrow:"How · the week",
       cls:"proc",
@@ -2256,6 +2570,17 @@ function renderGoals(){
     perf.appendChild(card);
   });
   host.appendChild(perf);
+
+  var ref = document.createElement("div"); ref.className = "goalgrp";
+  ref.innerHTML = '<h2>The numbers behind the targets</h2>'+
+    '<p class="lede">Every performance goal here is a move from tour standard towards the top ten. '+
+    'The tables are what that standard actually is.</p>';
+  var bb = document.createElement("button");
+  bb.type = "button"; bb.className = "benchlink"; bb.id = "goBench";
+  bb.textContent = "LPGA Tour averages \u2192";
+  bb.addEventListener("click", function(){ renderBench(); show("bench"); });
+  ref.appendChild(bb);
+  host.appendChild(ref);
 }
 
 function homePage(n){
@@ -2287,15 +2612,22 @@ function renderHome(){
     var hist = sessionsFor(a.id);
     var b = document.createElement("button");
     b.className="area"; b.type="button";
+    var dueNow = testDue(a.id);
     b.innerHTML =
       '<div class="idx num">'+areaNo(a)+'</div>'+
-      '<div><div class="nm">'+a.name+'</div><div class="sub">'+a.sub+'</div></div>'+
+      '<div><div class="nm">'+a.name+
+        (dueNow ? ' <span class="duechip">test due</span>' : '')+'</div>'+
+        '<div class="sub">'+a.sub+'</div></div>'+
       '<div class="right">'+ sparkline(hist.map(function(s){return s.total;}), areaMax(a)) +
         '<div class="lastscore">'+
           '<div class="big num">'+hist.length+'</div>'+
           '<div class="cap">'+(hist.length===1 ? "session" : "sessions")+'</div>'+
         '</div></div>';
-    b.addEventListener("click", function(){ openSession(a.id); });
+    b.addEventListener("click", function(){
+      var due = testDue(a.id);
+      if(due && showDue(due, a.id)) return;
+      openSession(a.id);
+    });
     host.appendChild(b);
   });
 
@@ -2557,6 +2889,20 @@ function resumeDraft(d){
 /* ---------- practice session ---------- */
 /* Starting a second session does not touch the first: it stays in the list,
    unfinished, until she picks it up again or deletes it. */
+/* A test opens exactly like a session, because it is one: same deck, same capture,
+   same scoring. It is saved under its own kind so it never lands in the practice
+   numbers, the placings or the balance chart. */
+function openTest(testId, resume){
+  var t = testById(testId); if(!t) return false;
+  var ok = openSession(testId, resume);
+  if(ok && state.draft){
+    state.draft.kind = "test";
+    state.draft.testId = testId;
+    $("sessArea").textContent = "Test \u00b7 " + (area(t.area) ? area(t.area).name : "");
+    saveDraft();
+  }
+  return ok;
+}
 function openSession(areaId, resume){
   if(!resume) resume = liveSessions().filter(function(x){
     return x.kind === "practice" && x.areaId === areaId; })[0] || null;
@@ -2574,7 +2920,7 @@ function openSession(areaId, resume){
   if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
   watchDraft();
   paintTick();
-  $("sessArea").textContent = a.retired ? "Earlier format" : "Area "+areaNo(a);
+  $("sessArea").textContent = a.isTest ? "Test" : (a.retired ? "Earlier format" : "Area "+areaNo(a));
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
   renderSession();
@@ -3379,6 +3725,8 @@ function renderReview(host, a){
     '<div class="rvtot"><span class="eyebrow">Session score</span>'+
     '<span class="f">'+(d.total||0)+' <span style="color:var(--muted);font-size:16px">/ '+d.max+'</span></span></div>'+
     '<p class="note">Tap any line to go back and change it.</p>';
+  var tp = tourPanel(a);
+  if(tp) host.appendChild(tp);
   host.querySelectorAll("[data-go]").forEach(function(el){
     el.addEventListener("click", function(){ deckShow(+el.getAttribute("data-go")); });
   });
@@ -3999,20 +4347,27 @@ function callsFor(a, s, cfg, store){
     if(kind === "lag"){
       out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
     } else if(kind === "grid"){
-      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull, lat:lat, two:!!a.twoTier});
+      /* A fade has to start left, so only the two left-hand windows are ever called. */
+      var ord = s.fade ? [1,4] : gridOrder(s.guide);
+      out.push({kind:"w", grid:s.guide, win:ord[i % ord.length], tc:s.tc, bull:s.bull,
+                lat:lat, two:!!a.twoTier, rule:a.rule, dist:s.dist});
     } else if(areaShape(a) === "clock"){
       out.push({kind:"t", st:(i%5)+1, tc:s.tc});
     } else {
       out.push({kind:"t", tc:s.tc, bull:s.bull, lat:lat, two:!!a.twoTier,
-                r1:s.r1, r2:s.r2, lie:s.lie, dist:s.dist});
+                r1:s.r1, r2:s.r2, lie:s.lie, dist:s.dist, rule:a.rule});
     }
   }
   return out;
 }
 /* The corridor measures line, not carry, so a ball that is straight but short is
    still inside it. It keeps its own zone on the picture, so the fault still shows. */
+var SHORT_ZONES = {short:1, shortL:1, shortR:1};
 function inFor(call, z){
   if(z == null) return false;
+  /* The pin-high test measures one thing only: did the ball get there. Left and right
+     are not the point, so every zone scores except the three short ones. */
+  if(call && call.rule === "pinhigh") return !SHORT_ZONES[z];
   if(call && call.lat && z === "short") return true;
   return isIn(z);
 }
@@ -5093,7 +5448,7 @@ function saveCurrent(){
     }
     s.date = $("sessDate").value || today();
     s.notes = $("sessNotes").value.trim();
-    s.checks = checksFor(s.areaId);
+    if(s.kind !== "test") s.checks = checksFor(s.areaId);
   } else if(state.view==="gym"){
     s = state.gymDraft;
     s.date = $("gymDate").value || today();
@@ -5573,6 +5928,7 @@ function renderSessions(){
 function render(){
   renderHome();
   renderSC();
+  renderTests();
   if(state.view==="history") renderProgress();
   if(state.view==="sessions") renderSessions();
 }
@@ -5788,6 +6144,68 @@ function openInfo(title, lines){
   document.body.style.overflow = "hidden";
   $("lbClose").focus();
 }
+/* The tour data used to sit in a tab of its own, which meant she read it nowhere near
+   the number it explains. It belongs next to the placing: what the target is, where the
+   figure came from, and how a hundred tour players get turned into a position. */
+var TOURINFO = {
+  10:{ title:"The tour numbers behind this",
+       rows:[["Driving accuracy, LPGA average","71%"],
+             ["Your corridor, driver","26 yd"],
+             ["Your corridor, 3-wood","23 yd"],
+             ["Your corridor, 5-wood / 2H","22 yd"],
+             ["Club head speed, LPGA average","94 mph"]],
+       lines:["The corridor is the width a tour player finds two times in three. It is tighter than a fairway on purpose: a typical tour fairway is about 30 yards and gets found 72% of the time.",
+              "So the target itself is the tour standard. Hitting 30 of 45 is exactly average out here.",
+              "The placing takes 45 balls at a 66% chance, allows for the fact that some tour players are better than others, and works out how many of a hundred of them would have beaten your score. 1st means almost nobody would.",
+              "Club head speed is measured, not placed. The average of the fifteen is the one that tracks progress: the fastest of fifteen reads about 4 mph high and moves twice as much between sessions."] },
+  11:{ title:"The tour numbers behind this",
+       rows:[["LPGA average proximity, 125 yd","26 ft"],["145 yd","32 ft"],["165 yd","38 ft"],["185 yd","43 ft"],
+             ["PGA average, the bullseye ring","22 to 33 ft"]],
+       lines:["The circle is where a tour player's average ball from that distance finishes.",
+              "Because the miss spreads out in every direction, a bit over half of tour shots land inside their own average, not two thirds. The placing uses 55%, which is what that works out to.",
+              "So a ball inside the circle is a tour-standard ball, and 33 of 60 is about what a tour player would do.",
+              "The bullseye is the PGA circle sitting inside the LPGA one. It is counted separately at the end, and shaped balls count in the same pool as straight ones."] },
+  2:{ title:"The tour numbers behind this",
+       rows:[["LPGA average proximity, 30 yd","11 ft"],["50 yd","17 ft"],["70 yd","19 ft"],["90 yd","20 ft"]],
+       lines:["Same idea as the approach circles: this is where a tour player's average wedge from that distance finishes.",
+              "No inner ring here. The PGA circles are only a foot tighter and nobody can tell 11 feet from 10 by eye.",
+              "A bit over half of tour wedges finish inside their own average, so the placing uses 55%. 33 of 60 is tour standard."] },
+  3:{ title:"The tour numbers behind this",
+       rows:[["LPGA sand save","45%"],["LPGA scrambling","50 to 60%"],
+             ["Inside two clubs, tour, from 20 paces","37%"],["From a plugged lie","18%"],
+             ["Inside one club, over the whole session","11%"]],
+       lines:["Nobody publishes short game proximity by distance and lie, so these come the other way round: take the up-and-down and hole-out rates the tour does publish, and work back to where the ball must be finishing.",
+              "Two clubs is about six feet, one club about three. They are the only targets you can actually measure on a green with the club in your hand.",
+              "The rate changes with every shot, so a ball inside two clubs from 10 paces is ordinary and the same ball from a plugged lie is a one in six. That is why the messages only speak on the hard ones.",
+              "Over 75 shots a tour player gets about 19 inside two clubs and 9 inside one."] },
+  4:{ title:"The tour numbers behind this",
+       rows:[["Tour make rate, 4 ft","90%"],["6 ft","68%"],["9 ft","46%"],["12 ft","32%"],
+             ["The clock, all 55 putts","65%"]],
+       lines:["A holed putt is the cleanest measure in golf, and the make rates by distance are well documented.",
+              "Your clock is 20 at 4 ft, 15 at 6, 10 at 9 and 10 at 12. A tour player holes about 36 of the 55, which is 65%, so the clock lands on the same two-in-three standard as the other tests without being designed that way.",
+              "The run has its own table here. Because the four-footers come first, a tour player's best run is about 14, so ten in a row is a below-average run rather than a good one.",
+              "The lag ladder and the rotation sit outside the placing. There is no tour equivalent to a lag inside one step, and a number we cannot stand behind is worse than none."]}
+};
+function tourPanel(a){
+  var t = TOURINFO[a.id]; if(!t) return null;
+  var box = document.createElement("div"); box.className = "tourbox";
+  box.innerHTML = '<button type="button" class="tourhd" aria-expanded="false">'+
+      '<span>'+t.title+'</span><span class="tchev" aria-hidden="true">\u203a</span></button>'+
+    '<div class="tourbody" hidden>'+
+      '<table class="btable tmini"><tbody>'+
+        t.rows.map(function(r){ return '<tr><td>'+r[0]+'</td><td class="key">'+r[1]+'</td></tr>'; }).join("")+
+      '</tbody></table>'+
+      t.lines.map(function(x){ return '<p class="note">'+x+'</p>'; }).join("")+
+    '</div>';
+  var hd = box.querySelector(".tourhd"), body = box.querySelector(".tourbody");
+  hd.addEventListener("click", function(){
+    var open = body.hidden;
+    body.hidden = !open;
+    hd.setAttribute("aria-expanded", open ? "true" : "false");
+    box.classList.toggle("open", open);
+  });
+  return box;
+}
 var INFO = {
   speed:{ title:"Club head speed", lines:[
     "Fastest and slowest of the ten driver balls.",
@@ -5830,7 +6248,12 @@ $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show(
 $("homeNext").addEventListener("click", function(){ homePage(1); });
 $("homeBack").addEventListener("click", function(){ homePage(0); });
 $("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
-$("tabBench").addEventListener("click", function(){ renderBench(); show("bench"); });
+$("tabTests").addEventListener("click", function(){ renderTests(); show("tests"); });
+$("dueGo").addEventListener("click", function(){ var id = state.dueTest; closeDue(); if(id) openTest(id); });
+$("dueLater").addEventListener("click", function(){
+  var id = state.dueArea; closeDue(); if(id != null) openSession(id);
+});
+$("benchBack").addEventListener("click", function(){ renderGoals(); show("goals"); });
 $("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
 $("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
 $("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
