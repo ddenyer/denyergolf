@@ -811,7 +811,14 @@
   .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
   .mk.hit.now circle{stroke:#3d0020; stroke-width:3}
 
-  .balls{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px}
+  /* Balls come in fives, because five is where you stop and think. */
+  .balls{display:flex; flex-direction:column; gap:10px; margin-top:14px}
+  .ballrow{display:flex; align-items:center; gap:10px}
+  .ballrow .setlab{font-family:Archivo, sans-serif; font-size:10.5px; font-weight:700;
+    letter-spacing:.7px; text-transform:uppercase; color:var(--muted);
+    width:38px; flex:none; line-height:1.15}
+  .ballrow .rowchips{display:flex; gap:7px; flex-wrap:wrap}
+  .ballrow + .ballrow{border-top:1px solid var(--line); padding-top:10px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
     background:var(--surface-2); color:var(--muted); font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:14px; font-weight:600; cursor:pointer; padding:0}
@@ -1248,10 +1255,10 @@ var AREAS = [
      more yards at the same angle. */
   plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
   sets:[
-    {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
+    {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", r2:0.66, word:"the driver", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
       max:15, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"Fastest and slowest of the fifteen"},
-    {id:"c", label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
-    {id:"e", label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
+    {id:"c", label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", r2:0.66, word:"the 3-wood", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
+    {id:"e", label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", r2:0.66, word:"the 5-wood", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
     {id:"r", rot:true, allWin:true, balls:10, guide:"windows", label:"Rotation \u00b7 ten balls, the app calls the club and the window",
       tgt:"Club and window drawn at random every ball. A point for the window, a point for the corridor",
       parts:[{id:"w", label:"Window", max:10},{id:"t", label:"Target", max:10}]}
@@ -1265,17 +1272,17 @@ var AREAS = [
      the ball was tour standard for a man playing a shorter club from the same spot. */
   plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", bull:"25 ft", dist:145, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", bull:"25 ft", dist:145, tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", bull:"25 ft", dist:145, r2:0.55, r1:0.41, word:"145 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", bull:"25 ft", dist:145, r2:0.55, r1:0.41, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", bull:"28 ft", dist:165, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", bull:"28 ft", dist:165, tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", bull:"28 ft", dist:165, r2:0.55, r1:0.41, word:"165 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", bull:"28 ft", dist:165, r2:0.55, r1:0.41, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", bull:"33 ft", dist:185, tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", bull:"33 ft", dist:185, tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", bull:"33 ft", dist:185, r2:0.55, r1:0.41, word:"185 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", bull:"33 ft", dist:185, r2:0.55, r1:0.41, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
@@ -1308,17 +1315,17 @@ var AREAS = [
   targets:"30y → 11 ft · 50y → 17 ft · 70y → 19 ft · 90y → 20 ft · tighter dispersion · low, normal and high on command",
   plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, tgt:"Inside 11 ft scores · the LPGA 66% circle from here", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Inside 11 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, tgt:"Inside 17 ft scores · the LPGA 66% circle from here", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Inside 17 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, tgt:"Inside 19 ft scores · the LPGA 66% circle from here", max:5},
-    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Inside 19 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, tgt:"Inside 20 ft scores · the LPGA 66% circle from here", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Inside 20 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. A point inside each target", max:20}
@@ -1355,14 +1362,20 @@ var AREAS = [
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
   plan:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
+  /* No placing here yet. The clock is a genuine 66% test (20 at 4 ft, 15 at 6, 10 at 9,
+     10 at 12 comes to 36.0 makes of 55 for a tour player) but the ladder and the
+     rotation put unrated and differently rated balls in the same session, so the
+     count has to be a convolution over the mix that session actually drew rather
+     than a single table. Until that is built, no number is better than a wrong one. */
   sets:[
-    {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", max:20},
-    {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", max:15},
-    {id:"c", label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", max:10},
-    {id:"e", label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", max:10},
-    {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", tgt:"50 putts", max:50}
+    {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
+    {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
+    {id:"c", label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", r2:0.46, word:"9 feet", max:10},
+    {id:"e", label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", r2:0.32, word:"12 feet", max:10},
+    {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", tgt:"30 putts · change ends after every five", max:30},
+    {id:"r", rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
   ],
-  setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Each round, putt five balls from one launch target to the five at the far end, then rotate the launch target and swap ends: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Ten rounds is 50 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break.",
+  setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Six rounds is 30 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
   }
 ];
 
@@ -2701,7 +2714,11 @@ function monitorNote(){
    The run carries across sets: changing club and walking to the next target is part
    of it. Recomputed from scratch whenever anything changes, so correcting a ball
    three sets back fixes the run rather than leaving a phantom streak. */
-function sessionBalls(a, sess){
+/* Every ball in the order it was hit, with the rate a tour player passes that
+   particular shot. A run that starts off a good lie and finishes in a bunker is not
+   the same run as three from the bunker, and the odds have to be the product of the
+   balls that actually made it, not the last one raised to a power. */
+function sessionLog(a, sess){
   var out = [];
   a.sets.forEach(function(s){
     var kind = trackKind(a, s); if(!kind) return;
@@ -2709,10 +2726,29 @@ function sessionBalls(a, sess){
     var calls = callsFor(a, s, null, sess);
     list.forEach(function(x, i){
       if(!x || !shotDone(s, x, calls[i])) return;
-      out.push(!!shotPoint(calls[i], x));
+      var r = (calls[i] && calls[i].kind === "lag") ? null
+            : ((calls[i] && calls[i].r2 != null) ? calls[i].r2 : s.r2);
+      out.push({ ok: !!shotPoint(calls[i], x), r: (r == null ? null : r) });
     });
   });
   return out;
+}
+function sessionBalls(a, sess){
+  return sessionLog(a, sess).map(function(b){ return b.ok; });
+}
+/* The chance a tour player strings together the run she is on: null when any ball
+   in it has no known rate, because a number we cannot stand behind is worse than
+   saying nothing. */
+function runOdds(a, sess, n){
+  if(!n || n < 2) return null;
+  var log = sessionLog(a, sess);
+  if(log.length < n) return null;
+  var odds = 1;
+  for(var i = log.length - n; i < log.length; i++){
+    if(!log[i].ok || log[i].r == null) return null;
+    odds *= log[i].r;
+  }
+  return odds;
 }
 function runStats(a, sess){
   var cur = 0, best = 0;
@@ -2740,11 +2776,6 @@ function flashMsg(html, ms){
   clearTimeout(el.__t);
   el.__t = setTimeout(function(){ el.hidden = true; }, ms || 2400);
 }
-function flashRun(n, beatsEver, word){
-  flashMsg('<span class="star">\u2605</span><b>'+n+' in a row</b>'+
-           (beatsEver ? '<span class="sub">best on '+word+' ever</span>' : ''));
-}
-
 /* ---- what a shot was worth ----
    Praise only when it is earned, and always with the number that earns it. A message
    about an ordinary shot teaches her to ignore every message. The odds are spoken on a
@@ -2760,37 +2791,45 @@ function oddsWord(p){
 var COUNT_WORD = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 function countWord(n){ return COUNT_WORD[n] || String(n); }
 var PRAISE = { seen:0, at:-99, run:0 };
-function praiseRates(a){ return !!(a && a.sets && a.sets.some(function(x){ return x.r2 != null; })); }
 function praiseShot(a, s, call, sh){
-  if(!a || !a.track || !s || !sh || sh.z == null) return;
-  if(!call || call.r2 == null) return;              // only where the tour rate is known
+  if(!a || !a.track || !s || !sh || sh.z == null || !call) return;
   PRAISE.seen++;
   var r = runStats(a, state.draft);
   if(r.cur <= PRAISE.run) PRAISE.run = r.cur;       // the run broke, or went backwards
-  if(!isIn(sh.z)) return;
-  var where = s.word || "there", msg = null, ms = 2400;
+  if(!shotPoint(call, sh)) return;
+  var where = call.word || s.word || "there", msg = null, ms = 2400;
+  var ever = bestRunEver(a.id, state.draft.id);
+  var everBit = r.cur > ever ? ' Your best ever.' : '';
 
   /* A run jumps the queue. It is the rarer event, it only fires when it has grown
      since the last time it spoke, and each extra ball makes it rarer, so it cannot
      nag. Single shots wait their turn. */
   if(r.cur >= 2 && r.cur > PRAISE.run){
-    var odds = Math.pow(call.r2, r.cur);
-    if(odds <= 0.05){
-      var ever = bestRunEver(a.id, state.draft.id);
+    var odds = runOdds(a, state.draft, r.cur);
+    if(odds != null && odds <= 0.05){
       msg = '<span class="star">\u2605</span><b>'+countWord(r.cur)+' in a row</b>'+
-            '<span class="sub">from '+where+'. A tour player does that one time in '+oddsWord(odds)+'.'+
-            (r.cur > ever ? ' Your best ever.' : '')+'</span>';
+            '<span class="sub">from '+where+'. A tour player does that one time in '+
+            oddsWord(odds)+'.'+everBit+'</span>';
       ms = odds <= 0.01 ? 3600 : 2800;
+      PRAISE.run = r.cur;
+    } else if(odds == null && r.cur >= 9){
+      /* Somewhere in that run is a ball with no tour rate: a lag, where there is no
+         tour equivalent to price it against. Nine is the smallest run that is rare
+         whatever the rate really is, because even at seven in ten, nine in a row is
+         one in twenty-five. Say what she did, and claim nothing about the odds. */
+      msg = '<span class="star">\u2605</span><b>'+r.cur+' in a row</b>'+
+            (everBit ? '<span class="sub">Your best on '+areaWord(a)+' ever.</span>' : '');
       PRAISE.run = r.cur;
     }
   }
-  if(!msg && PRAISE.seen - PRAISE.at >= 5){         // one shot message in any five balls
-    if(sh.z === "b" && call.r1 <= 0.12)
+  var r1 = (call.r1 != null) ? call.r1 : s.r1, r2 = (call.r2 != null) ? call.r2 : s.r2;
+  if(!msg && r2 != null && PRAISE.seen - PRAISE.at >= 5){   // one shot message in any five balls
+    if(sh.z === "b" && r1 != null && r1 <= 0.12)
       msg = '<b>Inside one club</b><span class="sub">from '+where+
-            '. One in '+oddsWord(call.r1)+' for a tour player.</span>';
-    else if(sh.z !== "b" && call.r2 <= 0.20)
+            '. One in '+oddsWord(r1)+' for a tour player.</span>';
+    else if(sh.z !== "b" && r2 <= 0.20)
       msg = '<b>Inside two clubs</b><span class="sub">from '+where+
-            '. One in '+oddsWord(call.r2)+' on the LPGA.</span>';
+            '. One in '+oddsWord(r2)+' on the LPGA.</span>';
   }
   if(!msg) return;
   PRAISE.at = PRAISE.seen;
@@ -2808,8 +2847,6 @@ function renderRun(){
   $("runEverLab").textContent = "Best on " + areaWord(a);
   $("runBar").hidden = !a.track;
   $("runBar").classList.toggle("hot", r.cur >= 3);
-  if(r.cur > (state.runShown || 0) && r.cur >= 4 && !praiseRates(a))
-    flashRun(r.cur, r.cur > ever, areaWord(a));
   state.runShown = r.cur;
 }
 
@@ -3808,7 +3845,8 @@ function rotPool(a){
   a.sets.forEach(function(x){
     if(x.rot || x.guide === "ladder") return;
     if(x.parts && (x.guide === "windows" || x.guide === "heights")){ windowed = true; gk = x.guide; }
-    else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist});
+    else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist,
+                                         r1:x.r1, r2:x.r2, word:x.word});
   });
   return {pool:pool, windowed:windowed, grid:gk};
 }
@@ -3822,13 +3860,34 @@ function shuffle(list){
    target with eighteen balls and another with thirteen, which makes the per-target
    rates wobble for no reason; cycling the targets and shuffling the order keeps the
    pressure and keeps the count even. */
+/* Putting rotates over the four lengths and the lag together, so she stands over the
+   ball not knowing whether it is a four-footer or a thirty-foot lag. That is the bit
+   the fixed sets cannot teach. */
+function makeClockRot(a, s){
+  var spec = rotPool(a), n = ballsIn(s), kinds = spec.pool.slice(), calls = [], i;
+  var rounds = Math.max(1, Math.ceil(n / 5));
+  for(i=0;i<n;i++){
+    var slot = i % (kinds.length + 1);
+    if(slot === kinds.length){
+      calls.push({ kind:"lag", t:1 + Math.floor(Math.random()*5),
+                   from:lagFrom(1 + Math.floor(Math.random()*rounds)) });
+    } else {
+      var p = kinds[slot];
+      calls.push({ kind:"t", st:1 + Math.floor(Math.random()*5), tc:p.tc,
+                   label:p.label, r2:p.r2, word:p.word });
+    }
+  }
+  return shuffle(calls);
+}
 function makeRotCalls(a, s){
+  if(areaShape(a) === "clock") return makeClockRot(a, s);
   var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && (spec.windowed || s.allWin));
   var order = gridOrder(spec.grid), calls = [], i;
   for(i=0;i<n;i++){
     var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
     calls.push({ kind:"t", grid:spec.grid, win:null, lat:areaShape(a) === "corridor",
-                 label:p.label, tc:p.tc, bull:p.bull, dist:p.dist });
+                 label:p.label, tc:p.tc, bull:p.bull, dist:p.dist,
+                 r1:p.r1, r2:p.r2, word:p.word, two:!!a.twoTier });
   }
   shuffle(calls);
   if(wantWin){
@@ -4077,19 +4136,33 @@ function shotRow(a, s, last, cfg){
     }
 
     chips.innerHTML = "";
-    for(var i=0;i<nb;i++){
-      (function(i){
-        var x = shots[i];
-        var b = document.createElement("button"); b.type="button"; b.className="ballchip";
-        if(i===cur) b.classList.add("now");
-        if(shotDone(s, x, calls[i])) b.classList.add("done");
-        if(x && inFor(calls[i], x.z)) b.classList.add("good");
-        if(calls[i].kind === "w") b.classList.add("win");
-        b.textContent = String(i+1);
-        b.setAttribute("aria-label", "Ball "+(i+1)+(x && x.z ? ", "+zoneLabel(a, x.z) : ", not logged"));
-        b.addEventListener("click", function(){ cur = i; phase = null; paint(); });
-        chips.appendChild(b);
-      })(i);
+    var nrows = Math.ceil(nb / 5), named = nb > 5;
+    for(var g=0; g<nrows; g++){
+      var brow = document.createElement("div"); brow.className = "ballrow";
+      if(named){
+        var slab = document.createElement("span"); slab.className = "setlab";
+        slab.textContent = "Set " + (g+1);
+        brow.appendChild(slab);
+      }
+      var rowchips = document.createElement("div"); rowchips.className = "rowchips";
+      for(var j=0; j<5; j++){
+        (function(i){
+          if(i >= nb) return;
+          var x = shots[i];
+          var b = document.createElement("button"); b.type="button"; b.className="ballchip";
+          if(i===cur) b.classList.add("now");
+          if(shotDone(s, x, calls[i])) b.classList.add("done");
+          if(x && inFor(calls[i], x.z)) b.classList.add("good");
+          if(calls[i].kind === "w") b.classList.add("win");
+          b.textContent = String(i+1);
+          b.setAttribute("aria-label", (named ? "Set "+(g+1)+", ball " : "Ball ")+(i+1)+
+                         (x && x.z ? ", "+zoneLabel(a, x.z) : ", not logged"));
+          b.addEventListener("click", function(){ cur = i; phase = null; paint(); });
+          rowchips.appendChild(b);
+        })(g*5 + j);
+      }
+      brow.appendChild(rowchips);
+      chips.appendChild(brow);
     }
 
     var sc = tallyShots(calls, shots);
