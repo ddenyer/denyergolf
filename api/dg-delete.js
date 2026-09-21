@@ -18,6 +18,7 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const auth = await authorise(body.code);
   if (!auth.ok) return res.status(auth.status).json({ ok: false, reason: auth.reason });
+  if (auth.unclaimed) return res.status(409).json({ ok: false, reason: 'needs_name' });
 
   const player = (body.player ? String(body.player) : '').trim().toLowerCase();
   const sessionId = body.id ? String(body.id) : '';

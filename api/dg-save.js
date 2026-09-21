@@ -31,6 +31,9 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const auth = await authorise(body.code);
   if (!auth.ok) return res.status(auth.status).json({ ok: false, reason: auth.reason });
+  // A real coupon that nobody has named themselves on yet. It owns no player,
+  // so there is nothing it may write to.
+  if (auth.unclaimed) return res.status(409).json({ ok: false, reason: 'needs_name' });
 
   const allowed = {};
   auth.players.forEach((p) => { allowed[p] = true; });
