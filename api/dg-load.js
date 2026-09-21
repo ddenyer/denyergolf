@@ -157,17 +157,38 @@ export default async function handler(req, res) {
     );
     const metaRows = m.ok ? await m.json() : [];
 
+    // Each session says whose it is. The save endpoint strips `player` out of
+    // the body because it has its own column, so without putting it back a code
+    // that opens several players gets the sessions and no way to tell them
+    // apart. That is exactly what happened to the coach view.
     const sessions = rows.map((row) => {
       const s = Object.assign({}, row.body);
       s.id = row.session_id;
+      s.player = row.player;
       return s;
     });
     const meta = {};
     metaRows.forEach((row) => { meta[row.player] = row.body; });
 
-    // How her name should be spelled on screen. Capitalising the key gets
-    // "Sophie-anne" wrong, so the name she actually typed is kept and sent back.
+    // How each name should be spelled on screen. Capitalising the key gets
+    // "Sophie-anne" wrong, so the name she typed is kept and sent back. Done for
+    // every player the code opens, not just the single-player case, so a coach
+    // sees "Charlotte" rather than a tidied-up slug.
     const display = {};
+    try {
+      const own = await fetch(
+        `${SUPABASE_URL}/rest/v1/dg_codes?players=ov.{${list}}&select=players,label`,
+        { headers }
+      );
+      if (own.ok) {
+        const rows2 = await own.json();
+        rows2.forEach((r) => {
+          if (r.label && Array.isArray(r.players) && r.players.length === 1) {
+            display[r.players[0]] = r.label;
+          }
+        });
+      }
+    } catch (e) { /* names fall back to the key, which is cosmetic */ }
     if (auth.players.length === 1 && auth.row && auth.row.label) {
       display[auth.players[0]] = auth.row.label;
     }
