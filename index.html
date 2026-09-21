@@ -1067,6 +1067,10 @@
     border-radius:7px; padding:7px 12px; font-family:Archivo, sans-serif; font-size:12.5px;
     cursor:pointer; color:var(--ink)}
   .pcardc .acts button:hover{border-color:var(--accent-fill); color:var(--accent)}
+  /* Remove player is final. It sits apart from the others and does not look
+     like something to tap on the way past. */
+  .pcardc .acts button.danger{margin-left:auto; color:var(--muted); border-style:dashed}
+  .pcardc .acts button.danger:hover{color:#b83232; border-color:#b83232; border-style:solid}
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
     margin-top:6px; background:var(--surface-2)}
   .cimport p{margin:0 0 10px; font-size:13px; color:var(--ink-2); line-height:1.5}
@@ -2201,7 +2205,7 @@ function pushMeta(){
        merge is a union by session id, never a replacement.
      - a save that fails says so. Three attempts, then the status line changes.
    None of this runs in the artifact build, which has no endpoints to call. */
-var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, busy:false };
+var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, busy:false, canDelete:false };
 
 function cloudCode(){
   try{
@@ -2371,6 +2375,11 @@ function cloudPull(){
     /* A real code that nobody has taken yet. She says who she is rather than it
        being a job for whoever administers the tool. */
     if(d.needsName){ askName(); return; }
+
+    /* whether the coach view offers Remove player at all. The endpoint checks
+       this again and asks for the password, so this is only about not showing
+       a button that would always be refused. */
+    CLOUD.canDelete = !!d.canDelete;
 
     if(!Array.isArray(d.sessions)) return;
 
@@ -6891,7 +6900,11 @@ function renderCoach(){
         '<button type="button" data-go="sessions">Sessions</button>'+
         '<button type="button" data-go="bench">Tour</button>'+
         '<button type="button" data-go="home">Practice</button>'+
+        (CLOUD.canDelete ? '<button type="button" class="danger" data-drop="1">Remove player</button>' : '')+
       '</div>';
+
+    var drop = card.querySelector("[data-drop]");
+    if(drop) drop.addEventListener("click", function(){ removePlayer(p); });
 
     card.querySelectorAll("[data-go]").forEach(function(b){
       b.addEventListener("click", function(){
@@ -6904,6 +6917,80 @@ function renderCoach(){
       });
     });
     host.appendChild(card);
+  });
+}
+
+/* ---- removing a player ----
+   Final, and there is no undo, so the three steps are deliberately separate.
+   The first two are about not doing this to the wrong person by accident. The
+   third is the only one that is a lock: the password is checked on the server
+   and is not in this page, unlike the coach password above. */
+/* The server files a player under a slug, so "Test Player" is stored as
+   "test-player". This has to match dg-claim.js exactly or the delete asks the
+   server to remove somebody who does not exist. Lower-casing alone was not
+   enough, which the tests caught before it reached you. */
+function playerSlug(name){
+  return String(name || "")
+    .normalize("NFKD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+function removePlayer(p){
+  var name = (p.name || "").trim();
+  var key  = playerSlug(name);
+  if(!key){ window.alert("That player has no name to confirm against."); return; }
+
+  var typed = window.prompt(
+    "Remove a player.\n\nThis deletes every session they have ever logged, on every device, and it cannot be undone.\n\nType the player's name to continue:");
+  if(typed === null) return;
+  if(playerSlug(typed) !== key){
+    window.alert("That is not the name of this player. Nothing has been removed.");
+    return;
+  }
+
+  var sure = window.prompt(
+    "Are you sure?\n\nThis is irreversible. All of " + name + "'s data is lost.\n\nType yes to continue:");
+  if(sure === null) return;
+  if(sure.trim().toLowerCase() !== "yes"){
+    window.alert("Nothing has been removed.");
+    return;
+  }
+
+  var pass = window.prompt("Enter the admin password:");
+  if(pass === null) return;
+
+  coachStatus("Removing " + name + "…");
+  cloudPost("/api/dg-remove-player", {
+    code: cloudCode(), player: key, confirm: "yes", password: pass
+  }).then(function(res){
+    var d = res.d || {};
+    if(!d.ok){
+      coachStatus("");
+      window.alert(
+        d.reason === "bad_password"     ? "That password was not recognised. Nothing has been removed." :
+        d.reason === "not_allowed"      ? "This code is not allowed to remove players." :
+        d.reason === "not_your_player"  ? "This code does not open that player." :
+        d.reason === "no_admin_password"? "No admin password is set on the server, so removing players is switched off." :
+        "That did not work. Nothing has been removed.");
+      return;
+    }
+    /* gone from the server: now take them off this device too, so the next
+       sync cannot push the whole lot back up again */
+    state.sessions = state.sessions.filter(function(s){ return s.playerId !== p.id; });
+    state.players  = state.players.filter(function(x){ return x.id !== p.id; });
+    if(!state.players.length) state.players = [{ id:uid(), name:"Player 1" }];
+    if(state.activePlayer === p.id) state.activePlayer = state.players[0].id;
+    Object.keys(CLOUD.pending).forEach(function(id){
+      if(CLOUD.pending[id] && CLOUD.pending[id].player === key) delete CLOUD.pending[id];
+    });
+    saveLocal(); renderPlayer(); render(); renderCoach();
+    coachStatus(name + " removed. " + d.removed.sessions +
+                (d.removed.sessions === 1 ? " session" : " sessions") + " deleted.");
+  }).catch(function(){
+    coachStatus("");
+    window.alert("Could not reach the server. Nothing has been removed.");
   });
 }
 
@@ -7114,7 +7201,25 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
   form.addEventListener("submit", function(e){ e.preventDefault(); submit(input.value); });
 
   var have = stored();
-  if(have && have.code){
+  var q = (new URLSearchParams(location.search).get("code") || "").trim().toUpperCase();
+
+  if(q && (!have || have.code !== q)){
+    /* A code in the link beats whatever this device already remembers. Without
+       this, a device that had been unlocked once would keep using its old code
+       and ignore the link entirely, so rotating a code would mean asking her to
+       type a random string on a phone. Now it is a tap on a new link.
+       If the new code is refused, the one she already had is tried rather than
+       leaving her locked out by a bad link. */
+    lock();
+    input.value = q;
+    submit(q).then(function(ok){
+      if(ok === true || !(have && have.code)) return;
+      submit(have.code, true).then(function(ok2){
+        if(ok2 === true) say("");
+        else { forget(); lock(); input.value = have.code; say(refusal(lastReason), true); }
+      });
+    });
+  } else if(have && have.code){
     unlock();
     submit(have.code, true).then(function(ok){
       if(ok === false){
@@ -7125,9 +7230,7 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
     });
   } else {
     lock();
-    var q = new URLSearchParams(location.search).get("code");
-    if(q){ input.value = q.toUpperCase(); submit(q); }
-    else { input.focus(); }
+    input.focus();
   }
 })();
 </script>
