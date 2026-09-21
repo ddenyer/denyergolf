@@ -1304,6 +1304,24 @@
 
 <div class="runflash" id="runFlash" hidden aria-live="polite"></div>
 
+<!-- First use of a code nobody has taken yet. Only ever shown on the hosted
+     build: without endpoints there is nobody to ask. -->
+<div class="duewrap" id="nameWrap" hidden>
+  <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+    <span class="eyebrow">First time here</span>
+    <h2 id="nameTitle">What should we call you?</h2>
+    <p>This names your practice log. Everything you score from now on is saved under it, on every device you sign in on.</p>
+    <form id="nameForm" autocomplete="off">
+      <input type="text" id="nameInput" maxlength="40" placeholder="First name"
+             aria-label="Your name" autocapitalize="words" spellcheck="false">
+      <p class="note" id="nameMsg"></p>
+      <div class="dueacts">
+        <button type="submit" class="pri" id="nameGo">That's me</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="duewrap" id="dueWrap" hidden>
   <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="dueTitle">
     <span class="eyebrow" id="dueCount"></span>
@@ -2276,6 +2294,56 @@ function cloudDrop(x){
   cloudTry("/api/dg-delete", { code:cloudCode(), id:x.id, player:key }).catch(function(){});
 }
 
+/* ---- first use of a code nobody has taken ----
+   The alternative was a row added by hand for every new player, which is a job
+   that falls to whoever runs the tool and is forgotten. She names herself once,
+   the endpoint refuses any name another code already holds, and that refusal is
+   the only thing standing between a fresh coupon and somebody else's history.
+   So it is said plainly on screen rather than dressed up as a glitch. */
+var NAME_SAYS = {
+  name_taken:      "Someone is already using that name. Try the one your coach gave you, or add your surname.",
+  already_claimed: "This code already belongs to someone. Ask your coach for your own.",
+  name_too_short:  "That is a little short. Use at least two letters.",
+  name_too_long:   "That is too long for a name.",
+  name_unusable:   "Try letters and numbers only.",
+  not_valid:       "That code is no longer valid. Ask your coach for a new one.",
+  wrong_tool:      "That code is for a different tool."
+};
+function askName(){
+  var wrap = $("nameWrap"); if(!wrap) return;
+  wrap.hidden = false;
+  var form = $("nameForm"), input = $("nameInput"), go = $("nameGo"), msg = $("nameMsg");
+  if(form.__wired) { try{ input.focus(); }catch(e){} return; }
+  form.__wired = true;
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = (input.value || "").trim();
+    if(name.length < 2){ msg.textContent = NAME_SAYS.name_too_short; return; }
+    go.disabled = true; msg.textContent = "Just a moment…";
+
+    cloudPost("/api/dg-claim", { code:cloudCode(), name:name }).then(function(res){
+      var d = res.d || {};
+      if(!d.ok){
+        go.disabled = false;
+        msg.textContent = NAME_SAYS[d.reason] || "That did not work. Try again in a moment.";
+        return;
+      }
+      try{ localStorage.setItem(WHO_KEY, d.display || name); }catch(e){}
+      applyCouponIdentity();
+      renderPlayer();
+      wrap.hidden = true;
+      CLOUD.pulled = false;      // now that she exists, do the real pull
+      cloudPull();
+      render(); show("home");
+    }).catch(function(){
+      go.disabled = false;
+      msg.textContent = "Could not reach the server. Check your connection and try again.";
+    });
+  });
+  try{ input.focus(); }catch(e){}
+}
+
 /* Everything this device holds, sent up in one go. Runs before the first pull so
    a device with sessions the server has never seen cannot be emptied by what
    comes back, and again once the player's name is known, because a session can
@@ -2298,18 +2366,32 @@ function cloudPull(){
   CLOUD.pulled = true;
 
   cloudTry("/api/dg-load", { code:cloudCode() }).then(function(d){
-    if(!d || !Array.isArray(d.sessions)) return;
+    if(!d) return;
+
+    /* A real code that nobody has taken yet. She says who she is rather than it
+       being a job for whoever administers the tool. */
+    if(d.needsName){ askName(); return; }
+
+    if(!Array.isArray(d.sessions)) return;
 
     /* The endpoint is what knows which player the code belongs to, so this is
        where her name comes from. It used to be a map in the page source. */
-    if(d.players && d.players[0]){
-      var nice = d.players[0].charAt(0).toUpperCase() + d.players[0].slice(1);
+    /* One player means the code names her, and the device becomes hers. A coach
+       code opens several, so there is nobody for it to switch to: snapping to
+       the first name in the list would drag the coach back to the same player
+       every time the page loaded. It leaves whoever he was looking at alone. */
+    if(d.players && d.players.length === 1){
+      var key  = d.players[0];
+      var nice = (d.display && d.display[key])
+               || (key.charAt(0).toUpperCase() + key.slice(1));
       var knew = couponPlayer();
       try{ localStorage.setItem(WHO_KEY, nice); }catch(e){}
       applyCouponIdentity();
       renderPlayer();
       // first time this device learned her name: send up anything it was holding
       if(!knew) cloudPushAll();
+    } else if(d.players && d.players.length > 1){
+      cloudPushAll();
     }
 
     var byId = {};
@@ -2343,7 +2425,12 @@ function cloudPull(){
 }
 function connect(){
   if(!window.claude || !claude.use){
-    setStatus("History is saved in this browser on this device. Export the CSV to keep a copy.");
+    /* Sessions sync to her account now, so the old line under the list ("saved in
+       this browser on this device") contradicted the box directly above it. The
+       device is still the working store, which is why it is named first. */
+    setStatus(cloudReady()
+      ? "Saved on this device and backed up to her account, so any device she signs in on shows the same history."
+      : "History is saved in this browser on this device. Export the CSV to keep a copy.");
     return;
   }
   claude.use("db").then(function(db){
