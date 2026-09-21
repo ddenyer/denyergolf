@@ -2213,12 +2213,42 @@ function cloudCode(){
     return (o && o.code) ? o.code : "";
   }catch(e){ return ""; }
 }
-/* The server keys rows on the player's name, which is what the coupon resolves
-   to. An unnamed default player is not synced: there is nobody to file it under. */
+/* The server keys rows on a slug of the player's name, so "Sophie Anne" is
+   filed as "sophie-anne". This has to match the endpoints exactly: lower-casing
+   alone sent "test player" where the server had "test-player". */
+function slugName(name){
+  return String(name || "")
+    .normalize("NFKD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+/* An unnamed default player is not synced: there is nobody to file it under. */
 function playerKey(playerId){
   var p = state.players.filter(function(x){ return x.id === playerId; })[0];
-  var n = ((p && p.name) || "").trim().toLowerCase();
-  return (!n || /^player\s*\d*$/.test(n)) ? "" : n;
+  var n = ((p && p.name) || "").trim();
+  if(!n || /^player\s*\d*$/i.test(n)) return "";
+  return slugName(n);
+}
+/* Make sure this device has a player to hang a server player's sessions on, and
+   give back its local id. Without this a coach code pulled down three sessions
+   belonging to players that did not exist on the laptop, and showed nothing. */
+function ensurePlayer(key, display){
+  var found = null;
+  state.players.forEach(function(p){ if(slugName(p.name) === key) found = p; });
+  if(found) return found.id;
+
+  var name = display || (key.charAt(0).toUpperCase() + key.slice(1));
+  var only = state.players.length === 1 ? state.players[0] : null;
+  if(only && /^player\s*\d*$/i.test((only.name || "").trim())){
+    only.name = name; seedByName(only);      // the unnamed default becomes her
+    return only.id;
+  }
+  var made = { id:uid(), name:name };
+  seedByName(made);
+  state.players.push(made);
+  return made.id;
 }
 function cloudReady(){ return !!cloudCode(); }
 
@@ -2400,12 +2430,29 @@ function cloudPull(){
       // first time this device learned her name: send up anything it was holding
       if(!knew) cloudPushAll();
     } else if(d.players && d.players.length > 1){
+      /* A coach code. Make sure every player it opens exists here, even one who
+         has not logged anything yet, so she shows in the coach list rather than
+         appearing only once she has a session. */
+      d.players.forEach(function(k){ ensurePlayer(k, d.display && d.display[k]); });
+      if(state.players.length){
+        var first = null;
+        state.players.forEach(function(p){ if(!first && slugName(p.name) === d.players[0]) first = p; });
+        if(first && !state.players.some(function(p){ return p.id === state.activePlayer; })) state.activePlayer = first.id;
+      }
+      renderPlayer();
       cloudPushAll();
     }
 
     var byId = {};
     state.sessions.filter(function(s){ return !s.sample; })
                   .forEach(function(s){ byId[s.id] = s; });
+
+    /* Point every session at a player that exists on THIS device. The playerId
+       inside it came from whatever device scored it and means nothing here. */
+    d.sessions.forEach(function(r){
+      if(!r.player) return;
+      r.playerId = ensurePlayer(r.player, d.display && d.display[r.player]);
+    });
 
     var added = 0;
     d.sessions.forEach(function(r){
