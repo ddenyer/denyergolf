@@ -86,7 +86,7 @@ export async function couponValid(code) {
 export async function codeRow(code) {
   const url = process.env.SUPABASE_URL;
   const r = await fetch(
-    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at`,
+    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete`,
     { headers: sbHeaders() }
   );
   if (!r.ok) throw new Error('code lookup failed: ' + (await r.text()));
@@ -172,7 +172,11 @@ export default async function handler(req, res) {
       display[auth.players[0]] = auth.row.label;
     }
 
-    return res.status(200).json({ ok: true, players: auth.players, display, sessions, meta });
+    // Tells the coach view whether to offer Remove player at all. Not the
+    // control itself: the endpoint checks this again, along with the password.
+    const canDelete = !!(auth.row && auth.row.can_delete);
+
+    return res.status(200).json({ ok: true, players: auth.players, display, sessions, meta, canDelete });
   } catch (err) {
     console.error('dg-load error:', err);
     return res.status(500).json({ ok: false, reason: err.message });
