@@ -960,6 +960,22 @@
   .storebox.bad{background:#fde7ea; border-color:#c8402f; color:#5c1410}
   .storebox.bad b{color:#8c1d16; font-family:Archivo, sans-serif}
 
+  /* ---- add to home screen ---- */
+  .installtip{border:1px solid var(--line-strong); border-radius:11px;
+    background:var(--surface-2); padding:13px 15px; margin:0 0 14px}
+  .installtip[hidden]{display:none}
+  .installtip h3{font-family:Archivo, sans-serif; font-size:15px; font-weight:600;
+    color:var(--ink); margin:0 0 4px}
+  .installtip p{margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.5}
+  .installtip .shareico{display:inline-block; vertical-align:-3px; margin:0 2px}
+  .installtip .shareico svg{display:block}
+  .installtip .tipacts{display:flex; gap:8px; margin-top:11px; align-items:center}
+  .installtip button{background:var(--surface); border:1px solid var(--line-strong);
+    border-radius:7px; padding:7px 13px; font-family:Archivo, sans-serif; font-size:12.5px;
+    cursor:pointer; color:var(--ink)}
+  .installtip button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#fff}
+  .installtip button.ghost{border:0; background:none; color:var(--muted); padding:7px 4px}
+
   /* ---- goals ---- */
   .goalgrp{margin-bottom:22px}
   .goalgrp h2{font-size:19px; margin:0 0 3px}
@@ -1135,6 +1151,17 @@
           <button id="resumeGo">Carry on</button>
           <button id="resumeDrop" class="ghost">Discard</button>
         </span>
+      </div>
+      <!-- Only ever shown on a page that declares a manifest, on a phone that
+           could install it, and not once it has been installed. -->
+      <div class="installtip" id="installTip" hidden>
+        <h3 id="installHead">Keep this on your home screen</h3>
+        <p id="installBody"></p>
+        <div class="tipacts">
+          <button type="button" class="pri" id="installGo" hidden>Install</button>
+          <button type="button" id="installOk">Got it</button>
+          <button type="button" class="ghost" id="installNo">Don't show this again</button>
+        </div>
       </div>
       <div id="homeGoals"></div>
       <button class="gonext" id="homeNext">Next &rarr;</button>
@@ -2333,6 +2360,108 @@ function cloudDrop(x){
   var key = playerKey(x.playerId);
   if(!key) return;
   cloudTry("/api/dg-delete", { code:cloudCode(), id:x.id, player:key }).catch(function(){});
+}
+
+/* ============ add to home screen ============
+   iOS gives a page no way to install itself: Apple requires the person to go
+   through the Share menu by hand, and there is no API to trigger it. So the
+   most that can be done is to stop it being a menu hunt, which is the part
+   people actually fail at. Android does allow it, so there the same panel gets
+   a real button.
+
+   Self-contained on purpose, for lifting into the other tools. It depends on
+   nothing in this app except the four element ids below, and it shows itself
+   only when all of these hold:
+     - the page declares a manifest, so it is installable at all. This is also
+       what keeps it out of the artifact build, where installing means nothing.
+     - it is not already running as an installed app
+     - it is a phone that can install it
+     - it has not been dismissed recently                                    */
+var INSTALL_KEY = "lcl.install.v1";
+
+function appInstalled(){
+  if(window.navigator.standalone === true) return true;              // iOS
+  try{ return !!(window.matchMedia && matchMedia("(display-mode: standalone)").matches); }
+  catch(e){ return false; }
+}
+function isApple(){
+  var ua = navigator.userAgent || "";
+  // an iPad on iPadOS 13+ claims to be a Mac, so touch points settle it
+  return /iPad|iPhone|iPod/.test(ua) ||
+         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+function appleSafari(){
+  // Chrome, Firefox and Edge on iOS cannot add to the home screen the same way
+  return isApple() && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent || "");
+}
+function installSnoozed(){
+  try{
+    var until = parseInt(localStorage.getItem(INSTALL_KEY), 10);
+    return !!until && (until === -1 || Date.now() < until);
+  }catch(e){ return false; }
+}
+function snoozeInstall(days){
+  try{ localStorage.setItem(INSTALL_KEY, days < 0 ? "-1" : String(Date.now() + days*86400000)); }catch(e){}
+  var t = $("installTip"); if(t) t.hidden = true;
+}
+
+var deferredInstall = null;
+window.addEventListener("beforeinstallprompt", function(e){
+  e.preventDefault();               // Android: keep it, offer it on our own terms
+  deferredInstall = e;
+  showInstallTip();
+});
+window.addEventListener("appinstalled", function(){ snoozeInstall(-1); });
+
+var SHARE_ICON =
+  '<span class="shareico"><svg width="15" height="18" viewBox="0 0 15 18" fill="none" aria-hidden="true">' +
+  '<path d="M7.5 1.2v10M7.5 1.2 4.4 4.3M7.5 1.2l3.1 3.1" stroke="currentColor" stroke-width="1.6" ' +
+  'stroke-linecap="round" stroke-linejoin="round"/>' +
+  '<path d="M3.2 7.6H2.1v8.2h10.8V7.6h-1.1" stroke="currentColor" stroke-width="1.6" ' +
+  'stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+function showInstallTip(){
+  var tip = $("installTip"); if(!tip) return;
+  if(!document.querySelector('link[rel="manifest"]')) return;
+  if(appInstalled() || installSnoozed()) return;
+
+  var go = $("installGo"), body = $("installBody");
+
+  if(deferredInstall){
+    body.innerHTML = "Add it to your home screen and it opens like an app, " +
+                     "full screen, with your history already in it.";
+    go.hidden = false;
+  } else if(appleSafari()){
+    body.innerHTML = "Tap " + SHARE_ICON + " <b>Share</b> at the bottom of the screen, " +
+                     "then <b>Add to Home Screen</b>. It then opens like an app, full " +
+                     "screen, and you will not have to enter your code again.";
+    go.hidden = true;
+  } else if(isApple()){
+    body.innerHTML = "Open this page in <b>Safari</b> first, then tap " + SHARE_ICON +
+                     " <b>Share</b> and <b>Add to Home Screen</b>. Other browsers on " +
+                     "iPhone cannot do it.";
+    go.hidden = true;
+  } else {
+    return;   // desktop, or a phone that has not offered: nothing useful to say
+  }
+  tip.hidden = false;
+}
+
+function wireInstallTip(){
+  var go = $("installGo"), ok = $("installOk"), no = $("installNo");
+  if(!ok || ok.__wired) return;
+  ok.__wired = true;
+  ok.addEventListener("click", function(){ snoozeInstall(14); });
+  no.addEventListener("click", function(){ snoozeInstall(-1); });
+  go.addEventListener("click", function(){
+    if(!deferredInstall) return;
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function(r){
+      if(r && r.outcome === "accepted") snoozeInstall(-1);
+      deferredInstall = null;
+    }).catch(function(){});
+  });
+  showInstallTip();
 }
 
 /* ---- first use of a code nobody has taken ----
@@ -7129,6 +7258,7 @@ window.addEventListener("lcl-who", function(){
 renderPlayer();
 render();
 show("home");
+wireInstallTip();
 connect();
 cloudPull();
 /* anything still queued when the page goes away gets one last go */
