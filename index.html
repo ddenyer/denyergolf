@@ -961,20 +961,11 @@
   .storebox.bad b{color:#8c1d16; font-family:Archivo, sans-serif}
 
   /* ---- add to home screen ---- */
-  .installtip{border:1px solid var(--line-strong); border-radius:11px;
-    background:var(--surface-2); padding:13px 15px; margin:0 0 14px}
-  .installtip[hidden]{display:none}
-  .installtip h3{font-family:Archivo, sans-serif; font-size:15px; font-weight:600;
-    color:var(--ink); margin:0 0 4px}
-  .installtip p{margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.5}
-  .installtip .shareico{display:inline-block; vertical-align:-3px; margin:0 2px}
-  .installtip .shareico svg{display:block}
-  .installtip .tipacts{display:flex; gap:8px; margin-top:11px; align-items:center}
-  .installtip button{background:var(--surface); border:1px solid var(--line-strong);
-    border-radius:7px; padding:7px 13px; font-family:Archivo, sans-serif; font-size:12.5px;
-    cursor:pointer; color:var(--ink)}
-  .installtip button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#fff}
-  .installtip button.ghost{border:0; background:none; color:var(--muted); padding:7px 4px}
+  #installTip .shareico{display:inline-block; vertical-align:-3px; margin:0 2px}
+  #installTip .shareico svg{display:block}
+  /* A class, not an inline style: the gate clears documentElement.style.overflow
+     when it unlocks, which happens after this is put up and would undo it. */
+  html.lockscroll, html.lockscroll body{overflow:hidden}
 
   /* ---- goals ---- */
   .goalgrp{margin-bottom:22px}
@@ -1151,17 +1142,6 @@
           <button id="resumeGo">Carry on</button>
           <button id="resumeDrop" class="ghost">Discard</button>
         </span>
-      </div>
-      <!-- Only ever shown on a page that declares a manifest, on a phone that
-           could install it, and not once it has been installed. -->
-      <div class="installtip" id="installTip" hidden>
-        <h3 id="installHead">Keep this on your home screen</h3>
-        <p id="installBody"></p>
-        <div class="tipacts">
-          <button type="button" class="pri" id="installGo" hidden>Install</button>
-          <button type="button" id="installOk">Got it</button>
-          <button type="button" class="ghost" id="installNo">Don't show this again</button>
-        </div>
       </div>
       <div id="homeGoals"></div>
       <button class="gonext" id="homeNext">Next &rarr;</button>
@@ -1341,6 +1321,24 @@
 </div>
 
 <div class="runflash" id="runFlash" hidden aria-live="polite"></div>
+
+<!-- Add to home screen. Full screen because it is a setup step, not a tip: she
+     is meant to do it now rather than notice it later. "Not now" exists because
+     a screen with no way past means a player who cannot install, for whatever
+     reason, cannot score either. -->
+<div class="duewrap" id="installTip" hidden>
+  <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="installHead">
+    <span class="eyebrow">One thing first</span>
+    <h2 id="installHead">Put this on your home screen</h2>
+    <p id="installBody"></p>
+    <p class="note" id="installWhy"></p>
+    <div class="dueacts">
+      <button type="button" class="pri" id="installGo" hidden>Install</button>
+      <button type="button" class="pri" id="installOk">DONE!</button>
+      <button type="button" id="installNo">Not now</button>
+    </div>
+  </div>
+</div>
 
 <!-- First use of a code nobody has taken yet. Only ever shown on the hosted
      build: without endpoints there is nobody to ask. -->
@@ -2402,7 +2400,7 @@ function installSnoozed(){
 }
 function snoozeInstall(days){
   try{ localStorage.setItem(INSTALL_KEY, days < 0 ? "-1" : String(Date.now() + days*86400000)); }catch(e){}
-  var t = $("installTip"); if(t) t.hidden = true;
+  hideInstallTip();
 }
 
 var deferredInstall = null;
@@ -2424,35 +2422,46 @@ function showInstallTip(){
   var tip = $("installTip"); if(!tip) return;
   if(!document.querySelector('link[rel="manifest"]')) return;
   if(appInstalled() || installSnoozed()) return;
+  // never stack it on top of another full-screen step
+  var name = $("nameWrap"), due = $("dueWrap");
+  if((name && !name.hidden) || (due && !due.hidden)) return;
 
-  var go = $("installGo"), body = $("installBody");
+  var go = $("installGo"), ok = $("installOk"), body = $("installBody"), why = $("installWhy");
 
   if(deferredInstall){
-    body.innerHTML = "Add it to your home screen and it opens like an app, " +
-                     "full screen, with your history already in it.";
-    go.hidden = false;
+    body.innerHTML = "Install it and it opens like an app, full screen, straight into your practice.";
+    go.hidden = false; ok.hidden = true;
   } else if(appleSafari()){
     body.innerHTML = "Tap " + SHARE_ICON + " <b>Share</b> at the bottom of the screen, " +
-                     "then <b>Add to Home Screen</b>. It then opens like an app, full " +
-                     "screen, and you will not have to enter your code again.";
-    go.hidden = true;
+                     "then <b>Add to Home Screen</b>.";
+    go.hidden = true; ok.hidden = false;
   } else if(isApple()){
     body.innerHTML = "Open this page in <b>Safari</b> first, then tap " + SHARE_ICON +
                      " <b>Share</b> and <b>Add to Home Screen</b>. Other browsers on " +
                      "iPhone cannot do it.";
-    go.hidden = true;
+    go.hidden = true; ok.hidden = false;
   } else {
     return;   // desktop, or a phone that has not offered: nothing useful to say
   }
+  why.textContent = "It then opens full screen, straight into your practice, and you will " +
+                    "never have to type your code again. Come back here and tap DONE when it is on there.";
   tip.hidden = false;
+  document.documentElement.classList.add("lockscroll");
+}
+function hideInstallTip(){
+  var tip = $("installTip"); if(tip) tip.hidden = true;
+  document.documentElement.classList.remove("lockscroll");
 }
 
 function wireInstallTip(){
   var go = $("installGo"), ok = $("installOk"), no = $("installNo");
   if(!ok || ok.__wired) return;
   ok.__wired = true;
-  ok.addEventListener("click", function(){ snoozeInstall(14); });
-  no.addEventListener("click", function(){ snoozeInstall(-1); });
+  // DONE means she says it is on there. The page cannot check: the installed app
+  // is a separate thing from this tab, so there is nothing here to read.
+  ok.addEventListener("click", function(){ snoozeInstall(-1); });
+  // and if she cannot, or will not, it comes back in a week rather than never
+  no.addEventListener("click", function(){ snoozeInstall(7); });
   go.addEventListener("click", function(){
     if(!deferredInstall) return;
     deferredInstall.prompt();
@@ -2506,6 +2515,7 @@ function askName(){
       CLOUD.pulled = false;      // now that she exists, do the real pull
       cloudPull();
       render(); show("home");
+      showInstallTip();          // naming is done, so this is the next setup step
     }).catch(function(){
       go.disabled = false;
       msg.textContent = "Could not reach the server. Check your connection and try again.";
