@@ -121,8 +121,36 @@ export default async function handler(req, res) {
       return res.status(write.status).json({ ok: false, reason: 'claim_failed: ' + t });
     }
 
+    // Put her in front of the coach. Without this a player can name herself and
+    // start logging while staying invisible to whoever is meant to be reading
+    // it, which leaves "a coupon and a link" true for her and not for him.
+    //
+    // Best effort on purpose: she has been created either way, and a coach who
+    // cannot see her yet is a nuisance, not a failure worth undoing a claim for.
+    let shownTo = 0;
+    try {
+      const coaches = await fetch(
+        `${SUPABASE_URL}/rest/v1/dg_codes?is_coach=is.true&select=code,players`,
+        { headers }
+      );
+      if (coaches.ok) {
+        const rows = await coaches.json();
+        for (const row of rows) {
+          const have = Array.isArray(row.players) ? row.players : [];
+          if (have.indexOf(player) !== -1) continue;
+          const r = await fetch(
+            `${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(row.code)}`,
+            { method: 'PATCH', headers, body: JSON.stringify({ players: have.concat([player]) }) }
+          );
+          if (r.ok) shownTo++;
+        }
+      }
+    } catch (e) {
+      console.error('dg-claim: could not add to a coach code:', e);
+    }
+
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).json({ ok: true, player, display: raw });
+    return res.status(200).json({ ok: true, player, display: raw, shownTo });
   } catch (err) {
     console.error('dg-claim error:', err);
     return res.status(500).json({ ok: false, reason: err.message });
