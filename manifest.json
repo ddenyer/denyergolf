@@ -1,0 +1,11 @@
+{
+  "name": "Denyer Golf",
+  "short_name": "Denyer Golf",
+  "display": "standalone",
+  "background_color": "#0e1310",
+  "theme_color": "#0e1310",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
