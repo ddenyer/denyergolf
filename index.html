@@ -2159,12 +2159,187 @@ function docBody(s){
            notes:s.notes||"", total:s.total||0, max:s.max||0 };
 }
 function pushDoc(s){
+  cloudPush(s);
   if(!state.db) return;
   try{ state.db.doc("sessions/"+s.id).set(docBody(s)).catch(function(){}); }catch(e){}
 }
 function pushMeta(){
+  cloudMeta();
   if(!state.db) return;
   try{ state.db.doc("meta/roster").set({players:state.players, activePlayer:state.activePlayer}).catch(function(){}); }catch(e){}
+}
+
+/* ============ cloud sync ============
+   Sessions used to live only in the browser they were scored in, so a phone and
+   an iPad kept separate histories and a coach saw neither. They now go to
+   Supabase through this site's own endpoints, keyed on the player the access
+   code belongs to.
+
+   Three rules this has to honour and does:
+     - the device keeps working with no network. Local storage is still the
+       working store; the cloud is a copy of it, never a dependency.
+     - nothing already on a device is lost. The first sync after this change
+       pushes every local session up before it takes anything down, and the
+       merge is a union by session id, never a replacement.
+     - a save that fails says so. Three attempts, then the status line changes.
+   None of this runs in the artifact build, which has no endpoints to call. */
+var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, busy:false };
+
+function cloudCode(){
+  try{
+    var o = JSON.parse(localStorage.getItem("dg.access.v1") || "null");
+    return (o && o.code) ? o.code : "";
+  }catch(e){ return ""; }
+}
+/* The server keys rows on the player's name, which is what the coupon resolves
+   to. An unnamed default player is not synced: there is nobody to file it under. */
+function playerKey(playerId){
+  var p = state.players.filter(function(x){ return x.id === playerId; })[0];
+  var n = ((p && p.name) || "").trim().toLowerCase();
+  return (!n || /^player\s*\d*$/.test(n)) ? "" : n;
+}
+function cloudReady(){ return !!cloudCode(); }
+
+function cloudPost(path, body){
+  return fetch(path, {
+    method:"POST",
+    headers:{"Content-Type":"application/json", "Accept":"application/json"},
+    body:JSON.stringify(body)
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); });
+}
+/* 0 / 508 / 2010ms, the house backoff. A third failure is visible, never silent. */
+function cloudTry(path, body, attempt){
+  attempt = attempt || 0;
+  return cloudPost(path, body).then(function(res){
+    if(res.ok && res.d && res.d.ok) return res.d;
+    throw new Error((res.d && res.d.reason) || "save failed");
+  }).catch(function(err){
+    if(attempt >= 2) throw err;
+    var wait = [508, 2010][attempt];
+    return new Promise(function(done){ setTimeout(done, wait); })
+      .then(function(){ return cloudTry(path, body, attempt + 1); });
+  });
+}
+
+/* stamp=true means something actually changed just now. A bulk re-push keeps
+   the stamp the session already had, because re-sending an unchanged session
+   must not make it look like the newest copy of it anywhere. */
+function cloudRow(s, stamp){
+  var key = playerKey(s.playerId);
+  if(!key) return null;
+  var row = JSON.parse(JSON.stringify(s));
+  row.player = key;
+  row.sv = stamp ? Date.now() : (s.sv || Date.now());
+  return row;
+}
+/* Queued by id and flushed a couple of seconds after the last change, so a
+   session being scored is one save per pause rather than one per ball. */
+function cloudPush(s){
+  if(!cloudReady() || !s || s.sample) return;
+  var row = cloudRow(s, true);
+  if(!row) return;
+  s.sv = row.sv;
+  CLOUD.pending[s.id] = row;
+  if(CLOUD.timer) clearTimeout(CLOUD.timer);
+  CLOUD.timer = setTimeout(cloudFlush, 2000);
+}
+function cloudFlush(){
+  if(!cloudReady() || CLOUD.busy) return;
+  var ids = Object.keys(CLOUD.pending);
+  if(!ids.length) return;
+  var batch = ids.map(function(id){ return CLOUD.pending[id]; });
+  CLOUD.pending = {};
+  CLOUD.busy = true;
+  cloudTry("/api/dg-save", { code:cloudCode(), sessions:batch }).then(function(){
+    CLOUD.on = true; CLOUD.at = Date.now(); CLOUD.why = "";
+  }).catch(function(err){
+    CLOUD.on = false;
+    CLOUD.why = "Not synced yet. It is saved on this device.";
+    // put them back so the next change or the next load tries again
+    batch.forEach(function(r){ if(!CLOUD.pending[r.id]) CLOUD.pending[r.id] = r; });
+  }).then(function(){ CLOUD.busy = false; renderStoreLine(); });
+}
+function cloudMeta(){
+  if(!cloudReady()) return;
+  var key = playerKey(state.activePlayer);
+  if(!key) return;
+  var p = state.players.filter(function(x){ return x.id === state.activePlayer; })[0];
+  if(!p) return;
+  var m = {}; m[key] = { player:JSON.parse(JSON.stringify(p)), lib:state.lib };
+  cloudTry("/api/dg-save", { code:cloudCode(), meta:m }).catch(function(){});
+}
+function cloudDrop(x){
+  if(!cloudReady() || !x) return;
+  delete CLOUD.pending[x.id];
+  var key = playerKey(x.playerId);
+  if(!key) return;
+  cloudTry("/api/dg-delete", { code:cloudCode(), id:x.id, player:key }).catch(function(){});
+}
+
+/* Everything this device holds, sent up in one go. Runs before the first pull so
+   a device with sessions the server has never seen cannot be emptied by what
+   comes back, and again once the player's name is known, because a session can
+   only be filed under a named player. */
+function cloudPushAll(){
+  var rows = state.sessions.filter(function(s){ return !s.sample; })
+                           .map(cloudRow).filter(Boolean);
+  if(!rows.length) return Promise.resolve(null);
+  return cloudTry("/api/dg-save", { code:cloudCode(), sessions:rows })
+           .catch(function(){ return null; });
+}
+
+/* Boot. Pull first, then push what the server turned out not to have.
+   Pulling cannot empty the device because the merge below is a union, and doing
+   it this way round means a device that has been offline for a week offers its
+   old copies only after it has seen the newer ones. The endpoint refuses a
+   stale write as well, so neither half depends on the other being right. */
+function cloudPull(){
+  if(!cloudReady() || CLOUD.pulled) return;
+  CLOUD.pulled = true;
+
+  cloudTry("/api/dg-load", { code:cloudCode() }).then(function(d){
+    if(!d || !Array.isArray(d.sessions)) return;
+
+    /* The endpoint is what knows which player the code belongs to, so this is
+       where her name comes from. It used to be a map in the page source. */
+    if(d.players && d.players[0]){
+      var nice = d.players[0].charAt(0).toUpperCase() + d.players[0].slice(1);
+      var knew = couponPlayer();
+      try{ localStorage.setItem(WHO_KEY, nice); }catch(e){}
+      applyCouponIdentity();
+      renderPlayer();
+      // first time this device learned her name: send up anything it was holding
+      if(!knew) cloudPushAll();
+    }
+
+    var byId = {};
+    state.sessions.filter(function(s){ return !s.sample; })
+                  .forEach(function(s){ byId[s.id] = s; });
+
+    var added = 0;
+    d.sessions.forEach(function(r){
+      var have = byId[r.id];
+      if(!have){ byId[r.id] = r; added++; return; }
+      // same session on both sides: the later write wins, and a session with no
+      // stamp is from before this change, so anything stamped is newer
+      if((r.sv || 0) > (have.sv || 0)) byId[r.id] = r;
+    });
+
+    var merged = Object.keys(byId).map(function(k){ return byId[k]; });
+    if(merged.length){
+      state.sessions = merged;
+      state.sampleOn = false;
+      saveLocal();
+    }
+    CLOUD.on = true; CLOUD.at = Date.now(); CLOUD.why = "";
+    if(added) render();
+    renderStoreLine();
+    cloudPushAll();      // now send up whatever the server did not have
+  }).catch(function(){
+    CLOUD.on = false;
+    CLOUD.why = "Could not reach the sync service. Everything is saved on this device.";
+    renderStoreLine();
+  });
 }
 function connect(){
   if(!window.claude || !claude.use){
@@ -3036,6 +3211,7 @@ function saveDraft(){
   var ok = saveLocal();
   STORE.draftAt = ok ? d.at : 0;
   STORE.draftOk = ok;
+  cloudPush(d);   // an unfinished session syncs too, so it can be resumed on another device
   paintTick();
 }
 /* A quiet line that says the session is safe, because the one thing worse than losing a
@@ -3060,6 +3236,7 @@ function dropSession(x){
   if(state.draft && state.draft.id === x.id){ state.draft = null; clearDraft(); }
   if(state.gymDraft && state.gymDraft.id === x.id){ state.gymDraft = null; clearDraft(); }
   saveLocal();
+  cloudDrop(x);
   if(state.db){ try{ state.db.doc("sessions/"+x.id).delete().catch(function(){}); }catch(e){} }
 }
 function loadDraft(){ return liveSessions()[0] || null; }
@@ -5981,6 +6158,15 @@ function renderStoreLine(){
             (others ? ' \u00b7 '+others+' under another name' : '')+
             (STORE.at ? ' \u00b7 last written '+whenText(STORE.at) : ''))+
     '</div>'+
+    (cloudReady()
+      ? '<div class="storebox'+(CLOUD.on ? "" : " bad")+'">'+
+          (CLOUD.on
+            ? '<b>Backed up.</b> The same history is on every device you sign in on'+
+              (CLOUD.at ? ', last checked '+whenText(CLOUD.at) : '')+'.'
+            : '<b>On this device only.</b> '+(CLOUD.why || "Not synced yet.")+
+              ' It will catch up on its own.')+
+        '</div>'
+      : '')+
     '<div class="tools"><button id="backupBtn">Back up my data</button>'+
     '<button id="restoreBtn">Restore from a backup</button></div>';
   $("backupBtn").addEventListener("click", backupData);
@@ -6710,11 +6896,16 @@ var had = loadLocal();
 applyCouponIdentity();
 window.addEventListener("lcl-who", function(){
   if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
+  cloudPull();            // the gate answered after boot, so the code is only known now
 });
 renderPlayer();
 render();
 show("home");
 connect();
+cloudPull();
+/* anything still queued when the page goes away gets one last go */
+window.addEventListener("beforeunload", cloudFlush);
+document.addEventListener("visibilitychange", function(){ if(document.hidden) cloudFlush(); });
 
 })();
 </script>
@@ -6741,10 +6932,10 @@ connect();
   var STRICT = true;
   var API    = "/api/validate-code";
   var KEY    = "dg.access.v1";
-  // The coupon is the login. Each player has her own code, so the code names her.
-  // Not a secret: anyone reading this page can see both. Inside a gated tool that
-  // is a partition, not a lock, which is all it needs to be.
-  var WHO    = { BELLA: "Annabel", CHABO: "Charlotte" };
+  // The coupon is the login: each player has her own code. Which code belongs to
+  // which player is no longer decided here. It used to be a map in this file,
+  // which meant anyone who opened the tool could read that CHABO is Charlotte.
+  // The app now asks /api/dg-load, which answers with the player the code is for.
   var TTL    = 30 * 86400000;
 
   var gate  = document.getElementById("gate");
@@ -6788,11 +6979,9 @@ connect();
       localStorage.setItem(KEY, JSON.stringify({
         code: code, at: Date.now(), membership: (d && d.membership) || ""
       }));
-      if(WHO[code]){
-        localStorage.setItem("lcl.who", WHO[code]);
-        // the app has already booted by now, so tell it who turned up
-        try{ window.dispatchEvent(new CustomEvent("lcl-who")); }catch(e){}
-      }
+      // the app has already booted by now, so tell it a code has arrived. It
+      // takes the name from the sync endpoint rather than from this page.
+      try{ window.dispatchEvent(new CustomEvent("lcl-who")); }catch(e){}
     }catch(e){}
   }
   function forget(){ try{ localStorage.removeItem(KEY); }catch(e){} }
