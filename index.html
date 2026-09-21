@@ -618,6 +618,8 @@
   .testpick .testrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px}
   .tsel{flex:1 1 150px; min-width:140px; background:var(--surface); color:var(--ink);
     border:1px solid var(--line-strong); border-radius:8px; padding:8px 9px; font-size:13.5px}
+  .tsel.wide{flex:1 1 100%}
+  .testpick .eyebrow{display:block}
   .tstep{flex:none}
   .tstep .tevery{width:44px; text-align:center}
   .tlab{font-size:13px; color:var(--muted)}
@@ -1860,9 +1862,78 @@ function condLabel(kind, field, val){
 
 function area(id){
   for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; }
+  for(var j=0;j<PRACTICE.length;j++){ if(PRACTICE[j].id===id) return PRACTICE[j]; }
+  var cp = customLib("practice");
+  for(var k=0;k<cp.length;k++){ if(cp[k].id===id) return cp[k]; }
   return testById(id);          // a test is an area as far as the session machinery cares
 }
+/* ============ tasks and the practice library ============
+   The five areas are the five tasks, and each is also the default practice session for
+   its task. A variant is another entry with the same type, so a session already stored
+   against id 11 is still a session of the default approach practice and nothing has to
+   be migrated.
+
+   What keys to the practice session: its own history, its placing, its per-target rates
+   and its runs, because all of those depend on the exact sets. What keys to the task:
+   the balance chart and the question of whether she practised approach at all. */
 function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
+var PRACTICE = [
+{ id:"p-approach-short", type:11, track:true,
+  name:"Approach \u00b7 short irons", sub:"110, 125, 140 and 155 yards \u00b7 the scoring clubs",
+  targets:"GIR 67 \u2192 73% \u00b7 proximity inside the circle \u00b7 pin high, not short",
+  plan:"10 min warm-up \u2192 45 min: eight sets of five, 40 balls, full routine every one",
+  sets:[
+    {id:"a", label:"110y", short:"110 yards", tc:"24 ft", bull:"20 ft", dist:110, r2:0.55, r1:0.41, word:"110 yards",
+     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"b", guide:"windows", label:"110y \u00b7 five windows", tc:"24 ft", bull:"20 ft", dist:110, r2:0.55, r1:0.41, word:"110 yards",
+     tgt:"Same club, same target. A point for the window, a point for the circle",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"c", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards",
+     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"d", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards",
+     tgt:"Same club, same target. A point for the window, a point for the circle",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"e", label:"140y", short:"140 yards", tc:"30 ft", bull:"24 ft", dist:140, r2:0.55, r1:0.41, word:"140 yards",
+     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"f", guide:"windows", label:"140y \u00b7 five windows", tc:"30 ft", bull:"24 ft", dist:140, r2:0.55, r1:0.41, word:"140 yards",
+     tgt:"Same club, same target. A point for the window, a point for the circle",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
+    {id:"g", label:"155y", short:"155 yards", tc:"34 ft", bull:"27 ft", dist:155, r2:0.55, r1:0.41, word:"155 yards",
+     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
+    {id:"h", guide:"windows", label:"155y \u00b7 five windows", tc:"34 ft", bull:"27 ft", dist:155, r2:0.55, r1:0.41, word:"155 yards",
+     tgt:"Same club, same target. A point for the window, a point for the circle",
+     parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+  ],
+  placing:{n:40, p:0.55, sd:0.05, field:"tour players"} }
+];
+function customLib(kind){
+  var o = (state.lib && state.lib[kind]) || [];
+  return o.slice();
+}
+function allPractice(typeId){
+  var out = [];
+  liveAreas().forEach(function(a){ if(a.id === typeId) out.push(a); });
+  PRACTICE.concat(customLib("practice")).forEach(function(p){
+    if(p && p.type === typeId) out.push(p);
+  });
+  return out;
+}
+function allTests(){ return TESTS.concat(customLib("tests")); }
+function typeOf(id){
+  var a = area(id);
+  if(!a) return id;
+  if(a.isTest) return a.area;
+  return a.type != null ? a.type : a.id;
+}
+/* Which practice session this player does for that task. Nothing assigned means the
+   one the programme ships with. */
+function practiceFor(typeId){
+  var p = playerObj();
+  var id = p && p.practice ? p.practice[typeId] : null;
+  if(id && area(id) && typeOf(id) === typeId) return id;
+  return typeId;
+}
+function isDefaultPractice(id){ return liveAreas().some(function(a){ return a.id === id; }); }
 function areaNo(a){ return a.no || a.id; }
 /* The name in prose, without the bracket: "approach", not "approach (ball flight control)". */
 function areaWord(a){ return String(a.name||"").replace(/\s*\(.*\)\s*$/, "").toLowerCase(); }
@@ -1932,10 +2003,57 @@ var TESTS = [
     {id:"d", guide:"windows", label:"185y \u00b7 fade", tc:"43 ft", dist:185, balls:5, fade:true,
      tgt:"Window 1 or 4, then back to the flag",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
+  ]},
+{ id:"t-tee-speed", area:10, isTest:true, track:true, shape:"corridor", rule:"corridor",
+  name:"Speed and corridor", sub:"Fifteen drivers at full speed, still in play",
+  why:"Speed is only worth having if it stays in the corridor. This is the test of whether the two can hold together: swing it as hard as she does on the range, and see what the corridor says.",
+  where:"Range, outdoors", balls:15, target:90,
+  ruleText:"A point for every ball inside the 26-yard corridor. Straight but short still counts, because the corridor measures line. The average speed of the fifteen is recorded with it.",
+  sets:[
+    {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", balls:15, max:15,
+     tgt:"Full speed every ball. Inside the corridor scores",
+     metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}],
+     metricLabel:"Club head speed \u00b7 mph", metricNote:"The average of the fifteen, and the fastest and slowest"}
+  ]},
+{ id:"t-wedge-distance", area:2, isTest:true, track:true, rule:"distance",
+  name:"Distance control", sub:"Right number, whatever the line does",
+  why:"Proximity mixes two faults together. This one asks about distance alone: a ball that is level with the flag but off to one side has the number right, and a ball that is straight but long or short does not.",
+  where:"Range or sim", balls:20, target:120,
+  ruleText:"A point for any ball level with the flag, left, right or in the circle. Long or short of the flag scores nothing, however straight it was.",
+  sets:[
+    {id:"a", label:"30y \u00b7 five balls", short:"30 yards", tc:"Level with the flag", dist:30, balls:5, max:5, tgt:"Five balls. The number, not the line"},
+    {id:"b", label:"50y \u00b7 five balls", short:"50 yards", tc:"Level with the flag", dist:50, balls:5, max:5, tgt:"Five balls. The number, not the line"},
+    {id:"c", label:"70y \u00b7 five balls", short:"70 yards", tc:"Level with the flag", dist:70, balls:5, max:5, tgt:"Five balls. The number, not the line"},
+    {id:"d", label:"90y \u00b7 five balls", short:"90 yards", tc:"Level with the flag", dist:90, balls:5, max:5, tgt:"Five balls. The number, not the line"}
+  ]},
+{ id:"t-short-oneclub", area:3, isTest:true, track:true, rule:"bull",
+  name:"Inside one club", sub:"Twenty shots, every lie, three feet or nothing",
+  why:"The two-club circle is the working target. This is the other end of it: how often she puts one close enough that the putt is a formality, from lies she does not choose.",
+  where:"Short game area", balls:20, target:120,
+  ruleText:"A point only for a ball inside one club, about three feet. Inside two clubs scores nothing here. A tour player manages it about one time in nine across these lies.",
+  sets:[
+    {id:"a", label:"Good lie \u00b7 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.172, r2:0.365, word:"20 paces", balls:5, max:5, tgt:"Five balls. Inside a club or nothing"},
+    {id:"b", label:"Good lie \u00b7 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", balls:5, max:5, tgt:"Five balls. Inside a club or nothing"},
+    {id:"c", label:"Bunker \u00b7 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.084, r2:0.221, word:"the bunker", balls:5, max:5, tgt:"Five balls. Inside a club or nothing"},
+    {id:"d", label:"Awkward lie \u00b7 your pick", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.066, r2:0.169, word:"an awkward lie", balls:5, max:5, tgt:"Five balls, a different lie each one"}
+  ]},
+{ id:"t-putt-six", area:4, isTest:true, track:true, shape:"clock", rule:"holed",
+  name:"Twenty from six feet", sub:"The length that decides a card",
+  why:"Six feet is where rounds are saved and thrown away, and it is the shortest putt a tour player misses often enough to matter. Twenty of them, around the clock, no second balls.",
+  where:"Practice green", balls:20, target:120,
+  ruleText:"A point for a holed putt, nothing else. A tour player holes about 68%, so 14 of 20 is tour standard.",
+  sets:[
+    {id:"a", label:"6 ft \u00b7 around the clock", tc:"6 ft", r2:0.68, word:"6 feet", balls:20, max:20,
+     tgt:"Four sets of five, moving round the hole. Holed scores"}
   ]}
 ];
-function testById(id){ for(var i=0;i<TESTS.length;i++){ if(TESTS[i].id===id) return TESTS[i]; } return null; }
-function testsFor(areaId){ return TESTS.filter(function(t){ return t.area === areaId; }); }
+function testById(id){
+  for(var i=0;i<TESTS.length;i++){ if(TESTS[i].id===id) return TESTS[i]; }
+  var ct = (typeof state !== "undefined" && state.lib && state.lib.tests) || [];
+  for(var j=0;j<ct.length;j++){ if(ct[j].id===id) return ct[j]; }
+  return null;
+}
+function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId; }); }
 
 /* ============ state ============ */
 var state = {
@@ -1951,6 +2069,7 @@ var state = {
   deck:null,
   restTimer:null,
   db:null,
+  lib:{practice:[], tests:[]},
   sampleOn:false
 };
 var LS = "lcl.v1";
@@ -1999,7 +2118,7 @@ function saveLocal(){
   try{
     localStorage.setItem(LS, JSON.stringify({
       players:state.players, activePlayer:state.activePlayer, cardMode:state.cardMode,
-      savedAt:Date.now(), sessions:live
+      lib:state.lib, savedAt:Date.now(), sessions:live
     }));
     STORE.ok = true; STORE.at = Date.now(); STORE.wrote = live.length; STORE.why = "";
     return true;
@@ -2020,6 +2139,7 @@ function loadLocal(){
     if(o && o.players && o.players.length){ state.players=o.players; state.activePlayer=o.activePlayer||o.players[0].id; }
     if(o && o.sessions) state.sessions = o.sessions;
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
+    if(o && o.lib) state.lib = { practice:(o.lib.practice||[]), tests:(o.lib.tests||[]) };
     if(o && o.savedAt) STORE.at = o.savedAt;
     STORE.read = true;
     STORE.wrote = (o && o.sessions) ? o.sessions.length : 0;
@@ -2344,10 +2464,12 @@ function testsDoneFor(areaId){
 }
 /* Practice sessions in that area since the last test of that area. A test is not a
    practice session, so it resets the count without counting towards the next one. */
-function sinceLastTest(areaId){
-  var done = testsDoneFor(areaId), from = done.length ? done[done.length-1].date : "";
-  return sessionsFor(areaId).filter(function(x){ return x.date >= from; }).length -
-         (done.length ? 0 : 0);
+/* Practice sessions on the session she is currently assigned, since the last test of
+   this task. Changing the practice starts the clock again, which is the point: a new
+   practice is a new programme, not a continuation of the old one. */
+function sinceLastTest(typeId){
+  var done = testsDoneFor(typeId), from = done.length ? done[done.length-1].date : "";
+  return sessionsFor(practiceFor(typeId)).filter(function(x){ return x.date >= from; }).length;
 }
 function testDue(areaId){
   var plan = testPlan(areaId); if(!plan) return null;
@@ -2389,10 +2511,65 @@ function testTally(t, sess){
   });
   return {n:n, got:got};
 }
+/* ---- adding to the libraries ----
+   A pasted definition is data, not code. It can compose new sessions out of pieces the
+   tool already knows: distances, ball counts, target rings, lies, which diagram captures
+   it and which of the existing scoring rules applies. It cannot introduce a new kind of
+   measurement, so a genuinely new rule or diagram is still a job for the source. Saying
+   that plainly here beats letting someone find out with a definition that half works. */
+var LIB_RULES = {corridor:1, pinhigh:1, distance:1, bull:1, holed:1, fade:1};
+var LIB_GUIDES = {windows:1, heights:1, ladder:1};
+function libProblem(o, kind){
+  if(!o || typeof o !== "object") return "That is not a definition.";
+  if(!o.id || typeof o.id !== "string") return "It needs an id, as text.";
+  if(!/^[a-z0-9-]+$/.test(o.id)) return "The id can only be lower-case letters, numbers and hyphens.";
+  if(area(o.id)) return "There is already something with the id " + o.id + ".";
+  if(!o.name) return "It needs a name.";
+  var typeId = (kind === "tests") ? o.area : o.type;
+  if(typeId == null) return "It needs to say which task it belongs to.";
+  if(!liveAreas().some(function(t){ return t.id === typeId; }))
+    return "Task " + typeId + " is not one of the five.";
+  if(!o.sets || !o.sets.length) return "It needs at least one set.";
+  var bad = null;
+  o.sets.forEach(function(st){
+    if(bad) return;
+    if(!st.id || !st.label) bad = "Every set needs an id and a label.";
+    else if(!st.parts && !st.max) bad = "Set " + st.id + " needs a max, or parts.";
+    else if(st.guide && !LIB_GUIDES[st.guide]) bad = "There is no diagram called " + st.guide + ".";
+  });
+  if(bad) return bad;
+  if(o.rule && !LIB_RULES[o.rule])
+    return "There is no scoring rule called " + o.rule + ". The rules are: " +
+           Object.keys(LIB_RULES).join(", ") + ". A new one needs a change to the app.";
+  if(kind === "tests" && !o.ruleText) return "A test has to say how it is scored.";
+  return null;
+}
+function importLib(kind){
+  var what = kind === "tests" ? "test" : "practice session";
+  var txt = prompt("Paste the " + what + " definition. Anything already in the library is kept.");
+  if(!txt) return;
+  var o; try{ o = JSON.parse(txt); }catch(e){ alert("That did not parse as a definition."); return; }
+  var list = o && o.length ? o : [o], added = 0, said = null;
+  for(var i=0;i<list.length;i++){
+    var p = libProblem(list[i], kind);
+    if(p){ said = p; break; }
+  }
+  if(said){ alert("Nothing was added.\n\n" + said); return; }
+  state.lib = state.lib || {practice:[], tests:[]};
+  state.lib[kind] = state.lib[kind] || [];
+  list.forEach(function(x){
+    if(kind === "tests"){ x.isTest = true; x.track = true; }
+    x.added = true;
+    state.lib[kind].push(x); added++;
+  });
+  if(!saveLocal()){ alert("It could not be saved on this device."); return; }
+  render(); renderGoals();
+  alert(added + " added to the library.");
+}
 function renderTests(){
   var host = $("testList"); if(!host) return;
   host.innerHTML = "";
-  TESTS.forEach(function(t){
+  allTests().forEach(function(t){
     var a = area(t.area), runs = testSessions(t.id);
     var tot = {n:0, got:0};
     runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
@@ -2415,7 +2592,16 @@ function renderTests(){
     card.querySelector("[data-run]").addEventListener("click", function(){ openTest(t.id); });
     host.appendChild(card);
   });
-  if(!TESTS.length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
+  if(!allTests().length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
+  var tools = document.createElement("div"); tools.className = "tools";
+  tools.innerHTML = '<button id="addTest">Add a test</button><button id="addPractice">Add a practice session</button>';
+  host.appendChild(tools);
+  var note = document.createElement("p"); note.className = "note";
+  note.textContent = "A pasted definition can use the distances, targets, lies, diagrams and "+
+    "scoring rules the app already has. A new kind of measurement still needs a change to the app itself.";
+  host.appendChild(note);
+  $("addTest").addEventListener("click", function(){ importLib("tests"); });
+  $("addPractice").addEventListener("click", function(){ importLib("practice"); });
 }
 
 /* ---------- goals ---------- */
@@ -2467,17 +2653,41 @@ function areaLive(a){
 function testBox(a){
   var box = document.createElement("div"); box.className = "gabox testpick";
   var avail = testsFor(a.id);
-  box.innerHTML = '<span class="eyebrow">Test \u00b7 every so many sessions</span>';
-  if(!avail.length){
-    box.innerHTML += '<p class="note">No tests in the library for this area yet.</p>';
-    return box;
-  }
+  var practices = allPractice(a.id);
+
+  /* Which practice she does for this task. The programme's own session is the default;
+     anything else in the library for this task sits below it. Switching restarts the
+     count to the next test, because a new practice is a new programme. */
+  box.innerHTML = '<span class="eyebrow">The practice session</span>';
+  var prow = document.createElement("div"); prow.className = "testrow";
+  var psel = document.createElement("select"); psel.className = "tsel wide psel";
+  psel.setAttribute("aria-label", "Which practice session for " + a.name);
+  var cur = practiceFor(a.id);
+  psel.innerHTML = practices.map(function(p){
+    return '<option value="'+p.id+'"'+(p.id===cur?' selected':'')+'>'+p.name+
+           (isDefaultPractice(p.id) ? ' (programme)' : '')+'</option>';
+  }).join("");
+  psel.addEventListener("change", function(){
+    var pl = playerObj(); if(!pl) return;
+    pl.practice = pl.practice || {};
+    if(psel.value === String(a.id) || psel.value === a.id) delete pl.practice[a.id];
+    else pl.practice[a.id] = psel.value;
+    saveLocal(); pushMeta();
+    paintWhen(); renderHome(); renderTests();
+  });
+  prow.appendChild(psel);
+  box.appendChild(prow);
+
+  var hd = document.createElement("span"); hd.className = "eyebrow"; hd.style.marginTop = "12px";
+  hd.style.display = "block"; hd.textContent = "Test \u00b7 every so many sessions";
+  box.appendChild(hd);
   var plan = testPlan(a.id) || {};
   var row = document.createElement("div"); row.className = "testrow";
 
-  var sel = document.createElement("select"); sel.className = "tsel";
+  var sel = document.createElement("select"); sel.className = "tsel tsel-test";
   sel.setAttribute("aria-label", "Which test to run for " + a.name);
-  sel.innerHTML = '<option value="">No test</option>' +
+  sel.disabled = !avail.length;
+  sel.innerHTML = '<option value="">'+(avail.length ? "No test" : "No tests yet")+'</option>' +
     avail.map(function(t){
       return '<option value="'+t.id+'"'+(plan.id===t.id?' selected':'')+'>'+t.name+'</option>';
     }).join("");
@@ -2501,6 +2711,8 @@ function testBox(a){
     else pl.tests[a.id] = { id:id, every:every };
     saveLocal(); pushMeta();
     paintWhen();
+    renderHome();
+    renderTests();
   }
   function nudge(d){ inp.value = String(Math.max(1, Math.min(30, (parseInt(inp.value,10)||5) + d))); save(); }
   minus.addEventListener("click", function(){ nudge(-1); });
@@ -2518,6 +2730,7 @@ function testBox(a){
   var when = document.createElement("p"); when.className = "note tnote";
   function paintWhen(){
     var plan2 = testPlan(a.id);
+    if(!avail.length){ when.textContent = "Nothing in the library for this area yet."; return; }
     if(!plan2){ when.textContent = "No test set for this area."; return; }
     var due = testDue(a.id), n = sinceLastTest(a.id);
     when.textContent = due
@@ -2608,25 +2821,26 @@ function renderHome(){
   renderHello();
   renderHomeGoals();
   var host = $("areaList"); host.innerHTML = "";
-  liveAreas().forEach(function(a){
-    var hist = sessionsFor(a.id);
+  liveAreas().forEach(function(t){
+    var pid = practiceFor(t.id), a = area(pid) || t;
+    var hist = sessionsFor(pid);
     var b = document.createElement("button");
     b.className="area"; b.type="button";
-    var dueNow = testDue(a.id);
+    var dueNow = testDue(t.id);
     b.innerHTML =
-      '<div class="idx num">'+areaNo(a)+'</div>'+
-      '<div><div class="nm">'+a.name+
+      '<div class="idx num">'+areaNo(t)+'</div>'+
+      '<div><div class="nm">'+t.name+
         (dueNow ? ' <span class="duechip">test due</span>' : '')+'</div>'+
-        '<div class="sub">'+a.sub+'</div></div>'+
+        '<div class="sub">'+(isDefaultPractice(pid) ? t.sub : a.name+' \u00b7 '+(a.sub||""))+'</div></div>'+
       '<div class="right">'+ sparkline(hist.map(function(s){return s.total;}), areaMax(a)) +
         '<div class="lastscore">'+
           '<div class="big num">'+hist.length+'</div>'+
           '<div class="cap">'+(hist.length===1 ? "session" : "sessions")+'</div>'+
         '</div></div>';
     b.addEventListener("click", function(){
-      var due = testDue(a.id);
-      if(due && showDue(due, a.id)) return;
-      openSession(a.id);
+      var due = testDue(t.id);
+      if(due && showDue(due, t.id)) return;
+      openSession(practiceFor(t.id));
     });
     host.appendChild(b);
   });
@@ -2709,7 +2923,7 @@ function renderBalance(){
     else if(isPrep(s)) counts[9]++;
     else if(isBand(s)) counts[8]++;
     else if(s.kind==="gym") counts[6]++;
-    else counts[s.areaId]=(counts[s.areaId]||0)+1;
+    else { var tid = typeOf(s.areaId); counts[tid]=(counts[tid]||0)+1; }
   });
   var BKEYS = [10,11,2,3,4,6,7,8,9];
   if(counts[1]) BKEYS.push(1);   // only if there are sessions in the earlier format
@@ -3464,7 +3678,8 @@ function tablesFor(spec){
    This is the run placing for that exact sequence, enumerated offline over a shared
    ability, and it is why putting carries its own table rather than sharing one. */
 var CLOCKRUN = [100,100,100,100,100,99,96,91,84,76,68,59,52,45,39,33,29,25,21,18,13,10,7,6,4,3,3,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
-var EXPRUN = {75:[0.00,1.00,1.03,1.08,1.16,1.26,1.37,1.49,1.62,1.75,1.87,1.99,2.10,2.21,2.31,2.42,2.52,2.62,2.73,2.84,2.96,3.08,3.20,3.32,3.45,3.57,3.70,3.84,3.97,4.12,4.26,4.41,4.56,4.72,4.89,5.06,5.23,5.42,5.61,5.80,6.01,6.23,6.45,6.69,6.93,7.19,7.46,7.75,8.05,8.37,8.71,9.07,9.46,9.87,10.30,10.78,11.29,11.84,12.44,13.09,13.81,14.60,15.47,16.46,17.56,18.82,20.26,21.95,23.94,26.34,29.29,33.05,38.03,45.02,55.75,75.00],
+var EXPRUN = {40:[0.00,1.00,1.05,1.15,1.29,1.47,1.65,1.85,2.03,2.21,2.38,2.56,2.74,2.93,3.13,3.34,3.57,3.80,4.05,4.31,4.59,4.89,5.21,5.56,5.93,6.34,6.79,7.29,7.85,8.47,9.17,9.98,10.92,12.03,13.36,14.99,17.06,19.80,23.63,29.50,40.00],
+  75:[0.00,1.00,1.03,1.08,1.16,1.26,1.37,1.49,1.62,1.75,1.87,1.99,2.10,2.21,2.31,2.42,2.52,2.62,2.73,2.84,2.96,3.08,3.20,3.32,3.45,3.57,3.70,3.84,3.97,4.12,4.26,4.41,4.56,4.72,4.89,5.06,5.23,5.42,5.61,5.80,6.01,6.23,6.45,6.69,6.93,7.19,7.46,7.75,8.05,8.37,8.71,9.07,9.46,9.87,10.30,10.78,11.29,11.84,12.44,13.09,13.81,14.60,15.47,16.46,17.56,18.82,20.26,21.95,23.94,26.34,29.29,33.05,38.03,45.02,55.75,75.00],
   45:[0,1.00,1.04,1.13,1.26,1.42,1.59,1.77,1.94,2.11,2.27,2.43,2.58,2.75,2.92,3.10,3.29,3.49,3.70,3.91,4.14,4.38,4.63,4.90,5.18,5.49,5.81,6.17,6.55,6.96,7.42,7.92,8.47,9.08,9.77,10.56,11.46,12.50,13.73,15.21,17.03,19.35,22.40,26.69,33.24,45],
 60:[0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
 2.79,2.93,3.07,3.22,3.37,3.52,3.68,3.85,4.01,4.19,4.37,4.56,4.76,4.97,5.18,5.41,5.65,5.90,6.16,
@@ -4363,11 +4578,16 @@ function callsFor(a, s, cfg, store){
 /* The corridor measures line, not carry, so a ball that is straight but short is
    still inside it. It keeps its own zone on the picture, so the fault still shows. */
 var SHORT_ZONES = {short:1, shortL:1, shortR:1};
+var OFFLINE_ZONES = {left:1, right:1};   // level with the flag, wide of it
 function inFor(call, z){
   if(z == null) return false;
   /* The pin-high test measures one thing only: did the ball get there. Left and right
      are not the point, so every zone scores except the three short ones. */
   if(call && call.rule === "pinhigh") return !SHORT_ZONES[z];
+  /* Distance control asks about the number alone, so wide of the flag but level with
+     it counts, and dead straight but long or short does not. */
+  if(call && call.rule === "distance") return isIn(z) || !!OFFLINE_ZONES[z];
+  if(call && call.rule === "bull") return z === "b";
   if(call && call.lat && z === "short") return true;
   return isIn(z);
 }
@@ -5795,6 +6015,14 @@ function restoreData(){
   (o.players||[]).forEach(function(pp){
     if(!state.players.some(function(x){ return x.id===pp.id; })) state.players.push(pp);
   });
+  if(o.lib){
+    state.lib = state.lib || {practice:[], tests:[]};
+    ["practice","tests"].forEach(function(k){
+      (o.lib[k]||[]).forEach(function(x){
+        if(x && x.id && !area(x.id)) state.lib[k].push(x);
+      });
+    });
+  }
   saveLocal(); render();
   setStatus(added + " " + (added===1?"session":"sessions") + " restored.");
 }
