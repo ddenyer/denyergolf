@@ -716,6 +716,9 @@
   .runflash b{display:block; font-family:Archivo, sans-serif; font-size:26px; font-weight:700; line-height:1.1}
   .runflash .star{display:block; font-size:30px; line-height:1}
   .runflash .sub{display:block; font-size:13px; margin-top:3px; opacity:.92}
+  .runflash{max-width:min(320px, calc(100vw - 40px))}
+  .runflash b{font-size:22px}
+  .runflash .star + b{font-size:26px}
   .runflash.go{animation:runpop .42s cubic-bezier(.2,1.4,.4,1) both}
   @keyframes runpop{ from{ transform:translate(-50%,-50%) scale(.5); opacity:0 } to{ transform:translate(-50%,-50%) scale(1); opacity:1 } }
   @media (prefers-reduced-motion: reduce){ .runflash.go{animation:none} }
@@ -1322,29 +1325,32 @@ var AREAS = [
   ],
   placing:{n:60, p:0.66, sd:0.05, field:"tour players"} },
 
-{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true,
-  targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point is in the target, within one club (about 3 ft)",
+{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces",
+  targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point inside two clubs, two points inside one",
   plan:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
-  /* Five balls a page. The old sets said "4 sets of 5" on one card; they are now four
-     cards of five, which is how they are actually hit. */
+  /* Two rings, because on a practice green a club length is the only thing you can
+     actually measure. One club is about 3 ft, two clubs about 6 ft. The circles stay
+     the same all the way through and the tour rate does the varying instead: r2 is how
+     often an LPGA player finishes inside two clubs from that distance and that lie,
+     r1 inside one. Both are derived from the tour's own up-and-down and hole-out rates. */
   sets:[
-    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"3 ft", tgt:"Set 1 of 4 · good lie · within 3 ft", max:5},
-    {id:"a2", blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"3 ft", tgt:"Set 2 of 4 · good lie · within 3 ft", max:5},
-    {id:"a3", blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"3 ft", tgt:"Set 3 of 4 · good lie · within 3 ft", max:5},
-    {id:"a4", blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"3 ft", tgt:"Set 4 of 4 · good lie · within 3 ft", max:5},
-    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"3 ft", tgt:"Set 1 of 3 · good lie · within 3 ft", max:5},
-    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"3 ft", tgt:"Set 2 of 3 · good lie · within 3 ft", max:5},
-    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"3 ft", tgt:"Set 3 of 3 · good lie · within 3 ft", max:5},
-    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"3 ft", tgt:"Set 1 of 3 · within 3 ft · you choose the loft", max:5},
-    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"3 ft", tgt:"Set 2 of 3 · within 3 ft · you choose the loft", max:5},
-    {id:"c3", blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"3 ft", tgt:"Set 3 of 3 · within 3 ft · you choose the loft", max:5},
-    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"3 ft", tgt:"Set 1 of 3 · within 3 ft", max:5},
-    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"3 ft", tgt:"Set 2 of 3 · within 3 ft", max:5},
-    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"3 ft", tgt:"Set 3 of 3 · within 3 ft", max:5},
-    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"3 ft", tgt:"Set 1 of 2 · within 3 ft", max:5},
-    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"3 ft", tgt:"Set 2 of 2 · within 3 ft", max:5}
+    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.172, r2:0.365, word:"20 paces", tgt:"Set 1 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a2", blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 2 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a3", blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", tgt:"Set 3 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a4", blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"2 clubs", bull:"1 club", dist:50, lie:"good", r1:0.070, r2:0.192, word:"50 paces", tgt:"Set 4 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.286, r2:0.479, word:"10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.172, r2:0.365, word:"20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"awk", r1:0.130, r2:0.289, word:"a downhill lie", tgt:"Set 1 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.066, r2:0.169, word:"the rough", tgt:"Set 2 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c3", blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"awk", r1:0.066, r2:0.176, word:"a bare lie", tgt:"Set 3 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.149, r2:0.317, word:"the bunker at 10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.084, r2:0.221, word:"the bunker at 20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.055, r2:0.162, word:"the bunker at 30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.066, r2:0.175, word:"a downhill bunker lie", tgt:"Set 1 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.066, r2:0.175, word:"a plugged lie", tgt:"Set 2 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10}
   ],
-  } ,
+  placing:{n:75, p:0.259, sd:0.05, bullP:0.113, field:"tour players"} },
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
@@ -2524,6 +2530,7 @@ function openSession(areaId, resume){
   }
   state.gymDraft = null;
   state.runShown = 0;
+  PRAISE = { seen:0, at:-99, run:0 };
   if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
   watchDraft();
   paintTick();
@@ -2723,16 +2730,71 @@ function bestRunEver(areaId, skipId){
   });
   return b;
 }
-function flashRun(n, beatsEver, word){
+function flashMsg(html, ms){
   var el = $("runFlash"); if(!el) return;
-  el.innerHTML = '<span class="star">\u2605</span><b>'+n+' in a row</b>'+
-                 (beatsEver ? '<span class="sub">best on '+word+' ever</span>' : '');
+  el.innerHTML = html;
   el.hidden = false;
   el.classList.remove("go");
   void el.offsetWidth;                 // restart the animation
   el.classList.add("go");
   clearTimeout(el.__t);
-  el.__t = setTimeout(function(){ el.hidden = true; }, 2400);
+  el.__t = setTimeout(function(){ el.hidden = true; }, ms || 2400);
+}
+function flashRun(n, beatsEver, word){
+  flashMsg('<span class="star">\u2605</span><b>'+n+' in a row</b>'+
+           (beatsEver ? '<span class="sub">best on '+word+' ever</span>' : ''));
+}
+
+/* ---- what a shot was worth ----
+   Praise only when it is earned, and always with the number that earns it. A message
+   about an ordinary shot teaches her to ignore every message. The odds are spoken on a
+   coarse ladder on purpose: the rates behind the awkward lies are good to about a third,
+   so the tool should never imply a precision it does not have. */
+var ODDS_LADDER = [3,4,5,6,8,10,12,15,20,25,30,40,50,75,100,150,200,300,500];
+function oddsWord(p){
+  if(!p || p <= 0) return 500;
+  var want = 1/p, best = ODDS_LADDER[0];
+  ODDS_LADDER.forEach(function(v){ if(Math.abs(v - want) < Math.abs(best - want)) best = v; });
+  return best;
+}
+var COUNT_WORD = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+function countWord(n){ return COUNT_WORD[n] || String(n); }
+var PRAISE = { seen:0, at:-99, run:0 };
+function praiseRates(a){ return !!(a && a.sets && a.sets.some(function(x){ return x.r2 != null; })); }
+function praiseShot(a, s, call, sh){
+  if(!a || !a.track || !s || !sh || sh.z == null) return;
+  if(!call || call.r2 == null) return;              // only where the tour rate is known
+  PRAISE.seen++;
+  var r = runStats(a, state.draft);
+  if(r.cur <= PRAISE.run) PRAISE.run = r.cur;       // the run broke, or went backwards
+  if(!isIn(sh.z)) return;
+  var where = s.word || "there", msg = null, ms = 2400;
+
+  /* A run jumps the queue. It is the rarer event, it only fires when it has grown
+     since the last time it spoke, and each extra ball makes it rarer, so it cannot
+     nag. Single shots wait their turn. */
+  if(r.cur >= 2 && r.cur > PRAISE.run){
+    var odds = Math.pow(call.r2, r.cur);
+    if(odds <= 0.05){
+      var ever = bestRunEver(a.id, state.draft.id);
+      msg = '<span class="star">\u2605</span><b>'+countWord(r.cur)+' in a row</b>'+
+            '<span class="sub">from '+where+'. A tour player does that one time in '+oddsWord(odds)+'.'+
+            (r.cur > ever ? ' Your best ever.' : '')+'</span>';
+      ms = odds <= 0.01 ? 3600 : 2800;
+      PRAISE.run = r.cur;
+    }
+  }
+  if(!msg && PRAISE.seen - PRAISE.at >= 5){         // one shot message in any five balls
+    if(sh.z === "b" && call.r1 <= 0.12)
+      msg = '<b>Inside one club</b><span class="sub">from '+where+
+            '. One in '+oddsWord(call.r1)+' for a tour player.</span>';
+    else if(sh.z !== "b" && call.r2 <= 0.20)
+      msg = '<b>Inside two clubs</b><span class="sub">from '+where+
+            '. One in '+oddsWord(call.r2)+' on the LPGA.</span>';
+  }
+  if(!msg) return;
+  PRAISE.at = PRAISE.seen;
+  flashMsg(msg, ms);
 }
 function renderRun(){
   var d = state.draft; if(!d || !$("runBar")) return;
@@ -2746,7 +2808,8 @@ function renderRun(){
   $("runEverLab").textContent = "Best on " + areaWord(a);
   $("runBar").hidden = !a.track;
   $("runBar").classList.toggle("hot", r.cur >= 3);
-  if(r.cur > (state.runShown || 0) && r.cur >= 4) flashRun(r.cur, r.cur > ever, areaWord(a));
+  if(r.cur > (state.runShown || 0) && r.cur >= 4 && !praiseRates(a))
+    flashRun(r.cur, r.cur > ever, areaWord(a));
   state.runShown = r.cur;
 }
 
@@ -2954,7 +3017,8 @@ function tablesFor(spec){
 /* The longest run you would expect from that many hits if they fell in a random
    order. Computed offline by exact enumeration over arrangements, because the
    inclusion-exclusion form of it cancels badly in floating point. n = 60. */
-var EXPRUN = {45:[0,1.00,1.04,1.13,1.26,1.42,1.59,1.77,1.94,2.11,2.27,2.43,2.58,2.75,2.92,3.10,3.29,3.49,3.70,3.91,4.14,4.38,4.63,4.90,5.18,5.49,5.81,6.17,6.55,6.96,7.42,7.92,8.47,9.08,9.77,10.56,11.46,12.50,13.73,15.21,17.03,19.35,22.40,26.69,33.24,45],
+var EXPRUN = {75:[0.00,1.00,1.03,1.08,1.16,1.26,1.37,1.49,1.62,1.75,1.87,1.99,2.10,2.21,2.31,2.42,2.52,2.62,2.73,2.84,2.96,3.08,3.20,3.32,3.45,3.57,3.70,3.84,3.97,4.12,4.26,4.41,4.56,4.72,4.89,5.06,5.23,5.42,5.61,5.80,6.01,6.23,6.45,6.69,6.93,7.19,7.46,7.75,8.05,8.37,8.71,9.07,9.46,9.87,10.30,10.78,11.29,11.84,12.44,13.09,13.81,14.60,15.47,16.46,17.56,18.82,20.26,21.95,23.94,26.34,29.29,33.05,38.03,45.02,55.75,75.00],
+  45:[0,1.00,1.04,1.13,1.26,1.42,1.59,1.77,1.94,2.11,2.27,2.43,2.58,2.75,2.92,3.10,3.29,3.49,3.70,3.91,4.14,4.38,4.63,4.90,5.18,5.49,5.81,6.17,6.55,6.96,7.42,7.92,8.47,9.08,9.77,10.56,11.46,12.50,13.73,15.21,17.03,19.35,22.40,26.69,33.24,45],
 60:[0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
 2.79,2.93,3.07,3.22,3.37,3.52,3.68,3.85,4.01,4.19,4.37,4.56,4.76,4.97,5.18,5.41,5.65,5.90,6.16,
 6.45,6.74,7.06,7.40,7.76,8.14,8.56,9.01,9.50,10.03,10.62,11.26,11.98,12.77,13.67,14.69,15.86,
@@ -2967,7 +3031,8 @@ function ordinalPlace(n){
 /* Balls that are straight full shots, and balls where a shape was called. Both count
    towards the score; the split is the diagnostic. */
 function testSplit(a, sess){
-  var out = {n:0, in_:0, bull:0, straight:{n:0, in_:0}, shaped:{n:0, in_:0}};
+  var out = {n:0, in_:0, bull:0, straight:{n:0, in_:0}, shaped:{n:0, in_:0},
+             good:{n:0, in_:0}, awk:{n:0, in_:0}};
   a.sets.forEach(function(st){
     var kind = trackKind(a, st); if(!kind) return;
     var list = (sess.shots||{})[st.id]; if(!list) return;
@@ -2976,7 +3041,9 @@ function testSplit(a, sess){
     list.forEach(function(x, i){
       if(!x || !shotDone(st, x, calls[i])) return;
       out.n++; bucket.n++;
-      if(inFor(calls[i], x.z)){ out.in_++; bucket.in_++; }
+      var lie = st.lie ? out[st.lie === "awk" ? "awk" : "good"] : null;
+      if(lie) lie.n++;
+      if(inFor(calls[i], x.z)){ out.in_++; bucket.in_++; if(lie) lie.in_++; }
       if(x.z === "b") out.bull++;
     });
   });
@@ -3002,6 +3069,16 @@ function targetRates(a, sess){
   order.sort(function(x, y){ return x - y; });
   return {by:by, order:order};
 }
+/* How much weight one row will bear. A target hit fifteen times reads to about
+   twelve points either way; five balls says almost nothing, and should not pretend to. */
+function rowNote(tg){
+  var sizes = tg.order.map(function(d){ return tg.by[d].n; });
+  var small = Math.min.apply(null, sizes), big = Math.max.apply(null, sizes);
+  var err = Math.round(100 * Math.sqrt(0.25 / Math.max(1, small)));
+  return (small === big ? "Each of these is " + small + " balls" : "These run from " + small + " to " + big + " balls")
+    + ", so the thinnest reads to within about " + err
+    + " points either way. Treat one bad number as a hint, not a finding.";
+}
 function placingBlock(a, sess){
   var spec = a.placing; if(!spec) return "";
   var t = testSplit(a, sess);
@@ -3011,7 +3088,7 @@ function placingBlock(a, sess){
   var tg = targetRates(a, sess);
   var rows = tg.order.map(function(dv){
     var e = tg.by[dv];
-    return '<span>'+dv+'y <b>'+pctText(e.in_, e.n)+'</b> ('+e.in_+'/'+e.n+')</span>';
+    return '<span>'+dv+(a.unit === "paces" ? "p" : "y")+' <b>'+pctText(e.in_, e.n)+'</b> ('+e.in_+'/'+e.n+')</span>';
   }).join("");
   var resid = "";
   if(full && EXPRUN[spec.n]){
@@ -3025,20 +3102,25 @@ function placingBlock(a, sess){
   }
   return '<div class="placing">'+
     '<span class="eyebrow">The test</span>'+
-    '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' inside the circle</span></div>'+
+    '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' inside '+(spec.bullP ? 'two clubs' : 'the circle')+'</span></div>'+
     (full
       ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
+        (spec.bullP ? '<p class="plread">Inside one club, <b>'+
+          ordinalPlace(tablesFor({n:spec.n, p:spec.bullP, sd:spec.bullSd || 0.035}).count[Math.min(spec.n, t.bull)])+
+          '</b> of the same hundred.</p>' : '')+
         (r.best ? '<p class="plread">Your run of '+r.best+' places <b>'+
           ordinalPlace(tab.run[Math.min(spec.n, r.best)])+'</b> of the same hundred.</p>' : '')
       : '<p class="plread">'+(spec.n - t.n)+' balls still to hit. The placing needs all '+spec.n+'.</p>')+
     resid+
     '<div class="plrow">'+
-      (t.straight.n ? '<span>Straight <b>'+pctText(t.straight.in_, t.straight.n)+'</b> ('+t.straight.in_+' of '+t.straight.n+')</span>' : '')+
+      (t.straight.n && !t.good.n ? '<span>Straight <b>'+pctText(t.straight.in_, t.straight.n)+'</b> ('+t.straight.in_+' of '+t.straight.n+')</span>' : '')+
       (t.shaped.n ? '<span>Shaped <b>'+pctText(t.shaped.in_, t.shaped.n)+'</b> ('+t.shaped.in_+' of '+t.shaped.n+')</span>' : '')+
-      (a.sets.some(function(x){ return x.bull; }) ? '<span>Bullseye <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
+      (t.good.n ? '<span>Good lie <b>'+pctText(t.good.in_, t.good.n)+'</b> ('+t.good.in_+' of '+t.good.n+')</span>' : '')+
+      (t.awk.n ? '<span>Awkward <b>'+pctText(t.awk.in_, t.awk.n)+'</b> ('+t.awk.in_+' of '+t.awk.n+')</span>' : '')+
+      (a.sets.some(function(x){ return x.bull; }) ? '<span>'+(spec.bullP ? 'Inside one club' : 'Bullseye')+' <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
     '</div>'+
     (rows ? '<div class="plrow tgt">'+rows+'</div>'+
-            '<p class="plnote">Each target is about fifteen balls, so a single session reads to within about twelve points either way. Treat one bad number as a hint, not a finding.</p>' : '')+
+            '<p class="plnote">'+rowNote(tg)+'</p>' : '')+
     '</div>';
 }
 function runLine(a, sess){
@@ -3774,11 +3856,12 @@ function callsFor(a, s, cfg, store){
     if(kind === "lag"){
       out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
     } else if(kind === "grid"){
-      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull, lat:lat});
+      out.push({kind:"w", grid:s.guide, win:gridOrder(s.guide)[i % gridOrder(s.guide).length], tc:s.tc, bull:s.bull, lat:lat, two:!!a.twoTier});
     } else if(areaShape(a) === "clock"){
       out.push({kind:"t", st:(i%5)+1, tc:s.tc});
     } else {
-      out.push({kind:"t", tc:s.tc, bull:s.bull, lat:lat});
+      out.push({kind:"t", tc:s.tc, bull:s.bull, lat:lat, two:!!a.twoTier,
+                r1:s.r1, r2:s.r2, lie:s.lie, dist:s.dist});
     }
   }
   return out;
@@ -3801,7 +3884,8 @@ function tallyShots(calls, shots){
     if(!sh) return;
     var c = calls[i] || {};
     if(c.kind === "w" && sh.w === c.win) w++;
-    if(shotPoint(c, sh)) t++;
+    // where there are two rings the inner one is worth both points
+    if(shotPoint(c, sh)) t += (c.two && sh.z === "b") ? 2 : 1;
   });
   return {w:w, t:t, total:w+t};
 }
@@ -4021,11 +4105,14 @@ function shotRow(a, s, last, cfg){
     for(var i=cur+1;i<nb;i++){ if(!shotDone(s, shots[i], calls[i])){ cur = i; return; } }
   }
   function record(patch){
+    var wasDone = shotDone(s, shots[cur], calls[cur]);
     var sh = shots[cur] || {};
     for(var k in patch) sh[k] = patch[k];
     shots[cur] = sh;
     phase = null;
+    var fresh = patch.z != null && !wasDone;
     rescore();
+    if(fresh && !cfg) praiseShot(a, s, calls[cur], shots[cur]);
     advance();
     paint();
     saveDraft();
