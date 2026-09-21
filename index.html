@@ -79,7 +79,7 @@
   nav.tabs{display:flex; gap:0; margin-top:8px; overflow-x:auto; scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{
-    background:none; border:0; border-bottom:2px solid transparent; padding:8px 6px 9px;
+    background:none; border:0; border-bottom:2px solid transparent; padding:8px 5px 9px;
     font-size:12.5px; font-weight:600; color:var(--muted); letter-spacing:0; white-space:nowrap;
   }
   nav.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent-fill)}
@@ -576,6 +576,11 @@
   .hrow .pill.part{background:#fff3d6; border-color:#e6b94d; color:#8a5d00}
   .hrow .openacts{margin-top:7px}
   .hrow .openacts button{padding:5px 13px; font-size:12.5px}
+  ol.lmsteps{margin:12px 0 4px; padding-left:22px; font-size:14.5px; line-height:1.55; color:var(--ink)}
+  ol.lmsteps li{margin-bottom:7px}
+  ol.lmsteps b{font-weight:600}
+  .lmlink{margin:12px 0 0}
+  .lmlink a{font-family:Archivo, sans-serif; font-size:14px; font-weight:600; color:var(--accent)}
   .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
   .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px;
     padding:8px 14px; font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
@@ -1040,7 +1045,8 @@
     </div>
     <nav class="tabs" role="tablist">
       <button id="tabPractice" role="tab" aria-selected="true">Practice</button>
-      <button id="tabBench" role="tab" aria-selected="false">Benchmarks</button>
+      <button id="tabSC" role="tab" aria-selected="false">S&amp;C</button>
+      <button id="tabBench" role="tab" aria-selected="false">Tour</button>
       <button id="tabSessions" role="tab" aria-selected="false">Sessions</button>
       <button id="tabHistory" role="tab" aria-selected="false">Progress</button>
       <button id="tabGoals" role="tab" aria-selected="false">Goals</button>
@@ -1113,6 +1119,12 @@
   <!-- ROUND -->
 
   <!-- BENCHMARKS -->
+  <section id="viewSC" hidden>
+    <h1>Strength &amp; conditioning</h1>
+    <p class="lede">The gym and everything that goes with it. Movement prep before every session, speed work alongside.</p>
+    <div class="arealist" id="scList"></div>
+  </section>
+
   <section id="viewBench" hidden>
     <h1>LPGA Tour averages</h1>
     <p class="lede">What the numbers look like at the top of the women's game. Use them to set the next target, not to judge today's session.</p>
@@ -1256,7 +1268,7 @@ var AREAS = [
   plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
   sets:[
     {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", r2:0.66, word:"the driver", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
-      max:15, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"Fastest and slowest of the fifteen"},
+      max:15, metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"The average of the fifteen, and the fastest and slowest"},
     {id:"c", label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", r2:0.66, word:"the 3-wood", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
     {id:"e", label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", r2:0.66, word:"the 5-wood", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
     {id:"r", rot:true, allWin:true, balls:10, guide:"windows", label:"Rotation \u00b7 ten balls, the app calls the club and the window",
@@ -1303,7 +1315,7 @@ var AREAS = [
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"i", label:"Approach 175y", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"e", label:"Driver · 10 balls", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
-      max:10, metrics:[{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"Fastest and slowest of the ten"},
+      max:10, metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"The average of the ten, and the fastest and slowest"},
     {id:"f", label:"3-wood", tgt:"35-yd target (17 each side)", max:5},
     {id:"g", label:"5-wood / hybrid", tgt:"30-yd target (15 each side)", max:5},
     {id:"h", guide:"windows", label:"Driver · five windows", tgt:"Five balls: a point for the window, a point for the 40-yd target",
@@ -1362,18 +1374,20 @@ var AREAS = [
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
   plan:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
-  /* No placing here yet. The clock is a genuine 66% test (20 at 4 ft, 15 at 6, 10 at 9,
-     10 at 12 comes to 36.0 makes of 55 for a tour player) but the ladder and the
-     rotation put unrated and differently rated balls in the same session, so the
-     count has to be a convolution over the mix that session actually drew rather
-     than a single table. Until that is built, no number is better than a wrong one. */
+  /* The test is the 55 clock putts and nothing else. A tour player holes 35.9 of them,
+     which is 65.3%, so the clock calibrates to two in three on its own. The ladder has no
+     tour equivalent to be placed against and the rotation mixes lags in with holing out,
+     so both are reported as their own percentages instead. runTable is the clock's own
+     run placing, because the rates fall away through the sequence. */
+  placing:{n:55, p:0.653, sd:0.045, sets:["a","b","c","e"], runTable:"CLOCKRUN",
+           mixed:true, word:"on the clock", field:"tour players"},
   sets:[
     {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
     {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
     {id:"c", label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", r2:0.46, word:"9 feet", max:10},
     {id:"e", label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", r2:0.32, word:"12 feet", max:10},
-    {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", tgt:"30 putts · change ends after every five", max:30},
-    {id:"r", rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
+    {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
+    {id:"r", rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", xg:"Rotation", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
   ],
   setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Six rounds is 30 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
   }
@@ -1749,6 +1763,10 @@ var COND = {
     {id:"speed", label:"Green speed", opts:[["fast","Fast"],["med","Medium"],["slow","Slow"]], hide:{venue:["indoor"]}}
   ]
 };
+/* Venue is recorded on every session, and it stays a record rather than a split.
+   Reporting indoors separately from outdoors halves every cell for a distinction
+   she cannot act on, and this tool has already found the edge of what its sample
+   sizes will carry. Combine them. */
 function condKind(areaId, kind){
   if(kind==="gym") return null;
   if(areaId===4) return "putt";
@@ -1945,14 +1963,16 @@ function show(view){
   $("viewSession").hidden = view!=="session";
   $("viewGym").hidden = view!=="gym";
   $("viewBench").hidden = view!=="bench";
+  $("viewSC").hidden = view!=="sc";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
   $("viewSessions").hidden = view!=="sessions";
   if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
   $("viewGoals").hidden = view!=="goals";
-  $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session"||view==="gym")?"true":"false");
+  $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
   $("tabBench").setAttribute("aria-selected", view==="bench"?"true":"false");
+  $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
   $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
   $("tabGoals").setAttribute("aria-selected", view==="goals"?"true":"false");
@@ -2279,6 +2299,14 @@ function renderHome(){
     host.appendChild(b);
   });
 
+  renderResume();
+}
+
+/* S&C has a tab of its own: it is a different kind of session from a golf area,
+   and mixing four gym rows into the practice list buried the five that matter. */
+function renderSC(){
+  var list = $("scList"); if(!list) return;
+  list.innerHTML = "";
   // strength & conditioning
   var gAll = coreGymSessions();
   var due = gym(gymDue());
@@ -2292,7 +2320,7 @@ function renderHome(){
         '<div class="cap">'+(gAll.length===1 ? "session" : "sessions")+'</div>'+
       '</div></div>';
   gb.addEventListener("click", function(){ openGym(); });
-  host.appendChild(gb);
+  list.appendChild(gb);
 
   // speed sticks, optional, counted on its own
   var sp = mine().filter(isSpeed);
@@ -2306,7 +2334,7 @@ function renderHome(){
       '<div class="cap">'+(sp.length===1 ? "session" : "sessions")+'</div>'+
     '</div></div>';
   sb.addEventListener("click", function(){ openGym(4); });
-  host.appendChild(sb);
+  list.appendChild(sb);
 
   // band session, optional, counted on its own
   var bnd = mine().filter(isBand);
@@ -2320,7 +2348,7 @@ function renderHome(){
       '<div class="cap">'+(bnd.length===1 ? "session" : "sessions")+'</div>'+
     '</div></div>';
   bb2.addEventListener("click", function(){ openGym(5); });
-  host.appendChild(bb2);
+  list.appendChild(bb2);
 
   // movement prep, on its own when they want it on its own
   var pr = mine().filter(isPrep);
@@ -2334,9 +2362,8 @@ function renderHome(){
       '<div class="cap">'+(pr.length===1 ? "session" : "sessions")+'</div>'+
     '</div></div>';
   pb.addEventListener("click", function(){ openGym(6); });
-  host.appendChild(pb);
+  list.appendChild(pb);
 
-  renderResume();
 }
 
 function renderBalance(){
@@ -2674,6 +2701,7 @@ function buildSessionCards(a, last){
       body.appendChild(w);
     }
     var grp = (s.group || s.blk || "").split("\u00b7")[0].trim();
+    if(s.metrics) cards.push(pcard('Before '+s.label+'<b>'+a.name+'</b>', monitorSetup(s, ballsIn(s))));
     cards.push(pcard('Set '+(i+1)+' of '+n+(grp?' \u00b7 '+grp:'')+'<b>'+a.name+'</b>', body));
 
     // a reading taken off that set, not a set of its own: give it its own page
@@ -2704,8 +2732,33 @@ function buildSessionCards(a, last){
 }
 function monitorNote(){
   var d = document.createElement("div"); d.className="banner monitor";
-  d.innerHTML = '<b>Use the launch monitor for this set only.</b> Get it running before ball one. '+
-    'You enter the fastest and slowest of the fifteen on the next screen.';
+  d.innerHTML = '<b>Launch monitor on, driver selected.</b> These balls only. '+
+    'The average, fastest and slowest go in on the next screen.';
+  return d;
+}
+/* The average of the set is the number that actually tracks her speed: the fastest of
+   fifteen reads about 4 mph high and moves twice as much between sessions. The monitor
+   will only give a clean average if nothing else is in the session with it, which is
+   what this page is for. */
+/* Only ever attach this to a set hit outdoors on the LM1, which measures club speed
+   directly by radar. A SkyTrak derives club speed from ball flight, so a thin strike
+   reads as a slow swing. Putting both in one series would make the trend meaningless. */
+function monitorSetup(s, n){
+  var d = document.createElement("div");
+  d.innerHTML =
+    '<div class="lbl">Set the monitor up first</div>'+
+    '<p class="tgt">One minute now, and the speed number is worth having. The average is the one '+
+    'that counts: the fastest of '+n+' flatters you by about 4 mph and jumps around twice as much.</p>'+
+    '<ol class="lmsteps">'+
+      '<li><b>Start a new session</b> on the monitor. A fresh one, so only these '+n+' balls are in it.</li>'+
+      '<li><b>Select driver</b> from the club list.</li>'+
+      '<li>Hit the '+n+'. Nothing else with the driver until they are done.</li>'+
+      '<li>End the session, then read <b>average, fastest and slowest</b> for the driver.</li>'+
+    '</ol>'+
+    '<p class="tgt">On the Shot Scope LM1: Start Session from the main menu, scroll to Driver, '+
+    'and the back button ends it. Per-club averages are in the Shot Scope app.</p>'+
+    '<p class="lmlink"><a href="https://shotscope.com/us/get-started/lm1-support/" '+
+    'target="_blank" rel="noopener noreferrer">LM1 setup and user guide \u2197</a></p>';
   return d;
 }
 
@@ -2718,10 +2771,15 @@ function monitorNote(){
    particular shot. A run that starts off a good lie and finishes in a bunker is not
    the same run as three from the bunker, and the odds have to be the product of the
    balls that actually made it, not the last one raised to a power. */
-function sessionLog(a, sess){
+function inTest(a, s){
+  var only = a.placing && a.placing.sets;
+  return !only || only.indexOf(s.id) !== -1;
+}
+function sessionLog(a, sess, testOnly){
   var out = [];
   a.sets.forEach(function(s){
     var kind = trackKind(a, s); if(!kind) return;
+    if(testOnly && !inTest(a, s)) return;
     var list = (sess.shots||{})[s.id]; if(!list) return;
     var calls = callsFor(a, s, null, sess);
     list.forEach(function(x, i){
@@ -2733,8 +2791,8 @@ function sessionLog(a, sess){
   });
   return out;
 }
-function sessionBalls(a, sess){
-  return sessionLog(a, sess).map(function(b){ return b.ok; });
+function sessionBalls(a, sess, testOnly){
+  return sessionLog(a, sess, testOnly).map(function(b){ return b.ok; });
 }
 /* The chance a tour player strings together the run she is on: null when any ball
    in it has no known rate, because a number we cannot stand behind is worse than
@@ -2750,9 +2808,9 @@ function runOdds(a, sess, n){
   }
   return odds;
 }
-function runStats(a, sess){
+function runStats(a, sess, testOnly){
   var cur = 0, best = 0;
-  sessionBalls(a, sess).forEach(function(ok){
+  sessionBalls(a, sess, testOnly).forEach(function(ok){
     if(ok){ cur++; if(cur > best) best = cur; } else cur = 0;
   });
   return {cur:cur, best:best};
@@ -3054,6 +3112,12 @@ function tablesFor(spec){
 /* The longest run you would expect from that many hits if they fell in a random
    order. Computed offline by exact enumeration over arrangements, because the
    inclusion-exclusion form of it cancels badly in floating point. n = 60. */
+/* The clock is four tests in one: twenty at ninety per cent, then fifteen, ten and ten
+   at rates that fall away. Conditional on a count the arrangement is no longer uniform,
+   so the flat run table is badly wrong here (it calls a run of ten 19th when it is 68th).
+   This is the run placing for that exact sequence, enumerated offline over a shared
+   ability, and it is why putting carries its own table rather than sharing one. */
+var CLOCKRUN = [100,100,100,100,100,99,96,91,84,76,68,59,52,45,39,33,29,25,21,18,13,10,7,6,4,3,3,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
 var EXPRUN = {75:[0.00,1.00,1.03,1.08,1.16,1.26,1.37,1.49,1.62,1.75,1.87,1.99,2.10,2.21,2.31,2.42,2.52,2.62,2.73,2.84,2.96,3.08,3.20,3.32,3.45,3.57,3.70,3.84,3.97,4.12,4.26,4.41,4.56,4.72,4.89,5.06,5.23,5.42,5.61,5.80,6.01,6.23,6.45,6.69,6.93,7.19,7.46,7.75,8.05,8.37,8.71,9.07,9.46,9.87,10.30,10.78,11.29,11.84,12.44,13.09,13.81,14.60,15.47,16.46,17.56,18.82,20.26,21.95,23.94,26.34,29.29,33.05,38.03,45.02,55.75,75.00],
   45:[0,1.00,1.04,1.13,1.26,1.42,1.59,1.77,1.94,2.11,2.27,2.43,2.58,2.75,2.92,3.10,3.29,3.49,3.70,3.91,4.14,4.38,4.63,4.90,5.18,5.49,5.81,6.17,6.55,6.96,7.42,7.92,8.47,9.08,9.77,10.56,11.46,12.50,13.73,15.21,17.03,19.35,22.40,26.69,33.24,45],
 60:[0,1.00,1.03,1.10,1.20,1.32,1.45,1.60,1.75,1.89,2.03,2.16,2.29,2.41,2.53,2.66,
@@ -3069,12 +3133,23 @@ function ordinalPlace(n){
    towards the score; the split is the diagnostic. */
 function testSplit(a, sess){
   var out = {n:0, in_:0, bull:0, straight:{n:0, in_:0}, shaped:{n:0, in_:0},
-             good:{n:0, in_:0}, awk:{n:0, in_:0}};
+             good:{n:0, in_:0}, awk:{n:0, in_:0}, extra:[], byId:{}};
   a.sets.forEach(function(st){
     var kind = trackKind(a, st); if(!kind) return;
     var list = (sess.shots||{})[st.id]; if(!list) return;
     var calls = callsFor(a, st, null, sess);
     var bucket = (kind === "grid") ? out.shaped : out.straight;
+    if(!inTest(a, st)){
+      /* Outside the test: still worth a number, just not a placing. */
+      var g = st.xg || "Other";
+      if(!out.byId[g]){ out.byId[g] = {lab:g, n:0, in_:0}; out.extra.push(out.byId[g]); }
+      list.forEach(function(x, i){
+        if(!x || !shotDone(st, x, calls[i])) return;
+        out.byId[g].n++;
+        if(shotPoint(calls[i], x)) out.byId[g].in_++;
+      });
+      return;
+    }
     list.forEach(function(x, i){
       if(!x || !shotDone(st, x, calls[i])) return;
       out.n++; bucket.n++;
@@ -3092,6 +3167,7 @@ function targetRates(a, sess){
   var by = {}, order = [];
   a.sets.forEach(function(st){
     var kind = trackKind(a, st); if(!kind) return;
+    if(!inTest(a, st)) return;
     var list = (sess.shots||{})[st.id]; if(!list) return;
     var calls = callsFor(a, st, null, sess);
     list.forEach(function(x, i){
@@ -3121,14 +3197,18 @@ function placingBlock(a, sess){
   var t = testSplit(a, sess);
   if(!t.n) return "";
   var full = t.n >= spec.n, tab = full ? tablesFor(spec) : null;
-  var r = runStats(a, sess);
+  var r = runStats(a, sess, !!spec.sets);
+  var runTab = (spec.runTable === "CLOCKRUN") ? CLOCKRUN : (tab ? tab.run : null);
   var tg = targetRates(a, sess);
   var rows = tg.order.map(function(dv){
     var e = tg.by[dv];
     return '<span>'+dv+(a.unit === "paces" ? "p" : "y")+' <b>'+pctText(e.in_, e.n)+'</b> ('+e.in_+'/'+e.n+')</span>';
   }).join("");
+  /* A residual compares the run she got with the run that count usually produces. That
+     only means anything when every ball is the same difficulty; on the clock the hits
+     cluster because the four-footers come first, not because she got hot. */
   var resid = "";
-  if(full && EXPRUN[spec.n]){
+  if(full && !spec.mixed && EXPRUN[spec.n]){
     var want = EXPRUN[spec.n][Math.min(spec.n, t.in_)] || 0;
     var gap = r.best - want;
     if(Math.abs(gap) >= 1.5){
@@ -3139,14 +3219,15 @@ function placingBlock(a, sess){
   }
   return '<div class="placing">'+
     '<span class="eyebrow">The test</span>'+
-    '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' inside '+(spec.bullP ? 'two clubs' : 'the circle')+'</span></div>'+
+    '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' '+
+      (spec.bullP ? 'inside two clubs' : (areaShape(a) === 'clock' ? 'holed on the clock' : 'inside the circle'))+'</span></div>'+
     (full
       ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
         (spec.bullP ? '<p class="plread">Inside one club, <b>'+
           ordinalPlace(tablesFor({n:spec.n, p:spec.bullP, sd:spec.bullSd || 0.035}).count[Math.min(spec.n, t.bull)])+
           '</b> of the same hundred.</p>' : '')+
-        (r.best ? '<p class="plread">Your run of '+r.best+' places <b>'+
-          ordinalPlace(tab.run[Math.min(spec.n, r.best)])+'</b> of the same hundred.</p>' : '')
+        (r.best && runTab ? '<p class="plread">Your best run '+(spec.word ? spec.word+' ' : '')+'of '+r.best+
+          ' places <b>'+ordinalPlace(runTab[Math.min(spec.n, r.best)])+'</b> of the same hundred.</p>' : '')
       : '<p class="plread">'+(spec.n - t.n)+' balls still to hit. The placing needs all '+spec.n+'.</p>')+
     resid+
     '<div class="plrow">'+
@@ -3155,6 +3236,9 @@ function placingBlock(a, sess){
       (t.good.n ? '<span>Good lie <b>'+pctText(t.good.in_, t.good.n)+'</b> ('+t.good.in_+' of '+t.good.n+')</span>' : '')+
       (t.awk.n ? '<span>Awkward <b>'+pctText(t.awk.in_, t.awk.n)+'</b> ('+t.awk.in_+' of '+t.awk.n+')</span>' : '')+
       (a.sets.some(function(x){ return x.bull; }) ? '<span>'+(spec.bullP ? 'Inside one club' : 'Bullseye')+' <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
+      t.extra.filter(function(g){ return g.n; }).map(function(g){
+        return '<span>'+g.lab+' <b>'+pctText(g.in_, g.n)+'</b> ('+g.in_+' of '+g.n+')</span>';
+      }).join("")+
     '</div>'+
     (rows ? '<div class="plrow tgt">'+rows+'</div>'+
             '<p class="plnote">'+rowNote(tg)+'</p>' : '')+
@@ -4245,8 +4329,11 @@ function scoreRow(label, tgt, parts, last, guide){
 function metricRow(s, last){
   var row = document.createElement("div"); row.className="set metric";
   var lm = last && last.metrics ? last.metrics : null;
-  var was = lm && (lm[s.metrics[0].id] || lm[s.metrics[1].id])
-    ? '<div class="mwas">Last session: fastest ' + (lm[s.metrics[0].id]||"\u2013") + " mph, slowest " + (lm[s.metrics[1].id]||"\u2013") + " mph</div>" : "";
+  var had = lm && s.metrics.some(function(m){ return lm[m.id] != null; });
+  var was = had
+    ? '<div class="mwas">Last session: ' + s.metrics.map(function(m){
+        return m.label.toLowerCase() + " " + (lm[m.id] != null ? lm[m.id] : "\u2013");
+      }).join(", ") + " mph</div>" : "";
   row.innerHTML = '<div class="lbl">'+s.metricLabel+infoChip("speed")+'</div>'+was;
   var MIN = 40, MAX = 140, STEP = 0.1, START = 90;
   function round1(v){ return Math.round(v*10)/10; }
@@ -4598,6 +4685,7 @@ function openGym(id, resume){
   state.draft = null;
   if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
   watchDraft();
+  state.view = "gym";
   $("gymName").textContent = g.name + " · " + g.lift;
   $("gymDate").value = state.gymDraft.date;
   renderGymSeg();
@@ -5484,6 +5572,7 @@ function renderSessions(){
 
 function render(){
   renderHome();
+  renderSC();
   if(state.view==="history") renderProgress();
   if(state.view==="sessions") renderSessions();
 }
@@ -5740,6 +5829,7 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
 $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
 $("homeNext").addEventListener("click", function(){ homePage(1); });
 $("homeBack").addEventListener("click", function(){ homePage(0); });
+$("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("tabBench").addEventListener("click", function(){ renderBench(); show("bench"); });
 $("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
 $("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
@@ -5749,7 +5839,7 @@ $("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state
 $("navNext").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx+1); });
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
-$("gymBack").addEventListener("click", function(){ show("home"); });
+$("gymBack").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("saveBtn").addEventListener("click", saveCurrent);
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
@@ -5875,7 +5965,7 @@ function renderCoach(){
       (p.checks ? '<p class="cnote"><em>Their check list</em>'+String(p.checks).replace(/</g,"&lt;")+'</p>' : '')+
       '<div class="acts">'+
         '<button type="button" data-go="sessions">Sessions</button>'+
-        '<button type="button" data-go="bench">Benchmarks</button>'+
+        '<button type="button" data-go="bench">Tour</button>'+
         '<button type="button" data-go="home">Practice</button>'+
       '</div>';
 
