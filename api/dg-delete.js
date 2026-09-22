@@ -5,7 +5,7 @@
 //
 // POST { code, id }  ->  { ok:true }
 
-import { authorise, sbHeaders } from './dg-load.js';
+import { authorise, sbHeaders, timedFetch } from './dg-load.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const r = await fetch(
+    const r = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${encodeURIComponent(player)}&session_id=eq.${encodeURIComponent(sessionId)}`,
       { method: 'DELETE', headers: sbHeaders() }
     );

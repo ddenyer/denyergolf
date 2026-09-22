@@ -19,10 +19,31 @@
 // a lock. This one is not in the page and not in this file. If it is not set,
 // deletion is refused outright rather than falling open.
 
-import { authorise, sbHeaders } from './dg-load.js';
+import { authorise, sbHeaders, timedFetch } from './dg-load.js';
 
 // Same time regardless of where the mismatch is, so the response cannot be used
 // to work the password out a character at a time.
+// A wrong password costs nothing to try again, and this endpoint is the only
+// thing between a valid coach code and wiping a player for good. Five wrong
+// answers and this code is refused for fifteen minutes, whatever it sends.
+// Per warm lambda rather than global, so it is a speed bump and not a lock, but
+// a speed bump turns an afternoon's guessing into something that cannot finish.
+const misses = new Map();
+const MAX_MISS = 5;
+const LOCKOUT = 15 * 60 * 1000;
+
+function lockedOut(code) {
+  const m = misses.get(code);
+  if (!m) return false;
+  if (Date.now() - m.at > LOCKOUT) { misses.delete(code); return false; }
+  return m.n >= MAX_MISS;
+}
+function noteMiss(code) {
+  const m = misses.get(code);
+  if (m && Date.now() - m.at <= LOCKOUT) { m.n++; m.at = Date.now(); }
+  else misses.set(code, { n: 1, at: Date.now() });
+}
+
 function sameSecret(a, b) {
   const x = String(a || ''), y = String(b || '');
   if (!x || !y) return false;
@@ -64,9 +85,14 @@ export default async function handler(req, res) {
   if (auth.players.indexOf(player) === -1) {
     return res.status(403).json({ ok: false, reason: 'not_your_player' });
   }
+  if (lockedOut(auth.code)) {
+    return res.status(429).json({ ok: false, reason: 'too_many_attempts' });
+  }
   if (!sameSecret(body.password, admin)) {
+    noteMiss(auth.code);
     return res.status(403).json({ ok: false, reason: 'bad_password' });
   }
+  misses.delete(auth.code);
 
   const headers = Object.assign({}, sbHeaders(), { Prefer: 'return=representation' });
   const p = encodeURIComponent(player);
@@ -75,7 +101,7 @@ export default async function handler(req, res) {
   try {
     // Her codes go first. If anything below fails, she is already locked out
     // rather than left with a working code and half her history.
-    const dropCode = await fetch(
+    const dropCode = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_codes?players=eq.{${p}}&select=code`,
       { method: 'DELETE', headers }
     );
@@ -87,7 +113,7 @@ export default async function handler(req, res) {
 
     // Take her out of any code that opens several players, such as the coach's,
     // without deleting that code.
-    const shared = await fetch(
+    const shared = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_codes?players=cs.{"${player}"}&select=code,players`,
       { headers: sbHeaders() }
     );
@@ -95,19 +121,19 @@ export default async function handler(req, res) {
       const rows = await shared.json();
       for (const row of rows) {
         const left = (row.players || []).filter((x) => x !== player);
-        await fetch(`${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(row.code)}`, {
+        await timedFetch(`${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(row.code)}`, {
           method: 'PATCH', headers: sbHeaders(), body: JSON.stringify({ players: left }),
         });
       }
     }
 
-    const dropMeta = await fetch(
+    const dropMeta = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_meta?player=eq.${p}&select=player`,
       { method: 'DELETE', headers }
     );
     if (dropMeta.ok) removed.meta = (await dropMeta.json()).length;
 
-    const dropSessions = await fetch(
+    const dropSessions = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${p}&select=session_id`,
       { method: 'DELETE', headers }
     );

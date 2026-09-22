@@ -27,6 +27,29 @@ const TOOL = 'denyer-golf';
 const seen = new Map();
 const TTL = 5 * 60 * 1000;
 
+// A code that WordPress has just refused is remembered for a short while too.
+// Without it, a device holding a revoked code makes a WordPress round trip on
+// every autosave, for as long as the app is open. The window is deliberately
+// much shorter than the success cache: a coupon being fixed should take effect
+// quickly, whereas a coupon being revoked is covered by the gate on page load.
+const refused = new Map();
+const BAD_TTL = 30 * 1000;
+
+// Nothing here may hang. A Vercel function that is still waiting on WordPress
+// when its own timeout fires returns nothing useful and bills for the wait, and
+// upstream being slow is the single most likely reason for a save to fail. Every
+// outbound call gets a deadline and a refusal that names itself.
+const FETCH_MS = 7000;
+export async function timedFetch(url, opts = {}, ms = FETCH_MS) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), ms);
+  try {
+    return await fetch(url, { ...opts, signal: ctl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function sbHeaders() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   return {
@@ -48,16 +71,25 @@ export async function couponValid(code) {
   const hit = seen.get(code);
   if (hit && Date.now() - hit < TTL) return { ok: true };
 
+  const no = refused.get(code);
+  if (no && Date.now() - no.at < BAD_TTL) {
+    return { ok: false, status: no.status, reason: no.reason };
+  }
+
   const wpUser = process.env.WP_APP_USER;
   const wpPass = process.env.WP_APP_PASSWORD;
   if (!wpUser || !wpPass) {
     console.error('dg: WP_APP_USER or WP_APP_PASSWORD is not set');
     return { ok: false, status: 500, reason: 'server_misconfigured' };
   }
+  // cleanCode has already limited this to [A-Z0-9_-], but it is going into a
+  // URL path, so encode it anyway rather than relying on a check made elsewhere.
+  const safe = encodeURIComponent(code);
+
   try {
     const auth = Buffer.from(`${wpUser}:${wpPass}`).toString('base64');
-    const r = await fetch(
-      `https://changebefore.com/wp-json/changebefore/v1/validate-coupon/${code}`,
+    const r = await timedFetch(
+      `https://changebefore.com/wp-json/changebefore/v1/validate-coupon/${safe}`,
       { headers: { Authorization: `Basic ${auth}` } }
     );
     if (!r.ok) return { ok: false, status: 502, reason: 'upstream_error' };
@@ -70,28 +102,61 @@ export async function couponValid(code) {
       return { ok: false, status: 502, reason: 'non_json_response' };
     }
     if (!d || d.valid !== true) {
-      return { ok: false, status: 403, reason: (d && d.reason) || 'not_valid' };
+      const out = { ok: false, status: 403, reason: (d && d.reason) || 'not_valid' };
+      refused.set(code, { at: Date.now(), status: out.status, reason: out.reason });
+      return out;
     }
-    if (d.tool && d.tool !== TOOL) return { ok: false, status: 403, reason: 'wrong_tool' };
+    if (d.tool && d.tool !== TOOL) {
+      const out = { ok: false, status: 403, reason: 'wrong_tool' };
+      refused.set(code, { at: Date.now(), status: out.status, reason: out.reason });
+      return out;
+    }
 
     seen.set(code, Date.now());
+    refused.delete(code);
     return { ok: true };
   } catch (err) {
-    console.error('dg couponValid error:', err);
-    return { ok: false, status: 502, reason: 'upstream_unreachable' };
+    // An abort is this endpoint's own deadline firing, not a refusal. Say which,
+    // because one is worth retrying in a moment and the other is not.
+    const timedOut = err && (err.name === 'AbortError' || err.name === 'TimeoutError');
+    if (!timedOut) console.error('dg couponValid error:', err);
+    return { ok: false, status: 504, reason: timedOut ? 'upstream_timeout' : 'upstream_unreachable' };
   }
 }
 
 // The row for a code, or null. Never cached.
 export async function codeRow(code) {
   const url = process.env.SUPABASE_URL;
-  const r = await fetch(
-    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete`,
+  const r = await timedFetch(
+    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete&limit=1`,
     { headers: sbHeaders() }
   );
   if (!r.ok) throw new Error('code lookup failed: ' + (await r.text()));
   const rows = await r.json();
   return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+// Player keys are created by slug() in dg-claim, so they are already
+// [a-z0-9-]. This is what makes sure of it before one is spliced into a
+// PostgREST filter: a key carrying a comma or a quote would not inject SQL,
+// but it would silently change which rows the filter selects, and a filter
+// that quietly matches the wrong player is worse than one that errors.
+const KEY_OK = /^[a-z0-9-]{1,40}$/;
+export function safeKeys(players) {
+  return (Array.isArray(players) ? players : []).filter((p) => KEY_OK.test(p));
+}
+
+// The display name is the one piece of free text a player types that another
+// person sees: the coach's list is drawn from it. Angle brackets and control
+// characters have no business in a name, and stripping them here means the
+// browser is never asked to be careful with it.
+export function safeLabel(s) {
+  return String(s == null ? '' : s)
+    .replace(/[<>]/g, '')
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .trim()
+    .slice(0, 40);
 }
 
 // The one gate every dg-* endpoint goes through.
@@ -137,12 +202,16 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, needsName: true, players: [], sessions: [], meta: {} });
   }
 
-  const list = auth.players.map((p) => `"${p}"`).join(',');
+  const keys = safeKeys(auth.players);
+  if (!keys.length) {
+    return res.status(200).json({ ok: true, players: [], display: {}, sessions: [], meta: {}, canDelete: false });
+  }
+  const list = keys.map((p) => `"${p}"`).join(',');
   const headers = sbHeaders();
 
   try {
-    const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/dg_sessions?player=in.(${list})&select=session_id,player,body,updated&order=updated.desc&limit=2000`,
+    const r = await timedFetch(
+      `${SUPABASE_URL}/rest/v1/dg_sessions?player=in.(${list})&select=session_id,player,body,updated&order=updated.desc&limit=5000`,
       { headers }
     );
     if (!r.ok) {
@@ -151,10 +220,13 @@ export default async function handler(req, res) {
     }
     const rows = await r.json();
 
-    const m = await fetch(
-      `${SUPABASE_URL}/rest/v1/dg_meta?player=in.(${list})&select=player,body`,
+    const m = await timedFetch(
+      `${SUPABASE_URL}/rest/v1/dg_meta?player=in.(${list})&select=player,body&limit=200`,
       { headers }
     );
+    // Goals and the library live here. Losing them silently is how a device ends
+    // up holding sessions it has no practice definition to draw, so say so.
+    if (!m.ok) console.error('dg-load: meta lookup failed', m.status, await m.text().catch(() => ''));
     const metaRows = m.ok ? await m.json() : [];
 
     // Each session says whose it is. The save endpoint strips `player` out of
@@ -176,28 +248,28 @@ export default async function handler(req, res) {
     // sees "Charlotte" rather than a tidied-up slug.
     const display = {};
     try {
-      const own = await fetch(
-        `${SUPABASE_URL}/rest/v1/dg_codes?players=ov.{${list}}&select=players,label`,
+      const own = await timedFetch(
+        `${SUPABASE_URL}/rest/v1/dg_codes?players=ov.{${list}}&select=players,label&limit=200`,
         { headers }
       );
       if (own.ok) {
         const rows2 = await own.json();
         rows2.forEach((r) => {
           if (r.label && Array.isArray(r.players) && r.players.length === 1) {
-            display[r.players[0]] = r.label;
+            display[r.players[0]] = safeLabel(r.label);
           }
         });
       }
     } catch (e) { /* names fall back to the key, which is cosmetic */ }
-    if (auth.players.length === 1 && auth.row && auth.row.label) {
-      display[auth.players[0]] = auth.row.label;
+    if (keys.length === 1 && auth.row && auth.row.label) {
+      display[keys[0]] = safeLabel(auth.row.label);
     }
 
     // Tells the coach view whether to offer Remove player at all. Not the
     // control itself: the endpoint checks this again, along with the password.
     const canDelete = !!(auth.row && auth.row.can_delete);
 
-    return res.status(200).json({ ok: true, players: auth.players, display, sessions, meta, canDelete });
+    return res.status(200).json({ ok: true, players: keys, display, sessions, meta, canDelete });
   } catch (err) {
     console.error('dg-load error:', err);
     return res.status(500).json({ ok: false, reason: err.message });

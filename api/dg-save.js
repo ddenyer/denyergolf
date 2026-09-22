@@ -16,9 +16,27 @@
 // and its failure mode is a save that quietly did not happen. See the building
 // reference: this is the first thing to check when a save goes missing.
 
-import { authorise, sbHeaders } from './dg-load.js';
+import { authorise, sbHeaders, timedFetch } from './dg-load.js';
 
 const MAX_BATCH = 500;
+
+// A session body that is wildly larger than any real session is a corrupted one,
+// and letting it through means every later save in the batch fails behind it.
+const MAX_BODY = 400 * 1024;
+
+// Same rule as dg-claim's slug(). A device sending "Sophie Anne" where the
+// server filed "sophie-anne" used to be rejected as somebody else's player, and
+// the rejection was invisible: the save simply never happened. Deriving the key
+// the same way on both sides is the only version of this that stays fixed.
+function slug(name) {
+  return String(name || '')
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -45,13 +63,22 @@ export default async function handler(req, res) {
   let updated = 0, inserted = 0;
   const rejected = [];
 
+  // One session that Supabase will not take used to abort the whole request.
+  // Every session queued behind it was never written, the device retried the
+  // same batch on every load, and it failed at the same row every time. A
+  // history could therefore stop backing up permanently because of one bad row,
+  // and nothing anywhere said so. Each session now stands or falls on its own,
+  // and what was refused comes back by name.
+  let broke = null;
+
   try {
     for (const s of sessions) {
-      const player = (s && s.player ? String(s.player) : '').trim().toLowerCase();
+      const player = slug(s && s.player);
       const sessionId = s && s.id ? String(s.id) : '';
 
       if (!player || !allowed[player]) { rejected.push({ id: sessionId, why: 'not_your_player' }); continue; }
       if (!sessionId) { rejected.push({ id: '', why: 'no_id' }); continue; }
+      if (sessionId.length > 200) { rejected.push({ id: sessionId.slice(0, 40), why: 'bad_id' }); continue; }
 
       // The row body is the session as the tool holds it, minus the routing
       // fields that get their own columns.
@@ -59,87 +86,120 @@ export default async function handler(req, res) {
       delete clean.player;
       delete clean.id;
 
+      let encoded;
+      try {
+        encoded = JSON.stringify(clean);
+      } catch (e) {
+        rejected.push({ id: sessionId, why: 'unserialisable' });
+        continue;
+      }
+      if (encoded.length > MAX_BODY) { rejected.push({ id: sessionId, why: 'too_big' }); continue; }
+
       const lookup =
         `player=eq.${encodeURIComponent(player)}&session_id=eq.${encodeURIComponent(sessionId)}`;
 
-      const getResp = await fetch(
-        `${SUPABASE_URL}/rest/v1/dg_sessions?${lookup}&select=id,sv`,
-        { headers }
-      );
-      if (!getResp.ok) {
-        const t = await getResp.text();
-        return res.status(getResp.status).json({ ok: false, reason: 'lookup failed: ' + t });
-      }
-      const existing = await getResp.json();
-
-      const sv = Number(s.sv) || 0;
-      const payload = {
-        player,
-        session_id: sessionId,
-        status: s.status || null,
-        played_on: s.date || null,
-        area_id: s.areaId || null,
-        kind: s.kind || null,
-        sv,
-        body: clean,
-        updated: new Date().toISOString(),
-      };
-
-      if (Array.isArray(existing) && existing.length > 0) {
-        // A device that has been offline holds an old copy. When it reconnects
-        // it offers that copy back; taking it would undo whatever was scored on
-        // the other device in the meantime. Oldest loses, every time.
-        const held = Number(existing[0].sv) || 0;
-        if (sv && held && sv < held) { rejected.push({ id: sessionId, why: 'stale' }); continue; }
-
-        const patchResp = await fetch(`${SUPABASE_URL}/rest/v1/dg_sessions?${lookup}`, {
-          method: 'PATCH',
-          headers,
-          body: JSON.stringify(payload),
-        });
-        if (!patchResp.ok) {
-          const t = await patchResp.text();
-          return res.status(patchResp.status).json({ ok: false, reason: 'patch failed: ' + t });
+      try {
+        const getResp = await timedFetch(
+          `${SUPABASE_URL}/rest/v1/dg_sessions?${lookup}&select=id,sv&limit=1`,
+          { headers }
+        );
+        if (!getResp.ok) {
+          // A 5xx from Supabase is about the service, not this row, so stop
+          // rather than grinding through five hundred of them.
+          if (getResp.status >= 500) { broke = 'lookup failed: ' + (await getResp.text()); break; }
+          rejected.push({ id: sessionId, why: 'lookup_refused' });
+          continue;
         }
-        updated++;
-      } else {
-        const insResp = await fetch(`${SUPABASE_URL}/rest/v1/dg_sessions`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(payload),
-        });
-        if (!insResp.ok) {
-          const t = await insResp.text();
-          return res.status(insResp.status).json({ ok: false, reason: 'insert failed: ' + t });
+        const existing = await getResp.json();
+
+        const sv = Number(s.sv) || 0;
+        const payload = {
+          player,
+          session_id: sessionId,
+          status: s.status || null,
+          played_on: s.date || null,
+          area_id: s.areaId || null,
+          kind: s.kind || null,
+          sv,
+          body: clean,
+          updated: new Date().toISOString(),
+        };
+
+        if (Array.isArray(existing) && existing.length > 0) {
+          // A device that has been offline holds an old copy. When it reconnects
+          // it offers that copy back; taking it would undo whatever was scored on
+          // the other device in the meantime. Oldest loses, every time.
+          const held = Number(existing[0].sv) || 0;
+          if (sv && held && sv < held) { rejected.push({ id: sessionId, why: 'stale' }); continue; }
+
+          const patchResp = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_sessions?${lookup}`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify(payload),
+          });
+          if (!patchResp.ok) {
+            if (patchResp.status >= 500) { broke = 'patch failed: ' + (await patchResp.text()); break; }
+            rejected.push({ id: sessionId, why: 'patch_refused' });
+            continue;
+          }
+          updated++;
+        } else {
+          const insResp = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_sessions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+          });
+          if (!insResp.ok) {
+            if (insResp.status >= 500) { broke = 'insert failed: ' + (await insResp.text()); break; }
+            rejected.push({ id: sessionId, why: 'insert_refused' });
+            continue;
+          }
+          inserted++;
         }
-        inserted++;
+      } catch (rowErr) {
+        // A timeout on one row is worth reporting and worth stopping for: the
+        // rest of the batch will almost certainly time out too.
+        broke = (rowErr && rowErr.name === 'AbortError') ? 'supabase_timeout' : String(rowErr && rowErr.message);
+        break;
       }
+    }
+
+    // Anything that did get written stays written, and the device is told the
+    // truth about the rest so it can try again rather than assume it is safe.
+    if (broke) {
+      return res.status(503).json({ ok: false, reason: broke, updated, inserted, rejected });
     }
 
     if (meta) {
       for (const player of Object.keys(meta)) {
-        const key = player.trim().toLowerCase();
-        if (!allowed[key]) { rejected.push({ id: 'meta:' + key, why: 'not_your_player' }); continue; }
+        const key = slug(player);
+        if (!key || !allowed[key]) { rejected.push({ id: 'meta:' + key, why: 'not_your_player' }); continue; }
+
+        let metaBody;
+        try {
+          metaBody = JSON.stringify(meta[player]);
+        } catch (e) { rejected.push({ id: 'meta:' + key, why: 'unserialisable' }); continue; }
+        if (metaBody.length > MAX_BODY) { rejected.push({ id: 'meta:' + key, why: 'too_big' }); continue; }
 
         const lookup = `player=eq.${encodeURIComponent(key)}`;
-        const getResp = await fetch(`${SUPABASE_URL}/rest/v1/dg_meta?${lookup}&select=player`, { headers });
+        const getResp = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_meta?${lookup}&select=player&limit=1`, { headers });
         if (!getResp.ok) {
           const t = await getResp.text();
-          return res.status(getResp.status).json({ ok: false, reason: 'meta lookup failed: ' + t });
+          return res.status(getResp.status).json({ ok: false, reason: 'meta lookup failed: ' + t, updated, inserted, rejected });
         }
         const has = await getResp.json();
         const payload = { player: key, body: meta[player], updated: new Date().toISOString() };
 
         const r = Array.isArray(has) && has.length
-          ? await fetch(`${SUPABASE_URL}/rest/v1/dg_meta?${lookup}`, {
+          ? await timedFetch(`${SUPABASE_URL}/rest/v1/dg_meta?${lookup}`, {
               method: 'PATCH', headers, body: JSON.stringify(payload),
             })
-          : await fetch(`${SUPABASE_URL}/rest/v1/dg_meta`, {
+          : await timedFetch(`${SUPABASE_URL}/rest/v1/dg_meta`, {
               method: 'POST', headers, body: JSON.stringify(payload),
             });
         if (!r.ok) {
           const t = await r.text();
-          return res.status(r.status).json({ ok: false, reason: 'meta save failed: ' + t });
+          return res.status(r.status).json({ ok: false, reason: 'meta save failed: ' + t, updated, inserted, rejected });
         }
       }
     }

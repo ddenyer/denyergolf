@@ -21,7 +21,7 @@
 // Rule 3 is the one that matters. Everything else about self-naming is
 // convenience; this is the part that keeps it from being a way in.
 
-import { authorise, cleanCode, couponValid, codeRow, sbHeaders } from './dg-load.js';
+import { cleanCode, couponValid, codeRow, sbHeaders, timedFetch, safeLabel } from './dg-load.js';
 
 // A display name becomes a stable key: lowercase, spaces and punctuation to
 // hyphens. "Sophie-Anne" and "sophie anne" both land on "sophie-anne", which is
@@ -48,7 +48,11 @@ export default async function handler(req, res) {
   const code = cleanCode(body.code);
   if (!code) return res.status(400).json({ ok: false, reason: 'invalid_code_format' });
 
-  const raw = String(body.name || '').trim();
+  // The name she types is stored and later drawn in the coach's list, so it is
+  // the one piece of free text one person here can put in front of another.
+  // Angle brackets and control characters come out before it is stored, not on
+  // the way to the screen: there is only one place to get that right.
+  const raw = safeLabel(body.name);
   if (raw.length < 2)  return res.status(400).json({ ok: false, reason: 'name_too_short' });
   if (raw.length > 40) return res.status(400).json({ ok: false, reason: 'name_too_long' });
 
@@ -71,7 +75,7 @@ export default async function handler(req, res) {
     // 3. does any other code already own this name? Checked across every row,
     //    including multi-player coach codes, which the unique index does not
     //    cover on its own.
-    const taken = await fetch(
+    const taken = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_codes?players=cs.{"${player}"}&select=code`,
       { headers }
     );
@@ -87,7 +91,7 @@ export default async function handler(req, res) {
     // Belt and braces: a player with sessions already, but no code pointing at
     // her, is someone whose code was deleted. Handing her history to whoever
     // types the name next is exactly what this endpoint must not do.
-    const existing = await fetch(
+    const existing = await timedFetch(
       `${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${encodeURIComponent(player)}&select=session_id&limit=1`,
       { headers }
     );
@@ -106,9 +110,9 @@ export default async function handler(req, res) {
     };
 
     const write = mine
-      ? await fetch(`${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}`,
+      ? await timedFetch(`${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}`,
           { method: 'PATCH', headers, body: JSON.stringify(payload) })
-      : await fetch(`${SUPABASE_URL}/rest/v1/dg_codes`,
+      : await timedFetch(`${SUPABASE_URL}/rest/v1/dg_codes`,
           { method: 'POST', headers, body: JSON.stringify(payload) });
 
     if (!write.ok) {
@@ -129,7 +133,7 @@ export default async function handler(req, res) {
     // cannot see her yet is a nuisance, not a failure worth undoing a claim for.
     let shownTo = 0;
     try {
-      const coaches = await fetch(
+      const coaches = await timedFetch(
         `${SUPABASE_URL}/rest/v1/dg_codes?is_coach=is.true&select=code,players`,
         { headers }
       );
@@ -138,7 +142,7 @@ export default async function handler(req, res) {
         for (const row of rows) {
           const have = Array.isArray(row.players) ? row.players : [];
           if (have.indexOf(player) !== -1) continue;
-          const r = await fetch(
+          const r = await timedFetch(
             `${SUPABASE_URL}/rest/v1/dg_codes?code=eq.${encodeURIComponent(row.code)}`,
             { method: 'PATCH', headers, body: JSON.stringify({ players: have.concat([player]) }) }
           );
