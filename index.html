@@ -2637,7 +2637,18 @@ function cloudRow(s, stamp){
   if(!key) return null;
   var row = JSON.parse(JSON.stringify(s));
   row.player = key;
-  row.sv = stamp ? Date.now() : (s.sv || Date.now());
+  /* A session scored before stamps existed has no sv. It used to be given
+     Date.now(), which says "this is the newest copy of this session anywhere"
+     about something played weeks ago. Two devices both holding that session
+     then each claimed to be newest on whichever pushed last, and a legacy
+     session edited on one device could be overwritten by the untouched copy on
+     the other. Same shape as the .map(cloudRow) bug, reached a different way.
+
+     Derive it from the date instead: every device computes the same number for
+     the same session, so neither can outrank the other, and any real edit
+     (which stamps with the actual time) beats all of them. */
+  row.sv = stamp ? Date.now()
+                 : (s.sv || Date.parse(s.date + "T12:00:00Z") || 1);
   return row;
 }
 /* Queued by id and flushed a couple of seconds after the last change, so a
@@ -2834,7 +2845,39 @@ function askName(){
     if(name.length < 2){ msg.textContent = NAME_SAYS.name_too_short; return; }
     go.disabled = true; msg.textContent = "Just a moment…";
 
-    cloudPost("/api/dg-claim", { code:cloudCode(), name:name }).then(function(res){
+    /* Check the live state at the moment of the action, not at the moment the
+       screen went up. Those are different times, and on 22 Sep a stale code
+       raised this screen on a code that owns three players: the screen was
+       right when it was drawn and wrong by the time it was read.
+
+       dg-claim refuses a code that already has a player, so nothing could have
+       been damaged either way. This is about not presenting a dead end: if the
+       code turns out to own somebody, say so and get out of the way rather than
+       letting her type a name into a form that can only fail. */
+    /* Read the code once and check it is there. Claiming with an empty code
+       posts `code:""` to the server, which is nonsense the endpoint then has to
+       refuse, and the reason it comes back with tells her nothing. It happens
+       when the gate decides the code is no longer valid while this screen is
+       open, which is exactly when a clear answer matters most. */
+    var claimCode = cloudCode();
+    if(!claimCode){
+      go.disabled = false;
+      msg.textContent = NAME_SAYS.not_valid;
+      return;
+    }
+    cloudPost("/api/dg-load", { code:claimCode }).then(function(chk){
+      var cur = chk && chk.d;
+      if(cur && cur.ok && cur.players && cur.players.length){
+        wrap.hidden = true;
+        CLOUD.pulled = false; CLOUD.pulledFor = "";
+        cloudPull();
+        render(); show("home");
+        setStatus("That code is already set up, so there was nothing to name.");
+        return null;      // stop here: nothing to claim
+      }
+      return cloudPost("/api/dg-claim", { code:claimCode, name:name });
+    }).then(function(res){
+      if(!res) return;    // the check above handled it
       var d = res.d || {};
       if(!d.ok){
         go.disabled = false;
