@@ -960,6 +960,26 @@
   .storebox.bad{background:#fde7ea; border-color:#c8402f; color:#5c1410}
   .storebox.bad b{color:#8c1d16; font-family:Archivo, sans-serif}
 
+  /* ---- progress: goals and patterns ---- */
+  .grow{padding:12px 0; border-top:1px solid var(--line)}
+  .grow:first-of-type{border-top:0}
+  .gnm{font-family:Archivo, sans-serif; font-size:14.5px; font-weight:600; color:var(--ink)}
+  .gsub{font-weight:400; color:var(--muted); font-size:12.5px}
+  .gval{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:24px;
+    color:var(--ink); margin-top:3px}
+  .gunit{font-family:Archivo, sans-serif; font-size:14px; color:var(--muted)}
+  .gmove{font-family:Archivo, sans-serif; font-size:13px; color:var(--muted);
+    font-weight:400; line-height:1.5; margin-top:2px}
+  .gmove.up{color:#2f7d46}
+  .gmove.down{color:#b83232}
+  .swlist{list-style:none; margin:0 0 6px; padding:0}
+  .swlist li{padding:7px 0; border-top:1px solid var(--line); font-size:13.5px;
+    color:var(--ink-2); line-height:1.5}
+  .swlist li:first-child{border-top:0}
+  .swarea{font-family:Archivo, sans-serif; font-weight:600; color:var(--ink)}
+  .goallist{margin:0 0 10px; padding:0 0 0 20px}
+  .goallist li{font-size:14.5px; color:var(--ink); line-height:1.6; padding:1px 0}
+
   /* ---- add to home screen ---- */
   #installTip .shareico{display:inline-block; vertical-align:-3px; margin:0 2px}
   #installTip .shareico svg{display:block}
@@ -1251,7 +1271,15 @@
 
   <section id="viewHistory" hidden>
     <h1>Progress</h1>
-    <p class="lede">How the numbers are moving, area by area, and what the conditions did to them.</p>
+    <p class="lede">What the practice says about the goals, where the misses lean, and how each area is moving.</p>
+
+    <div id="goalProg"></div>
+
+    <div class="panel">
+      <h2>Strengths and what to work on</h2>
+      <div id="swPanel"></div>
+    </div>
+
     <div class="panel">
       <h2>Where the practice went</h2>
       <div class="balance" id="balance"></div>
@@ -6502,7 +6530,390 @@ function restoreData(){
   setStatus(added + " " + (added===1?"session":"sessions") + " restored.");
 }
 
+/* ============ progress: reading the history ============
+   Everything here works off the balls, not the session totals, because a total
+   says she scored 48 and a ball says she missed it short. The whole point of the
+   page is the second kind of statement.
+
+   Two rules run through all of it. Nothing is called a trend on fewer than five
+   sessions, and no difference is called a change unless it clears a significance
+   test. With sixty balls a session it is very easy to produce a chart that looks
+   like progress and is noise, and a coaching tool that does that is worse than
+   no tool. */
+var MIN_SESSIONS = 5;
+
+/* Where the ball finished, reduced to a side and a depth. Null where the shape
+   of that area has no opinion: a holed putt is not left or right of anything. */
+function zoneSide(z){
+  if(z === "left" || z === "longL" || z === "shortL" || z === "l" || z === "wayLeft") return "L";
+  if(z === "right" || z === "longR" || z === "shortR" || z === "r" || z === "wayRight") return "R";
+  return null;
+}
+function zoneDepth(z){
+  if(z === "short" || z === "shortL" || z === "shortR" || z === "bunker") return "S";
+  if(z === "long" || z === "longL" || z === "longR") return "L";
+  if(z === "g0" || z === "g1") return "S";          // lag: short of the target gate
+  if(z === "g4" || z === "g5") return "L";          // and past it
+  return null;
+}
+
+/* Every scored ball in one area, oldest first, with what was asked of it. */
+function ballStream(areaId, sessions){
+  var a = area(areaId); if(!a || !a.sets) return [];
+  var out = [];
+  (sessions || sessionsFor(areaId)).forEach(function(sess){
+    a.sets.forEach(function(s){
+      if(!trackKind(a, s)) return;
+      var list = (sess.shots || {})[s.id]; if(!list) return;
+      var calls = callsFor(a, s, null, sess);
+      list.forEach(function(x, i){
+        if(!x || !shotDone(s, x, calls[i])) return;
+        var c = calls[i] || {};
+        out.push({
+          date: sess.date, setId: s.id, z: x.z, w: x.w, call: c,
+          ok: !!shotPoint(c, x),
+          win: (c.kind === "w" && x.w === c.win),
+          side: zoneSide(x.z), depth: zoneDepth(x.z)
+        });
+      });
+    });
+  });
+  return out;
+}
+
+function pct(n, d){ return d ? Math.round(n / d * 100) : null; }
+
+/* Two proportions, and whether the difference is worth mentioning. A plain
+   z-test: |z| under 2 is left alone rather than dressed up as a trend. */
+function moved(hitA, nA, hitB, nB){
+  if(nA < 20 || nB < 20) return { verdict:"thin" };
+  var pA = hitA / nA, pB = hitB / nB;
+  var p = (hitA + hitB) / (nA + nB);
+  var se = Math.sqrt(p * (1 - p) * (1 / nA + 1 / nB));
+  if(!se) return { verdict:"flat", from:pA, to:pB };
+  var z = (pB - pA) / se;
+  return {
+    verdict: Math.abs(z) < 2 ? "flat" : (z > 0 ? "up" : "down"),
+    from: pA, to: pB, z: z
+  };
+}
+/* A lopsided miss, tested rather than eyeballed. Fifty-fifty is the null: with
+   thirty misses you need about twenty on one side before it means anything. */
+function lopsided(a, b){
+  var n = a + b;
+  if(n < 20) return { verdict:"thin", n:n };
+  var z = (a - b) / Math.sqrt(n);
+  return { verdict: Math.abs(z) < 2 ? "even" : (a > b ? "A" : "B"), n:n, a:a, b:b, z:z };
+}
+
+/* Split a history into an earlier and a later half, so "is it moving" is asked
+   of two comparable blocks rather than a first session against a last one. */
+function halves(list){
+  if(list.length < 2) return null;
+  var cut = Math.floor(list.length / 2);
+  return { early: list.slice(0, cut), late: list.slice(cut) };
+}
+function tally(balls, test){
+  var hit = 0, n = 0;
+  balls.forEach(function(b){ var v = test(b); if(v === null) return; n++; if(v) hit++; });
+  return { hit:hit, n:n };
+}
+
+/* What each area is actually judged on. The programme already states a target
+   for every one of these; this is the same thing counted from the balls. */
+var HEADLINE = {
+  10: [{ key:"corridor", lab:"In the corridor", test:function(b){ return b.ok; } }],
+  11: [{ key:"circle", lab:"Inside the circle", test:function(b){ return isIn(b.z); } },
+       { key:"pinhigh", lab:"Pin high or past", why:"Short is the miss that costs most: the trouble is usually front.",
+         test:function(b){ return b.depth === null ? (isIn(b.z) ? true : null) : b.depth !== "S"; } }],
+  2:  [{ key:"circle", lab:"Inside the circle", test:function(b){ return isIn(b.z); } },
+       { key:"depth", lab:"Right distance", why:"Wedges are a distance problem before they are a direction problem.",
+         test:function(b){ return b.depth === null ? (isIn(b.z) ? true : null) : false; } }],
+  3:  [{ key:"two", lab:"Inside two clubs", test:function(b){ return isIn(b.z); } },
+       { key:"one", lab:"Inside one club", test:function(b){ return b.z === "b"; } }],
+  4:  [{ key:"holed", lab:"Holed", test:function(b){ return isIn(b.z); } }]
+};
+
+/* ---- placing ----
+   The score out of 80 only means something against the same session; the placing
+   means something full stop, because it is where that count would finish in a
+   hundred tour players. It is also the one number that survives the session being
+   rebuilt: the old short game scored out of 75 and the new one out of 150, and a
+   placing from either is still a placing.
+
+   Only a full test gets one. Forty balls of a sixty-ball session is a good
+   practice and not a result. */
+function sessionPlacing(a, sess){
+  var spec = a && a.placing; if(!spec) return null;
+  var t = testSplit(a, sess);
+  if(!t.n || t.n < spec.n) return null;
+  var tab = tablesFor(spec);
+  var p = tab.count[Math.min(spec.n, t.in_)];
+  return (p == null) ? null : p;
+}
+function placingSeries(areaId){
+  var a = area(areaId); if(!a || !a.placing) return [];
+  return sessionsFor(areaId).map(function(s){
+    var p = sessionPlacing(a, s);
+    return p == null ? null : { date:s.date, place:p };
+  }).filter(Boolean);
+}
+function mean(xs){ return xs.length ? xs.reduce(function(t,x){ return t+x; },0)/xs.length : null; }
+function sd(xs){
+  if(xs.length < 2) return null;
+  var m = mean(xs);
+  return Math.sqrt(xs.reduce(function(t,x){ return t + (x-m)*(x-m); }, 0) / (xs.length - 1));
+}
+/* Sessions are the unit here, not balls. Sixty balls hit on one afternoon are one
+   observation of the player, not sixty, and testing them as sixty is what makes a
+   ball-level test declare a trend after two good days. This is the same comparison
+   done honestly, which is also the real reason five sessions is the threshold. */
+function placingMoved(early, late){
+  if(early.length < 2 || late.length < 2) return { verdict:"thin" };
+  var mE = mean(early), mL = mean(late);
+  var sE = sd(early), sL = sd(late);
+  var se = Math.sqrt((sE*sE)/early.length + (sL*sL)/late.length);
+  if(!se) return { verdict: mL === mE ? "flat" : (mL < mE ? "up" : "down"), from:mE, to:mL };
+  var t = (mE - mL) / se;          // placing falls as she improves
+  return { verdict: Math.abs(t) < 2 ? "flat" : (t > 0 ? "up" : "down"),
+           from:mE, to:mL, t:t, spread: Math.round(Math.max(sE, sL)) };
+}
+
+/* Club head speed, which is its own thing: measured not scored, and outdoors
+   only, because tee shots cannot be hit under the sim roof. */
+function speedSeries(){
+  return sessionsFor(10).concat(sessionsFor(1))
+    .filter(function(s){ return s.metrics && s.metrics.chsAvg; })
+    .sort(function(a,b){ return a.date < b.date ? -1 : 1; })
+    .map(function(s){ return { date:s.date, avg:+s.metrics.chsAvg,
+                               fast:+(s.metrics.chsFast||0), slow:+(s.metrics.chsSlow||0) }; });
+}
+
+function daysAgo(dateStr){ var d = daysSince(dateStr); return d == null ? null : d; }
+
+function arrow(v){ return v === "up" ? "↗" : v === "down" ? "↘" : "→"; }
+/* The headline already says where she is, so this only has to say what it did to
+   get there. Saying the destination twice is what made the first version read
+   like three unrelated numbers. */
+/* The headline already says where she is, so this only has to say what it did to
+   get there. It names the actual sessions compared: "the first half" reads as
+   half a session or half a season, and it is neither. */
+function sessWord(n){ return n + (n === 1 ? " session" : " sessions"); }
+/* Placing runs the other way: 12th is better than 40th, so "up" is a fall. */
+function placingWords(m, nEarly, nLate){
+  if(m.verdict === "thin") return "Not enough full sessions yet to say.";
+  var from = ordinalPlace(Math.round(m.from));
+  var span = "her first " + sessWord(nEarly);
+  if(m.verdict === "flat")
+    return "Holding. " + from + " over " + span + ", and the move since is inside the " +
+           (m.spread ? "session-to-session spread of about " + m.spread + " places" : "noise") + ".";
+  return (m.verdict === "up" ? "Up from " : "Down from ") + from + " over " + span +
+         ", measured against the " + sessWord(nLate) + " since.";
+}
+function movedWords(m, nEarly, nLate){
+  if(m.verdict === "thin") return "Not enough balls yet to say.";
+  var from = Math.round(m.from * 100);
+  var span = "her first " + sessWord(nEarly);
+  if(m.verdict === "flat")
+    return "Holding. " + from + "% over " + span + ", and the move since is inside the noise.";
+  return (m.verdict === "up" ? "Up" : "Down") + " from " + from + "% over " + span +
+         ", measured against the " + sessWord(nLate) + " since.";
+}
+
+/* ---------- 1. goals ----------
+   Her written goals are shown as she wrote them, because most of them (win a
+   tournament, a plus handicap) are not things practice data can answer. Under
+   them sit the ones it can: the programme's own target for each area she is
+   working on, counted from the balls. */
+function renderGoalProgress(){
+  var host = $("goalProg"); if(!host) return;
+  host.innerHTML = "";
+  var p = playerObj();
+
+  if(p && p.outcomes){
+    /* toBullets hands back three strings for three fields, not markup, and it
+       splits on a middot only. Typed into a box these arrive on separate lines,
+       so both separators are honoured here rather than changing a helper the
+       rest of the app relies on. */
+    var lines = (Array.isArray(p.outcomes) ? p.outcomes
+                 : String(p.outcomes).split(/\s*[·\n]\s*/))
+                .map(function(x){ return String(x == null ? "" : x).trim(); })
+                .filter(function(x){ return x; }).slice(0, 5);
+    if(lines.length){
+      var said = document.createElement("div"); said.className = "panel";
+      said.innerHTML = '<h2>What she said it is all for</h2><ul class="goallist">' +
+        lines.map(function(x){ return '<li>' + String(x).replace(/</g,"&lt;") + '</li>'; }).join("") +
+        '</ul><p class="note">These are the season outcomes. Practice data cannot settle them, ' +
+        'so what follows is the part of them it can move.</p>';
+      host.appendChild(said);
+    }
+  }
+
+  var rows = [], thin = [];
+  liveAreas().forEach(function(a){
+    var metrics = HEADLINE[a.id]; if(!metrics) return;
+    var hist = sessionsFor(a.id); if(!hist.length) return;
+    var balls = ballStream(a.id, hist);
+    if(!balls.length) return;
+
+    /* The number is shown from the first session, because it is simply what she
+       is doing and she should be able to see it. The trend is held back until
+       five, which is a different question with a different answer. */
+    var ready = hist.length >= MIN_SESSIONS;
+    var h = ready ? halves(hist) : null;
+    var lateBalls = ready ? ballStream(a.id, h.late) : balls;
+
+    /* Placing leads, because it is the only figure that is comparable across
+       areas, across session formats, and against anything outside this app. */
+    var ps = placingSeries(a.id);
+    if(ps.length){
+      var places = ps.map(function(x){ return x.place; });
+      var prow = { a:a, placing:true, now: Math.round(mean(places.slice(-Math.ceil(places.length/2)))),
+                   nPlace: ps.length, latest: ps[ps.length-1].place };
+      if(ps.length >= MIN_SESSIONS){
+        var cut = Math.floor(places.length/2);
+        prow.mv = placingMoved(places.slice(0, cut), places.slice(cut));
+        prow.nEarly = cut; prow.nLate = places.length - cut;
+        prow.ready = true;
+      }
+      rows.push(prow);
+    }
+
+    metrics.forEach(function(m){
+      var row = { a:a, m:m, now:tally(lateBalls, m.test), n:hist.length, ready:ready };
+      if(ready){
+        var e = tally(ballStream(a.id, h.early), m.test);
+        row.mv = moved(e.hit, e.n, row.now.hit, row.now.n);
+        row.nEarly = h.early.length;
+        row.nLate = h.late.length;
+      }
+      rows.push(row);
+    });
+    if(!ready) thin.push({ a:a, n:hist.length });
+  });
+
+  var sp = speedSeries();
+  var box = document.createElement("div"); box.className = "panel";
+  var html = '<h2>What the practice says</h2>';
+
+  if(sp.length >= 2){
+    var gain = Math.round((sp[sp.length-1].avg - sp[0].avg) * 10) / 10;
+    var stale = daysAgo(sp[sp.length-1].date);
+    html += '<div class="grow"><div class="gnm">Club head speed <span class="gsub">driver, average of the set</span></div>' +
+      '<div class="gval">' + sp[sp.length-1].avg + ' mph <span class="gmove">' +
+      (gain > 0 ? "+" : "") + gain + ' since ' + fmtDate(sp[0].date) + '</span></div>' +
+      '<p class="note">Target is +5 mph. ' +
+      (sp.length < MIN_SESSIONS ? 'Only ' + sp.length + ' measured sets so far, so this is a reading rather than a trend. ' : '') +
+      (stale != null && stale > 42 ? 'Nothing measured for ' + stale + ' days: tee shots cannot be hit indoors, so this stops over the winter rather than going backwards.' : '') +
+      '</p></div>';
+  }
+
+  if(!rows.length && sp.length < 2){
+    html += '<p class="note">Nothing scored yet. Numbers appear from the first session, and trends once there are ' +
+            MIN_SESSIONS + ' in an area.</p>';
+  }
+
+  rows.forEach(function(r){
+    if(r.placing){
+      html += '<div class="grow"><div class="gnm">Against a tour field' +
+        ' <span class="gsub">' + r.a.name + '</span></div>' +
+        '<div class="gval">' + ordinalPlace(r.now) + ' <span class="gunit">of 100</span></div>' +
+        '<div class="gmove ' + (r.ready ? r.mv.verdict : "early") + '">' +
+        (r.ready
+          ? arrow(r.mv.verdict) + ' ' + placingWords(r.mv, r.nEarly, r.nLate)
+          : 'Across ' + sessWord(r.nPlace) + ' of full sixty. No trend yet: ' +
+            MIN_SESSIONS + ' is where one starts to mean something.') +
+        '</div>' +
+        '<p class="note">Where that count would finish in a hundred tour players. ' +
+        'The only figure here that survives the session being rebuilt, so it is the one ' +
+        'to watch across a season.</p></div>';
+      return;
+    }
+    html += '<div class="grow"><div class="gnm">' + r.m.lab +
+      ' <span class="gsub">' + r.a.name + '</span></div>' +
+      '<div class="gval">' + pct(r.now.hit, r.now.n) + '%</div>' +
+      '<div class="gmove ' + (r.ready ? r.mv.verdict : "early") + '">' +
+      (r.ready
+        ? arrow(r.mv.verdict) + ' ' + movedWords(r.mv, r.nEarly, r.nLate)
+        : 'Across ' + sessWord(r.n) + '. No trend yet: ' + MIN_SESSIONS + ' is where one starts to mean something.') +
+      '</div>' +
+      (r.m.why ? '<p class="note">' + r.m.why + '</p>' : '') + '</div>';
+  });
+
+  if(thin.length){
+    html += '<p class="note"><b>Why ' + MIN_SESSIONS + ':</b> a single good or bad day moves a ball count ' +
+      'far more than it moves a player. Sixty balls is plenty of balls, but they were all hit ' +
+      'on the same afternoon in the same wind, so they do not count as sixty separate pieces of ' +
+      'evidence about her. Five sessions is the point at which one bad day stops running the answer.</p>';
+  }
+  box.innerHTML = html;
+  host.appendChild(box);
+}
+
+/* ---------- 2. strengths and weaknesses ----------
+   A miss that leans one way, tested rather than noticed. Then the same lean
+   showing up in two areas at once, which is the thing neither area can tell you
+   on its own and the reason this section exists. */
+function renderStrengths(){
+  var host = $("swPanel"); if(!host) return;
+  host.innerHTML = "";
+
+  var leans = [], notes = [];
+  liveAreas().forEach(function(a){
+    var hist = sessionsFor(a.id); if(hist.length < 3) return;
+    var balls = ballStream(a.id, hist).filter(function(b){ return !b.ok; });
+
+    var L = balls.filter(function(b){ return b.side === "L"; }).length;
+    var R = balls.filter(function(b){ return b.side === "R"; }).length;
+    var side = lopsided(L, R);
+    if(side.verdict === "A" || side.verdict === "B"){
+      leans.push({ a:a, kind:"side", dir: side.verdict === "A" ? "left" : "right",
+                   a_n:L, b_n:R, n:side.n });
+    }
+
+    var S = balls.filter(function(b){ return b.depth === "S"; }).length;
+    var Lo = balls.filter(function(b){ return b.depth === "L"; }).length;
+    var dep = lopsided(S, Lo);
+    if(dep.verdict === "A" || dep.verdict === "B"){
+      leans.push({ a:a, kind:"depth", dir: dep.verdict === "A" ? "short" : "long",
+                   a_n:S, b_n:Lo, n:dep.n });
+    }
+  });
+
+  var html = "";
+  if(!leans.length){
+    html = '<p class="note">No miss is leaning one way often enough to be worth calling a pattern. ' +
+           'That is a real answer, not an empty one: it means the misses are scattered rather than systematic.</p>';
+  } else {
+    html = '<ul class="swlist">';
+    leans.forEach(function(x){
+      var words = x.kind === "side"
+        ? 'misses go <b>' + x.dir + '</b> ' + Math.round(Math.max(x.a_n,x.b_n)/x.n*100) + '% of the time (' +
+          x.a_n + ' left, ' + x.b_n + ' right)'
+        : 'misses finish <b>' + x.dir + '</b> ' + Math.round(Math.max(x.a_n,x.b_n)/x.n*100) + '% of the time (' +
+          x.a_n + ' short, ' + x.b_n + ' long)';
+      html += '<li><span class="swarea">' + x.a.name + '</span> ' + words + '</li>';
+    });
+    html += '</ul>';
+
+    /* the cross-area part: the same lean in two places at once */
+    var sides = leans.filter(function(x){ return x.kind === "side"; });
+    var pairs = [];
+    for(var i = 0; i < sides.length; i++)
+      for(var j = i + 1; j < sides.length; j++)
+        if(sides[i].dir === sides[j].dir)
+          pairs.push(sides[i].a.name + ' and ' + sides[j].a.name + ', both ' + sides[i].dir);
+    if(pairs.length){
+      html += '<p class="note"><b>Worth joining up:</b> ' + pairs.join('; ') +
+              '. A lean that shows in two areas is more likely to be one cause than two.</p>';
+    }
+  }
+  host.innerHTML = html;
+}
+
 function renderProgress(){
+  renderGoalProgress();
+  renderStrengths();
   renderBalance();
   renderConditions();
   var host = $("charts"); host.innerHTML="";
@@ -6520,13 +6931,16 @@ function renderProgress(){
                      lineChart(hist, areaMax(a), a.name);
     host.appendChild(card);
 
-    if(a.id===1){
+    /* Speed is measured on the driver set, which lives in Tee shots now. It used
+       to be attached to the retired area, so on a device with no legacy sessions
+       the chart never appeared even though the numbers were being recorded. */
+    if(a.id===10 || a.id===1){
       var sr = speedRows();
-      if(sr.length){
+      if(sr.length && !host.querySelector(".speedcard")){
         var pb=0, gain=null;
         sr.forEach(function(x){ if(x.f>pb) pb=x.f; });
         if(sr.length>1) gain = Math.round((sr[sr.length-1].f - sr[0].f)*10)/10;
-        var sc = document.createElement("div"); sc.className="chartcard";
+        var sc = document.createElement("div"); sc.className="chartcard speedcard";
         sc.innerHTML = '<div class="hd"><span class="nm">Club head speed · driver</span><span class="pb num">fastest '+pb+' mph'+
           (gain!==null ? ' · '+(gain>0?"+":"")+gain+' since '+sr[0].d : '')+'</span></div>'+
           speedChart(sr)+
