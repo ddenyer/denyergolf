@@ -1977,6 +1977,100 @@ var GYM = [
   blocks:[
   {name:"Movement prep", ex:[
     {id:"pp", name:"Movement prep", prepList:true, pre:"Eleven movements \u00b7 8\u201310 min", tgt:11, sets:1}]}
+] },
+
+/* ---- Nov 2025 programme, added Sep 2026 ----
+   A different shape from sessions 1 to 3, and deliberately kept as its own pair
+   rather than folded into them. Those are ramped percentage work built round a
+   key lift with progression tracked on it. These are paired supersets at fixed
+   light loads: A1 straight into A2, then a minute, three times through.
+
+   Marked extra:true on purpose. gymDue() picks whichever non-extra session was
+   done least recently, so leaving these in the rotation would interleave two
+   different programmes and, because they start with no history at all, they
+   would read as due ahead of everything else from the moment they appeared.
+   They are chosen from the list instead. One word to change if that is wrong.
+
+   The warm up from the sheet is the first block of each, rather than a seventh
+   session, because it is what she does before these two specifically, and the
+   existing Movement prep is already the general one.
+
+   Videos: only the trap bar deadlift came with a link. Two more are exercises
+   the app already had, so those ids are reused. The rest have a written cue and
+   no video, which is honest: a guessed YouTube id is a video of something else. */
+
+{ id:7, name:"Strength 1", lift:"Rotational slam \u00b7 push press", extra:true,
+  intro:"Nov 2025 programme. Three pairs, three rounds each. Go straight from the first exercise into the second, then take the minute. The loads are light on purpose: this is quality and position work, not a grind.",
+  tip:"If a load is not available, go lighter rather than heavier. Nothing here is supposed to be a fight.",
+  blocks:[
+  {name:"Prepare", note:"Roll first, then move. Do not hold the stretches", ex:[
+    {id:"w1", name:"Foam roll \u00b7 quads and glutes", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Slow. Stop on the sore spots and breathe rather than rolling back and forth over them."},
+    {id:"w2", name:"Foam roll \u00b7 hamstrings", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Cross the other leg on top for more pressure. Work up from behind the knee."},
+    {id:"w3", name:"Foam roll \u00b7 thoracic spine and lats", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Roller across the upper back, hands behind the head, ribs down. Then roll onto one side for the lat."},
+    {id:"w4", name:"Spiderman", pre:"3 / side", tgt:3, sets:1, rest:"\u2013",
+     cue:"Long lunge, lead foot outside the hand. Drop the back hip, then turn the chest up towards the ceiling and reach."},
+    {id:"w5", name:"Inch worm", pre:"4", tgt:4, sets:1, rest:"\u2013",
+     cue:"Hands walk out to a plank, feet walk in to the hands. Legs as straight as they will go without rounding the back."},
+    {id:"w6", name:"Squat to stand", pre:"4", tgt:4, sets:1, rest:"30 s",
+     cue:"Hold the toes, sink the hips into a deep squat and lift the chest, then push the hips up towards straight legs without letting go."}]},
+  {name:"Pair A", note:"Slam straight into the lunge, then a minute. Three rounds", ex:[
+    {id:"a1", name:"MB rotational slam", pre:"3 \u00d7 5 / side \u00b7 3 kg", tgt:5, sets:3,
+     load:true, unit:"kg", kit:"ball", rest:"\u2013",
+     cue:"Feet square to the wall, ball at the hip. Turn through the trail leg and throw it down hard. Every rep at full speed, and stop the set if they start to slow."},
+    {id:"a2", name:"Overhead walking lunge", pre:"3 \u00d7 8 / side \u00b7 4 kg", tgt:8, sets:3,
+     load:true, unit:"kg", kit:"ball", rest:"1 min",
+     cue:"Weight locked out overhead, arms by the ears. Ribs down so the back does not arch. Long step, back knee to just above the floor, drive up through the front heel."}]},
+  {name:"Pair B", note:"Single leg squat into the push press, then a minute", ex:[
+    {id:"b1", name:"Band supported single leg squat", pre:"3 \u00d7 5 / side \u00b7 bodyweight", tgt:5, sets:3, rest:"\u2013",
+     cue:"Hold the band in front at chest height and let it take just enough weight to keep you upright. Sit back and down on one leg, other leg out in front, knee tracking over the middle of the foot."},
+    {id:"b2", name:"DB push press", pre:"3 \u00d7 8 \u00b7 3 kg", tgt:8, sets:3,
+     load:true, unit:"kg", kit:"db", rest:"1 min",
+     cue:"Dumbbells at the shoulders. A short dip of the knees, then drive with the legs and let the arms finish it overhead. The dip is small and fast, not a squat."}]},
+  {name:"Pair C", note:"Face pull into the side plank, then a minute", ex:[
+    {id:"c1", name:"Banded face pull", pre:"3 \u00d7 12\u201315 \u00b7 orange band", tgt:12, top:15, sets:3, rest:"\u2013",
+     cue:"Band anchored at head height. Pull it to the face with the elbows high and wide, hands finishing either side of the ears. Shoulder blades back and down, no shrug."},
+    {id:"c2", name:"Side plank, Powell raise", vid:"SrsfDavxo_o", pre:"3 \u00d7 8 / side \u00b7 3 kg", tgt:8, sets:3,
+     load:true, unit:"kg", kit:"db", rest:"1 min",
+     cue:"Side plank on the elbow, hips stacked and lifted. Raise the top arm out and up with the weight, keeping the hips still. The plank is the exercise, the arm is the test of it."}]}
+], tip2:"" },
+
+{ id:8, name:"Strength 2", lift:"Trap bar deadlift \u00b7 pull up", extra:true,
+  intro:"Nov 2025 programme, the second of the pair. Same shape: three pairs, three rounds, straight from the first into the second and then the minute.",
+  tip:"The trap bar is the only real load here. Everything else is bodyweight or a band, so the quality of the positions is what is being trained.",
+  blocks:[
+  {name:"Prepare", note:"Roll first, then move. Do not hold the stretches", ex:[
+    {id:"w1", name:"Foam roll \u00b7 quads and glutes", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Slow. Stop on the sore spots and breathe rather than rolling back and forth over them."},
+    {id:"w2", name:"Foam roll \u00b7 hamstrings", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Cross the other leg on top for more pressure. Work up from behind the knee."},
+    {id:"w3", name:"Foam roll \u00b7 thoracic spine and lats", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
+     cue:"Roller across the upper back, hands behind the head, ribs down. Then roll onto one side for the lat."},
+    {id:"w4", name:"Spiderman", pre:"3 / side", tgt:3, sets:1, rest:"\u2013",
+     cue:"Long lunge, lead foot outside the hand. Drop the back hip, then turn the chest up towards the ceiling and reach."},
+    {id:"w5", name:"Inch worm", pre:"4", tgt:4, sets:1, rest:"\u2013",
+     cue:"Hands walk out to a plank, feet walk in to the hands. Legs as straight as they will go without rounding the back."},
+    {id:"w6", name:"Squat to stand", pre:"4", tgt:4, sets:1, rest:"30 s",
+     cue:"Hold the toes, sink the hips into a deep squat and lift the chest, then push the hips up towards straight legs without letting go."}]},
+  {name:"Pair A", note:"Deadlift straight into the pull up, then a minute. Three rounds", ex:[
+    {id:"a1", name:"Split stance trap bar deadlift", vid:"02Yo0wVfdac", pre:"3 \u00d7 6 / side \u00b7 30 kg", tgt:6, sets:3,
+     load:true, unit:"kg", kit:"bar", rest:"\u2013", prog:true, key:true,
+     cue:"One foot forward, one back, most of the weight through the front leg. Hips back, flat back, stand it up. Six on one stance, then six on the other."},
+    {id:"a2", name:"Banded pull up", pre:"3 \u00d7 3 \u00b7 bodyweight", tgt:3, sets:3, rest:"1 min",
+     cue:"Band under the feet or one knee, enough that the third rep is hard rather than impossible. Start from a dead hang, chin clearly over the bar, lower under control."}]},
+  {name:"Pair B", note:"Cossack lunge into the Pallof hold, then a minute", ex:[
+    {id:"b1", name:"Cossack lunge", pre:"3 \u00d7 8 / side \u00b7 bodyweight", tgt:8, sets:3, rest:"\u2013",
+     cue:"Wide stance. Sit down into one hip with that foot flat, the other leg straight with the toes up. Chest tall. Push back to the middle without using the hands."},
+    {id:"b2", name:"Pallof press hold", vid:"HXrLaqNIkTs", pre:"3 \u00d7 20 s / side \u00b7 blue band", tgt:20, sets:3, rep:"sec", rest:"1 min",
+     cue:"Band anchored at chest height to your side. Press it straight out and hold. The band is trying to turn you and the job is to not let it. Held still, not squeezed."}]},
+  {name:"Pair C", note:"Walk out into the knee raises, then a minute. Two rounds", ex:[
+    {id:"c1", name:"Plank walk out with lift off", pre:"2 \u00d7 5 out and back \u00b7 bodyweight", tgt:5, sets:2, rest:"\u2013",
+     cue:"From standing, hands to the floor and walk out to a long plank, lift one hand an inch off the floor without the hips moving, then walk back in. Hips stay square the whole way."},
+    {id:"c2", name:"Hanging knee raises", pre:"2 \u00d7 10\u201312 \u00b7 bodyweight", tgt:10, top:12, sets:2, rest:"1 min",
+     cue:"Dead hang, shoulders active. Knees up to at least hip height without swinging. Lower slowly, and stop the set when the swing starts.",
+     note:"The Nov 2025 sheet says 25 kg here. Confirmed as an error, so this is bodyweight."}]}
 ] }
 ];
 function gym(id){ for(var i=0;i<GYM.length;i++){ if(GYM[i].id===id) return GYM[i]; } return GYM[0]; }
@@ -3711,6 +3805,26 @@ function renderSC(){
       '</div></div>';
   gb.addEventListener("click", function(){ openGym(); });
   list.appendChild(gb);
+
+  /* The Nov 2025 pair, on its own card. renderSC builds every row by hand
+     rather than iterating GYM, so a session added to the array with no row
+     here is simply unreachable: it was listed nowhere and could not be opened.
+     Kept apart from the card above because the two are different programmes,
+     and interleaving them in one rotation would have her doing ramped
+     percentage work and paired supersets on alternate days. */
+  var nv = mine().filter(isNov);
+  var nd = gym(novDue());
+  var nb = document.createElement("button");
+  nb.className="area"; nb.type="button";
+  nb.innerHTML = '<div class="idx num">S&amp;C</div>'+
+    '<div><div class="nm">Strength 1 &amp; 2</div>'+
+    '<div class="sub">Paired supersets · Nov 2025 programme · next up '+nd.name+'</div></div>'+
+    '<div class="right"><div class="lastscore">'+
+      '<div class="big num">'+nv.length+'</div>'+
+      '<div class="cap">'+(nv.length===1 ? "session" : "sessions")+'</div>'+
+    '</div></div>';
+  nb.addEventListener("click", function(){ openGym(novDue()); });
+  list.appendChild(nb);
 
   // speed sticks, optional, counted on its own
   var sp = mine().filter(isSpeed);
@@ -6106,9 +6220,20 @@ var ROWS = [["dr","Drive"],["ap","Approach"],["rc","Recovery"]];
 function isSpeed(s){ return s.kind==="gym" && s.gymId===4; }
 function isBand(s){ return s.kind==="gym" && s.gymId===5; }
 function isPrep(s){ return s.kind==="gym" && s.gymId===6; }
+/* The Nov 2025 pair. Its own programme, so it has its own card and its own
+   rotation rather than being mixed into the ramped percentage work. */
+function isNov(s){ return s.kind==="gym" && (s.gymId===7 || s.gymId===8); }
 function coreGymSessions(){
-  return mine().filter(function(s){ return s.kind==="gym" && !isSpeed(s) && !isBand(s) && !isPrep(s); })
+  return mine().filter(function(s){ return s.kind==="gym" && !isSpeed(s) && !isBand(s) && !isPrep(s) && !isNov(s); })
                .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+}
+/* Alternates between Strength 1 and Strength 2, whichever was done longer ago,
+   the same way gymDue does for the core three. */
+function novDue(){
+  var a = gymSessions(7), b = gymSessions(8);
+  var da = a.length ? a[a.length-1].date : "0000";
+  var db = b.length ? b[b.length-1].date : "0000";
+  return da <= db ? 7 : 8;
 }
 function gymSessions(id){
   return mine().filter(function(s){ return s.kind==="gym" && (id==null || s.gymId===id); })
@@ -7707,6 +7832,15 @@ function summary(){
   GYM.forEach(function(g){
     var k = keyEx(g), h = gymSessions(g.id);
     if(!h.length) return;
+    /* Not every session has a key lift to track a load on: Speed sticks, the
+       Band session and Movement prep never did, and nor does Strength 1. This
+       used to read k.id regardless, so Copy summary threw the moment any of
+       those had a single session logged against it, and the button did nothing
+       with no explanation. Say how many sessions and leave the load out. */
+    if(!k){
+      out.push("S&C "+g.name+" ("+g.lift+"): "+h.length+" sessions");
+      return;
+    }
     var lastLoad = "";
     for(var i=h.length-1;i>=0;i--){ if(h[i].ex && h[i].ex[k.id] && h[i].ex[k.id].load){ lastLoad = h[i].ex[k.id].load+" kg"; break; } }
     out.push("S&C "+g.name+" ("+g.lift+"): "+h.length+" sessions, "+k.name+" "+(lastLoad||"no load logged"));
