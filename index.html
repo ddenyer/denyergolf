@@ -1041,18 +1041,18 @@
   /* the fault banner. Sits over everything, because a screen that failed to
      draw may have left nothing else readable, but it is dismissible: the app
      underneath is usually still perfectly usable and she may be mid-session. */
-  #faultbar{position:fixed; left:0; right:0; top:0; z-index:9000;
+  #faultbar, #stuckbar{position:fixed; left:0; right:0; top:0; z-index:9000;
     padding:13px 16px calc(13px + env(safe-area-inset-bottom,0px));
     background:var(--card); border-bottom:2px solid var(--accent);
     box-shadow:0 6px 24px rgba(0,0,0,.22)}
-  #faultbar .faultmsg{font-family:Archivo, sans-serif; font-size:14.5px;
+  #faultbar .faultmsg, #stuckbar .faultmsg{font-family:Archivo, sans-serif; font-size:14.5px;
     line-height:1.38; color:var(--ink)}
-  #faultbar .faultrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-  #faultbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:9px;
+  #faultbar .faultrow, #stuckbar .faultrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  #faultbar button, #stuckbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:9px;
     border:1px solid var(--line); background:var(--bg); color:var(--ink);
     font-family:Archivo, sans-serif; font-size:14px; font-weight:600; cursor:pointer}
-  #faultbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
-  :root[data-theme="dark"] #faultbar button.faultgo{color:#12030a}
+  #faultbar button.faultgo, #stuckbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
+  :root[data-theme="dark"] #faultbar button.faultgo, :root[data-theme="dark"] #stuckbar button.faultgo{color:#12030a}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #faultbar button.faultgo{color:#12030a}}
 
   /* ---- access gate ---- */
@@ -1389,9 +1389,9 @@
      build: without endpoints there is nobody to ask. -->
 <div class="duewrap" id="nameWrap" hidden>
   <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
-    <span class="eyebrow">First time here</span>
+    <span class="eyebrow" id="nameEyebrow">First time here</span>
     <h2 id="nameTitle">What should we call you?</h2>
-    <p>This names your practice log. Everything you score from now on is saved under it, on every device you sign in on.</p>
+    <p id="nameLead">This names your practice log. Everything you score from now on is saved under it, on every device you sign in on.</p>
     <form id="nameForm" autocomplete="off">
       <input type="text" id="nameInput" maxlength="40" placeholder="First name"
              aria-label="Your name" autocapitalize="words" spellcheck="false">
@@ -1472,6 +1472,34 @@ function faultBanner(what){
     bar.appendChild(row);
     (document.body || document.documentElement).appendChild(bar);
   }catch(e){ /* if even this fails there is nothing sensible left to try */ }
+}
+/* Nothing scored on this device is reaching her account, and waiting will not
+   fix it. Same furniture as the fault banner, different message and a different
+   offer: reloading is useless here, but getting a file off the phone is not.
+
+   This is deliberately hard to ignore. The quiet version of this warning, one
+   line on a tab she had no reason to open, is what let 21 Sep happen. */
+function stuckBanner(){
+  try{
+    if(document.getElementById("stuckbar")) return;
+    var bar = document.createElement("div");
+    bar.id = "stuckbar"; bar.setAttribute("role", "alert");
+    var msg = document.createElement("div"); msg.className = "faultmsg";
+    msg.textContent = "Nothing you score here is being saved to your account. "
+      + "This device is signed in with a code the server does not recognise. "
+      + "Everything is still on the phone for now, but do not rely on it.";
+    bar.appendChild(msg);
+    var row = document.createElement("div"); row.className = "faultrow";
+    var keep = document.createElement("button");
+    keep.type = "button"; keep.className = "faultgo"; keep.textContent = "Back up my data";
+    keep.addEventListener("click", function(){ try{ backupData(); }catch(e){} });
+    var hide = document.createElement("button");
+    hide.type = "button"; hide.textContent = "I know";
+    hide.addEventListener("click", function(){ bar.parentNode && bar.parentNode.removeChild(bar); });
+    row.appendChild(keep); row.appendChild(hide);
+    bar.appendChild(row);
+    (document.body || document.documentElement).appendChild(bar);
+  }catch(e){}
 }
 window.addEventListener("error", function(e){
   faultBanner(e && (e.message || e.type));
@@ -2533,7 +2561,7 @@ function pushMeta(){
        merge is a union by session id, never a replacement.
      - a save that fails says so. Three attempts, then the status line changes.
    None of this runs in the artifact build, which has no endpoints to call. */
-var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, pulledFor:"", busy:false, canDelete:false };
+var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, pulledFor:"", busy:false, canDelete:false, stuck:false };
 
 function cloudCode(){
   try{
@@ -2682,10 +2710,30 @@ function cloudFlush(){
     CLOUD.on = true; CLOUD.at = Date.now(); CLOUD.why = "";
   }).catch(function(err){
     CLOUD.on = false;
-    CLOUD.why = "Not synced yet. It is saved on this device.";
+    /* A dropped connection and a refusal are not the same thing, and saying
+       "not synced yet" for both is what cost Annabel a session on 21 Sep.
+
+       Her code was rotated that evening. Her phone still held the old one, so
+       every save was refused outright: valid code, nobody attached to it. The
+       app said "Not synced yet. It is saved on this device", which reads like
+       slow wifi and will be ignored, when what it meant was that nothing she
+       scored would ever leave that phone. The history was cleared a day later
+       and the session went with it.
+
+       A refusal is settled. It will not come right by waiting, and it needs to
+       sound like the problem it is. */
+    CLOUD.stuck = !!(err && err.settled);
+    CLOUD.why = CLOUD.stuck
+      ? "NOT being backed up. This device is signed in with a code the server does not recognise, "
+        + "so nothing scored here is leaving this phone. Ask your coach for a current link before you score anything else."
+      : "Not synced yet. It is saved on this device.";
     // put them back so the next change or the next load tries again
     batch.forEach(function(r){ if(!CLOUD.pending[r.id]) CLOUD.pending[r.id] = r; });
-  }).then(function(){ CLOUD.busy = false; renderStoreLine(); });
+  }).then(function(){
+    CLOUD.busy = false;
+    renderStoreLine();
+    if(CLOUD.stuck) stuckBanner();
+  });
 }
 function cloudMeta(){
   if(!cloudReady()) return;
@@ -2830,8 +2878,27 @@ var NAME_SAYS = {
   name_too_long:   "That is too long for a name.",
   name_unusable:   "Try letters and numbers only.",
   not_valid:       "That code is no longer valid. Ask your coach for a new one.",
-  wrong_tool:      "That code is for a different tool."
+  wrong_tool:      "That code is for a different tool.",
+  not_invited:     "Nobody has been set up on this code. Ask your coach for your current link."
 };
+/* The code opens the tool but belongs to nobody, and nobody was invited on it.
+   That is an old link, not a new player: a code rotated away months ago, or one
+   issued for something else. It used to be offered a name box, which is how an
+   old link of Annabel's made a second Annabel on 22 Sep.
+
+   Same panel, no form. She is told plainly what is wrong and who can fix it,
+   which is all she can usefully do about it. */
+function sayNotSetUp(){
+  var wrap = $("nameWrap"); if(!wrap) return;
+  var eb = $("nameEyebrow"), title = $("nameTitle"), lead = $("nameLead"), form = $("nameForm");
+  if(eb) eb.textContent = "This code is not set up";
+  if(title) title.textContent = "Nobody is using this code yet";
+  if(lead) lead.textContent = "It opens the tool, but no player has been set up on it, so there is "
+    + "nothing here to score against. This is usually an old link. Ask your coach for your current one.";
+  if(form) form.hidden = true;
+  wrap.hidden = false;
+}
+
 function askName(){
   var wrap = $("nameWrap"); if(!wrap) return;
   wrap.hidden = false;
@@ -2933,7 +3000,25 @@ function cloudPushAll(){
     return chain.then(function(){
       return cloudTry("/api/dg-save", { code:cloudCode(), sessions:part });
     });
-  }, Promise.resolve(null)).catch(function(){ return null; });
+  }, Promise.resolve(null)).catch(function(err){
+    /* This used to swallow the error and return null, which is the quietest
+       possible way to fail at the ONE job this function has. It is the bulk
+       backup: it runs on every load and it is what gets a device's history off
+       the device. A settled refusal here means nothing is being backed up and
+       waiting will not change that, which is precisely the state Annabel's
+       phone was in all day on 21 Sep while the app said nothing useful. */
+    CLOUD.on = false;
+    if(err && err.settled){
+      CLOUD.stuck = true;
+      CLOUD.why = "NOT being backed up. This device is signed in with a code the server does not "
+        + "recognise, so nothing scored here is leaving this phone. Ask your coach for a current link.";
+      try{ stuckBanner(); }catch(e){}
+    } else if(!CLOUD.why){
+      CLOUD.why = "Not synced yet. It is saved on this device.";
+    }
+    try{ renderStoreLine(); }catch(e){}
+    return null;
+  });
 }
 
 /* The goal-bearing fields on a player. Everything else about a player (id, the
@@ -3048,6 +3133,8 @@ function cloudPull(){
     /* A real code that nobody has taken yet. She says who she is rather than it
        being a job for whoever administers the tool. */
     if(d.needsName){ askName(); return; }
+    /* Valid code, nobody on it, and nobody invited on it either. */
+    if(d.notSetUp){ sayNotSetUp(); return; }
 
     /* This code owns somebody, so whatever the naming screen is doing up, it is
        wrong. An earlier pull on a stale code can have raised it a moment ago,
