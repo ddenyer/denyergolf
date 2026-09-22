@@ -1999,23 +1999,18 @@ var GYM = [
    the app already had, so those ids are reused. The rest have a written cue and
    no video, which is honest: a guessed YouTube id is a video of something else. */
 
-{ id:7, name:"Strength 1", lift:"Rotational slam \u00b7 push press", extra:true,
+{ id:7, name:"Strength 1", lift:"Rotational slam \u00b7 push press", grp:"nov",
   intro:"Nov 2025 programme. Three pairs, three rounds each. Go straight from the first exercise into the second, then take the minute. The loads are light on purpose: this is quality and position work, not a grind.",
   tip:"If a load is not available, go lighter rather than heavier. Nothing here is supposed to be a fight.",
+  prep:[
+    ["Foam roll \u00b7 quads and glutes","60\u201390 s each",null],
+    ["Foam roll \u00b7 hamstrings","60\u201390 s each",null],
+    ["Foam roll \u00b7 thoracic spine and lats","60\u201390 s each",null],
+    ["Spiderman","3 / side","-CiWQ2IvY34"],
+    ["Inch worm","4","9UPNa7mbhqA"],
+    ["Squat to stand","4","xWtrhKwUscU"]
+  ],
   blocks:[
-  {name:"Prepare", note:"Roll first, then move. Do not hold the stretches", ex:[
-    {id:"w1", name:"Foam roll \u00b7 quads and glutes", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Slow. Stop on the sore spots and breathe rather than rolling back and forth over them."},
-    {id:"w2", name:"Foam roll \u00b7 hamstrings", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Cross the other leg on top for more pressure. Work up from behind the knee."},
-    {id:"w3", name:"Foam roll \u00b7 thoracic spine and lats", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Roller across the upper back, hands behind the head, ribs down. Then roll onto one side for the lat."},
-    {id:"w4", name:"Spiderman", pre:"3 / side", tgt:3, sets:1, rest:"\u2013",
-     cue:"Long lunge, lead foot outside the hand. Drop the back hip, then turn the chest up towards the ceiling and reach."},
-    {id:"w5", name:"Inch worm", pre:"4", tgt:4, sets:1, rest:"\u2013",
-     cue:"Hands walk out to a plank, feet walk in to the hands. Legs as straight as they will go without rounding the back."},
-    {id:"w6", name:"Squat to stand", pre:"4", tgt:4, sets:1, rest:"30 s",
-     cue:"Hold the toes, sink the hips into a deep squat and lift the chest, then push the hips up towards straight legs without letting go."}]},
   {name:"Pair A", note:"Slam straight into the lunge, then a minute. Three rounds", ex:[
     {id:"a1", name:"MB rotational slam", pre:"3 \u00d7 5 / side \u00b7 3 kg", tgt:5, sets:3,
      load:true, unit:"kg", kit:"ball", rest:"\u2013",
@@ -2037,23 +2032,18 @@ var GYM = [
      cue:"Side plank on the elbow, hips stacked and lifted. Raise the top arm out and up with the weight, keeping the hips still. The plank is the exercise, the arm is the test of it."}]}
 ], tip2:"" },
 
-{ id:8, name:"Strength 2", lift:"Trap bar deadlift \u00b7 pull up", extra:true,
+{ id:8, name:"Strength 2", lift:"Trap bar deadlift \u00b7 pull up", grp:"nov",
   intro:"Nov 2025 programme, the second of the pair. Same shape: three pairs, three rounds, straight from the first into the second and then the minute.",
   tip:"The trap bar is the only real load here. Everything else is bodyweight or a band, so the quality of the positions is what is being trained.",
+  prep:[
+    ["Foam roll \u00b7 quads and glutes","60\u201390 s each",null],
+    ["Foam roll \u00b7 hamstrings","60\u201390 s each",null],
+    ["Foam roll \u00b7 thoracic spine and lats","60\u201390 s each",null],
+    ["Spiderman","3 / side","-CiWQ2IvY34"],
+    ["Inch worm","4","9UPNa7mbhqA"],
+    ["Squat to stand","4","xWtrhKwUscU"]
+  ],
   blocks:[
-  {name:"Prepare", note:"Roll first, then move. Do not hold the stretches", ex:[
-    {id:"w1", name:"Foam roll \u00b7 quads and glutes", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Slow. Stop on the sore spots and breathe rather than rolling back and forth over them."},
-    {id:"w2", name:"Foam roll \u00b7 hamstrings", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Cross the other leg on top for more pressure. Work up from behind the knee."},
-    {id:"w3", name:"Foam roll \u00b7 thoracic spine and lats", pre:"60\u201390 s each", tgt:1, sets:1, rest:"\u2013",
-     cue:"Roller across the upper back, hands behind the head, ribs down. Then roll onto one side for the lat."},
-    {id:"w4", name:"Spiderman", pre:"3 / side", tgt:3, sets:1, rest:"\u2013",
-     cue:"Long lunge, lead foot outside the hand. Drop the back hip, then turn the chest up towards the ceiling and reach."},
-    {id:"w5", name:"Inch worm", pre:"4", tgt:4, sets:1, rest:"\u2013",
-     cue:"Hands walk out to a plank, feet walk in to the hands. Legs as straight as they will go without rounding the back."},
-    {id:"w6", name:"Squat to stand", pre:"4", tgt:4, sets:1, rest:"30 s",
-     cue:"Hold the toes, sink the hips into a deep squat and lift the chest, then push the hips up towards straight legs without letting go."}]},
   {name:"Pair A", note:"Deadlift straight into the pull up, then a minute. Three rounds", ex:[
     {id:"a1", name:"Split stance trap bar deadlift", vid:"02Yo0wVfdac", pre:"3 \u00d7 6 / side \u00b7 30 kg", tgt:6, sets:3,
      load:true, unit:"kg", kit:"bar", rest:"\u2013", prog:true, key:true,
@@ -2543,7 +2533,7 @@ function pushMeta(){
        merge is a union by session id, never a replacement.
      - a save that fails says so. Three attempts, then the status line changes.
    None of this runs in the artifact build, which has no endpoints to call. */
-var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, busy:false, canDelete:false };
+var CLOUD = { on:false, at:0, why:"", pending:{}, timer:null, pulled:false, pulledFor:"", busy:false, canDelete:false };
 
 function cloudCode(){
   try{
@@ -2855,7 +2845,8 @@ function askName(){
       applyCouponIdentity();
       renderPlayer();
       wrap.hidden = true;
-      CLOUD.pulled = false;      // now that she exists, do the real pull
+      // now that she exists, do the real pull, on the same code
+      CLOUD.pulled = false; CLOUD.pulledFor = "";
       cloudPull();
       render(); show("home");
       showInstallTip();          // naming is done, so this is the next setup step
@@ -2988,8 +2979,25 @@ function usableSession(r){
    old copies only after it has seen the newer ones. The endpoint refuses a
    stale write as well, so neither half depends on the other being right. */
 function cloudPull(){
-  if(!cloudReady() || CLOUD.pulled) return;
+  /* The guard used to be "have I pulled", when the question is "have I pulled
+     FOR THIS CODE".
+
+     Boot runs cloudPull with whatever code the device already had. The gate is
+     still asking WordPress about the code in the link at that point, and only
+     answers a moment later. So opening ?code=NEW on a device holding an older
+     code pulled on the OLD one first. If that old code had nobody attached, the
+     answer was needsName and the naming screen came up. The gate then stored
+     the new code and fired lcl-who, which calls cloudPull again, and the plain
+     boolean sent it straight back out. The naming screen stayed up, on a code
+     that owns three players.
+
+     Keying the guard on the code means the gate's answer always gets its own
+     pull, and switching codes mid-session works too. */
+  var code = cloudCode();
+  if(!code) return;
+  if(CLOUD.pulled && CLOUD.pulledFor === code) return;
   CLOUD.pulled = true;
+  CLOUD.pulledFor = code;
 
   cloudTry("/api/dg-load", { code:cloudCode() }).then(function(d){
     if(!d) return;
@@ -2997,6 +3005,15 @@ function cloudPull(){
     /* A real code that nobody has taken yet. She says who she is rather than it
        being a job for whoever administers the tool. */
     if(d.needsName){ askName(); return; }
+
+    /* This code owns somebody, so whatever the naming screen is doing up, it is
+       wrong. An earlier pull on a stale code can have raised it a moment ago,
+       and being asked to name yourself on a code that already has three players
+       is alarming in a way that is very hard to undo if you answer it. */
+    if(d.players && d.players.length){
+      var nw = $("nameWrap");
+      if(nw && !nw.hidden){ nw.hidden = true; show("home"); }
+    }
 
     /* whether the coach view offers Remove player at all. The endpoint checks
        this again and asks for the password, so this is only about not showing
@@ -3793,11 +3810,10 @@ function renderSC(){
   list.innerHTML = "";
   // strength & conditioning
   var gAll = coreGymSessions();
-  var due = gym(gymDue());
   var gb = document.createElement("button");
   gb.className="area"; gb.type="button";
   gb.innerHTML = '<div class="idx num">S&amp;C</div>'+
-    '<div><div class="nm">Strength &amp; conditioning</div><div class="sub">Power, compound, support, trunk · next up '+due.name+' · '+due.lift+'</div></div>'+
+    '<div><div class="nm">Strength &amp; conditioning</div><div class="sub">Power, compound, support, trunk · September 2026 programme</div></div>'+
     '<div class="right">'+
       '<div class="lastscore">'+
         '<div class="big num">'+gAll.length+'</div>'+
@@ -3813,12 +3829,11 @@ function renderSC(){
      and interleaving them in one rotation would have her doing ramped
      percentage work and paired supersets on alternate days. */
   var nv = mine().filter(isNov);
-  var nd = gym(novDue());
   var nb = document.createElement("button");
   nb.className="area"; nb.type="button";
   nb.innerHTML = '<div class="idx num">S&amp;C</div>'+
     '<div><div class="nm">Strength 1 &amp; 2</div>'+
-    '<div class="sub">Paired supersets · Nov 2025 programme · next up '+nd.name+'</div></div>'+
+    '<div class="sub">Paired supersets · Nov 2025 programme</div></div>'+
     '<div class="right"><div class="lastscore">'+
       '<div class="big num">'+nv.length+'</div>'+
       '<div class="cap">'+(nv.length===1 ? "session" : "sessions")+'</div>'+
@@ -6242,7 +6257,9 @@ function gymSessions(id){
 function gymDue(){
   var best=null, bestDate="9999";
   GYM.forEach(function(g){
-    if(g.extra) return;
+    /* A session in a named group belongs to its own programme and rotates
+       within it, so it must not be pulled into the core rotation here. */
+    if(g.extra || g.grp) return;
     var h = gymSessions(g.id);
     var d = h.length ? h[h.length-1].date : "0000";
     if(d < bestDate){ bestDate=d; best=g.id; }
@@ -6296,6 +6313,18 @@ function gymIntro(){
       (g.srcVid ? '<p class="note" style="margin-top:12px">Every exercise has a diagram on its card. '+g.srcNote+
         vidChip(g.srcVid, g.srcName, "watch the video")+'</p>' : '')+
       (g.kit ? '<div class="targets" style="margin-top:12px"><span class="eyebrow">Kit</span><span>'+g.kit+'</span></div>' : '')+
+      (g.tip ? '<p class="note" style="margin-top:12px"><b>'+g.tip+'</b></p>' : '');
+    return d;
+  }
+  /* A second programme, so it gets its own rules rather than the four that
+     govern the ramped percentage work, and its own warm up in the same
+     collapsible box: one list, read once, not a card per movement. */
+  if(g.grp === "nov"){
+    d.innerHTML =
+      '<div class="targets" style="margin-top:0"><span class="eyebrow">How it runs</span><span>'+g.intro+'</span></div>'+
+      '<details class="prepbox" id="prepBox" open><summary>Warm up <span>every session \u00b7 6\u20138 min</span></summary>'+
+      '<p class="note" style="margin:8px 0 0">Roll first, then move. Do not hold the stretches: work through the range and keep going.</p>'+
+      '<div id="prepList"></div></details>'+
       (g.tip ? '<p class="note" style="margin-top:12px"><b>'+g.tip+'</b></p>' : '');
     return d;
   }
@@ -6378,13 +6407,20 @@ function buildGymList(g, last){
   $("gymProg").innerHTML = "";
   updateNav();
 }
+/* Which programme a session belongs to. The core three are ungrouped; the
+   Nov 2025 pair is "nov"; the optional extras belong to nothing and get no
+   picker at all. */
+function gymGrp(g){ return g.extra ? null : (g.grp || "core"); }
 function renderGymSeg(){
   var host = $("gymSeg"); host.innerHTML="";
-  if(gym(state.gymDraft.gymId).extra){ host.hidden = true; return; }
+  var grp = gymGrp(gym(state.gymDraft.gymId));
+  if(!grp){ host.hidden = true; return; }
   host.hidden = false;
-  var due = gymDue();
+  /* Each programme marks its own due session, so the Nov pair says which of
+     the two is next rather than borrowing the core rotation's answer. */
+  var due = (grp === "nov") ? novDue() : gymDue();
   GYM.forEach(function(g){
-    if(g.extra) return;
+    if(gymGrp(g) !== grp) return;
     var h = gymSessions(g.id);
     var b = document.createElement("button"); b.type="button"; b.setAttribute("role","tab");
     b.setAttribute("aria-selected", g.id===state.gymDraft.gymId ? "true" : "false");
@@ -6396,14 +6432,18 @@ function renderGymSeg(){
     host.appendChild(b);
   });
 }
+/* Each programme has its own warm up. The core three share the eleven-movement
+   PREP list; the Nov 2025 pair carries its own on the session. */
+function prepFor(g){ return (g && g.prep && g.prep.length) ? g.prep : PREP; }
 function renderPrep(){
   var host = $("prepList");
   if(!host) return;
-  var rows = PREP.map(function(p,i){
+  var rows = prepFor(gym(state.gymDraft.gymId)).map(function(p,i){
     return '<div><span>'+(i+1)+'</span><span>'+p[0]+vidChip(p[2], p[0])+'</span><em>'+p[1]+'</em></div>';
   }).join("");
   host.innerHTML = '<div class="prep">'+rows+'</div>'+
-    '<label class="prepdone"><input type="checkbox" id="prepDone"> Movement prep done</label>';
+    '<label class="prepdone"><input type="checkbox" id="prepDone"> '+
+      (gym(state.gymDraft.gymId).grp === "nov" ? "Warm up done" : "Movement prep done")+'</label>';
   $("prepDone").checked = !!state.gymDraft.prep;
   $("prepDone").addEventListener("change", function(){ state.gymDraft.prep = this.checked; });
 }
