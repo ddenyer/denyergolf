@@ -128,7 +128,7 @@ export async function couponValid(code) {
 export async function codeRow(code) {
   const url = process.env.SUPABASE_URL;
   const r = await timedFetch(
-    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete&limit=1`,
+    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete,claimable&limit=1`,
     { headers: sbHeaders() }
   );
   if (!r.ok) throw new Error('code lookup failed: ' + (await r.text()));
@@ -179,7 +179,12 @@ export async function authorise(raw) {
   }
 
   const players = (row && Array.isArray(row.players)) ? row.players : [];
-  if (!players.length) return { ok: true, code, players: [], unclaimed: true };
+  if (!players.length) {
+    // Unclaimed is not the same as invited. A code WordPress still accepts but
+    // that nobody was invited on is an old link, not a new player. See
+    // sql/dg-claimable.sql for what that cost on 22 Sep.
+    return { ok: true, code, players: [], unclaimed: true, claimable: !!(row && row.claimable), row };
+  }
   return { ok: true, code, players, row };
 }
 
@@ -199,7 +204,14 @@ export default async function handler(req, res) {
   // A real coupon nobody has taken yet. The tool asks her what to call herself
   // and posts it to /api/dg-claim. Deliberately returns no sessions at all.
   if (auth.unclaimed) {
-    return res.status(200).json({ ok: true, needsName: true, players: [], sessions: [], meta: {} });
+    // Invited: she names herself and the tool creates her.
+    if (auth.claimable) {
+      return res.status(200).json({ ok: true, needsName: true, players: [], sessions: [], meta: {} });
+    }
+    // Not invited: the code opens the tool but belongs to nobody. Say so rather
+    // than offering to create a player, which is how a rotated-away code used
+    // to be able to mint a duplicate of someone who already existed.
+    return res.status(200).json({ ok: true, notSetUp: true, players: [], sessions: [], meta: {} });
   }
 
   const keys = safeKeys(auth.players);

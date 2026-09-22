@@ -72,6 +72,15 @@ export default async function handler(req, res) {
       return res.status(409).json({ ok: false, reason: 'already_claimed' });
     }
 
+    // 2b. was anybody actually invited on it? A code WordPress still accepts is
+    //     not an invitation: the codes cannot be turned off at that end, so
+    //     every code ever issued would otherwise stay able to create a player
+    //     for ever. That is how BELLA, rotated away the night before, made a
+    //     second Annabel on 22 Sep. See sql/dg-claimable.sql.
+    if (!mine || mine.claimable !== true) {
+      return res.status(403).json({ ok: false, reason: 'not_invited' });
+    }
+
     // 3. does any other code already own this name? Checked across every row,
     //    including multi-player coach codes, which the unique index does not
     //    cover on its own.
@@ -107,6 +116,7 @@ export default async function handler(req, res) {
       players: [player],
       label: raw,
       claimed_at: new Date().toISOString(),
+      claimable: false,      // an invitation is good for exactly one player
     };
 
     const write = mine
