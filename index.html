@@ -1038,6 +1038,23 @@
     font-family:Archivo, sans-serif; font-size:14px; font-weight:600}
   .backlink:hover{color:var(--accent)}
 
+  /* the fault banner. Sits over everything, because a screen that failed to
+     draw may have left nothing else readable, but it is dismissible: the app
+     underneath is usually still perfectly usable and she may be mid-session. */
+  #faultbar{position:fixed; left:0; right:0; top:0; z-index:9000;
+    padding:13px 16px calc(13px + env(safe-area-inset-bottom,0px));
+    background:var(--card); border-bottom:2px solid var(--accent);
+    box-shadow:0 6px 24px rgba(0,0,0,.22)}
+  #faultbar .faultmsg{font-family:Archivo, sans-serif; font-size:14.5px;
+    line-height:1.38; color:var(--ink)}
+  #faultbar .faultrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  #faultbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--bg); color:var(--ink);
+    font-family:Archivo, sans-serif; font-size:14px; font-weight:600; cursor:pointer}
+  #faultbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
+  :root[data-theme="dark"] #faultbar button.faultgo{color:#12030a}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #faultbar button.faultgo{color:#12030a}}
+
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto}
@@ -1415,6 +1432,64 @@
 <script>
 (function(){
 "use strict";
+
+/* ============ the safety net ============
+   Everything below runs in one scope with no framework behind it, so an
+   unexpected shape anywhere — a session from a device running an older build,
+   a practice format that is not on this phone, a field that arrived null —
+   used to mean one silent TypeError and a button that simply stopped working.
+   She is standing on a range with a bucket of balls; a dead button with no
+   explanation is the worst thing this app can do to her.
+
+   So: nothing is swallowed. The error is caught, said plainly, and the two
+   things worth doing about it are put in front of her. The app is left
+   running, because the failure is usually one panel and she can still score.  */
+var FAULT = { count:0, last:"" };
+function faultBanner(what){
+  FAULT.count++;
+  FAULT.last = String(what || "");
+  try{
+    if(document.getElementById("faultbar")) return;
+    var bar = document.createElement("div");
+    bar.id = "faultbar";
+    bar.setAttribute("role", "alert");
+    var msg = document.createElement("div");
+    msg.className = "faultmsg";
+    msg.textContent = "Something on this screen did not draw properly. "
+      + "Your scoring is safe and nothing has been deleted.";
+    bar.appendChild(msg);
+    var row = document.createElement("div"); row.className = "faultrow";
+    var again = document.createElement("button");
+    again.type = "button"; again.textContent = "Reload";
+    again.addEventListener("click", function(){ location.reload(); });
+    var keep = document.createElement("button");
+    keep.type = "button"; keep.textContent = "Back up my data";
+    keep.addEventListener("click", function(){ try{ backupData(); }catch(e){} });
+    var hide = document.createElement("button");
+    hide.type = "button"; hide.className = "faultgo"; hide.textContent = "Carry on";
+    hide.addEventListener("click", function(){ bar.parentNode && bar.parentNode.removeChild(bar); });
+    row.appendChild(again); row.appendChild(keep); row.appendChild(hide);
+    bar.appendChild(row);
+    (document.body || document.documentElement).appendChild(bar);
+  }catch(e){ /* if even this fails there is nothing sensible left to try */ }
+}
+window.addEventListener("error", function(e){
+  faultBanner(e && (e.message || e.type));
+});
+window.addEventListener("unhandledrejection", function(e){
+  faultBanner(e && e.reason && (e.reason.message || e.reason));
+});
+/* Wrap a top-level redraw so one bad panel cannot take the page with it. */
+function guard(fn, label){
+  return function(){
+    try{ return fn.apply(this, arguments); }
+    catch(err){
+      if(window.console && console.error) console.error((label || "render") + " failed:", err);
+      faultBanner(label + ": " + (err && err.message));
+      return null;
+    }
+  };
+}
 
 /* ============ the programme ============ */
 var AREAS = [
@@ -2016,10 +2091,20 @@ function practiceFor(typeId){
   return typeId;
 }
 function isDefaultPractice(id){ return liveAreas().some(function(a){ return a.id === id; }); }
-function areaNo(a){ return a.no || a.id; }
+function areaNo(a){ return a ? (a.no || a.id) : ""; }
 /* The name in prose, without the bracket: "approach", not "approach (ball flight control)". */
-function areaWord(a){ return String(a.name||"").replace(/\s*\(.*\)\s*$/, "").toLowerCase(); }
-function areaTitle(a){ return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name; }
+function areaWord(a){ return a ? String(a.name||"").replace(/\s*\(.*\)\s*$/, "").toLowerCase() : "practice"; }
+/* area() gives back null for an id it cannot resolve, which happens whenever a
+   session outlives the definition it was scored against: a pasted practice that
+   only ever existed on the other phone, or a restore from a backup written
+   before the library was carried in it. That is a session the app should still
+   list, still count and still let her delete. It used to throw here instead,
+   and because renderSessions empties the list before it refills it, one such
+   session took the whole Sessions tab down with it, delete button and all. */
+function areaTitle(a){
+  if(!a) return "Practice · format no longer on this device";
+  return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name;
+}
 /* A 7 ft circle round a 50-yard flag is a 48 to 52 yard shot. Saying it that way
    turns an abstract target into a number she can aim at. */
 function bandText(dist, tc){
@@ -2152,6 +2237,7 @@ var state = {
   restTimer:null,
   db:null,
   lib:{practice:[], tests:[]},
+  gone:{},              // ids deleted on purpose, so no merge can resurrect them
   sampleOn:false
 };
 var LS = "lcl.v1";
@@ -2168,7 +2254,7 @@ function mineAll(){ return state.sessions.filter(function(s){ return s.playerId=
    Everything lives in this browser, so a write that quietly fails loses a session's
    work. Nothing here swallows an error any more: the app knows whether storage is
    working, says so, and refuses to write an empty history over a full one. */
-var STORE = { ok:null, why:"", at:0, wrote:0, read:false };
+var STORE = { ok:null, why:"", at:0, wrote:0, read:false, damaged:false, rescued:false, lastWrote:null };
 function storageWorks(){
   try{
     localStorage.setItem("lcl.probe", "1");
@@ -2189,6 +2275,23 @@ function storedCount(){
     return (o && o.sessions) ? o.sessions.length : 1;
   }catch(e){ return 1; }   // unreadable, but something is there: do not write over it
 }
+/* Ids that have been deleted on purpose, so a merge cannot put them back.
+   Kept for a month, which is far longer than any device stays out of sync and
+   short enough that the list never grows without bound. */
+var GONE_KEEP = 31 * 24 * 3600 * 1000;
+function tombstone(id){
+  if(!id) return;
+  state.gone = state.gone || {};
+  state.gone[id] = Date.now();
+}
+function tombPrune(g){
+  var out = {}, now = Date.now();
+  Object.keys(g || {}).forEach(function(id){
+    if(now - (g[id] || 0) < GONE_KEEP) out[id] = g[id];
+  });
+  return out;
+}
+
 function saveLocal(){
   var live = state.sessions.filter(function(s){ return !s.sample; });
   // a boot that failed to read must never be the thing that empties the store
@@ -2197,11 +2300,54 @@ function saveLocal(){
     STORE.why = "The history on this device could not be read, so it has been left alone.";
     return false;
   }
+  /* The store said it could not be read, and we are about to write over it.
+     Keep the unreadable bytes under their own key first. It promised her
+     nothing had been deleted, and then the next ball she scored deleted it. */
+  if(STORE.damaged && !STORE.rescued){
+    try{
+      var bad = localStorage.getItem(LS);
+      if(bad) localStorage.setItem(LS + ".damaged", bad);
+      STORE.rescued = true;
+    }catch(e){ STORE.rescued = true; }
+  }
+
+  state.gone = tombPrune(state.gone);
+
+  /* Two tabs, or the app and a browser tab, each hold their own copy of the
+     history in memory and each used to write the whole thing back. Whichever
+     saved last won, and everything the other one had scored since it booted
+     was gone. Read what is actually on disk and take the union, so a write
+     can only ever add. Anything deliberately deleted is held out by its
+     tombstone rather than being resurrected here. */
   try{
-    localStorage.setItem(LS, JSON.stringify({
+    var raw = localStorage.getItem(LS);
+    /* Byte-identical to what this tab wrote last time means nobody else has
+       touched it, which is the normal case. Skip the parse. */
+    if(raw && raw !== STORE.lastWrote){
+      var disk = JSON.parse(raw);
+      if(disk && Array.isArray(disk.sessions)){
+        var mineById = {};
+        live.forEach(function(s){ mineById[s.id] = true; });
+        var g = tombPrune(disk.gone);
+        Object.keys(state.gone).forEach(function(id){ g[id] = state.gone[id]; });
+        state.gone = g;
+        disk.sessions.forEach(function(s){
+          if(!s || !s.id || mineById[s.id]) return;
+          if(state.gone[s.id]) return;
+          live.push(s);
+          state.sessions.push(s);
+        });
+      }
+    }
+  }catch(e){ /* unreadable: the write below is still the best available copy */ }
+
+  try{
+    var blob = JSON.stringify({
       players:state.players, activePlayer:state.activePlayer, cardMode:state.cardMode,
-      lib:state.lib, savedAt:Date.now(), sessions:live
-    }));
+      lib:state.lib, gone:state.gone, savedAt:Date.now(), sessions:live
+    });
+    localStorage.setItem(LS, blob);
+    STORE.lastWrote = blob;
     STORE.ok = true; STORE.at = Date.now(); STORE.wrote = live.length; STORE.why = "";
     return true;
   }catch(e){
@@ -2222,13 +2368,33 @@ function loadLocal(){
     if(o && o.sessions) state.sessions = o.sessions;
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
     if(o && o.lib) state.lib = { practice:(o.lib.practice||[]), tests:(o.lib.tests||[]) };
+    if(o && o.gone) state.gone = tombPrune(o.gone);
     if(o && o.savedAt) STORE.at = o.savedAt;
+    /* A stored activePlayer that is not in the stored roster used to leave
+       playerObj() quietly answering with somebody else: her history read as
+       empty while her goals panel showed, and saved over, the other girl's. */
+    if(!state.players.some(function(p){ return p.id === state.activePlayer; })){
+      state.activePlayer = state.players.length ? state.players[0].id : "p1";
+    }
+    STORE.lastWrote = raw;
     STORE.read = true;
     STORE.wrote = (o && o.sessions) ? o.sessions.length : 0;
     return true;
   }catch(e){
     STORE.ok = false;
-    STORE.why = "The history saved on this device could not be read. Nothing has been deleted.";
+    STORE.damaged = true;
+    /* Keep the unreadable bytes now, not later. The message below promises
+       nothing has been deleted, and the first ball she scored used to delete
+       it: the empty-store guard in saveLocal only holds while the history is
+       empty, and scoring one ball makes it non-empty. Copying it here means
+       the promise is true from the moment it is made, whatever happens next. */
+    try{
+      var bad = localStorage.getItem(LS);
+      if(bad) localStorage.setItem(LS + ".damaged", bad);
+      STORE.rescued = true;
+    }catch(e2){ /* no room to keep it, which is often why it is damaged */ }
+    STORE.why = "The history saved on this device could not be read. Nothing has been deleted, "
+              + "and the unreadable copy has been kept.";
     return false;
   }
 }
@@ -2245,7 +2411,25 @@ function pushDoc(s){
   if(!state.db) return;
   try{ state.db.doc("sessions/"+s.id).set(docBody(s)).catch(function(){}); }catch(e){}
 }
+/* Every goal, target and swing check she types goes through here. These are the
+   edits it hurts most to lose: prose she thought about, typed once, and will
+   assume is kept. saveLocal can refuse — private browsing, a full store — and
+   thirteen call sites used to throw that answer away and say nothing. */
+function saveEdit(){
+  var ok = saveLocal();
+  pushMeta();
+  if(!ok) setStatus("That was NOT saved. " + (STORE.why || "This browser refused the write.")
+                  + " Copy what you typed before leaving this screen.");
+  return ok;
+}
 function pushMeta(){
+  /* Stamp the edit so the pull can tell a newer copy from an older one. Without
+     it, goals could only ever be filled in where a device had none, never
+     updated across devices. */
+  try{
+    var me = state.players.filter(function(x){ return x.id === state.activePlayer; })[0];
+    if(me){ me.mv = Date.now(); try{ saveLocal(); }catch(e){} }
+  }catch(e){}
   cloudMeta();
   if(!state.db) return;
   try{ state.db.doc("meta/roster").set({players:state.players, activePlayer:state.activePlayer}).catch(function(){}); }catch(e){}
@@ -2312,20 +2496,48 @@ function ensurePlayer(key, display){
 }
 function cloudReady(){ return !!cloudCode(); }
 
+/* A request that never comes back is worse than one that fails: the queue stays
+   busy and nothing else is allowed to go up. Anything not answered inside
+   twenty seconds is treated as a failure and retried like any other. */
+var CLOUD_TIMEOUT = 20000;
 function cloudPost(path, body){
-  return fetch(path, {
+  var ctl = (typeof AbortController === "function") ? new AbortController() : null;
+  var timer = setTimeout(function(){ try{ ctl && ctl.abort(); }catch(e){} }, CLOUD_TIMEOUT);
+  var opts = {
     method:"POST",
     headers:{"Content-Type":"application/json", "Accept":"application/json"},
     body:JSON.stringify(body)
-  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); });
+  };
+  if(ctl) opts.signal = ctl.signal;
+  return fetch(path, opts).then(function(r){
+    /* A gateway or a host block page answers with HTML, and r.json() then
+       rejects with something that says nothing useful. Treat an unparseable
+       body as no body and keep the status, so a real refusal can still be told
+       apart from a network wobble. */
+    return r.json().then(
+      function(d){ return { ok:r.ok, status:r.status, d:d }; },
+      function(){  return { ok:r.ok, status:r.status, d:null }; }
+    );
+  }).then(function(res){ clearTimeout(timer); return res; },
+          function(err){ clearTimeout(timer); throw err; });
+}
+/* A refusal that will be refused again is not worth three goes. A revoked code
+   or a code with nobody on it answers the same way every time, and retrying it
+   only means three WordPress round trips per save for as long as it lasts. */
+function cloudFinal(status){
+  return status === 400 || status === 403 || status === 404 || status === 409 || status === 405;
 }
 /* 0 / 508 / 2010ms, the house backoff. A third failure is visible, never silent. */
 function cloudTry(path, body, attempt){
   attempt = attempt || 0;
   return cloudPost(path, body).then(function(res){
     if(res.ok && res.d && res.d.ok) return res.d;
-    throw new Error((res.d && res.d.reason) || "save failed");
+    var e = new Error((res.d && res.d.reason) || ("save failed (" + res.status + ")"));
+    e.status = res.status;
+    e.settled = cloudFinal(res.status);
+    throw e;
   }).catch(function(err){
+    if(err && err.settled) throw err;
     if(attempt >= 2) throw err;
     var wait = [508, 2010][attempt];
     return new Promise(function(done){ setTimeout(done, wait); })
@@ -2356,7 +2568,16 @@ function cloudPush(s){
   CLOUD.timer = setTimeout(cloudFlush, 2000);
 }
 function cloudFlush(){
-  if(!cloudReady() || CLOUD.busy) return;
+  if(!cloudReady()) return;
+  /* A flush already in flight used to mean this one simply returned, taking the
+     scheduled timer with it. The last balls of a session, queued while a slow
+     save was still going, then sat here until the next page load. Come back
+     rather than drop it. */
+  if(CLOUD.busy){
+    if(CLOUD.timer) clearTimeout(CLOUD.timer);
+    CLOUD.timer = setTimeout(cloudFlush, 1200);
+    return;
+  }
   var ids = Object.keys(CLOUD.pending);
   if(!ids.length) return;
   var batch = ids.map(function(id){ return CLOUD.pending[id]; });
@@ -2556,12 +2777,115 @@ function askName(){
    a device with sessions the server has never seen cannot be emptied by what
    comes back, and again once the player's name is known, because a session can
    only be filed under a named player. */
+/* Sent in chunks. One request carrying a whole season is both too big for the
+   platform's request limit and too slow for its function timeout, and the
+   failure mode of exceeding either is a backup that never completes and never
+   says why. Forty at a time always fits. */
+var PUSH_CHUNK = 40;
 function cloudPushAll(){
+  /* cloudRow's second argument decides whether the session is stamped as
+     changed just now. `.map(cloudRow)` passed the ARRAY INDEX as that argument,
+     so every session except the first was re-stamped with the current time on
+     every single bulk push — and a bulk push runs on every page load.
+
+     That defeated the whole stale guard. A phone that had been offline for a
+     week re-stamped its week-old copies as the newest in existence and
+     overwrote the work done on the iPad in the meantime, on both sides of the
+     wire: the server's guard compares stamps, and the stamps were lying.
+
+     A bulk re-push must carry the stamp the session already had. */
   var rows = state.sessions.filter(function(s){ return !s.sample; })
-                           .map(cloudRow).filter(Boolean);
+                           .map(function(s){ return cloudRow(s, false); })
+                           .filter(Boolean);
   if(!rows.length) return Promise.resolve(null);
-  return cloudTry("/api/dg-save", { code:cloudCode(), sessions:rows })
-           .catch(function(){ return null; });
+
+  var chunks = [];
+  for(var i = 0; i < rows.length; i += PUSH_CHUNK) chunks.push(rows.slice(i, i + PUSH_CHUNK));
+  return chunks.reduce(function(chain, part){
+    return chain.then(function(){
+      return cloudTry("/api/dg-save", { code:cloudCode(), sessions:part });
+    });
+  }, Promise.resolve(null)).catch(function(){ return null; });
+}
+
+/* The goal-bearing fields on a player. Everything else about a player (id, the
+   local name) belongs to this device and is never taken from the server. */
+var META_FIELDS = ["outcomes", "project", "targets", "process", "checksByArea", "plans", "assigned"];
+
+/* Take goals, targets and the library back down.
+
+   Two rules, and the second is the one that matters:
+     - a server copy stamped later than this device's last edit wins outright,
+       which is how an edit made on the phone reaches the iPad.
+     - otherwise it only FILLS GAPS. A field this device already has is left
+       exactly as it is.
+   So the worst case is that an edit fails to propagate, never that one is
+   overwritten. Meta has no per-field history, so there is no safe way to merge
+   two sets of edits, and silently losing the typed one is not an option. */
+function applyMeta(meta){
+  if(!meta || typeof meta !== "object") return;
+  var touched = false;
+
+  Object.keys(meta).forEach(function(key){
+    var box = meta[key];
+    if(!box || typeof box !== "object") return;
+
+    var them = box.player;
+    if(them && typeof them === "object"){
+      var mine = null;
+      state.players.forEach(function(p){ if(slugName(p.name) === key) mine = p; });
+      if(mine){
+        var newer = (Number(them.mv) || 0) > (Number(mine.mv) || 0);
+        META_FIELDS.forEach(function(f){
+          if(them[f] == null) return;
+          if(newer || mine[f] == null){
+            try{ mine[f] = JSON.parse(JSON.stringify(them[f])); touched = true; }catch(e){}
+          }
+        });
+        if(newer && them.mv) mine.mv = them.mv;
+      }
+    }
+
+    /* The library is shared across players on a device, so it is merged by id
+       rather than replaced. An id already here wins: it may have been edited. */
+    var lib = box.lib;
+    if(lib && typeof lib === "object"){
+      state.lib = state.lib || { practice:[], tests:[] };
+      ["practice", "tests"].forEach(function(k){
+        var incoming = Array.isArray(lib[k]) ? lib[k] : [];
+        state.lib[k] = state.lib[k] || [];
+        var have = {};
+        state.lib[k].forEach(function(x){ if(x && x.id) have[x.id] = true; });
+        incoming.forEach(function(x){
+          if(!x || !x.id || have[x.id]) return;
+          /* Straight through the same validator the paste box uses. A malformed
+             definition reaching state.lib is a blank home screen at boot. */
+          if(typeof libProblem === "function" && libProblem(x, k)) return;
+          state.lib[k].push(x); have[x.id] = true; touched = true;
+        });
+      });
+    }
+  });
+
+  /* Redraw. Without this the goals came down, were saved, and stayed invisible
+     until something else happened to trigger a render: her season outcomes sat
+     in storage while the panel went on saying "not set". */
+  if(touched){
+    try{ saveLocal(); }catch(e){}
+    try{ renderPlayer(); render(); }catch(e){}
+  }
+}
+
+/* A session is only worth merging in if the app can actually draw it. One
+   malformed row used to be enough to take a screen down; now it is skipped and
+   counted, and the rest of the history arrives. */
+function usableSession(r){
+  if(!r || typeof r !== "object") return false;
+  if(!r.id || typeof r.id !== "string") return false;
+  if(r.scores  != null && typeof r.scores  !== "object") return false;
+  if(r.shots   != null && typeof r.shots   !== "object") return false;
+  if(r.metrics != null && typeof r.metrics !== "object") return false;
+  return true;
 }
 
 /* Boot. Pull first, then push what the server turned out not to have.
@@ -2617,6 +2941,23 @@ function cloudPull(){
       cloudPushAll();
     }
 
+    /* Goals, targets, swing checks and the practice library were being sent up
+       by cloudMeta and never taken down again: nothing read d.meta at all.
+
+       For Charlotte and Annabel that hid itself, because seedByName puts the
+       programme defaults back on a fresh device and they look like the real
+       thing. For anyone who names herself there is no seed, so her season
+       outcomes simply vanished on the second device. And for those two,
+       anything they had EDITED came back as the default instead.
+
+       It took the practice library with it, which is worse than it sounds: a
+       session scored against a pasted format arrives on the other device with
+       no definition to render it against, which is the crash that used to take
+       the whole Sessions tab down.
+
+       Runs after the player blocks above, so there is somebody to hang it on. */
+    applyMeta(d.meta);
+
     var byId = {};
     state.sessions.filter(function(s){ return !s.sample; })
                   .forEach(function(s){ byId[s.id] = s; });
@@ -2628,14 +2969,24 @@ function cloudPull(){
       r.playerId = ensurePlayer(r.player, d.display && d.display[r.player]);
     });
 
-    var added = 0;
+    var added = 0, skipped = 0;
     d.sessions.forEach(function(r){
+      /* A row the app cannot draw is left on the server rather than merged in.
+         It is not deleted anywhere; it simply does not get to take a screen
+         down on the way in. */
+      if(!usableSession(r)){ skipped++; return; }
+      /* Deleted here on purpose. If the server-side delete did not land, the
+         pull would otherwise hand it straight back every time she loaded. */
+      if(state.gone && state.gone[r.id]){ cloudDrop(r); return; }
       var have = byId[r.id];
       if(!have){ byId[r.id] = r; added++; return; }
       // same session on both sides: the later write wins, and a session with no
       // stamp is from before this change, so anything stamped is newer
       if((r.sv || 0) > (have.sv || 0)) byId[r.id] = r;
     });
+    if(skipped && window.console && console.warn){
+      console.warn("dg: " + skipped + " session(s) from the server were not in a shape this build can read");
+    }
 
     var merged = Object.keys(byId).map(function(k){ return byId[k]; });
     if(merged.length){
@@ -2647,9 +2998,17 @@ function cloudPull(){
     if(added) render();
     renderStoreLine();
     cloudPushAll();      // now send up whatever the server did not have
-  }).catch(function(){
+  }).catch(function(err){
     CLOUD.on = false;
-    CLOUD.why = "Could not reach the sync service. Everything is saved on this device.";
+    /* A refusal and a flat tyre are different things and she should be told
+       which. A refusal is settled and will not fix itself by waiting. */
+    CLOUD.why = (err && err.settled)
+      ? "This device is not signed in for syncing. Everything is saved on the device."
+      : "Could not reach the sync service. Everything is saved on this device.";
+    /* Let a later trigger try again. This used to stay latched for the life of
+       the page, so one dropped connection at boot meant no sync at all until
+       she happened to reload. */
+    if(!(err && err.settled)) CLOUD.pulled = false;
     renderStoreLine();
   });
 }
@@ -2669,7 +3028,18 @@ function connect(){
     db.doc("meta/roster").get().then(function(snap){
       if(snap.exists){
         var d=snap.data();
-        if(d.players && d.players.length){ state.players=d.players; state.activePlayer=d.activePlayer||d.players[0].id; }
+        if(d.players && d.players.length){
+          state.players=d.players;
+          state.activePlayer=d.activePlayer||d.players[0].id;
+          /* The roster is replaced wholesale here, and it used to be possible
+             for activePlayer to end up pointing at nobody. playerObj() then
+             quietly answered with players[0] while mine() filtered strictly, so
+             her history read as empty and her goals panel showed — and saved
+             over — the other girl's. */
+          if(!state.players.some(function(p){ return p.id === state.activePlayer; })){
+            state.activePlayer = state.players[0].id;
+          }
+        }
         renderPlayer(); render();
       } else { pushMeta(); }
     }).catch(function(){});
@@ -2941,7 +3311,7 @@ function testSessions(testId, playerId){
   return state.sessions.filter(function(x){
     return x.kind === "test" && x.testId === testId &&
            x.playerId === (playerId || state.activePlayer);
-  }).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  }).sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
 }
 function testPlan(areaId){
   var p = playerObj();
@@ -2952,7 +3322,7 @@ function testsDoneFor(areaId){
   return state.sessions.filter(function(x){
     var t = x.kind === "test" ? testById(x.testId) : null;
     return t && t.area === areaId && x.playerId === state.activePlayer;
-  }).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  }).sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
 }
 /* Practice sessions in that area since the last test of that area. A test is not a
    practice session, so it resets the count without counting towards the next one. */
@@ -2968,24 +3338,6 @@ function testDue(areaId){
   var every = Math.max(1, plan.every || 5), n = sinceLastTest(areaId);
   if(n < every) return null;
   return { test:testById(plan.id), n:n, every:every, over:n - every };
-}
-function testCount(t){
-  /* Balls that met the rule. On the fade test that is the window and the circle on the
-     same ball, which is stricter than the card, because half a fade is not a fade. */
-  var got = 0, n = 0;
-  (t.sets || []).forEach(function(st){
-    var list = (state.draft.shots || {})[st.id] || [];
-    var calls = callsFor(t, st, null, state.draft);
-    list.forEach(function(x, i){
-      if(!x || !shotDone(st, x, calls[i])) return;
-      n++;
-      var c = calls[i] || {};
-      var ring = inFor(c, x.z);
-      if(c.kind === "w") { if(x.w === c.win && ring) got++; }
-      else if(ring) got++;
-    });
-  });
-  return {n:n, got:got};
 }
 function testTally(t, sess){
   var got = 0, n = 0;
@@ -3164,7 +3516,7 @@ function testBox(a){
     pl.practice = pl.practice || {};
     if(psel.value === String(a.id) || psel.value === a.id) delete pl.practice[a.id];
     else pl.practice[a.id] = psel.value;
-    saveLocal(); pushMeta();
+    saveEdit();
     paintWhen(); renderHome(); renderTests();
   });
   prow.appendChild(psel);
@@ -3201,7 +3553,7 @@ function testBox(a){
     inp.value = String(every);
     if(!id) delete pl.tests[a.id];
     else pl.tests[a.id] = { id:id, every:every };
-    saveLocal(); pushMeta();
+    saveEdit();
     paintWhen();
     renderHome();
     renderTests();
@@ -3246,7 +3598,7 @@ function renderGoals(){
   out.appendChild(bulletBox({
     eyebrow:"Outcome goals",
     lines: outcomesFor,
-    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveLocal(); pushMeta(); } }
+    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveEdit(); } }
   }));
   host.appendChild(out);
 
@@ -3259,8 +3611,8 @@ function renderGoals(){
     card.appendChild(bulletBox({
       eyebrow:"Targets",
       lines: function(){ return targetsFor(a.id); },
-      onSave: function(v){ var pl = playerObj(); if(pl){ pl.targets = pl.targets || {}; pl.targets[a.id] = v; saveLocal(); pushMeta(); } },
-      onReset: function(){ var pl = playerObj(); if(pl && pl.targets){ delete pl.targets[a.id]; saveLocal(); pushMeta(); } }
+      onSave: function(v){ var pl = playerObj(); if(pl){ pl.targets = pl.targets || {}; pl.targets[a.id] = v; saveEdit(); } },
+      onReset: function(){ var pl = playerObj(); if(pl && pl.targets){ delete pl.targets[a.id]; saveEdit(); } }
     }));
     var live = document.createElement("p"); live.className="galive"; live.textContent = areaLive(a);
     card.appendChild(live);
@@ -3269,8 +3621,8 @@ function renderGoals(){
       eyebrow:"How · the week",
       cls:"proc",
       lines: function(){ return processFor(a.id); },
-      onSave: function(v){ var pl = playerObj(); if(pl){ pl.process = pl.process || {}; pl.process[a.id] = v; saveLocal(); pushMeta(); } },
-      onReset: function(){ var pl = playerObj(); if(pl && pl.process){ delete pl.process[a.id]; saveLocal(); pushMeta(); } }
+      onSave: function(v){ var pl = playerObj(); if(pl){ pl.process = pl.process || {}; pl.process[a.id] = v; saveEdit(); } },
+      onReset: function(){ var pl = playerObj(); if(pl && pl.process){ delete pl.process[a.id]; saveEdit(); } }
     }));
     perf.appendChild(card);
   });
@@ -3305,7 +3657,7 @@ function renderHomeGoals(){
   host.appendChild(bulletBox({
     eyebrow:"This season \u00b7 what it is all for",
     lines: outcomesFor,
-    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveLocal(); pushMeta(); } }
+    onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveEdit(); } }
   }));
 }
 function renderHome(){
@@ -3549,6 +3901,7 @@ function clearDraft(){
   if(draftTimer){ clearInterval(draftTimer); draftTimer = null; }
 }
 function dropSession(x){
+  tombstone(x.id);     // so the cross-tab merge in saveLocal cannot bring it back
   state.sessions = state.sessions.filter(function(y){ return y.id !== x.id; });
   if(state.draft && state.draft.id === x.id){ state.draft = null; clearDraft(); }
   if(state.gymDraft && state.gymDraft.id === x.id){ state.gymDraft = null; clearDraft(); }
@@ -3556,7 +3909,6 @@ function dropSession(x){
   cloudDrop(x);
   if(state.db){ try{ state.db.doc("sessions/"+x.id).delete().catch(function(){}); }catch(e){} }
 }
-function loadDraft(){ return liveSessions()[0] || null; }
 function watchDraft(){
   if(draftTimer) clearInterval(draftTimer);
   draftTimer = setInterval(saveDraft, 15000);
@@ -3615,8 +3967,28 @@ function openSession(areaId, resume){
   if(!resume) resume = liveSessions().filter(function(x){
     return x.kind === "practice" && x.areaId === areaId; })[0] || null;
   var a = area(areaId);
+  /* No definition, no session. This used to walk straight into a.isTest below
+     and throw, which left the home screen showing a perfectly good "Resume"
+     bar whose button did nothing at all, on every load, for ever. Saying so is
+     the difference between a bug she can work around and one she cannot. */
+  if(!a || !a.sets){
+    alert("This session was scored against a practice format that is not on this device. "
+        + "It is still in your history and still counts, but it cannot be opened here. "
+        + "If you set it up on another device, open the app there and it will come back.");
+    return false;
+  }
   if(resume){
     state.draft = resume;
+    /* A resumed session came from storage or from another device, so it is only
+       as complete as whatever wrote it. The fresh branch below seeds these; the
+       resume branch never did, and every scoring path indexes them unguarded. */
+    if(!state.draft.scores)  state.draft.scores  = {};
+    if(!state.draft.metrics) state.draft.metrics = {};
+    if(!state.draft.shots)   state.draft.shots   = {};
+    if(!state.draft.slope)   state.draft.slope   = {};
+    if(!state.draft.cond)    state.draft.cond    = {};
+    if(!state.draft.rot)     state.draft.rot     = {};
+    if(state.draft.max == null) state.draft.max  = areaMax(a);
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
                     date:today(), scores:{}, metrics:{}, shots:{}, slope:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : (a.compete ? a.compete.max : 0)), won:null, notes:"", max:areaMax(a) };
@@ -5041,12 +5413,36 @@ function makeRotCalls(a, s){
   }
   return calls;
 }
+/* Calls for a rotation set. The draw is random, made once, and kept with the
+   session: it is what each ball was asked to do, so it is part of the result.
+
+   A finished session must never be re-drawn. It used to be: if the stored draw
+   was missing or the wrong length — a set definition edited since, or a session
+   that came back through a path which drops `rot` — this regenerated it from
+   Math.random in the middle of a render. The scoring of a session she played
+   months ago then changed every time the page was reloaded, and because the
+   draft timer saves every fifteen seconds, one of those re-rolls eventually got
+   written down as the real one. A stats function must not rewrite history. */
+var ROT_SPARE = {};
 function rotCalls(a, s, store){
   store = store || state.draft || {};
-  store.rot = store.rot || {};
-  var n = ballsIn(s), cur = store.rot[s.id];
-  if(!cur || cur.length !== n){ cur = makeRotCalls(a, s); store.rot[s.id] = cur; }
-  return cur;
+  var n = ballsIn(s);
+  var live = store.status !== "done";
+  var cur = (store.rot || {})[s.id];
+  if(cur && cur.length === n) return cur;
+
+  if(live){
+    store.rot = store.rot || {};
+    cur = makeRotCalls(a, s);
+    store.rot[s.id] = cur;
+    return cur;
+  }
+  /* Finished, and the stored draw cannot be used. Make one, hold it for this
+     page only, and leave the session exactly as it was found. It is at least
+     the same answer every time it is asked within a session. */
+  var key = (store.id || "?") + "|" + s.id + "|" + n;
+  if(!ROT_SPARE[key]) ROT_SPARE[key] = makeRotCalls(a, s);
+  return ROT_SPARE[key];
 }
 function callsFor(a, s, cfg, store){
   if(cfg && cfg.calls) return cfg.calls;
@@ -5475,13 +5871,6 @@ var COURSE_RULES = [
   ["Get your head right", ["It's OK to make mistakes","Target and shot shape, not mechanics",
     "One shot at a time","Control the controllables","Be your own caddie \u2014 commit"]]
 ];
-function renderCourseRules(hostId){
-  var host = $(hostId); if(!host) return;
-  host.innerHTML = COURSE_RULES.map(function(g){
-    return '<div class="cgroup" style="margin-bottom:10px"><span class="eyebrow">'+g[0]+'</span>'+
-      '<ul class="rulelist">'+g[1].map(function(r){ return "<li>"+r+"</li>"; }).join("")+'</ul></div>';
-  }).join("");
-}
 /* Targets and swing checks are three bullets. Anything stored as the old single
    string is split on the middle dot so nothing already saved is lost. */
 function toBullets(v){
@@ -5544,7 +5933,7 @@ function renderChecks(hostId, areaId, opts){
     lines: function(){ return checksFor(areaId); },
     onSave: function(v){
       var pl = playerObj();
-      if(pl){ pl.checksByArea = pl.checksByArea || {}; pl.checksByArea[areaId] = v; saveLocal(); pushMeta(); }
+      if(pl){ pl.checksByArea = pl.checksByArea || {}; pl.checksByArea[areaId] = v; saveEdit(); }
       if(state.draft) state.draft.checks = checksFor(areaId);
       if(opts.after) opts.after();
     }
@@ -5654,11 +6043,11 @@ function renderTargets(hostId, areaId){
     lines: function(){ return targetsFor(areaId); },
     onSave: function(v){
       var pl = playerObj();
-      if(pl){ pl.targets = pl.targets || {}; pl.targets[areaId] = v; saveLocal(); pushMeta(); }
+      if(pl){ pl.targets = pl.targets || {}; pl.targets[areaId] = v; saveEdit(); }
     },
     onReset: function(){
       var pl = playerObj();
-      if(pl && pl.targets){ delete pl.targets[areaId]; saveLocal(); pushMeta(); }
+      if(pl && pl.targets){ delete pl.targets[areaId]; saveEdit(); }
     }
   });
   if(hostId==="roundTargetBox") box.style.marginTop = "12px";
@@ -5698,7 +6087,8 @@ function renderCond(hostId, draft, kind){
 
 function updateTotal(){
   var d = state.draft; if(!d) return;
-  var a = area(d.areaId);
+  var a = area(d.areaId); if(!a || !a.sets) return;
+  if(!d.scores) d.scores = {};
   var t = 0; a.sets.forEach(function(s){ setParts(s).forEach(function(p){ t += (d.scores[p.key]||0); }); });
   d.total = t;
   $("totFig").textContent = String(t);
@@ -5909,12 +6299,6 @@ function roundKit(x, kit, working){
   return best;
 }
 function kgText(v){ return ((v % 1 === 0) ? String(v) : v.toFixed(1)); }
-function plateOld(x, base){
-  var step = (base < 20) ? 1 : 2.5;
-  var v = Math.round(x/step)*step;
-  if(v <= 0) v = step;
-  return (v % 1 === 0) ? String(v) : v.toFixed(1);
-}
 function perSide(e){ return String(e.pre||"").indexOf("/ side") > -1; }
 function repNote(e, reps){
   var u = e.rep==="sec" ? "s" : e.rep==="m" ? "m" : e.rep==="cm" ? "cm" : "";
@@ -6131,24 +6515,6 @@ var RSTATS = [
      parts:[{id:"m", label:"Made", max:10},{id:"a", label:"Chances", max:10}]},
   {id:"x3",    label:"Three putts",          note:"Or worse",                    max:6}
 ];
-function statStepper(key, max, label, compact){
-  var st = document.createElement("div"); st.className = "stepper" + (compact ? " compact" : "");
-  var minus = document.createElement("button"); minus.type="button"; minus.textContent="\u2212";
-  minus.setAttribute("aria-label","Subtract one from "+label);
-  var val = document.createElement("span"); val.className="val";
-  var inp = document.createElement("input"); inp.type="number"; inp.min="0"; inp.max=String(max);
-  inp.value="0"; inp.inputMode="numeric"; inp.setAttribute("aria-label", label+" out of "+max);
-  var mx = document.createElement("span"); mx.className="max"; mx.textContent="/"+max;
-  val.appendChild(inp); val.appendChild(mx);
-  var plus = document.createElement("button"); plus.type="button"; plus.textContent="+";
-  plus.setAttribute("aria-label","Add one to "+label);
-  st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
-    minus.addEventListener("click", function(){ set(parseInt(inp.value,10)-1); });
-  plus.addEventListener("click", function(){ set(parseInt(inp.value,10)+1); });
-  inp.addEventListener("input", function(){ set(parseInt(inp.value,10)); });
-  inp.addEventListener("focus", function(){ inp.select(); });
-  return st;
-}
 /* ---------- save ---------- */
 function saveCurrent(){
   var s;
@@ -6490,7 +6856,11 @@ function renderStoreLine(){
   $("restoreBtn").addEventListener("click", restoreData);
 }
 function backupData(){
+  /* The library goes in the backup. restoreData has always read o.lib and
+     backupData never wrote it, so a restore onto a clean device brought the
+     sessions back with nothing to score them against. */
   var blob = JSON.stringify({ v:1, at:Date.now(), players:state.players,
+    lib:state.lib,
     sessions:state.sessions.filter(function(s){ return !s.sample; }) });
   var name = "longer-closer-lower-" + today() + ".json";
   if(window.claude && claude.use){
@@ -6513,21 +6883,40 @@ function restoreData(){
   if(!txt) return;
   var o; try{ o = JSON.parse(txt); }catch(e){ setStatus("That did not look like a backup file."); return; }
   var have = {}; state.sessions.forEach(function(x){ have[x.id]=true; });
-  var added = 0;
-  (o.sessions||[]).forEach(function(x){ if(x && x.id && !have[x.id]){ state.sessions.push(x); added++; } });
+  var added = 0, dropped = 0;
+  (o.sessions||[]).forEach(function(x){
+    if(!x || !x.id || have[x.id]) return;
+    if(!usableSession(x)){ dropped++; return; }
+    state.sessions.push(x); have[x.id] = true; added++;
+  });
   (o.players||[]).forEach(function(pp){
-    if(!state.players.some(function(x){ return x.id===pp.id; })) state.players.push(pp);
+    if(pp && pp.id && !state.players.some(function(x){ return x.id===pp.id; })) state.players.push(pp);
   });
   if(o.lib){
     state.lib = state.lib || {practice:[], tests:[]};
     ["practice","tests"].forEach(function(k){
       (o.lib[k]||[]).forEach(function(x){
-        if(x && x.id && !area(x.id)) state.lib[k].push(x);
+        /* Through the same validator the paste box uses. This used to take
+           anything with an id, and a definition with no sets is a blank home
+           screen on the next boot, because render() runs unguarded there. */
+        if(!x || !x.id || area(x.id)) return;
+        if(libProblem(x, k)){ dropped++; return; }
+        state.lib[k].push(x);
       });
     });
   }
-  saveLocal(); render();
-  setStatus(added + " " + (added===1?"session":"sessions") + " restored.");
+  /* A restore is exactly when storage is most likely to refuse: she is often
+     restoring because something went wrong. Saying "14 sessions restored" and
+     then losing them all on reload is the one thing this must not do. */
+  var ok = saveLocal();
+  render();
+  if(!ok){
+    setStatus("Nothing could be saved: " + (STORE.why || "this browser refused the write.")
+            + " The backup file is still good. Try again in a normal browser window.");
+    return;
+  }
+  setStatus(added + " " + (added===1?"session":"sessions") + " restored."
+          + (dropped ? " " + dropped + " item(s) in the file could not be read and were left out." : ""));
 }
 
 /* ============ progress: reading the history ============
@@ -6613,25 +7002,50 @@ function halves(list){
   var cut = Math.floor(list.length / 2);
   return { early: list.slice(0, cut), late: list.slice(cut) };
 }
-function tally(balls, test){
+/* `only` restricts the count to named sets. A metric that is not asked of every
+   set in the area has to say so, or the sets it cannot apply to sit in the
+   denominator and quietly drag the answer down. */
+function tally(balls, test, only){
   var hit = 0, n = 0;
-  balls.forEach(function(b){ var v = test(b); if(v === null) return; n++; if(v) hit++; });
+  balls.forEach(function(b){
+    if(only && only.indexOf(b.setId) === -1) return;
+    var v = test(b); if(v === null) return; n++; if(v) hit++;
+  });
   return { hit:hit, n:n };
 }
 
 /* What each area is actually judged on. The programme already states a target
-   for every one of these; this is the same thing counted from the balls. */
+   for every one of these; this is the same thing counted from the balls.
+
+   Each test must give the same answer as inFor() does when it scores the ball.
+   Two of them did not, and both erred the same way: they threw away balls the
+   app itself counts as good, so the headline read lower than the card. */
 var HEADLINE = {
   10: [{ key:"corridor", lab:"In the corridor", test:function(b){ return b.ok; } }],
+  /* Pin high is one question: did it get there. inFor's pinhigh rule scores
+     every zone except the three short ones, so wide-but-level is a hit. This
+     used to return null for left and right, dropping them from both sides of
+     the ratio and understating her by several points. */
   11: [{ key:"circle", lab:"Inside the circle", test:function(b){ return isIn(b.z); } },
        { key:"pinhigh", lab:"Pin high or past", why:"Short is the miss that costs most: the trouble is usually front.",
-         test:function(b){ return b.depth === null ? (isIn(b.z) ? true : null) : b.depth !== "S"; } }],
+         test:function(b){ return b.z == null ? null : !SHORT_ZONES[b.z]; } }],
+  /* Distance control asks about the number alone. inFor's distance rule counts
+     level with the flag but wide of it, for the same reason. This used to
+     return false for every determinable depth, so a ball level with the flag
+     and ten feet left was scored as the wrong distance. */
   2:  [{ key:"circle", lab:"Inside the circle", test:function(b){ return isIn(b.z); } },
        { key:"depth", lab:"Right distance", why:"Wedges are a distance problem before they are a direction problem.",
-         test:function(b){ return b.depth === null ? (isIn(b.z) ? true : null) : false; } }],
+         test:function(b){ return b.z == null ? null : (isIn(b.z) || !!OFFLINE_ZONES[b.z]); } }],
   3:  [{ key:"two", lab:"Inside two clubs", test:function(b){ return isIn(b.z); } },
        { key:"one", lab:"Inside one club", test:function(b){ return b.z === "b"; } }],
-  4:  [{ key:"holed", lab:"Holed", test:function(b){ return isIn(b.z); } }]
+  /* The clock and nothing else, which is what the area's own placing spec says:
+     "The test is the 55 clock putts and nothing else." The lag ladder and the
+     rotation were in this count, and a lag putt is scored on gates, so its zone
+     can never be "holed". Fifty putts that were incapable of passing sat in the
+     denominator, and a player holing two in three of her clock putts was shown
+     a holing rate in the thirties. */
+  4:  [{ key:"holed", lab:"Holed", why:"The clock only: a lag is scored on gates, not on the hole.",
+         only:"placing", test:function(b){ return isIn(b.z); } }]
 };
 
 /* ---- placing ----
@@ -6668,15 +7082,42 @@ function sd(xs){
    observation of the player, not sixty, and testing them as sixty is what makes a
    ball-level test declare a trend after two good days. This is the same comparison
    done honestly, which is also the real reason five sessions is the threshold. */
+/* Two-sided 5% critical value for Student's t. At the sample sizes this app
+   actually has — five sessions split two and three — the right number is 4.30,
+   not 1.96, and using 2 regardless is what turns a one-in-twenty claim into
+   nearer one in six. Stepped rather than interpolated: erring high is the safe
+   direction for a claim about a child's progress. */
+var T95 = [[1,12.71],[2,4.303],[3,3.182],[4,2.776],[5,2.571],[6,2.447],[7,2.365],
+           [8,2.306],[9,2.262],[10,2.228],[12,2.179],[15,2.131],[20,2.086],
+           [24,2.064],[30,2.042],[40,2.021],[60,2.000],[120,1.980]];
+function tCrit(df){
+  if(!(df > 0)) return T95[0][1];
+  for(var i = 0; i < T95.length; i++){ if(df <= T95[i][0]) return T95[i][1]; }
+  return 1.96;
+}
 function placingMoved(early, late){
   if(early.length < 2 || late.length < 2) return { verdict:"thin" };
   var mE = mean(early), mL = mean(late);
   var sE = sd(early), sL = sd(late);
-  var se = Math.sqrt((sE*sE)/early.length + (sL*sL)/late.length);
-  if(!se) return { verdict: mL === mE ? "flat" : (mL < mE ? "up" : "down"), from:mE, to:mL };
+  var vE = (sE*sE) / early.length, vL = (sL*sL) / late.length;
+
+  /* A placing is a whole number out of a hundred, so two sessions landing on
+     exactly the same one is common and says nothing about there being no
+     variation underneath. Floor the standard error at half a place rather than
+     letting a zero denominator declare a certainty it has not earned. */
+  var se = Math.max(Math.sqrt(vE + vL), 0.5);
+
+  /* Welch–Satterthwaite. With two sessions against three this comes out near 2,
+     where the threshold is more than twice the 1.96 everyone reaches for. */
+  var df = ((vE + vL) * (vE + vL)) /
+           ((vE*vE) / (early.length - 1) + (vL*vL) / (late.length - 1));
+  if(!(df > 0)) df = early.length + late.length - 2;
+  var crit = tCrit(df);
+
   var t = (mE - mL) / se;          // placing falls as she improves
-  return { verdict: Math.abs(t) < 2 ? "flat" : (t > 0 ? "up" : "down"),
-           from:mE, to:mL, t:t, spread: Math.round(Math.max(sE, sL)) };
+  return { verdict: Math.abs(t) < crit ? "flat" : (t > 0 ? "up" : "down"),
+           from:mE, to:mL, t:t, df:df, crit:crit,
+           spread: Math.round(Math.max(sE || 0, sL || 0)) };
 }
 
 /* Club head speed, which is its own thing: measured not scored, and outdoors
@@ -6684,7 +7125,10 @@ function placingMoved(early, late){
 function speedSeries(){
   return sessionsFor(10).concat(sessionsFor(1))
     .filter(function(s){ return s.metrics && s.metrics.chsAvg; })
-    .sort(function(a,b){ return a.date < b.date ? -1 : 1; })
+    /* Returning 1 for equal dates is an inconsistent comparator: two sessions
+       on the same day could sort either way, and the first and last entries are
+       what the "+X mph since" figure reads off. */
+    .sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); })
     .map(function(s){ return { date:s.date, avg:+s.metrics.chsAvg,
                                fast:+(s.metrics.chsFast||0), slow:+(s.metrics.chsSlow||0) }; });
 }
@@ -6780,9 +7224,18 @@ function renderGoalProgress(){
     }
 
     metrics.forEach(function(m){
-      var row = { a:a, m:m, now:tally(lateBalls, m.test), n:hist.length, ready:ready };
+      /* "placing" means: the sets this area's placing spec counts, which is the
+         area's own statement of which sets are the comparable test. */
+      var only = (m.only === "placing")
+               ? (a.placing && a.placing.sets) || null
+               : (m.only || null);
+      var row = { a:a, m:m, now:tally(lateBalls, m.test, only), n:hist.length, ready:ready };
+      /* No balls this metric can be asked of means there is nothing to say.
+         pct() answers null on an empty denominator and the row printed the
+         literal text "null%". */
+      if(!row.now.n) return;
       if(ready){
-        var e = tally(ballStream(a.id, h.early), m.test);
+        var e = tally(ballStream(a.id, h.early), m.test, only);
         row.mv = moved(e.hit, e.n, row.now.hit, row.now.n);
         row.nEarly = h.early.length;
         row.nLate = h.late.length;
@@ -6821,7 +7274,11 @@ function renderGoalProgress(){
         '<div class="gmove ' + (r.ready ? r.mv.verdict : "early") + '">' +
         (r.ready
           ? arrow(r.mv.verdict) + ' ' + placingWords(r.mv, r.nEarly, r.nLate)
-          : 'Across ' + sessWord(r.nPlace) + ' of full sixty. No trend yet: ' +
+          /* The full test is 45, 55, 60 or 75 balls depending on the area. It
+             used to say sixty for all of them, which is wrong for four of the
+             six and makes her doubt the rest of the number. */
+          : 'Across ' + sessWord(r.nPlace) + ' of the full ' +
+            ((r.a.placing && r.a.placing.n) || 'test') + '. No trend yet: ' +
             MIN_SESSIONS + ' is where one starts to mean something.') +
         '</div>' +
         '<p class="note">Where that count would finish in a hundred tour players. ' +
@@ -6860,7 +7317,12 @@ function renderStrengths(){
 
   var leans = [], notes = [];
   liveAreas().forEach(function(a){
-    var hist = sessionsFor(a.id); if(hist.length < 3) return;
+    /* The same five-session bar the goal panel uses, and for the same reason.
+       This panel publishes claims like "her misses go left three times in four";
+       running that off three sessions while the panel beside it explains why
+       three is not enough was the kind of inconsistency that quietly teaches
+       her to trust the wrong number. */
+    var hist = sessionsFor(a.id); if(hist.length < MIN_SESSIONS) return;
     var balls = ballStream(a.id, hist).filter(function(b){ return !b.ok; });
 
     var L = balls.filter(function(b){ return b.side === "L"; }).length;
@@ -7383,7 +7845,7 @@ $("gymBack").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("saveBtn").addEventListener("click", saveCurrent);
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
-  if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveLocal(); pushMeta(); render(); }
+  if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveEdit(); render(); }
 });
 $("playerSwitch").addEventListener("click", function(){
   var i = state.players.map(function(p){ return p.id; }).indexOf(state.activePlayer);
@@ -7396,7 +7858,7 @@ $("playerSwitch").addEventListener("click", function(){
   } else {
     state.activePlayer = state.players[(i+1) % state.players.length].id;
   }
-  renderPlayer(); saveLocal(); pushMeta();
+  renderPlayer(); saveEdit();
   state.sampleOn = false;
   render(); show("home");
 });
@@ -7441,6 +7903,29 @@ function fallbackCopy(text, what){
       function(){ setStatus(what+" could not be copied. "+text.slice(0,80)+"…"); });
   } else setStatus(what+" is not available in this browser.");
 }
+
+/* Every screen the tabs can reach, wrapped once here rather than at each of the
+   thirty-odd call sites. A function declaration is a mutable binding, so this
+   swaps what the existing handlers already point at. The effect is that a panel
+   that cannot draw says so and leaves the rest of the app alive, instead of
+   throwing part-way through and leaving a tab that does nothing when tapped. */
+render           = guard(render,           "the screen");
+renderSessions   = guard(renderSessions,   "the session list");
+renderProgress   = guard(renderProgress,   "progress");
+renderGoalProgress = guard(renderGoalProgress, "goal progress");
+renderStrengths  = guard(renderStrengths,  "strengths");
+renderGoals      = guard(renderGoals,      "goals");
+renderSession    = guard(renderSession,    "the score card");
+renderSC         = guard(renderSC,         "S&C");
+renderTests      = guard(renderTests,      "tests");
+renderBench      = guard(renderBench,      "benchmarks");
+renderHome       = guard(renderHome,       "the home screen");
+renderPlayer     = guard(renderPlayer,     "the player");
+renderReview     = guard(renderReview,     "the review");
+renderGym        = guard(renderGym,        "the gym session");
+csv              = guard(csv,              "the CSV export");
+backupData       = guard(backupData,       "the backup");
+restoreData      = guard(restoreData,      "the restore");
 
 /* ---------- coach ---------- */
 var COACH_PASS = "Coach1*";
