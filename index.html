@@ -650,7 +650,13 @@
   .mxacts button{flex:1 1 0; min-height:56px; border-radius:10px;
     font-family:Archivo, sans-serif; font-size:17px; font-weight:600; cursor:pointer}
   .mxgo{border:0; background:var(--accent-fill); color:#ffffff}
+  .mxgo.wide{min-height:62px; font-size:18px}
   .mxno{border:1.5px solid var(--line-strong); background:var(--surface); color:var(--ink)}
+  .mxno.quit{border-color:var(--down); color:var(--down)}
+  .mxpausebar{margin-top:10px}
+  .mxtop.held .mxfig{color:var(--muted)}
+  .mxheld{color:var(--muted)}
+  .mxres.won .mxheld{color:#a8d5bd}
 
   .mxbands{display:flex; flex-direction:column; gap:8px; margin:14px 0 4px}
   .mxband{display:flex; align-items:center; gap:13px; width:100%; min-height:58px; padding:0 16px;
@@ -697,6 +703,25 @@
   .mxrun.best{border-color:var(--up); color:var(--up); font-weight:600}
   .mxrun.now{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--ink)}
   .mxrun.now.best{background:var(--up-wash); border-color:var(--up); color:var(--up)}
+
+  .mxsetup{margin-top:14px}
+  .mxsrow{display:flex; gap:11px; align-items:flex-start; padding:10px 0;
+    border-bottom:1px solid var(--line)}
+  .mxsrow:last-of-type{border-bottom:0}
+  .mxsrow .n{flex:none; width:22px; height:22px; border-radius:50%; background:var(--surface-2);
+    border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--ink-2)}
+  .mxsrow .b{display:flex; flex-direction:column; gap:2px; min-width:0}
+  .mxsrow .b b{font-size:14.5px; font-weight:600}
+  /* Not ".set": that class already exists for a scoring row and brings a white
+     card with it, which made every station's setup look like an input box. */
+  .mxsrow .cfg{font-size:12.5px; line-height:1.4; color:var(--ink-2)}
+  .mxsrow .pts{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+    color:var(--muted); margin-top:2px}
+  .mxfold{margin-top:16px; border-top:1px solid var(--line); padding-top:10px}
+  .mxfold summary{cursor:pointer; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
+  .mxfold summary:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
 
   .mxreach{margin-top:18px}
   .mxrow{display:flex; align-items:center; gap:9px; padding:5px 0}
@@ -2545,12 +2570,29 @@ function mxSeed(a, d){
   if(!d.mx || typeof d.mx !== "object") d.mx = {};
   var mx = d.mx;
   if(a.shape === "gauntlet"){
-    if(typeof mx.start !== "number" || !(mx.start > 0)) mx.start = Date.now();
+    /* The clock is accumulated time, not "now minus when the page opened".
+       Opening the test in the car park and walking to the green used to cost
+       her five minutes of the forty five.
+
+       `acc` is time already run, `since` is when the current running stretch
+       began, or 0 while paused. Closing the app does NOT pause it: `since`
+       stays set and the time keeps counting, which is what makes the clock
+       survive a locked phone. Only the Pause button pauses it. */
+    if(typeof mx.first !== "number" || mx.first < 0) mx.first = 0;
+    if(typeof mx.acc   !== "number" || mx.acc   < 0) mx.acc   = 0;
+    if(typeof mx.since !== "number" || mx.since < 0) mx.since = 0;
+    if(typeof mx.pauses !== "number" || mx.pauses < 0) mx.pauses = 0;
+    /* A draft written by the first build of this test carried `start` and
+       nothing else. Treat it as one unbroken stretch from then. */
+    if(mx.start > 0 && !mx.first){ mx.first = mx.start; mx.since = mx.start; }
     if(!Array.isArray(mx.laps)) mx.laps = [];
     if(typeof mx.at !== "number" || mx.at < 0) mx.at = 0;
     if(typeof mx.end !== "number" || mx.end < 0) mx.end = 0;
   } else {
     if(!Array.isArray(mx.hits)) mx.hits = [];
+    /* Twelve stations have to be walked out and marked before a ball is hit,
+       so the card opens on the list rather than on station one. */
+    if(typeof mx.ready !== "boolean") mx.ready = mx.hits.length > 0;
   }
 }
 
@@ -2569,16 +2611,29 @@ function gtComplete(a, d){
   for(var i=0;i<laps.length;i++){ if(laps[i] >= n) return true; }
   return false;
 }
-/* The clock runs off a stored start time, which is what lets it survive a
-   locked phone or a closed tab. The same property means an abandoned matrix
-   reads as hours old when she comes back to it, so elapsed is capped at the
-   limit and a session found past the limit is closed out rather than resumed. */
+/* Accumulated running time, capped at the limit. The cap matters because a
+   running clock survives the app being shut: without it an abandoned matrix
+   comes back reading nine hours. */
 function gtElapsed(a, d){
   var mx = (d && d.mx) || {};
   if(mx.end) return mx.end;
-  var ms = Date.now() - (mx.start || Date.now());
+  var ms = (mx.acc || 0) + (mx.since ? Date.now() - mx.since : 0);
   if(!(ms >= 0)) ms = 0;
   return Math.min(ms, gtLimit(a));
+}
+function gtStarted(d){ return !!(d && d.mx && d.mx.first); }
+function gtRunning(d){ return !!(d && d.mx && d.mx.since && !d.mx.end); }
+function gtPaused(d){ return gtStarted(d) && !gtRunning(d) && !gtDone(d); }
+/* Time she stood there with the clock off. Recorded rather than hidden: a
+   finish with twelve minutes of pauses in it is not the same as one without,
+   and the number is only worth anything if it says which. */
+function gtPausedMs(a, d){
+  var mx = (d && d.mx) || {};
+  if(!mx.first) return 0;
+  var wall = (mx.end ? (mx.endWall || 0) : Date.now()) - mx.first;
+  var ran = gtElapsed(a, d);
+  var out = wall - ran;
+  return out > 1000 ? out : 0;
 }
 function gtBest(d){
   var mx = (d && d.mx) || {}, laps = mx.laps || [], best = mx.at || 0;
@@ -2706,7 +2761,7 @@ function mxStart(){
 function mxTick(){
   var d = state.draft;
   var a = d ? area(d.areaId) : null;
-  if(state.view !== "session" || !a || a.shape !== "gauntlet" || gtDone(d)){ mxStop(); return; }
+  if(state.view !== "session" || !a || a.shape !== "gauntlet" || !gtRunning(d)){ mxStop(); return; }
   var ms = gtElapsed(a, d), lim = gtLimit(a);
   var el = $("mxClock");
   if(el){
@@ -2724,6 +2779,8 @@ function mxTick(){
 function gtTimeUp(a, d){
   if(!d || !d.mx || gtDone(d)) return;
   d.mx.end = gtLimit(a);
+  d.mx.endWall = Date.now();
+  d.mx.since = 0;
   d.total = gtBest(d); d.max = gtN(a);
   try{ renderSession(); }catch(e){}
   try{ saveCurrent(); }catch(e){}
@@ -2733,23 +2790,60 @@ function gtTimeUp(a, d){
 /* ---- the gauntlet page ---- */
 function gtPass(){
   var d = state.draft, a = d ? area(d.areaId) : null;
-  if(!a || gtDone(d)) return;
+  if(!a || gtDone(d) || !gtRunning(d)) return;
   mxSeed(a, d);
   d.mx.at = (d.mx.at || 0) + 1;
   if(d.mx.at >= gtN(a)){
     d.mx.laps.push(gtN(a));
     d.mx.end = gtElapsed(a, d);
+    d.mx.endWall = Date.now();
+    d.mx.since = 0;
     mxStop();
   }
   mxAfter(a, d);
 }
 function gtMiss(){
   var d = state.draft, a = d ? area(d.areaId) : null;
-  if(!a || gtDone(d)) return;
+  if(!a || gtDone(d) || !gtRunning(d)) return;
   mxSeed(a, d);
   d.mx.laps.push(d.mx.at || 0);
   d.mx.at = 0;
   mxAfter(a, d);
+}
+/* ---- the controls ----
+   Start, because she taps Run in the car park and walks to the green.
+   Pause, because someone plays through and the rain comes in.
+   Give up, because the alternative is standing there waiting out the clock. */
+function gtStart(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a || gtDone(d) || gtRunning(d)) return;
+  mxSeed(a, d);
+  if(!d.mx.first) d.mx.first = Date.now();
+  d.mx.since = Date.now();
+  mxAfter(a, d);
+  mxStart();
+}
+function gtPause(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a || !gtRunning(d)) return;
+  d.mx.acc = (d.mx.acc || 0) + (Date.now() - d.mx.since);
+  d.mx.since = 0;
+  d.mx.pauses = (d.mx.pauses || 0) + 1;
+  mxStop();
+  mxAfter(a, d);
+}
+function gtGiveUp(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a) return;
+  if(!confirm("Give up on this matrix?\n\nNothing is kept: the attempts and the time on the clock "
+            + "are thrown away, and it will not appear in her history.")) return;
+  mxStop();
+  dropSession(d);
+  state.draft = null;
+  render();
+  show("tests");
+  renderTests();
+  setStatus("Matrix abandoned. Nothing was saved.");
 }
 function mxAfter(a, d){
   d.total = (a.shape === "gauntlet") ? gtBest(d) : cdPts(a, cdHits(d));
@@ -2770,10 +2864,10 @@ function buildGauntlet(a){
      copies of the same number a centimetre apart just makes her check which
      one is real. */
   if(!done){
-    var top = document.createElement("div"); top.className = "mxtop";
+    var top = document.createElement("div"); top.className = "mxtop" + (gtPaused(d) ? " held" : "");
     top.innerHTML =
       '<div class="mxtime"><span class="mxfig'+(ms >= lim - 5*60*1000 ? " late" : "")+'" id="mxClock">'+mmss(ms)+'</span>'+
-        '<span class="mxsub" id="mxLeft">of '+mmss(lim)+'</span></div>'+
+        '<span class="mxsub" id="mxLeft">'+(gtPaused(d) ? "paused · of " + mmss(lim) : "of " + mmss(lim))+'</span></div>'+
       '<div class="mxtry"><b>'+gtTries(d)+'</b><span>'+(gtTries(d)===1?"attempt":"attempts")+'</span></div>';
     host.appendChild(top);
   }
@@ -2807,11 +2901,34 @@ function buildGauntlet(a){
 
   if(!done){
     var acts = document.createElement("div"); acts.className = "mxacts";
-    acts.innerHTML = '<button type="button" class="mxgo" id="mxPass">Passed</button>'+
-                     '<button type="button" class="mxno" id="mxMiss">Missed</button>';
-    host.appendChild(acts);
-    $("mxPass").addEventListener("click", gtPass);
-    $("mxMiss").addEventListener("click", gtMiss);
+    if(!gtStarted(d)){
+      acts.innerHTML = '<button type="button" class="mxgo wide" id="mxBegin">Start the clock</button>';
+      host.appendChild(acts);
+      var hint = document.createElement("p"); hint.className = "note mxpace";
+      hint.textContent = "Forty five minutes from the moment you tap it, so stand over the "
+        + "first putt before you do. It keeps running if you lock the phone.";
+      host.appendChild(hint);
+      $("mxBegin").addEventListener("click", gtStart);
+    } else if(gtPaused(d)){
+      acts.innerHTML = '<button type="button" class="mxgo" id="mxResume">Carry on</button>'+
+                       '<button type="button" class="mxno quit" id="mxQuit">Give up</button>';
+      host.appendChild(acts);
+      var held = document.createElement("p"); held.className = "note mxpace";
+      held.textContent = "Clock stopped. Giving up throws the whole thing away, nothing is saved.";
+      host.appendChild(held);
+      $("mxResume").addEventListener("click", gtStart);
+      $("mxQuit").addEventListener("click", gtGiveUp);
+    } else {
+      acts.innerHTML = '<button type="button" class="mxgo" id="mxPass">Passed</button>'+
+                       '<button type="button" class="mxno" id="mxMiss">Missed</button>';
+      host.appendChild(acts);
+      var ph = document.createElement("div"); ph.className = "tools mxpausebar";
+      ph.innerHTML = '<button id="mxHold">Pause the clock</button>';
+      host.appendChild(ph);
+      $("mxPass").addEventListener("click", gtPass);
+      $("mxMiss").addEventListener("click", gtMiss);
+      $("mxHold").addEventListener("click", gtPause);
+    }
   }
 
   host.appendChild(gtReachTable(a, d));
@@ -2820,7 +2937,7 @@ function buildGauntlet(a){
   nb.style.marginTop = "18px";
   host.appendChild(nb);
 
-  if(!done) mxStart(); else mxStop();
+  if(gtRunning(d)) mxStart(); else mxStop();
 }
 function gtLaps(d){ return ((d.mx && d.mx.laps) || []).length; }
 function gtReachTable(a, d){
@@ -2857,9 +2974,63 @@ function cdUndo(){
   d.mx.hits.pop();
   mxAfter(a, d);
 }
+function cdBegin(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a) return;
+  mxSeed(a, d);
+  d.mx.ready = true;
+  renderSession();
+  updateTotal();
+}
+/* The setting-up sheet. Twelve stations is a lot to place, some of them need a
+   particular lie or a slope, and she is doing it alone on a practice green.
+   Reading it off her phone one station at a time would mean twelve walks back. */
+function buildCardSetup(a){
+  var host = $("sessCards"); host.innerHTML = "";
+  var lead = document.createElement("div"); lead.className = "mxst on";
+  lead.innerHTML = '<p class="eyebrow">Before you start</p>'+
+    '<h3>Set the twelve stations</h3>'+
+    '<p class="mxdet">Walk them out and mark them first. One shot at each, '+
+    (a.laps || 4)+' times round, '+cdShots(a)+' shots in all. Points differ by station '+
+    'because the stations are not equally hard.</p>';
+  host.appendChild(lead);
+
+  host.appendChild(cdStationList(a, true));
+
+  var acts = document.createElement("div"); acts.className = "mxacts";
+  acts.innerHTML = '<button type="button" class="mxgo wide" id="cdBegin">All twelve are set</button>';
+  host.appendChild(acts);
+  $("cdBegin").addEventListener("click", cdBegin);
+
+  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+  mxStop();
+}
+/* The same list twice over: as the setting-up sheet, and folded away on the
+   scoring page so she can check a station without losing her place. */
+function cdStationList(a, open){
+  var wrap = document.createElement("div"); wrap.className = "mxsetup";
+  var rows = "";
+  (a.stations || []).forEach(function(st, i){
+    var bands = (st.bands || []).map(function(b){ return b.pts + " " + b.lab.toLowerCase(); }).join(" · ");
+    rows += '<div class="mxsrow"><span class="n">'+(i+1)+'</span>'+
+      '<span class="b"><b>'+st.name+'</b><span class="cfg">'+st.set+'</span>'+
+      '<span class="pts">'+bands+'</span></span></div>';
+  });
+  if(open){
+    wrap.innerHTML = rows +
+      '<p class="note">Station 11 is meant to be nearly impossible. It is on the card to be '+
+      'measured, not passed.</p>';
+  } else {
+    wrap.innerHTML = '<details class="mxfold"><summary>All twelve stations</summary>'+rows+'</details>';
+  }
+  return wrap;
+}
 function buildCard(a){
   var d = state.draft;
   mxSeed(a, d);
+  if(!d.mx.ready){ buildCardSetup(a); return; }
   var host = $("sessCards"); host.innerHTML = "";
   var hits = cdHits(d), n = cdN(a), shots = cdShots(a), i = hits.length;
   var done = i >= shots, pts = cdPts(a, hits);
@@ -2915,6 +3086,7 @@ function buildCard(a){
 
   host.appendChild(cdGrid(a, hits));
   if(done) host.appendChild(cdStationTable(a, hits));
+  else host.appendChild(cdStationList(a, false));
 
   var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
   nb.style.marginTop = "18px";
@@ -3076,10 +3248,15 @@ function mxPastHtml(a, s){
 function gtResultHtml(a, d){
   var n = gtN(a), won = gtComplete(a, d), ms = gtElapsed(a, d), lim = gtLimit(a);
   var tries = gtLaps(d), prev = gtBestEver(a, d);
+  var heldMs = gtPausedMs(a, d);
+  /* Said on the result, not buried: a finish with twelve minutes of pauses in
+     it is a different thing from one without, and the time only means
+     something if it says which. */
+  var heldLine = heldMs ? ' <span class="mxheld">Paused for '+mmss(heldMs)+'.</span>' : '';
   var h = '<div class="mxres '+(won ? "won" : "out")+'">';
   if(won){
     h += '<p class="eyebrow">Matrix complete</p><div class="mxbig">'+mmss(ms)+'</div>'+
-      '<p>'+tries+' '+(tries===1?"attempt":"attempts")+', and '+mmss(lim-ms)+' to spare.</p>'+
+      '<p>'+tries+' '+(tries===1?"attempt":"attempts")+', and '+mmss(lim-ms)+' to spare.'+heldLine+'</p>'+
       '<p>'+(prev == null
         ? 'The first time she has finished it. Two current England players never have.'
         : (ms < prev ? 'A new best by '+mmss(prev-ms)+'. '+mmss(ms)+' is the time to beat now.'
@@ -3087,7 +3264,7 @@ function gtResultHtml(a, d){
   } else {
     h += '<p class="eyebrow">Ran out of time</p><div class="mxbig">'+mmss(lim)+'</div>'+
       '<p>Furthest she got was station '+gtBest(d)+' of '+n+', over '+
-      tries+' '+(tries===1?"attempt":"attempts")+'.</p>'+
+      tries+' '+(tries===1?"attempt":"attempts")+'.'+heldLine+'</p>'+
       '<p class="mxread">'+gtHonest(a, d)+'</p>';
   }
   return h + '</div>';
@@ -4945,7 +5122,7 @@ function draftHasContent(d){
      that does not persist is a clock that restarts at zero on every reload,
      which is the one thing the design cannot allow. A card starts counting
      from its first shot. */
-  if(d.mx && (d.mx.start > 0 || (d.mx.hits && d.mx.hits.length) ||
+  if(d.mx && (d.mx.first > 0 || (d.mx.hits && d.mx.hits.length) ||
               (d.mx.laps && d.mx.laps.length) || d.mx.at)) return true;
   if(d.notes && String(d.notes).trim()) return true;
   function any(o, f){ if(!o) return false; for(var k in o){ if(f(o[k])) return true; } return false; }
@@ -5037,8 +5214,9 @@ function draftProgress(d){
   var ma = area(d.areaId);
   if(ma && isMatrix(ma)){
     if(ma.shape === "gauntlet"){
+      if(!gtStarted(d)) return "not started, the clock is still at zero";
       return "on station " + (((d.mx && d.mx.at) || 0) + 1) + " of " + gtN(ma) +
-             ", " + mmss(gtElapsed(ma, d)) + " gone";
+             ", " + mmss(gtElapsed(ma, d)) + " gone" + (gtPaused(d) ? ", paused" : "");
     }
     return ((d.mx && d.mx.hits ? d.mx.hits.length : 0)) + " of " + cdShots(ma) + " shots";
   }
@@ -5128,9 +5306,11 @@ function openSession(areaId, resume){
        shut. The clock is wall clock on purpose, so without this she would come
        back to a session reading nine hours. Close it out where it actually
        ended instead of pretending it is still live. */
-    if(a.shape === "gauntlet" && !gtDone(state.draft) &&
-       Date.now() - state.draft.mx.start >= gtLimit(a)){
+    if(a.shape === "gauntlet" && !gtDone(state.draft) && gtStarted(state.draft) &&
+       gtElapsed(a, state.draft) >= gtLimit(a)){
       state.draft.mx.end = gtLimit(a);
+      state.draft.mx.endWall = Date.now();
+      state.draft.mx.since = 0;
       state.draft.total = gtBest(state.draft);
       state.draft.max = gtN(a);
     }
