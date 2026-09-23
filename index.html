@@ -9738,6 +9738,31 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
     }, 10 * 60000);
   }
 
+  /* A second opinion, for when the code service cannot be reached.
+     /api/dg-load answers from the dg_codes table, which is what actually
+     decides whose sessions a code opens. A code with players attached there
+     was real when it was attached, so it is good enough to sign in on while
+     WordPress is unreachable. An unknown code still gets nothing, and if
+     WordPress is up and refusing, this endpoint refuses too.
+
+     This exists because the grace period above can only help a device that
+     still remembers a code. On 23 Sep the devices that had already been wiped
+     had nothing to coast on and could not get back in at all, which made a
+     one hour upstream wobble into a hard lockout with no way through. */
+  function vouch(code){
+    return fetch("/api/dg-load", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: JSON.stringify({ code: code })
+    }).then(function(r){
+      return r.status === 200 ? r.json() : null;
+    }).then(function(d){
+      // players.length matters: a valid but unclaimed code answers 200 as well,
+      // and that is not somebody who can be signed in.
+      return !!(d && d.ok === true && d.players && d.players.length);
+    }).catch(function(){ return false; });
+  }
+
   function check(code){
     // POST with the tool name, the same as ahamo-hplt does. The endpoint ignores
     // `tool` today; sending it means this keeps working if it starts filtering.
@@ -9758,10 +9783,24 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
         lastReason = d && d.reason;
         /* Could not ask, so this is not an answer. Returning null rather than
            false is what stops a bad afternoon upstream from wiping the code
-           off every device that reloads. */
+           off every device that reloads. Before settling for that, see whether
+           the sync endpoint will vouch for the code. */
         if(soft(lastReason)){
-          if(!quiet){ btn.disabled = false; say(refusal(lastReason), true); }
-          return null;
+          /* Only for a code she has just typed. A background re-check must
+             fall through to the grace window instead, or a device three days
+             past its last good check would be let straight back in and the
+             twenty four hour limit would mean nothing. */
+          if(quiet) return null;
+          return vouch(code).then(function(good){
+            if(good){
+              keep(code, d);
+              unlock();
+              coasting();
+              return true;
+            }
+            btn.disabled = false; say(refusal(lastReason), true);
+            return null;
+          });
         }
         if(!quiet){ btn.disabled = false; say(refusal(lastReason), true); }
         return false;
