@@ -1190,6 +1190,65 @@
   #faultbar button.faultgo, #stuckbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
   :root[data-theme="dark"] #faultbar button.faultgo, :root[data-theme="dark"] #stuckbar button.faultgo{color:#12030a}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #faultbar button.faultgo{color:#12030a}}
+  /* ---------- aim scope ----------------------------------------------------
+     Camera overlay that draws the set's own target at its true angular size,
+     so she can see how wide it really is and anchor it to something on the
+     range. It measures nothing and scores nothing.
+
+     Everything here is prefixed. The tool already owns .chip, .row, .note and
+     .sl, and the scope arrived from a standalone page that used all four. A
+     bare class name would have restyled half the app, the way .set once put a
+     white card round every station in The Hundred.
+     --------------------------------------------------------------------- */
+  #asWrap{position:fixed; inset:0; z-index:9500; background:#0e1210; color:#f2f5f2;
+    font-family:Archivo,"Helvetica Neue",Arial,sans-serif; overflow:hidden;
+    -webkit-user-select:none; user-select:none}
+  #asStage{position:absolute; inset:0; overflow:hidden; background:#000}
+  #asCam{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    min-width:100%; min-height:100%; object-fit:cover}
+  #asOv{position:absolute; inset:0; width:100%; height:100%; touch-action:none}
+
+  #asHud{position:absolute; left:0; right:0; top:0; z-index:20; pointer-events:none;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 58px 10px 14px;
+    background:linear-gradient(to bottom,rgba(0,0,0,.62),transparent)}
+  #asHud .asfig{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; font-weight:600}
+  #asHud .assub{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px;
+    color:#b9c3bc; margin-top:2px}
+  #asClose{position:absolute; z-index:30; right:10px; background:rgba(0,0,0,.45);
+    top:calc(8px + env(safe-area-inset-top,0px));
+    border:1px solid rgba(255,255,255,.22); color:#f2f5f2; border-radius:9px;
+    width:40px; height:40px; font-size:21px; line-height:1; cursor:pointer}
+
+  #asSheet{position:absolute; left:0; right:0; bottom:0; z-index:25;
+    background:rgba(20,26,22,.92);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,.16);
+    padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; gap:9px; max-height:58vh; overflow-y:auto}
+  .asrow{display:flex; gap:7px; flex-wrap:wrap}
+  .aschip{flex:1 1 auto; min-height:40px; padding:0 12px; border-radius:9px;
+    border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05);
+    color:#f2f5f2; font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:13px; font-weight:600; cursor:pointer}
+  .aschip.on{background:#d2006a; border-color:#d2006a; color:#fff}
+  .asnote{font-size:12px; line-height:1.5; color:#8b9790; margin:0}
+  #asWrap details summary{font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase;
+    color:#8b9790; cursor:pointer; padding:4px 0}
+  .asslide{display:flex; align-items:center; gap:10px; font-size:12.5px; color:#b9c3bc}
+  .asslide span{flex:1 1 auto}
+  .asslide b{font-family:"IBM Plex Mono",ui-monospace,monospace; color:#f2f5f2}
+  #asWrap input[type=range]{width:100%; accent-color:#d2006a}
+  #asStart{position:absolute; inset:0; z-index:40; display:flex; align-items:center;
+    justify-content:center; padding:24px; background:#0e1210; text-align:left}
+  #asStart .ascard{max-width:420px}
+  #asStart h2{font-size:23px; margin:0 0 8px; letter-spacing:-.3px}
+  #asStart p{color:#b9c3bc; font-size:14.5px; line-height:1.55; margin:0 0 14px}
+  #asGo{width:100%; min-height:54px; border:0; border-radius:11px; background:#d2006a;
+    color:#fff; font-family:Archivo,sans-serif; font-size:17px; font-weight:600; cursor:pointer}
+  #asErr{margin-top:14px; color:#ff9db0; font-size:13.5px; line-height:1.5; min-height:1em}
+  /* the chip that opens it, alongside the existing diagram chip */
+  .vid.aimc{color:var(--accent)}
 
   /* ---- access gate ---- */
   #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
@@ -1396,6 +1455,10 @@
     <h2 style="margin-top:22px">Proximity by distance</h2>
     <p class="note" style="margin:0 0 10px">What tour players actually leave themselves from each distance. Average proximity is the middle of the field, not the target.</p>
     <div class="cardscroll"><table class="btable" id="proxTable"></table></div>
+    <p class="note" style="margin-top:12px"><button type="button" id="aimFromBench" class="vid aimc" style="font-size:12.5px">⊙ open the aim scope</button>
+      Hold the camera up and see how wide the approach circles actually are. They barely
+      change angular size from 110 yards out to 185, because the circle grows in step with
+      the distance.</p>
     <p class="note">For scale, Minjee Lee's +2.02 strokes-gained approach season, the best of the ShotLink era bar Tiger in 2006: 12 ft from 100-125 in the fairway, 16.4 ft from 125-150, 20 ft from 150-175, 22.5 ft from 175-200.</p>
   </section>
 
@@ -1498,6 +1561,47 @@
     </div>
     <div class="lbimg" id="lbImg"></div>
     <ol id="lbBody"></ol>
+  </div>
+</div>
+
+
+<!-- Aim scope. Built as a full-bleed overlay rather than a view, so show() and
+     the tab system are untouched: it sits on top of whatever she was doing and
+     puts her straight back there when it closes. -->
+<div id="asWrap" hidden>
+  <div id="asStage">
+    <video id="asCam" playsinline muted autoplay></video>
+    <canvas id="asOv"></canvas>
+  </div>
+  <div id="asHud">
+    <div class="asfig" id="asFig">&nbsp;</div>
+    <div class="assub" id="asSub">&nbsp;</div>
+  </div>
+  <button id="asClose" aria-label="Close the aim scope">&times;</button>
+  <div id="asSheet" hidden>
+    <div class="asrow" id="asDists"></div>
+    <label class="asslide"><span id="asDistLab">Distance to the flag</span>
+      <b id="asDistV"></b></label>
+    <input type="range" id="asDist" min="0" max="100" step="1" value="0">
+    <p class="asnote" id="asTip">Tap the flag on screen to put the target there.</p>
+    <details>
+      <summary>Calibration</summary>
+      <label class="asslide"><span>Camera field of view</span><b id="asFovV">69&deg;</b></label>
+      <input type="range" id="asFov" min="40" max="100" step="0.5" value="69">
+      <p class="asnote">Everything scales off this, and it differs by phone. Set it
+        once: stand a measured distance from two things a measured distance apart
+        and nudge until the bracket sits on them. It is remembered after that.</p>
+    </details>
+  </div>
+  <div id="asStart">
+    <div class="ascard">
+      <h2>Aim scope</h2>
+      <p>Shows the target at its true size through the camera. Line it up, see what
+         sits behind the edges on the range, and use those as the target for the
+         session. It measures nothing and records nothing.</p>
+      <button id="asGo">Start the camera</button>
+      <div id="asErr"></div>
+    </div>
   </div>
 </div>
 
@@ -5458,7 +5562,7 @@ function buildSessionCards(a, last){
     var body = document.createElement("div");
     var tracked = trackKind(a, s);
     if(s.metrics) body.appendChild(monitorNote());
-    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, null));
+    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, null, a, s));
     if(s.guide && GUIDES[s.guide] && !tracked){
       var w = document.createElement("div"); w.className="dgwrap";
       w.innerHTML = GUIDES[s.guide].svg;
@@ -6164,7 +6268,7 @@ function buildSessionList(a, last){
       current.appendChild(wrap); host.appendChild(current);
     }
     if(s.metrics) wrap.appendChild(monitorNote());
-    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, s.guide));
+    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, s.guide, a, s));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
   if(a.compete){
@@ -6890,7 +6994,7 @@ function shotRow(a, s, last, cfg){
   var wantsSlope = !cfg && (kind === "lag" || areaShape(a) === "clock");
 
   var row = document.createElement("div"); row.className = "set shotset";
-  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s)+'</div></div>';
+  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s)+aimChip(a, s)+'</div></div>';
   if(wantsSlope) row.appendChild(slopeBox(kind, s, function(){ diag.__key = null; paint(); }));
 
   var ask = document.createElement("p"); ask.className = "shotask";
@@ -7109,9 +7213,9 @@ function shotRow(a, s, last, cfg){
   return row;
 }
 
-function scoreRow(label, tgt, parts, last, guide){
+function scoreRow(label, tgt, parts, last, guide, a, s){
   var row = document.createElement("div"); row.className="set";
-  row.innerHTML = '<div><div class="lbl">'+label+guideChip(guide)+'</div><div class="tgt">'+tgt+'</div></div>';
+  row.innerHTML = '<div><div class="lbl">'+label+guideChip(guide)+'</div><div class="tgt">'+tgt+(a && s ? aimChip(a, s) : "")+'</div></div>';
 
   if(parts.length === 1){
     row.appendChild(makeStepper(parts[0].key, parts[0].max, label, false, parts[0].min));
@@ -9219,6 +9323,333 @@ function infoChip(key){
     '<path d="M5 4.3 L5 7.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'+
     '<circle cx="5" cy="2.9" r="0.75" fill="currentColor"/></svg>what this is</button>';
 }
+
+/* ============ aim scope ============
+   A camera overlay that draws a set's target at its true angular size. It is a
+   calibration aid and nothing else: no scoring, no storage, no bearing on a
+   session. She lines it up once, sees which two things on the range sit on the
+   edges, and puts the phone away.
+
+   The targets are NOT held here. They are read off the set she is looking at at
+   the moment she opens it, so there is exactly one copy of every number in this
+   file and the scope cannot drift away from the card she is scoring against.
+
+   The maths. A circle of radius r feet at d yards subtends a half angle of
+   atan(r / 3d): r over the distance in feet. Approach circles grow almost in
+   step with distance, so their angle barely moves, around 8 to 9 degrees from
+   110 yards out to 185. A fixed target does the opposite: two clubs is 22
+   degrees at ten paces and under 5 by fifty, and a tee corridor is a fixed lane
+   so it narrows with every yard of carry. */
+
+var AS_FOV = "lcl.aim.fov.v1";
+
+/* Read a target off a set. Returns null when the set has no circle to draw:
+   "Pin high" and "Level with the flag" are real targets but not widths, and a
+   putt has no aiming circle because the hole is the target. */
+function aimTarget(s){
+  if(!s || !s.dist || !s.tc) return null;
+  var ft = /^(\d+) ft$/.exec(s.tc), cl = /^(\d+) clubs?$/.exec(s.tc);
+  var c = ft ? +ft[1] : cl ? +cl[1] * 3 : 0;      /* the tool: one club is about 3 ft */
+  if(!c) return null;
+  var bf = /^(\d+) ft$/.exec(s.bull || ""), bc = /^(\d+) clubs?$/.exec(s.bull || "");
+  return { label: s.short || s.label, dist: s.dist, c: c,
+           b: bf ? +bf[1] : bc ? +bc[1] * 3 : 0,
+           unit: cl ? "paces" : "yd", clubs: !!cl };
+}
+/* Every distance in the same area, so she can flick between them in the scope
+   without going back for another card. Deduplicated on distance: the windows
+   variant of a set repeats its parent's numbers. */
+function aimSiblings(a){
+  var out = [], seen = {};
+  ((a && a.sets) || []).forEach(function(s){
+    var t = aimTarget(s);
+    if(!t || seen[t.dist]) return;
+    seen[t.dist] = 1; out.push(t);
+  });
+  return out.sort(function(x, y){ return x.dist - y.dist; });
+}
+/* There is no "current area" on state, so the chip carries both ids and the
+   list is rebuilt from the real objects when she taps it. */
+function aimAreaById(id){
+  var pools = [typeof AREAS !== "undefined" ? AREAS : [],
+               typeof PRACTICE !== "undefined" ? PRACTICE : [],
+               typeof TESTS !== "undefined" ? TESTS : [],
+               (typeof state !== "undefined" && state.lib && state.lib.areas) || []];
+  for(var i=0;i<pools.length;i++){
+    for(var j=0;j<pools[i].length;j++){
+      if(String(pools[i][j].id) === String(id)) return pools[i][j];
+    }
+  }
+  return null;
+}
+function aimChip(a, s){
+  if(!aimTarget(s)) return "";
+  return '<button type="button" class="vid aimc" data-aim-area="' + (a && a.id) +
+    '" data-aim="' + s.id +
+    '" aria-label="See this target at its true size through the camera">' +
+    '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true">' +
+    '<circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" stroke-width="1.2"/>' +
+    '<path d="M5 0.6 L5 2.4 M5 7.6 L5 9.4 M0.6 5 L2.4 5 M7.6 5 L9.4 5" ' +
+    'stroke="currentColor" stroke-width="1.2"/></svg>aim</button>';
+}
+
+var aim = { list: [], i: 0, fov: 69, spot: null, stream: null, raf: 0, on: false, adj: 0 };
+
+/* The real distance to the flag, which is not the set's number.
+   The camera's field of view is a property of the phone and never changes, so
+   it is remembered. What changes every time she moves range or bay is how far
+   away the flag she has picked actually is: score the 125 set at a flag that is
+   really 138 away and the bracket is wrong however well the camera is set.
+   So the distance is asked for every session and the calibration is not.
+
+   The circle itself does not move with it. "Inside 26 ft scores" is the rule
+   she is scoring by whatever the yardage turns out to be, so the radius stays
+   and only the angle it subtends changes. */
+function aimSpan(d){ return Math.max(10, Math.round(d * 0.3)); }
+function aimDist(){
+  var t = aim.list[aim.i];
+  return aim.adj || (t ? t.dist : 0);
+}
+function aimDistUI(){
+  var t = aim.list[aim.i]; if(!t) return;
+  var sp = aimSpan(t.dist), el = $("asDist");
+  el.min = Math.max(3, t.dist - sp);
+  el.max = t.dist + sp;
+  el.value = aimDist();
+  var off = aimDist() !== t.dist;
+  $("asDistV").textContent = aimDist() + " " + t.unit;
+  $("asDistLab").textContent = off
+    ? "Distance to the flag \u00b7 the set says " + t.dist
+    : "Distance to the flag";
+}
+
+function aimEls(){
+  return { wrap:$("asWrap"), cam:$("asCam"), cv:$("asOv"), sheet:$("asSheet"),
+           start:$("asStart"), err:$("asErr"), fig:$("asFig"), sub:$("asSub") };
+}
+function aimDPR(){ return Math.min(window.devicePixelRatio || 1, 3); }
+
+/* Pinhole projection. tan rather than a flat degrees-per-pixel ratio, which is
+   out by several per cent by 20 degrees off centre and would quietly widen
+   every target. The frame is drawn object-fit:cover, so work out how much of it
+   is actually on screen before scaling. */
+function aimK(){
+  var e = aimEls(), vw = e.cam.videoWidth, vh = e.cam.videoHeight;
+  var half = Math.tan(aim.fov * Math.PI / 360);
+  if(!vw || !vh) return e.cv.width / (2 * half);
+  var s = Math.max(e.cv.width / vw, e.cv.height / vh);
+  return (vw * s / 2) / half;
+}
+function aimDx(theta){ return Math.tan(theta) * aimK(); }
+function aimHalf(ft, d){ return Math.atan(ft / (3 * d)); }
+
+function aimPaint(){
+  var e = aimEls(), cv = e.cv, g = cv.getContext("2d"), D = aimDPR();
+  g.clearRect(0, 0, cv.width, cv.height);
+  var t = aim.list[aim.i]; if(!t) return;
+
+  var p = aim.spot ? { x: aim.spot.x * D, y: aim.spot.y * D }
+                   : { x: cv.width / 2, y: cv.height / 2 };
+  var dd = aimDist();
+  var half = aimHalf(t.c, dd), w = aimDx(half);
+  var bw = t.b ? aimDx(aimHalf(t.b, dd)) : 0;
+  var top = p.y - 70 * D, bot = p.y + 70 * D;
+
+  function tag(txt, x, y, col){
+    g.save();
+    g.font = "600 " + (12 * D) + "px 'IBM Plex Mono', ui-monospace, monospace";
+    g.textAlign = "center"; g.textBaseline = "middle";
+    var pad = 6 * D, tw = g.measureText(txt).width;
+    g.fillStyle = "rgba(0,0,0,.6)";
+    g.fillRect(x - tw/2 - pad, y - 10*D, tw + pad*2, 20*D);
+    g.fillStyle = col; g.fillText(txt, x, y);
+    g.restore();
+  }
+
+  if(bw){
+    g.save();
+    g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = 1.6*D;
+    g.setLineDash([6*D, 5*D]);
+    g.beginPath();
+    g.moveTo(p.x - bw, p.y - 44*D); g.lineTo(p.x - bw, p.y + 44*D);
+    g.moveTo(p.x + bw, p.y - 44*D); g.lineTo(p.x + bw, p.y + 44*D);
+    g.stroke(); g.restore();
+  }
+  g.save();
+  g.strokeStyle = "#d2006a"; g.lineWidth = 3*D;
+  g.beginPath();
+  g.moveTo(p.x - w, top); g.lineTo(p.x - w, bot);
+  g.moveTo(p.x + w, top); g.lineTo(p.x + w, bot);
+  g.stroke();
+  g.lineWidth = 1.6*D; g.strokeStyle = "rgba(210,0,106,.55)";
+  g.beginPath(); g.moveTo(p.x - w, p.y); g.lineTo(p.x + w, p.y); g.stroke();
+  /* the cross marks where she said the flag is */
+  g.strokeStyle = "rgba(255,255,255,.75)"; g.lineWidth = 1.2*D;
+  g.beginPath();
+  g.moveTo(p.x - 13*D, p.y); g.lineTo(p.x + 13*D, p.y);
+  g.moveTo(p.x, p.y - 13*D); g.lineTo(p.x, p.y + 13*D);
+  g.stroke(); g.restore();
+
+  tag(t.c * 2 + " ft across", p.x, bot + 16*D, "#ffffff");
+  tag((half * 2 * 180 / Math.PI).toFixed(2) + "° wide", p.x, top - 16*D, "#b9c3bc");
+  if(bw) tag(t.b + " ft", p.x - bw, p.y - 54*D, "rgba(255,255,255,.8)");
+
+  /* Close in, a target can be wider than the phone can see: two clubs at ten
+     paces is 22 degrees and the frame, cropped to portrait, is nearer twenty.
+     Both edges then fall outside the canvas and it draws nothing at all, which
+     reads as broken rather than as "bigger than this". */
+  if(p.x - w < 0 || p.x + w > cv.width){
+    g.save(); g.fillStyle = "#d2006a";
+    if(p.x - w < 0){
+      g.beginPath(); g.moveTo(0, p.y - 16*D); g.lineTo(18*D, p.y); g.lineTo(0, p.y + 16*D); g.fill();
+    }
+    if(p.x + w > cv.width){
+      g.beginPath(); g.moveTo(cv.width, p.y - 16*D); g.lineTo(cv.width - 18*D, p.y);
+      g.lineTo(cv.width, p.y + 16*D); g.fill();
+    }
+    g.restore();
+    tag("wider than the frame · step back", p.x, p.y + 104*D, "#ffd27f");
+  }
+
+  e.fig.textContent = (t.clubs ? "Inside " + (t.c/3) + " club" + (t.c/3 > 1 ? "s" : "")
+                               : "Inside " + t.c + " ft")
+                      + " at " + dd + " " + t.unit
+                      + (dd !== t.dist ? " (set: " + t.dist + ")" : "");
+  e.sub.textContent = (t.c * 2) + " ft across · " +
+    (half * 2 * 180 / Math.PI).toFixed(2) + "° wide" +
+    (t.b ? " · dashed is " + t.b + " ft" : "");
+}
+
+function aimSize(){
+  var e = aimEls(), D = aimDPR();
+  e.cv.width  = Math.round(e.cv.clientWidth  * D);
+  e.cv.height = Math.round(e.cv.clientHeight * D);
+  aimPaint();
+}
+/* Repaint every frame rather than on demand. The scale depends on
+   videoWidth, which is 0 until the camera reports its dimensions, so a single
+   paint at startup lands on the fallback and never corrects itself: the bracket
+   sits at roughly a third of its true size for the whole session. */
+function aimLoop(){
+  if(!aim.on) return;
+  aimPaint();
+  aim.raf = requestAnimationFrame(aimLoop);
+}
+function aimDists(){
+  var host = $("asDists"); host.innerHTML = "";
+  aim.list.forEach(function(t, n){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "aschip" + (n === aim.i ? " on" : "");
+    b.textContent = t.dist + " " + t.unit;
+    b.addEventListener("click", function(){
+      aim.i = n; aim.adj = 0; aimDists(); aimDistUI(); aimPaint();
+    });
+    host.appendChild(b);
+  });
+}
+
+function openAim(list, idx){
+  if(!list || !list.length) return;
+  /* adj cleared here as well as on a set change: without it a distance she
+     nudged last time silently follows her into the next session, and the
+     bracket would be wrong in the one way she has no reason to check. */
+  aim.list = list; aim.i = Math.max(0, idx || 0); aim.spot = null; aim.adj = 0;
+  try{
+    var f = parseFloat(localStorage.getItem(AS_FOV));
+    if(f >= 40 && f <= 100) aim.fov = f;
+  }catch(e){}
+  $("asFov").value = aim.fov;
+  $("asFovV").textContent = Math.round(aim.fov) + "°";
+  $("asErr").textContent = "";
+  $("asStart").hidden = false;
+  $("asSheet").hidden = true;
+  $("asWrap").hidden = false;
+  document.body.style.overflow = "hidden";
+  aimDists();
+  aimDistUI();
+}
+
+/* Closing has to actually stop the camera. A stream left running is a flat
+   battery and a green dot that follows her round the rest of the app, and it
+   would keep doing it while she scored a session. */
+function closeAim(){
+  aim.on = false;
+  if(aim.raf){ cancelAnimationFrame(aim.raf); aim.raf = 0; }
+  try{
+    if(aim.stream) aim.stream.getTracks().forEach(function(t){ t.stop(); });
+  }catch(e){}
+  aim.stream = null;
+  try{ $("asCam").srcObject = null; }catch(e){}
+  $("asWrap").hidden = true;
+  $("asSheet").hidden = true;
+  $("asStart").hidden = false;
+  document.body.style.overflow = "";
+}
+
+$("asGo").addEventListener("click", function(){
+  var e = aimEls();
+  e.err.textContent = "";
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    e.err.textContent = "This browser will not give the page a camera.";
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } },
+    audio: false
+  }).then(function(stream){
+    aim.stream = stream;
+    e.cam.srcObject = stream;
+    /* Not awaited. Depending on the autoplay policy play() can reject or simply
+       never settle, and the scope would then sit behind a button that worked. */
+    try{ var pr = e.cam.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(x){}
+    e.start.hidden = true;
+    e.sheet.hidden = false;
+    aimSize();
+    aim.on = true; aimLoop();
+  }).catch(function(x){
+    e.err.textContent = "The camera was refused (" + ((x && x.name) || "unknown") +
+      "). Allow the camera for this site in Settings, then try again.";
+  });
+});
+
+$("asClose").addEventListener("click", closeAim);
+/* Reachable outside a session too, from the reference page where the proximity
+   table already lives. Uses the programme approach area, which is the set of
+   distances the question "how wide is that really" usually gets asked about. */
+(function(){
+  var b = $("aimFromBench"); if(!b) return;
+  b.addEventListener("click", function(){
+    var a = aimAreaById(11) || aimAreaById("p-approach-short");
+    if(a) openAim(aimSiblings(a), 1);
+  });
+})();
+$("asOv").addEventListener("click", function(ev){
+  var r = this.getBoundingClientRect();
+  aim.spot = { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  aimPaint();
+});
+$("asDist").addEventListener("input", function(){
+  aim.adj = parseInt(this.value, 10) || 0;
+  aimDistUI(); aimPaint();
+});
+$("asDistV").addEventListener("click", function(){
+  aim.adj = 0; aimDistUI(); aimPaint();     /* back to what the set says */
+});
+$("asFov").addEventListener("input", function(){
+  aim.fov = parseFloat(this.value);
+  $("asFovV").textContent = Math.round(aim.fov) + "°";
+  try{ localStorage.setItem(AS_FOV, String(aim.fov)); }catch(e){}
+  aimPaint();
+});
+window.addEventListener("resize", function(){ if(aim.on) aimSize(); });
+window.addEventListener("orientationchange", function(){
+  if(aim.on) setTimeout(aimSize, 300);
+});
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape" && !$("asWrap").hidden) closeAim();
+});
+
 function openGuide(key){
   var g = GUIDES[key]; if(!g) return;
   $("lbTitle").textContent = g.title;
@@ -9235,6 +9666,24 @@ function closeGuide(){
 document.addEventListener("click", function(e){
   var t = e.target.closest ? e.target.closest(".vid.guide") : null;
   if(t){ e.preventDefault(); openGuide(t.getAttribute("data-guide")); return; }
+  var am = e.target.closest ? e.target.closest(".vid.aimc") : null;
+  if(am){
+    e.preventDefault();
+    /* Rebuild the list from the area she is in, so the numbers come off the
+       same objects the card was drawn from rather than a copy. */
+    var ar = aimAreaById(am.getAttribute("data-aim-area"));
+    if(ar){
+      var sid = am.getAttribute("data-aim");
+      var lst = aimSiblings(ar), at = 0;
+      (ar.sets || []).forEach(function(x){
+        if(x.id === sid){
+          lst.forEach(function(t, k){ if(t.dist === x.dist) at = k; });
+        }
+      });
+      openAim(lst, at);
+    }
+    return;
+  }
   var it = e.target.closest ? e.target.closest(".vid.info") : null;
   if(it){ e.preventDefault(); openInfo(INFO[it.getAttribute("data-info")].title, INFO[it.getAttribute("data-info")].lines); }
 });
