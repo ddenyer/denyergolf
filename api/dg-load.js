@@ -163,12 +163,21 @@ export function safeLabel(s) {
 //   { ok:true, code, players, row }        allowed
 //   { ok:true, code, players:[], unclaimed:true }   real coupon, no player yet
 //   { ok:false, status, reason }           refused
+// "We could not ask", as against "the answer was no". A 502/504 is WordPress
+// being unreachable or answering with a SiteGround block page; a 403 is a
+// coupon that has genuinely been refused. Only the first kind is survivable.
+const CANNOT_ASK = { 502: 1, 503: 1, 504: 1 };
+
 export async function authorise(raw) {
   const code = cleanCode(raw);
   if (!code) return { ok: false, status: 400, reason: 'invalid_code_format' };
 
   const valid = await couponValid(code);
-  if (!valid.ok) return valid;
+  let degraded = false;
+  if (!valid.ok) {
+    if (!CANNOT_ASK[valid.status]) return valid;   // a real refusal stands
+    degraded = true;
+  }
 
   let row;
   try {
@@ -179,6 +188,20 @@ export async function authorise(raw) {
   }
 
   const players = (row && Array.isArray(row.players)) ? row.players : [];
+
+  // WordPress is down. Fall back to dg_codes, which is the table that decides
+  // whose sessions a code opens in the first place: a code with players
+  // attached here was real when it was attached. An unknown code still gets
+  // nothing, and claiming a new player is refused outright below.
+  //
+  // Without this, an hour of upstream trouble means every save is refused
+  // while the app says "not synced yet", which is exactly how a session was
+  // lost on 21 Sep.
+  if (degraded) {
+    if (!players.length) return valid;
+    console.warn('dg: upstream unreachable (' + valid.reason + '), coasting on dg_codes for', code);
+    return { ok: true, code, players, row, degraded: true };
+  }
   if (!players.length) {
     // Unclaimed is not the same as invited. A code WordPress still accepts but
     // that nobody was invited on is an old link, not a new player. See
@@ -281,7 +304,8 @@ export default async function handler(req, res) {
     // control itself: the endpoint checks this again, along with the password.
     const canDelete = !!(auth.row && auth.row.can_delete);
 
-    return res.status(200).json({ ok: true, players: keys, display, sessions, meta, canDelete });
+    return res.status(200).json({ ok: true, players: keys, display, sessions, meta, canDelete,
+                                  degraded: !!auth.degraded });
   } catch (err) {
     console.error('dg-load error:', err);
     return res.status(500).json({ ok: false, reason: err.message });
