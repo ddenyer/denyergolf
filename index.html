@@ -619,6 +619,117 @@
     border-radius:8px; padding:8px 15px; font-family:Archivo, sans-serif; font-size:13.5px;
     font-weight:600; cursor:pointer}
   .twhere{font-size:12px; color:var(--muted)}
+
+  /* ---- the two matrices ---- */
+  .mxtop{display:flex; align-items:flex-end; gap:14px; margin:4px 0 14px}
+  .mxtime{display:flex; flex-direction:column}
+  .mxfig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+    font-size:44px; font-weight:600; line-height:1; letter-spacing:-1px; color:var(--ink)}
+  .mxfig.late{color:var(--down)}
+  .mxsub{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+    color:var(--muted); margin-top:5px}
+  .mxtry{margin-left:auto; text-align:right}
+  .mxtry b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:26px; font-weight:600; line-height:1; color:var(--ink)}
+  .mxtry span{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px;
+    letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
+
+  .mxsts{display:flex; flex-direction:column; gap:7px}
+  .mxst{background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:11px 13px}
+  .mxst.on{background:var(--surface); border:2px solid var(--accent-fill); padding:14px 14px 15px}
+  .mxst.on h3{margin:5px 0 6px; font-size:17px; font-weight:600; line-height:1.25}
+  .mxdet{margin:0; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
+  .mxmini{display:flex; align-items:center; gap:11px; font-size:14px; color:var(--ink-2)}
+  .mxdot{flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--muted)}
+  .mxdot.ok{background:var(--up); border-color:var(--up); color:#ffffff}
+
+  .mxacts{display:flex; gap:10px; margin:14px 0 4px}
+  .mxacts button{flex:1 1 0; min-height:56px; border-radius:10px;
+    font-family:Archivo, sans-serif; font-size:17px; font-weight:600; cursor:pointer}
+  .mxgo{border:0; background:var(--accent-fill); color:#ffffff}
+  .mxno{border:1.5px solid var(--line-strong); background:var(--surface); color:var(--ink)}
+
+  .mxbands{display:flex; flex-direction:column; gap:8px; margin:14px 0 4px}
+  .mxband{display:flex; align-items:center; gap:13px; width:100%; min-height:58px; padding:0 16px;
+    border:1.5px solid var(--line-strong); border-radius:10px; background:var(--surface);
+    color:var(--ink); font-family:Archivo, sans-serif; cursor:pointer; text-align:left}
+  .mxband.best{border-color:var(--accent-fill); background:var(--accent-wash)}
+  .mxband.miss{min-height:50px; border-color:var(--line); background:var(--surface-2); color:var(--ink-2)}
+  .mxband .pts{width:26px; flex:none; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:25px; font-weight:600}
+  .mxband.best .pts{color:var(--accent)}
+  .mxband.miss .pts{font-size:21px; color:var(--muted)}
+  .mxband .lab{font-size:15.5px; font-weight:600}
+
+  .mxres{border-radius:12px; padding:16px 16px 17px; margin:0 0 14px}
+  .mxres.won{background:var(--up); color:#ffffff}
+  .mxres.won .eyebrow{color:#a8d5bd}
+  .mxres.won p{color:#d6e8dd}
+  .mxres.out{background:var(--surface); border:1px solid var(--line-strong)}
+  .mxres.card{background:var(--surface); border:1px solid var(--line)}
+  .mxres .mxbig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+    font-size:46px; font-weight:600; line-height:1; letter-spacing:-1.1px; margin:4px 0 8px}
+  .mxres p{margin:0; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
+  .mxplace{margin-top:9px !important; font-size:15px !important; font-weight:600; color:var(--accent) !important}
+
+  .mxscale{position:relative; height:12px; border-radius:6px; background:var(--bg); overflow:hidden;
+    margin-top:10px}
+  .mxscale i{display:block; height:12px; background:var(--accent-fill)}
+  .mxscale u{position:absolute; top:0; width:2px; height:12px; background:var(--ink-2)}
+  .mxends{display:flex; justify-content:space-between; margin-top:5px;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; color:var(--muted)}
+
+  .mxpace{margin:0 0 12px !important}
+  .mxhard{margin:8px 0 0; padding-top:8px; border-top:1px solid var(--line);
+    font-size:12.5px; line-height:1.45; color:var(--muted)}
+  .mxread{margin-top:10px !important; font-size:12.5px !important; line-height:1.5 !important;
+    color:var(--muted) !important}
+  .mxres.won .mxread{color:#d6e8dd !important}
+
+  .mxruns{margin-top:16px}
+  .mxrunrow{display:flex; gap:6px; flex-wrap:wrap; margin:7px 0 6px}
+  .mxrun{min-width:38px; padding:6px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); text-align:center;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--ink-2)}
+  .mxrun.best{border-color:var(--up); color:var(--up); font-weight:600}
+  .mxrun.now{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--ink)}
+  .mxrun.now.best{background:var(--up-wash); border-color:var(--up); color:var(--up)}
+
+  .mxreach{margin-top:18px}
+  .mxrow{display:flex; align-items:center; gap:9px; padding:5px 0}
+  .mxrow span:first-child{flex:1 1 auto; font-size:13px; color:var(--ink-2); min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .mxbar{flex:none; width:70px; height:8px; border-radius:4px; background:var(--bg); overflow:hidden}
+  .mxbar i{display:block; height:8px; background:var(--up)}
+  .mxrow b{flex:none; width:46px; text-align:right;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; color:var(--ink)}
+
+  .mxgrid{margin-top:18px}
+  .mxlap{display:flex; align-items:center; gap:7px; margin-bottom:5px}
+  .mxlap .ln{flex:none; width:13px; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:11px; color:var(--muted)}
+  /* Twelve cells across a phone is 21px each, so the gap has to carry the
+     separation on its own. At 3px two scored cells side by side read as one
+     wide block holding a two digit number. */
+  .mxlap .cells{flex:1 1 auto; display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); gap:5px}
+  .mxlap b{flex:none; width:22px; text-align:right;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; font-weight:600}
+  .mxlap .cell{height:20px; border-radius:3px; background:var(--surface);
+    box-shadow:inset 0 0 0 1px var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; color:var(--muted)}
+  /* A white ring inside each scored cell. Without it two filled neighbours
+     read as one wide cell holding a two digit number, and "1" beside "2"
+     becomes twelve. */
+  .mxlap .cell.one{background:var(--accent-fill); color:#ffffff;
+    box-shadow:inset 0 0 0 1.5px var(--surface)}
+  .mxlap .cell.two{background:var(--accent-wash); color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--accent-fill)}
+  .mxlap .cell.nil{background:var(--bg); color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+  .mxlap .cell.next{box-shadow:inset 0 0 0 2px var(--accent-fill)}
   .benchlink{background:var(--surface); border:1px solid var(--line-strong); border-radius:9px;
     padding:11px 15px; font-family:Archivo, sans-serif; font-size:14px; font-weight:600;
     color:var(--accent); cursor:pointer}
@@ -2324,7 +2435,81 @@ var TESTS = [
   sets:[
     {id:"a", label:"6 ft \u00b7 around the clock", tc:"6 ft", r2:0.68, word:"6 feet", balls:20, max:20,
      tgt:"Four sets of five, moving round the hole. Holed scores"}
-  ]}
+  ]},
+
+/* ---- the two short game matrices ----
+   Neither of these is scored the way every other test is, so both carry a
+   `shape` and neither has `sets`. Keeping `sets:[]` matters: openSession
+   refuses an area without one, and a dozen render paths walk it.
+
+   They are also not two versions of one idea. Watson's produces a time and no
+   score; The Hundred produces a score and no time. Sharing a screen between
+   them would have compromised both. */
+
+{ id:"t-watson", area:3, isTest:true, track:true, shape:"gauntlet",
+  name:"The Watson matrix", sub:"Five in a row, one miss and you start again",
+  why:"Set by John Watson to the England squad. Five short game shots that have to come off consecutively: miss any one of them and you go back to the first. Forty five minutes on the clock. It is the only test here that can be failed outright, and that is the point of it.",
+  where:"Short game area", balls:0, target:10,
+  limit:45*60,
+  ruleText:"Pass all five in a row inside forty five minutes. Any miss sends you back to station one. What is recorded is the time, the number of attempts, and how far each attempt got.",
+  stations:[
+    {id:"a", name:"Eight foot putt", detail:"Hole it."},
+    {id:"b", name:"Chip, 8 iron, 10 yards down slope", detail:"Inside a three foot circle."},
+    {id:"c", name:"Up and down, 58 or 54", detail:"Down slope, little green to work with. Chip it, then hole the putt. Both, or it does not count."},
+    {id:"d", name:"Three from four feet", detail:"Three positions round the hole, all three holed in a row. Miss one and the whole matrix restarts."},
+    {id:"e", name:"Up and down from 30 yards", detail:"Pin on the front of the green, big slope. Pitch it on, then hole the putt."}
+  ],
+  sets:[] },
+
+{ id:"t-hundred", area:3, isTest:true, track:true, shape:"card",
+  name:"The Hundred", sub:"Twelve stations, four times round",
+  why:"Forty eight shots across the whole short game, scored on proximity rather than up and down. A hundred points are available and nobody gets near them: a tour player scores thirty six. It is a benchmark rather than a drill, and it is the only test here that says where a shot pattern would finish in a tour field.",
+  where:"Short game area", balls:48, target:200,
+  laps:4,
+  ruleText:"One shot at each station, four times round. Points depend on the station, because the stations are not equally hard. Tour expectation is thirty six.",
+  /* The point values follow how much a station's score moves with skill
+     against how much it bounces at random, NOT how rare the outcome is.
+     Weighting the long bunker at 1/0.03 would amplify noise, not signal.
+     That is why they come out as flat as they do. */
+  stations:[
+    {id:"s1",  name:"Short putt circle",       set:"4 ft, three positions round the hole",
+     bands:[{pts:1, lab:"All three holed"}]},
+    {id:"s2",  name:"Chip from greenside rough", set:"10 to 15 yards",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]},
+    {id:"s3",  name:"Straight putt",           set:"6 ft, slight break allowed",
+     bands:[{pts:1, lab:"Holed"}]},
+    {id:"s4",  name:"Greenside bunker",        set:"12 to 15 yards, standard lie",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]},
+    {id:"s5",  name:"Lag putt",                set:"13 paces, across a slope",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]},
+    {id:"s6",  name:"Short sided lofted pitch", set:"15 yards, down slope, tight lie, little green",
+     bands:[{pts:3, lab:"Inside one club"},{pts:2, lab:"Inside two clubs"}]},
+    {id:"s7",  name:"Breaking putt",           set:"6 ft, at least a cup of break",
+     bands:[{pts:1, lab:"Holed"}]},
+    {id:"s8",  name:"Awkward lie chip",        set:"10 to 15 yards, ball above or below the feet",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]},
+    {id:"s9",  name:"Downhill slider",         set:"15 ft, on the fast line",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]},
+    {id:"s10", name:"Pitch",                   set:"30 to 40 yards, full green, normal lie",
+     bands:[{pts:3, lab:"Inside one club"},{pts:2, lab:"Inside two clubs"}]},
+    /* The wide band here is three clubs, not two. At two clubs this station
+       expected about a tenth of a point a lap, which measures nothing at all
+       while still costing four of the forty eight shots. Widening the ring is
+       what brings it back, and it keeps the ceiling at a hundred. */
+    {id:"s11", name:"Long bunker",             set:"25 to 35 yards, or a plugged lie",
+     bands:[{pts:4, lab:"Inside one club"},{pts:3, lab:"Within three clubs"}]},
+    {id:"s12", name:"Pitch and run",           set:"10 to 15 yards, flat fairway lie",
+     bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]}
+  ],
+  /* Score to placing in a hundred tour players. Read as: this score or better
+     finishes here. Between two rows the lower placing applies, so the table is
+     never kinder than the evidence. */
+  placing:[[28,91],[30,82],[32,70],[34,57],[36,44],[38,31],[40,20],[42,13],[44,7],[46,4],[48,3],[52,1]],
+  tourScore:36,
+  /* Reliability 0.41 for one session, so a single run is close to a coin toss.
+     The placing is withheld until there are enough sessions to average. */
+  needRuns:3,
+  sets:[] }
 ];
 function testById(id){
   for(var i=0;i<TESTS.length;i++){ if(TESTS[i].id===id) return TESTS[i]; }
@@ -2333,6 +2518,652 @@ function testById(id){
   return null;
 }
 function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId; }); }
+
+/* ============ the two matrices ============
+   Every other test counts points out of n balls, so one set of machinery
+   serves them all. These two do not fit it and are not made to.
+
+   THE WATSON MATRIX is a gauntlet: five stations in order, any miss sends her
+   back to the first, forty five minutes on the clock. The output is a time,
+   an attempt count, and how far each attempt got. There is no score.
+
+   THE HUNDRED is a card: twelve stations, four times round, each shot scored
+   into a band whose value depends on the station. The output is a score and a
+   placing. There is no clock.
+
+   What they share is only that both carry `shape` and neither has `sets`, so
+   both bypass the scoring path rather than bending it. */
+
+function mxShape(a){ return a && (a.shape === "gauntlet" || a.shape === "card") ? a.shape : null; }
+function isMatrix(a){ return !!mxShape(a); }
+
+/* A draft arriving from storage or another device is only as complete as
+   whatever wrote it, so every field is seeded rather than assumed. Same
+   lesson as the resume branch in openSession. */
+function mxSeed(a, d){
+  if(!d) return;
+  if(!d.mx || typeof d.mx !== "object") d.mx = {};
+  var mx = d.mx;
+  if(a.shape === "gauntlet"){
+    if(typeof mx.start !== "number" || !(mx.start > 0)) mx.start = Date.now();
+    if(!Array.isArray(mx.laps)) mx.laps = [];
+    if(typeof mx.at !== "number" || mx.at < 0) mx.at = 0;
+    if(typeof mx.end !== "number" || mx.end < 0) mx.end = 0;
+  } else {
+    if(!Array.isArray(mx.hits)) mx.hits = [];
+  }
+}
+
+function mmss(ms){
+  var t = Math.max(0, Math.floor(ms/1000));
+  var m = Math.floor(t/60), s = t % 60;
+  return m + ":" + (s < 10 ? "0" : "") + s;
+}
+
+/* ---- the gauntlet ---- */
+function gtN(a){ return (a.stations || []).length; }
+function gtLimit(a){ return (a.limit || 45*60) * 1000; }
+function gtDone(d){ return !!(d && d.mx && d.mx.end); }
+function gtComplete(a, d){
+  var n = gtN(a), laps = (d && d.mx && d.mx.laps) || [];
+  for(var i=0;i<laps.length;i++){ if(laps[i] >= n) return true; }
+  return false;
+}
+/* The clock runs off a stored start time, which is what lets it survive a
+   locked phone or a closed tab. The same property means an abandoned matrix
+   reads as hours old when she comes back to it, so elapsed is capped at the
+   limit and a session found past the limit is closed out rather than resumed. */
+function gtElapsed(a, d){
+  var mx = (d && d.mx) || {};
+  if(mx.end) return mx.end;
+  var ms = Date.now() - (mx.start || Date.now());
+  if(!(ms >= 0)) ms = 0;
+  return Math.min(ms, gtLimit(a));
+}
+function gtBest(d){
+  var mx = (d && d.mx) || {}, laps = mx.laps || [], best = mx.at || 0;
+  for(var i=0;i<laps.length;i++){ if(laps[i] > best) best = laps[i]; }
+  return best;
+}
+function gtTries(d){
+  var mx = (d && d.mx) || {};
+  return (mx.laps || []).length + (gtDone(d) ? 0 : 1);
+}
+/* Reached and cleared, per station. The pair is what says which station is
+   actually costing her: failing station five is worth several failures at
+   station one, because everything before it has to be played again. */
+function gtReach(a, d){
+  var n = gtN(a), out = [], i;
+  for(i=0;i<n;i++) out.push({got:0, of:0});
+  var mx = (d && d.mx) || {}, laps = (mx.laps || []).slice();
+  if(!gtDone(d)) laps.push(mx.at || 0);
+  laps.forEach(function(cleared){
+    for(var k=0;k<n;k++){
+      if(k > cleared) break;      // never got there
+      out[k].of++;
+      if(k < cleared) out[k].got++;
+    }
+  });
+  return out;
+}
+
+/* ---- the card ---- */
+function cdN(a){ return (a.stations || []).length; }
+function cdShots(a){ return (a.laps || 4) * cdN(a); }
+function cdHits(d){ return (d && d.mx && Array.isArray(d.mx.hits)) ? d.mx.hits : []; }
+function cdStation(a, i){ var st = a.stations || []; return st.length ? st[i % st.length] : null; }
+function cdPts(a, hits){
+  var t = 0;
+  (hits || []).forEach(function(b, i){
+    if(!b) return;
+    var s = cdStation(a, i);
+    var band = s && s.bands && s.bands[b-1];
+    if(band) t += band.pts || 0;
+  });
+  return t;
+}
+function cdMax(a){
+  var per = 0;
+  (a.stations || []).forEach(function(s){ per += (s.bands && s.bands[0] ? s.bands[0].pts : 0) || 0; });
+  return per * (a.laps || 4);
+}
+/* Scored in place rather than over a slice: the station lookup is modular, so
+   a re-based index would score lap two against lap one's point values. */
+function cdLapScore(a, hits, lap){
+  var n = cdN(a), t = 0, i;
+  for(i = lap*n; i < (lap+1)*n; i++){
+    var b = (hits || [])[i];
+    if(!b) continue;
+    var s = cdStation(a, i), band = s && s.bands && s.bands[b-1];
+    if(band) t += band.pts || 0;
+  }
+  return t;
+}
+function cdByStation(a, hits){
+  var n = cdN(a), out = [], i;
+  for(i=0;i<n;i++) out.push({got:0, of:0});
+  (a.stations || []).forEach(function(s, i2){
+    out[i2].of = ((s.bands && s.bands[0] ? s.bands[0].pts : 0) || 0) * (a.laps || 4);
+  });
+  (hits || []).forEach(function(b, i3){
+    var k = i3 % n;
+    if(!b) return;
+    var s = cdStation(a, i3), band = s && s.bands && s.bands[b-1];
+    if(band) out[k].got += band.pts || 0;
+  });
+  return out;
+}
+/* Finished runs only. An unfinished one is in state.sessions too, marked live,
+   and counting it as a run made "one run logged" read as two. */
+function cdDone(a, notId){
+  return testSessions(a.id).filter(function(x){
+    return x.status !== "live" && x.id !== notId;
+  });
+}
+/* Tour pace, per lap. Thirty six over four laps is nine, and nine out of a
+   possible twenty five is the number that needs saying out loud: on this card
+   a good player misses most of it. */
+function cdLapPace(a){
+  return Math.round(10 * (a.tourScore || 36) / (a.laps || 4)) / 10;
+}
+/* Why a station is worth what it is worth. The point values already encode how
+   hard each one is, so this says what they mean rather than inventing a rate
+   the card does not carry. */
+function cdHardNote(st){
+  var top = st && st.bands && st.bands[0] ? st.bands[0].pts : 0;
+  if(!st || !st.bands) return "";
+  if(st.bands.length === 1) return "Holed, or nothing. No half marks here.";
+  if(top >= 4) return "The hardest shot on the card. Scoring here at all is rare, which is why it is worth four.";
+  if(top === 3) return "One of the hard ones. Three points because most of these do not come off.";
+  return "";
+}
+/* This score or better finishes here. Between two rows the lower placing
+   applies, so the table is never kinder than the evidence behind it. */
+function cdPlacing(a, score){
+  var tbl = a.placing || [];
+  if(!tbl.length) return null;
+  var out = null;
+  for(var i=0;i<tbl.length;i++){ if(score >= tbl[i][0]) out = tbl[i][1]; }
+  return out == null ? 99 : out;
+}
+function cdOrdinal(n){
+  if(n == null) return "";
+  var s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+/* ---- the clock ----
+   One interval for the whole app, cleared the moment it has nothing to tick.
+   It only rewrites the two time nodes: a full re-render every second would
+   fight the notes field for focus. */
+function mxStop(){
+  if(state.mxTimer){ clearInterval(state.mxTimer); state.mxTimer = null; }
+}
+function mxStart(){
+  mxStop();
+  state.mxTimer = setInterval(mxTick, 1000);
+}
+function mxTick(){
+  var d = state.draft;
+  var a = d ? area(d.areaId) : null;
+  if(state.view !== "session" || !a || a.shape !== "gauntlet" || gtDone(d)){ mxStop(); return; }
+  var ms = gtElapsed(a, d), lim = gtLimit(a);
+  var el = $("mxClock");
+  if(el){
+    el.textContent = mmss(ms);
+    el.className = "mxfig" + (ms >= lim - 5*60*1000 ? " late" : "");
+  }
+  var left = $("mxLeft");
+  if(left) left.textContent = "of " + mmss(lim);
+  if(ms >= lim){ mxStop(); gtTimeUp(a, d); }
+}
+/* Forty five minutes and the session ends there. It saves itself rather than
+   being thrown away: she did the work, and an incomplete run with six attempts
+   in it says something. Abandoning inside the time is the other case, and that
+   one is a live session she can delete. */
+function gtTimeUp(a, d){
+  if(!d || !d.mx || gtDone(d)) return;
+  d.mx.end = gtLimit(a);
+  d.total = gtBest(d); d.max = gtN(a);
+  try{ renderSession(); }catch(e){}
+  try{ saveCurrent(); }catch(e){}
+  try{ setStatus("Forty five minutes. The matrix was saved as it stood."); }catch(e){}
+}
+
+/* ---- the gauntlet page ---- */
+function gtPass(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a || gtDone(d)) return;
+  mxSeed(a, d);
+  d.mx.at = (d.mx.at || 0) + 1;
+  if(d.mx.at >= gtN(a)){
+    d.mx.laps.push(gtN(a));
+    d.mx.end = gtElapsed(a, d);
+    mxStop();
+  }
+  mxAfter(a, d);
+}
+function gtMiss(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a || gtDone(d)) return;
+  mxSeed(a, d);
+  d.mx.laps.push(d.mx.at || 0);
+  d.mx.at = 0;
+  mxAfter(a, d);
+}
+function mxAfter(a, d){
+  d.total = (a.shape === "gauntlet") ? gtBest(d) : cdPts(a, cdHits(d));
+  d.max   = (a.shape === "gauntlet") ? gtN(a) : cdMax(a);
+  saveDraft();
+  renderSession();
+  updateTotal();
+}
+function buildGauntlet(a){
+  var d = state.draft;
+  mxSeed(a, d);
+  var host = $("sessCards"); host.innerHTML = "";
+  var n = gtN(a), done = gtDone(d), won = gtComplete(a, d);
+  var ms = gtElapsed(a, d), lim = gtLimit(a);
+
+  /* The running clock is the whole top of the page while it is running, and
+     gone once it stops: the result block below carries the final time, and two
+     copies of the same number a centimetre apart just makes her check which
+     one is real. */
+  if(!done){
+    var top = document.createElement("div"); top.className = "mxtop";
+    top.innerHTML =
+      '<div class="mxtime"><span class="mxfig'+(ms >= lim - 5*60*1000 ? " late" : "")+'" id="mxClock">'+mmss(ms)+'</span>'+
+        '<span class="mxsub" id="mxLeft">of '+mmss(lim)+'</span></div>'+
+      '<div class="mxtry"><b>'+gtTries(d)+'</b><span>'+(gtTries(d)===1?"attempt":"attempts")+'</span></div>';
+    host.appendChild(top);
+  }
+
+  if(done){
+    var res = document.createElement("div");
+    res.innerHTML = gtResultHtml(a, d);
+    while(res.firstChild) host.appendChild(res.firstChild);
+    var gstrip = gtRunStrip(a, d);
+    if(gstrip) host.appendChild(gstrip);
+  }
+
+  var list = document.createElement("div"); list.className = "mxsts";
+  var onIdx = done ? -1 : (d.mx.at || 0);
+  (a.stations || []).forEach(function(st, i){
+    /* A completed matrix ticks all five: she did clear every one of them, and
+       leaving them blank made the finished page look like a failed one. A
+       matrix that ran out of time ticks none, because the run it ended on did
+       not clear them. */
+    var tick = done ? won : (i < onIdx);
+    var row = document.createElement("div");
+    row.className = "mxst" + (i === onIdx ? " on" : "") + (tick ? " ok" : "");
+    row.innerHTML =
+      (i === onIdx
+        ? '<p class="eyebrow">Station '+(i+1)+' of '+n+'</p><h3>'+st.name+'</h3><p class="mxdet">'+st.detail+'</p>'
+        : '<div class="mxmini"><span class="mxdot'+(tick ? " ok" : "")+'">'+
+            (tick ? "✓" : (i+1))+'</span><span>'+st.name+'</span></div>');
+    list.appendChild(row);
+  });
+  host.appendChild(list);
+
+  if(!done){
+    var acts = document.createElement("div"); acts.className = "mxacts";
+    acts.innerHTML = '<button type="button" class="mxgo" id="mxPass">Passed</button>'+
+                     '<button type="button" class="mxno" id="mxMiss">Missed</button>';
+    host.appendChild(acts);
+    $("mxPass").addEventListener("click", gtPass);
+    $("mxMiss").addEventListener("click", gtMiss);
+  }
+
+  host.appendChild(gtReachTable(a, d));
+
+  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+
+  if(!done) mxStart(); else mxStop();
+}
+function gtLaps(d){ return ((d.mx && d.mx.laps) || []).length; }
+function gtReachTable(a, d){
+  var wrap = document.createElement("div"); wrap.className = "mxreach";
+  var rows = gtReach(a, d), n = gtN(a);
+  var h = '<p class="eyebrow">Reached, and cleared</p>';
+  (a.stations || []).forEach(function(st, i){
+    var r = rows[i] || {got:0, of:0};
+    var pct = r.of ? Math.round(100*r.got/r.of) : 0;
+    h += '<div class="mxrow"><span>'+(i+1)+' · '+st.name+'</span>'+
+         '<span class="mxbar"><i style="width:'+pct+'%"></i></span>'+
+         '<b>'+r.got+'/'+r.of+'</b></div>';
+  });
+  h += '<p class="note">A station failed late costs more than one failed early, '+
+       'because everything before it has to be played again.</p>';
+  wrap.innerHTML = h;
+  return wrap;
+}
+
+/* ---- the card page ---- */
+function cdHit(band){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a) return;
+  mxSeed(a, d);
+  if(d.mx.hits.length >= cdShots(a)) return;
+  d.mx.hits.push(band);
+  mxAfter(a, d);
+}
+function cdUndo(){
+  var d = state.draft, a = d ? area(d.areaId) : null;
+  if(!a) return;
+  mxSeed(a, d);
+  if(!d.mx.hits.length) return;
+  d.mx.hits.pop();
+  mxAfter(a, d);
+}
+function buildCard(a){
+  var d = state.draft;
+  mxSeed(a, d);
+  var host = $("sessCards"); host.innerHTML = "";
+  var hits = cdHits(d), n = cdN(a), shots = cdShots(a), i = hits.length;
+  var done = i >= shots, pts = cdPts(a, hits);
+
+  var top = document.createElement("div"); top.className = "mxtop";
+  top.innerHTML =
+    '<div class="mxtime"><span class="mxfig">'+pts+'</span><span class="mxsub">'+
+      (done ? shots+' shots' : 'after '+i+' of '+shots)+'</span></div>'+
+    '<div class="mxtry"><b>'+(done ? (a.laps||4) : (Math.floor(i/n)+1))+'</b><span>of '+(a.laps||4)+' laps</span></div>';
+  host.appendChild(top);
+
+  if(done){
+    host.appendChild(cdResult(a, hits, d));
+    var strip = cdRunStrip(a, d, pts);
+    if(strip) host.appendChild(strip);
+  } else {
+    /* The running score needs an anchor or it reads as a disaster all the way
+       round. Nine a lap is tour pace, out of a possible twenty five. */
+    var pace = document.createElement("p"); pace.className = "note mxpace";
+    var lapNow = Math.floor(i / n), inLap = cdLapScore(a, hits, lapNow);
+    var expect = Math.round(10 * cdLapPace(a) * ((i % n) / n)) / 10;
+    pace.innerHTML = i === 0
+      ? "Tour pace is <b>" + cdLapPace(a) + "</b> a lap, out of a possible " +
+        (cdMax(a)/(a.laps||4)) + ". Most of these shots are meant to be missed."
+      : "<b>" + inLap + "</b> this lap, against <b>" + expect + "</b> at tour pace by now.";
+    host.appendChild(pace);
+
+    var st = cdStation(a, i);
+    var hard = cdHardNote(st);
+    var cur = document.createElement("div"); cur.className = "mxst on";
+    cur.innerHTML = '<p class="eyebrow">Station '+((i % n)+1)+' of '+n+'</p>'+
+      '<h3>'+st.name+'</h3><p class="mxdet">'+st.set+'</p>'+
+      (hard ? '<p class="mxhard">'+hard+'</p>' : '');
+    host.appendChild(cur);
+
+    var acts = document.createElement("div"); acts.className = "mxbands";
+    (st.bands || []).forEach(function(b, bi){
+      acts.innerHTML += '<button type="button" class="mxband'+(bi===0?" best":"")+'" data-b="'+(bi+1)+'">'+
+        '<span class="pts">'+b.pts+'</span><span class="lab">'+b.lab+'</span></button>';
+    });
+    acts.innerHTML += '<button type="button" class="mxband miss" data-b="0">'+
+      '<span class="pts">0</span><span class="lab">Outside</span></button>';
+    host.appendChild(acts);
+    acts.querySelectorAll("[data-b]").forEach(function(btn){
+      btn.addEventListener("click", function(){ cdHit(+btn.getAttribute("data-b")); });
+    });
+
+    var un = document.createElement("div"); un.className = "tools";
+    un.innerHTML = '<button id="mxUndo">Undo the last shot</button>';
+    host.appendChild(un);
+    $("mxUndo").addEventListener("click", cdUndo);
+  }
+
+  host.appendChild(cdGrid(a, hits));
+  if(done) host.appendChild(cdStationTable(a, hits));
+
+  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+  mxStop();
+}
+function cdGrid(a, hits){
+  var wrap = document.createElement("div"); wrap.className = "mxgrid";
+  var n = cdN(a), laps = a.laps || 4, h = '<p class="eyebrow">The card</p>';
+  for(var L=0; L<laps; L++){
+    var cells = "";
+    for(var k=0; k<n; k++){
+      var idx = L*n + k, b = hits[idx];
+      var s = cdStation(a, idx);
+      var v = (b && s && s.bands && s.bands[b-1]) ? s.bands[b-1].pts : (b === 0 ? 0 : null);
+      var cls = v == null ? "cell" : (b === 1 ? "cell one" : (b ? "cell two" : "cell nil"));
+      if(idx === hits.length) cls += " next";
+      cells += '<span class="'+cls+'">'+(v == null ? "" : v)+'</span>';
+    }
+    h += '<div class="mxlap"><span class="ln">'+(L+1)+'</span><span class="cells">'+cells+'</span>'+
+         '<b>'+(hits.length > L*n ? cdLapScore(a, hits, L) : "–")+'</b></div>';
+  }
+  wrap.innerHTML = h;
+  return wrap;
+}
+/* The scale, the placing, and the sentence that stops a perfectly good score
+   reading as a failure. Thirty six out of a hundred is tour standard on this
+   card: without saying so plainly, every run she ever logs looks like a bad
+   one, and she stops caring about the number. */
+function cdResult(a, hits, s){
+  var wrap = document.createElement("div"); wrap.className = "mxres card";
+  var pts = cdPts(a, hits), tour = a.tourScore || 36;
+  var prev = cdDone(a, s && s.id);
+  var runs = prev.length + 1;               // this one counts
+  var enough = runs >= (a.needRuns || 3);
+  var place = cdPlacing(a, pts);
+  var lo = (a.placing && a.placing[0] ? a.placing[0][0] : 28);
+  var hi = (a.placing && a.placing[a.placing.length-1] ? a.placing[a.placing.length-1][0] : 52);
+  var pc = Math.max(0, Math.min(100, Math.round(100*(pts-lo)/(hi-lo))));
+  var tc = Math.max(0, Math.min(100, Math.round(100*(tour-lo)/(hi-lo))));
+  var h = '<p class="eyebrow">'+cdShots(a)+' shots</p><div class="mxbig">'+pts+'</div>';
+  h += '<div class="mxscale"><i style="width:'+pc+'%"></i>'+
+       '<u style="left:'+tc+'%"></u></div>'+
+       '<div class="mxends"><span>'+lo+'</span><span>tour '+tour+'</span><span>'+hi+'+</span></div>';
+  h += enough
+    ? '<p class="mxplace">'+cdOrdinal(place)+' of a hundred tour players.</p>'
+    : '<p class="note">'+runs+' '+(runs===1?"run":"runs")+' logged. One session of this is close to a coin toss, '+
+      'so the placing is held back until there are '+(a.needRuns||3)+' to average.</p>';
+  h += '<p class="mxread">'+cdReading(a, pts)+'</p>';
+  wrap.innerHTML = h;
+  return wrap;
+}
+/* How to read the number, in her terms rather than a percentage. */
+function cdReading(a, pts){
+  var tour = a.tourScore || 36, max = cdMax(a);
+  var pct = Math.round(100*pts/max), tpct = Math.round(100*tour/max);
+  /* Above tour standard the number speaks for itself. Below it, the percentage
+     is the thing that has to be defused, or a perfectly good card reads as a
+     bad one every single time. */
+  if(pts >= tour){
+    return (pts === tour ? "Exactly tour average." : (pts - tour) + " clear of tour average.") +
+      " " + pct + "% of the " + max + " on the card, against " + tpct + "% for a tour player.";
+  }
+  return (tour - pts) + " short of tour average, which is " + tour + ". That is " + pct +
+    "% of the " + max + " on the card. A low number here is the point of the test: " +
+    "a tour player only manages " + tpct + "%, and most of these shots are meant to be missed.";
+}
+/* Her own runs, which is the comparison that actually moves. Reliability is
+   0.41 on one session, so the average of the last few is the honest line and
+   a single session's movement is noise. */
+function cdRunStrip(a, s, pts){
+  var prev = cdDone(a, s && s.id);
+  if(!prev.length) return null;
+  var scores = prev.map(function(x){ return cdPts(a, cdHits(x)); });
+  var all = scores.concat([pts]);
+  var best = Math.max.apply(null, all);
+  var last = all.slice(-5);
+  var avg = Math.round(10 * last.reduce(function(t,v){ return t+v; }, 0) / last.length) / 10;
+  var wrap = document.createElement("div"); wrap.className = "mxruns";
+  var h = '<p class="eyebrow">Her own runs</p><div class="mxrunrow">';
+  all.slice(-6).forEach(function(v, i, arr){
+    var isNow = i === arr.length - 1;
+    h += '<span class="mxrun'+(isNow ? " now" : "")+(v === best ? " best" : "")+'">'+v+'</span>';
+  });
+  h += '</div>';
+  h += '<p class="note"><b>'+avg+'</b> average over the last '+last.length+
+       ', best '+best+'.'+
+       (pts === best && all.length > 1 ? ' That is her best yet.' : '')+
+       ' Reliability on one run is low, so judge it on the average, never on a single session.</p>';
+  wrap.innerHTML = h;
+  return wrap;
+}
+/* What the Tests tab says about a matrix. Neither shape has a ball count or a
+   pass rate, so neither can use the tally line every other test shares. */
+function mxTestStat(t, runs){
+  if(t.shape === "gauntlet"){
+    var lim = gtLimit(t), best = null, wins = 0, far = 0;
+    runs.forEach(function(r){
+      var reached = gtBest(r);
+      if(reached > far) far = reached;
+      if(gtComplete(t, r)){
+        wins++;
+        var ms = gtElapsed(t, r);
+        if(best == null || ms < best) best = ms;
+      }
+    });
+    if(!runs.length) return { fill:0, text:"Nothing logged yet", where:"45 minutes" };
+    if(best == null){
+      return { fill: Math.round(100*far/gtN(t)),
+        text: "Not finished yet · furthest was station <b>"+far+"</b> of "+gtN(t)+
+              ", over "+runs.length+" "+(runs.length===1?"run":"runs"),
+        where:"45 minutes" };
+    }
+    return { fill: Math.max(4, Math.round(100*(lim-best)/lim)),
+      text: "Best <b>"+mmss(best)+"</b> · completed "+wins+" of "+runs.length+
+            " "+(runs.length===1?"run":"runs"),
+      where:"45 minutes" };
+  }
+  var lo = (t.placing && t.placing[0] ? t.placing[0][0] : 28);
+  var hi = (t.placing && t.placing[t.placing.length-1] ? t.placing[t.placing.length-1][0] : 52);
+  if(!runs.length) return { fill:0, text:"Nothing logged yet · tour is "+(t.tourScore||36), where:cdShots(t)+" shots" };
+  var sum = 0;
+  runs.forEach(function(r){ sum += cdPts(t, cdHits(r)); });
+  var avg = Math.round(sum/runs.length);
+  var enough = runs.length >= (t.needRuns || 3);
+  return {
+    fill: Math.max(3, Math.min(100, Math.round(100*(avg-lo)/(hi-lo)))),
+    text: "<b>"+avg+"</b> average of "+runs.length+" "+(runs.length===1?"run":"runs")+
+          (enough ? " · "+cdOrdinal(cdPlacing(t, avg))+" on tour"
+                  : " · not enough yet to read a placing"),
+    where: cdShots(t)+" shots"
+  };
+}
+
+/* ---- a finished matrix, read back later ----
+   Both shapes store the same fields a live draft holds, so the helpers above
+   work unchanged on a saved session. The history view is the only place the
+   best ever time appears, which is what makes the Watson result mean
+   something on the second run rather than only on the day. */
+function mxPastHtml(a, s){
+  var h = "";
+  if(a.shape === "gauntlet"){
+    h += gtResultHtml(a, s);
+    var gs = gtRunStrip(a, s);
+    if(gs) h += gs.outerHTML;
+    h += gtReachTable(a, s).outerHTML;
+  } else {
+    var ph = cdHits(s);
+    h += cdResult(a, ph, s).outerHTML;
+    var pstrip = cdRunStrip(a, s, cdPts(a, ph));
+    if(pstrip) h += pstrip.outerHTML;
+    h += cdGrid(a, ph).outerHTML;
+    h += cdStationTable(a, ph).outerHTML;
+  }
+  return h;
+}
+/* The result block, shared by the live page and the history view so a run
+   cannot read one way on the day and another way a week later. */
+function gtResultHtml(a, d){
+  var n = gtN(a), won = gtComplete(a, d), ms = gtElapsed(a, d), lim = gtLimit(a);
+  var tries = gtLaps(d), prev = gtBestEver(a, d);
+  var h = '<div class="mxres '+(won ? "won" : "out")+'">';
+  if(won){
+    h += '<p class="eyebrow">Matrix complete</p><div class="mxbig">'+mmss(ms)+'</div>'+
+      '<p>'+tries+' '+(tries===1?"attempt":"attempts")+', and '+mmss(lim-ms)+' to spare.</p>'+
+      '<p>'+(prev == null
+        ? 'The first time she has finished it. Two current England players never have.'
+        : (ms < prev ? 'A new best by '+mmss(prev-ms)+'. '+mmss(ms)+' is the time to beat now.'
+                     : mmss(prev)+' is still the one to beat.'))+'</p>';
+  } else {
+    h += '<p class="eyebrow">Ran out of time</p><div class="mxbig">'+mmss(lim)+'</div>'+
+      '<p>Furthest she got was station '+gtBest(d)+' of '+n+', over '+
+      tries+' '+(tries===1?"attempt":"attempts")+'.</p>'+
+      '<p class="mxread">'+gtHonest(a, d)+'</p>';
+  }
+  return h + '</div>';
+}
+/* Not finishing this is the normal outcome and needs saying, or a test set to
+   an England squad reads as a personal failure every time she runs it. */
+function gtHonest(a, d){
+  var best = gtBest(d), n = gtN(a);
+  if(best >= n - 1)
+    return "One shot from finishing a test two current England players have never completed. "+
+           "That is not a failed session.";
+  if(best >= 3)
+    return "Three of the five on a test two current England players have never completed. "+
+           "Any miss anywhere sends her back to the start, so getting deep is most of the work.";
+  return "This is built to be failed. One miss at any station puts her back to the first, "+
+         "and two current England players have never finished it.";
+}
+/* Her completed times, and the one to beat. */
+function gtRunStrip(a, d){
+  var done = testSessions(a.id, d.playerId).filter(function(x){
+    return x.status !== "live" && x.id !== d.id && gtComplete(a, x); });
+  var mine = gtComplete(a, d) ? [gtElapsed(a, d)] : [];
+  var times = done.map(function(x){ return gtElapsed(a, x); }).concat(mine);
+  if(times.length < 2) return null;
+  var best = Math.min.apply(null, times);
+  var wrap = document.createElement("div"); wrap.className = "mxruns";
+  var h = '<p class="eyebrow">Every time she has finished it</p><div class="mxrunrow">';
+  times.slice(-6).forEach(function(t, i, arr){
+    h += '<span class="mxrun'+(i === arr.length-1 && mine.length ? " now" : "")+
+         (t === best ? " best" : "")+'">'+mmss(t)+'</span>';
+  });
+  var allRuns = done.length + mine.length +
+    testSessions(a.id, d.playerId).filter(function(x){
+      return x.status !== "live" && x.id !== d.id && !gtComplete(a, x); }).length +
+    (gtComplete(a, d) ? 0 : 1);
+  h += '</div><p class="note">'+times.length+' completed of '+allRuns+
+       ' runs. Best '+mmss(best)+'.</p>';
+  wrap.innerHTML = h;
+  return wrap;
+}
+/* The best completed time before this one, or null if this is the first. */
+function gtBestEver(a, s){
+  var best = null;
+  testSessions(a.id, s.playerId).forEach(function(x){
+    if(x.id === s.id) return;
+    if(x.date > s.date) return;
+    if(!gtComplete(a, x)) return;
+    var t = gtElapsed(a, x);
+    if(best == null || t < best) best = t;
+  });
+  return best;
+}
+function cdStationTable(a, hits){
+  var wrap = document.createElement("div"); wrap.className = "mxreach";
+  var rows = cdByStation(a, hits);
+  var h = '<p class="eyebrow">Every station, '+(a.laps||4)+' laps each</p>';
+  var zeroHard = 0;
+  (a.stations || []).forEach(function(st, i){
+    var r = rows[i] || {got:0, of:0};
+    var pct = r.of ? Math.round(100*r.got/r.of) : 0;
+    var top = st.bands && st.bands[0] ? st.bands[0].pts : 0;
+    if(!r.got && top >= 3) zeroHard++;
+    h += '<div class="mxrow"><span>'+(i+1)+' · '+st.name+'</span>'+
+         '<span class="mxbar"><i style="width:'+pct+'%"></i></span>'+
+         '<b>'+r.got+'/'+r.of+'</b></div>';
+  });
+  /* A blank row against one of the hard stations is the normal outcome, not a
+     hole in her game, and it needs saying next to the blank rather than three
+     screens away. */
+  h += '<p class="note">Points scored against points available.' +
+       (zeroHard ? ' Nothing scored on ' + (zeroHard === 1 ? 'one of the hard stations' :
+         zeroHard + ' of the hard stations') + ', which is the usual outcome rather than a weakness. ' +
+         'Those are worth three and four precisely because they rarely come off.' : '') + '</p>';
+  wrap.innerHTML = h;
+  return wrap;
+}
 
 /* ============ state ============ */
 var state = {
@@ -2348,6 +3179,7 @@ var state = {
   deck:null,
   restTimer:null,
   db:null,
+  mxTimer:null,
   lib:{practice:[], tests:[]},
   gone:{},              // ids deleted on purpose, so no merge can resurrect them
   sampleOn:false
@@ -3310,6 +4142,11 @@ var $ = function(id){ return document.getElementById(id); };
 
 function show(view){
   state.view = view;
+  /* Leaving the session screen stops the matrix clock. It is rebuilt from the
+     stored start time on the way back in, so nothing is lost by stopping it,
+     and an interval left running on a screen nobody is looking at is how a
+     phone's battery disappears. */
+  if(view !== "session") mxStop();
   $("viewHome").hidden = view!=="home";
   $("viewSession").hidden = view!=="session";
   $("viewGym").hidden = view!=="gym";
@@ -3657,9 +4494,11 @@ function renderTests(){
   allTests().forEach(function(t){
     var a = area(t.area), runs = testSessions(t.id);
     var tot = {n:0, got:0};
-    runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
+    if(!isMatrix(t)) runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
     var pct = tot.n ? Math.round(100*tot.got/tot.n) : null;
     var fill = Math.min(100, Math.round(100*tot.n/(t.target||100)));
+    var mxs = isMatrix(t) ? mxTestStat(t, runs) : null;
+    if(mxs) fill = mxs.fill;
     var card = document.createElement("div"); card.className = "testcard";
     card.innerHTML =
       '<div class="tchd"><div><div class="nm">'+t.name+'</div>'+
@@ -3669,11 +4508,12 @@ function renderTests(){
       '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
       '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
       '<p class="tstat">'+
-        (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
-               : 'Nothing logged yet')+
-        ' \u00b7 aiming for '+(t.target||100)+'</p>'+
+        (mxs ? mxs.text
+             : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
+                      : 'Nothing logged yet')+
+               ' \u00b7 aiming for '+(t.target||100))+'</p>'+
       '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
-        '<span class="twhere">'+t.balls+' balls \u00b7 '+t.where+'</span></div>';
+        '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>';
     card.querySelector("[data-run]").addEventListener("click", function(){ openTest(t.id); });
     host.appendChild(card);
   });
@@ -4100,6 +4940,13 @@ var draftTimer = null;
 function draftHasContent(d){
   if(!d) return false;
   if(d.total || d.compete) return true;
+  /* A matrix that has started counts as content even with nothing scored. The
+     gauntlet's clock is wall clock read off a stored start time, so a draft
+     that does not persist is a clock that restarts at zero on every reload,
+     which is the one thing the design cannot allow. A card starts counting
+     from its first shot. */
+  if(d.mx && (d.mx.start > 0 || (d.mx.hits && d.mx.hits.length) ||
+              (d.mx.laps && d.mx.laps.length) || d.mx.at)) return true;
   if(d.notes && String(d.notes).trim()) return true;
   function any(o, f){ if(!o) return false; for(var k in o){ if(f(o[k])) return true; } return false; }
   if(any(d.cond, function(v){ return !!v; })) return true;
@@ -4184,6 +5031,17 @@ function draftLabel(d){
 function draftProgress(d){
   if(!d) return "";
   if(d.kind === "gym") return (d.total||0) + " of " + (d.max||0) + " sets done";
+  /* "3 of 5 points scored" is wrong twice over for a matrix: the gauntlet has
+     no points at all, and the card's hundred is a ceiling nobody reaches, so
+     quoting it makes an ordinary score read as a disaster. */
+  var ma = area(d.areaId);
+  if(ma && isMatrix(ma)){
+    if(ma.shape === "gauntlet"){
+      return "on station " + (((d.mx && d.mx.at) || 0) + 1) + " of " + gtN(ma) +
+             ", " + mmss(gtElapsed(ma, d)) + " gone";
+    }
+    return ((d.mx && d.mx.hits ? d.mx.hits.length : 0)) + " of " + cdShots(ma) + " shots";
+  }
   return (d.total||0) + " of " + (d.max||0) + " points scored";
 }
 function renderResume(){
@@ -4213,6 +5071,13 @@ function resumeDraft(d){
    numbers, the placings or the balance chart. */
 function openTest(testId, resume){
   var t = testById(testId); if(!t) return false;
+  /* An unfinished run of THIS test is picked up rather than started again.
+     openSession's own resume lookup only matches kind "practice", so without
+     this, tapping Run on a test already in progress opened a second one beside
+     it. Harmless for a ball count. Not harmless for the Watson matrix, where
+     starting again quietly means a second clock. */
+  if(!resume) resume = liveSessions().filter(function(x){
+    return x.kind === "test" && x.testId === testId; })[0] || null;
   var ok = openSession(testId, resume);
   if(ok && state.draft){
     state.draft.kind = "test";
@@ -4257,6 +5122,19 @@ function openSession(areaId, resume){
   state.runShown = 0;
   PRAISE = { seen:0, at:-99, run:0 };
   if(!resume){ STORE.draftAt = 0; STORE.draftOk = null; }
+  if(isMatrix(a)){
+    mxSeed(a, state.draft);
+    /* Resuming a gauntlet whose forty five minutes ran out while the app was
+       shut. The clock is wall clock on purpose, so without this she would come
+       back to a session reading nine hours. Close it out where it actually
+       ended instead of pretending it is still live. */
+    if(a.shape === "gauntlet" && !gtDone(state.draft) &&
+       Date.now() - state.draft.mx.start >= gtLimit(a)){
+      state.draft.mx.end = gtLimit(a);
+      state.draft.total = gtBest(state.draft);
+      state.draft.max = gtN(a);
+    }
+  }
   watchDraft();
   paintTick();
   $("sessArea").textContent = a.isTest ? "Test" : (a.retired ? "Earlier format" : "Area "+areaNo(a));
@@ -4268,6 +5146,27 @@ function openSession(areaId, resume){
 }
 function renderSession(){
   var a = area(state.draft.areaId);
+  /* The two matrices own their whole page: no set list, no paging, no running
+     total in the bar, because none of those say anything about a gauntlet or a
+     card. Everything they do need is drawn by their own builder. */
+  if(isMatrix(a)){
+    stashNotes();
+    var mb = $("sessMode") ? $("sessMode").parentNode : null;
+    if(mb) mb.hidden = true;
+    if($("sessProg")) $("sessProg").hidden = true;
+    if($("runBar")) $("runBar").hidden = true;
+    if($("navBack")) $("navBack").hidden = true;
+    if($("navNext")) $("navNext").hidden = true;
+    if(a.shape === "gauntlet") buildGauntlet(a); else buildCard(a);
+    if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
+    updateTotal();
+    return;
+  }
+  var mb2 = $("sessMode") ? $("sessMode").parentNode : null;
+  if(mb2) mb2.hidden = false;
+  if($("sessProg")) $("sessProg").hidden = false;
+  if($("navBack")) $("navBack").hidden = false;
+  if($("navNext")) $("navNext").hidden = false;
   var last = sessionsFor(a.id).slice(-1)[0];
   stashNotes();
   $("sessMode").textContent = state.cardMode ? "Show all sets" : "One at a time";
@@ -6347,6 +7246,28 @@ function renderCond(hostId, draft, kind){
 function updateTotal(){
   var d = state.draft; if(!d) return;
   var a = area(d.areaId); if(!a || !a.sets) return;
+  if(isMatrix(a)){
+    mxSeed(a, d);
+    var fin;
+    if(a.shape === "gauntlet"){
+      d.total = gtBest(d); d.max = gtN(a); fin = gtDone(d);
+    } else {
+      d.total = cdPts(a, cdHits(d)); d.max = cdMax(a);
+      fin = cdHits(d).length >= cdShots(a);
+    }
+    $("totFig").textContent = String(d.total);
+    $("totOf").textContent = "/ " + d.max;
+    $("totVs").innerHTML = (a.shape === "gauntlet")
+      ? (gtDone(d) ? "" : "furthest so far")
+      : (fin ? "" : "of " + cdShots(a) + " shots");
+    /* Saving half a matrix would put a meaningless row in her history, so the
+       button stays shut until the thing is actually over. Forty five minutes
+       saves a gauntlet by itself; a card is over when the last shot is in. */
+    $("saveBtn").textContent = fin ? "Save session" : "Not finished yet";
+    $("saveBtn").disabled = !fin;
+    saveDraft();
+    return;
+  }
   if(!d.scores) d.scores = {};
   var t = 0; a.sets.forEach(function(s){ setParts(s).forEach(function(p){ t += (d.scores[p.key]||0); }); });
   d.total = t;
@@ -6818,9 +7739,14 @@ function saveCurrent(){
     // an empty session is almost always a mis-tap on save, not a real session
     var anyMetric = false;
     if(s.metrics){ for(var mk in s.metrics){ if(s.metrics[mk] != null) anyMetric = true; } }
-    if(!s.total && !s.compete && !anyMetric && !$("sessNotes").value.trim()){
+    /* A matrix that ran out of time having never cleared station one scores
+       zero, and that is a real result, not a mis-tap. It also saves itself
+       without anybody present to answer a dialog. */
+    if(!isMatrix(area(s.areaId)) &&
+       !s.total && !s.compete && !anyMetric && !$("sessNotes").value.trim()){
       if(!confirm("Nothing was scored in this session. Save it anyway?")) return;
     }
+    mxStop();
     s.date = $("sessDate").value || today();
     s.notes = $("sessNotes").value.trim();
     if(s.kind !== "test") s.checks = checksFor(s.areaId);
@@ -7879,6 +8805,16 @@ function openPast(s){
   $("pastWhen").textContent = fmtDate(s.date) + (who ? " \u00b7 " + who : "");
 
   var h = "";
+
+  var pa = isGym ? null : area(s.areaId);
+  if(pa && isMatrix(pa)){
+    $("pastBody").innerHTML = mxPastHtml(pa, s) +
+      '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
+      (s.notes ? String(s.notes).replace(/</g,"&lt;") : "Nothing written down for this one.")+
+      '</p></div>';
+    show("past");
+    return;
+  }
 
   h += '<div class="pastsum">'+
        '<div><b>'+(s.total||0)+'</b><span>'+(isGym ? "sets done" : "scored")+'</span></div>'+
