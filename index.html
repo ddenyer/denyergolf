@@ -9644,7 +9644,30 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
     server_misconfigured:"This site is not set up to check codes yet."
   };
 
+  /* Reasons that mean "we could not ask", as against "the answer was no".
+     This distinction is the whole of the grace period below, and getting it
+     wrong in either direction is bad: treat a refusal as soft and a revoked
+     code keeps working, treat an outage as a refusal and everybody is locked
+     out of a tool that is working perfectly well.
+
+     On 23 Sep changebefore.com answered with a SiteGround block page instead
+     of JSON. That came back as valid:false, which the gate read as a refusal,
+     so it forgot the code and locked every device on the first reload. The
+     server was fine and the data was fine. */
+  var SOFT = {
+    upstream_error:1, upstream_unreachable:1, upstream_timeout:1,
+    non_json_response:1, server_misconfigured:1
+  };
+  /* How long a device coasts on its last successful check. Long enough to ride
+     out an afternoon of upstream trouble, short enough that a code pulled from
+     WordPress stops working on a device inside a day. */
+  var GRACE = 24 * 3600000;
+
   var lastReason = null, lastTool = null;
+  function soft(reason){ return !!SOFT[reason]; }
+  function inGrace(rec){
+    return !!(rec && rec.code && rec.at && (Date.now() - rec.at) < GRACE);
+  }
 
   function refusal(reason){
     if(reason === "wrong_tool"){
@@ -9675,6 +9698,46 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
   function lock(){ gate.hidden = false; document.documentElement.style.overflow = "hidden"; }
   function unlock(){ gate.hidden = true; document.documentElement.style.overflow = ""; }
 
+  /* Coasting: signed in on a code this device checked out recently, on a day
+     when the code service cannot be reached. Said out loud rather than hidden,
+     because she should know the tool is running on yesterday's answer, and
+     retried in the background so it puts itself right without a reload. */
+  var coastEl = null, retryT = null;
+  function coasting(){
+    try{
+      if(!coastEl && document.body){
+        coastEl = document.createElement("div");
+        coastEl.id = "gateCoast";
+        coastEl.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:150;" +
+          "background:#fce8f2;border-bottom:1px solid #d2006a;color:#4a564e;" +
+          "font:13px/1.45 Archivo,Helvetica,Arial,sans-serif;padding:9px 14px;text-align:center";
+        coastEl.textContent = "Could not re-check your access code just now, so this device is "
+          + "carrying on with the one it already had. Everything else works normally.";
+        document.body.appendChild(coastEl);
+      }
+      if(coastEl) coastEl.hidden = false;
+    }catch(e){}
+    retryLater();
+  }
+  function retryLater(){
+    if(retryT) return;
+    retryT = setInterval(function(){
+      var rec = stored();
+      if(!rec || !rec.code){ clearInterval(retryT); retryT = null; return; }
+      submit(rec.code, true).then(function(ok){
+        if(ok === true){
+          if(coastEl) coastEl.hidden = true;
+          clearInterval(retryT); retryT = null;
+        } else if(ok === false){
+          // it came back and said no, which is an answer and ends the grace
+          clearInterval(retryT); retryT = null;
+          if(coastEl) coastEl.hidden = true;
+          forget(); lock(); input.value = rec.code; say(refusal(lastReason), true);
+        }
+      });
+    }, 10 * 60000);
+  }
+
   function check(code){
     // POST with the tool name, the same as ahamo-hplt does. The endpoint ignores
     // `tool` today; sending it means this keeps working if it starts filtering.
@@ -9693,6 +9756,13 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
     return check(code).then(function(d){
       if(!d || d.valid !== true){
         lastReason = d && d.reason;
+        /* Could not ask, so this is not an answer. Returning null rather than
+           false is what stops a bad afternoon upstream from wiping the code
+           off every device that reloads. */
+        if(soft(lastReason)){
+          if(!quiet){ btn.disabled = false; say(refusal(lastReason), true); }
+          return null;
+        }
         if(!quiet){ btn.disabled = false; say(refusal(lastReason), true); }
         return false;
       }
@@ -9728,8 +9798,15 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
     submit(q).then(function(ok){
       if(ok === true || !(have && have.code)) return;
       submit(have.code, true).then(function(ok2){
-        if(ok2 === true) say("");
-        else { forget(); lock(); input.value = have.code; say(refusal(lastReason), true); }
+        if(ok2 === true){ say(""); return; }
+        /* Only a real refusal costs her the code she already had. An outage
+           leaves it exactly where it was. */
+        if(ok2 === false){
+          forget(); lock(); input.value = have.code; say(refusal(lastReason), true);
+          return;
+        }
+        if(inGrace(have)){ unlock(); coasting(); }
+        else { lock(); input.value = have.code; say(refusal(lastReason), true); }
       });
     });
   } else if(have && have.code){
@@ -9739,6 +9816,13 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) cl
         forget(); lock();
         input.value = have.code;
         say(refusal(lastReason), true);
+        return;
+      }
+      /* Null means nobody answered. She is already unlocked, so the only
+         question is whether her last good check is recent enough to coast on. */
+      if(ok === null){
+        if(inGrace(have)) coasting();
+        else { forget(); lock(); input.value = have.code; say(refusal(lastReason), true); }
       }
     });
   } else {
