@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Aim scope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  /* Prototype. Nothing here touches the tool: no stored sessions, no scoring,
+     no shared code. It draws targets at their true angular size over the camera
+     so she can see how big they actually are, then anchor them to something on
+     the range and put the phone away. */
+  :root{
+    --bg:#0e1210; --panel:rgba(20,26,22,.92); --line:rgba(255,255,255,.16);
+    --ink:#f2f5f2; --ink-2:#b9c3bc; --muted:#8b9790;
+    --accent:#d2006a; --accent-soft:rgba(210,0,106,.9);
+    --good:#3fbf80;
+  }
+  *{box-sizing:border-box}
+  /* Both the start card and the sheet set display:flex, and an author rule
+     beats the browser's own [hidden]{display:none}. Without this the start
+     screen stays on top after the camera opens and eats every tap. */
+  [hidden]{display:none !important}
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:Archivo,"Helvetica Neue",Arial,sans-serif; overflow:hidden;
+    -webkit-user-select:none; user-select:none}
+  #stage{position:fixed; inset:0; overflow:hidden; background:#000}
+  video{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    min-width:100%; min-height:100%; object-fit:cover}
+  canvas{position:absolute; inset:0; width:100%; height:100%; touch-action:none}
+
+  #start{position:fixed; inset:0; z-index:40; display:flex; align-items:center;
+    justify-content:center; padding:24px; background:var(--bg)}
+  #start .card{max-width:420px}
+  #start h1{font-size:26px; margin:0 0 8px; letter-spacing:-.3px}
+  #start p{color:var(--ink-2); font-size:14.5px; line-height:1.55; margin:0 0 14px}
+  #start .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10.5px;
+    letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:0 0 10px}
+  button.go{width:100%; min-height:56px; border:0; border-radius:11px;
+    background:var(--accent); color:#fff; font-family:Archivo,sans-serif;
+    font-size:17px; font-weight:600; cursor:pointer}
+  #err{margin-top:14px; color:#ff9db0; font-size:13.5px; line-height:1.5; min-height:1em}
+
+  #hud{position:fixed; left:0; right:0; top:0; z-index:20;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;
+    background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent); pointer-events:none}
+  #hud .fig{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; font-weight:600}
+  #hud .sub{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; color:var(--ink-2); margin-top:2px}
+
+  #sheet{position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--panel);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; gap:10px; max-height:62vh; overflow-y:auto}
+  .row{display:flex; gap:7px; flex-wrap:wrap}
+  .chip{flex:1 1 auto; min-height:42px; padding:0 12px; border-radius:9px;
+    border:1px solid var(--line); background:rgba(255,255,255,.05); color:var(--ink);
+    font-family:Archivo,sans-serif; font-size:14px; font-weight:600; cursor:pointer}
+  .chip.on{background:var(--accent); border-color:var(--accent); color:#fff}
+  .chip.sm{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px; min-height:38px}
+  label.sl{display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--ink-2)}
+  label.sl span.k{flex:1 1 auto}
+  label.sl b{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px; color:var(--ink)}
+  input[type=range]{width:100%; accent-color:var(--accent)}
+  .note{font-size:12px; line-height:1.5; color:var(--muted); margin:0}
+  .fold summary{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10.5px;
+    letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); cursor:pointer; padding:4px 0}
+  .fold[open] summary{margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="cam" playsinline muted autoplay></video>
+  <canvas id="ov"></canvas>
+</div>
+
+<div id="hud">
+  <div class="fig" id="hudFig">&nbsp;</div>
+  <div class="sub" id="hudSub">&nbsp;</div>
+</div>
+
+<div id="sheet" hidden>
+  <div class="row" id="modes">
+    <button class="chip on" data-mode="approach">Approach</button>
+    <button class="chip" data-mode="driver">Driver</button>
+    <button class="chip" data-mode="windows">Windows</button>
+  </div>
+  <div class="row" id="dists"></div>
+
+  <p class="note" id="tip">Tap the flag on screen to put the target there.</p>
+
+  <details class="fold" id="winFold" hidden>
+    <summary>Window grid</summary>
+    <label class="sl"><span class="k">Height above the flag</span><b id="elevV">14&deg;</b></label>
+    <input type="range" id="elev" min="0" max="30" step="0.5" value="14">
+    <label class="sl"><span class="k">Row height</span><b id="rowV">4.0&deg;</b></label>
+    <input type="range" id="rowh" min="2" max="8" step="0.25" value="4">
+    <p class="note">The windows sit well above the flag, because at 20 m the ball is
+      already climbing. Set the height by eye against where her shots actually are.
+      Widths come from the curvature maths: straight is within 1.5&deg;, a working
+      draw or fade runs 1.5&deg; to 4.5&deg;.</p>
+  </details>
+
+  <details class="fold">
+    <summary>Calibration</summary>
+    <label class="sl"><span class="k">Camera field of view</span><b id="fovV">69&deg;</b></label>
+    <input type="range" id="fov" min="40" max="100" step="0.5" value="69">
+    <p class="note">Everything scales off this. To set it: stand a measured distance
+      from two objects a measured distance apart, switch to Approach, and nudge the
+      slider until the bracket matches them. An iPhone main camera is near 69&deg;,
+      the ultra wide is far wider, and any zoom changes it.</p>
+  </details>
+</div>
+
+<div id="start">
+  <div class="card">
+    <p class="eyebrow">Longer &middot; Closer &middot; Lower</p>
+    <h1>Aim scope</h1>
+    <p>Shows how big the target actually is, at its true angular size, over the camera.
+       It measures nothing and records nothing. Line it up, see what sits behind the
+       edges on the range, and use those as the target for the session.</p>
+    <p>Needs the camera. Works in Safari on https.</p>
+    <button class="go" id="begin">Start the camera</button>
+    <div id="err"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var video = document.getElementById("cam");
+  var cv    = document.getElementById("ov");
+  var ctx   = cv.getContext("2d");
+  var sheet = document.getElementById("sheet");
+
+  var DPR = Math.min(window.devicePixelRatio || 1, 3);
+
+  /* ---- the geometry ----------------------------------------------------
+     Approach circle: taken straight from the Ball flight control sets. These
+     are RADII, in the sense the tool means them and the sense the proximity
+     table means them: "inside 32 ft" is 32 ft from the flag in any direction,
+     so the circle she is aiming at is 64 ft across. The first draft of this
+     file halved them, which drew every bracket at half its true width and made
+     the targets look far tighter than they are. Since showing the true width
+     is the only reason this page exists, that was worth catching.
+
+     Driver corridor: a fixed 26 yard lane, stated as 13 each side of the line,
+     so the angle NARROWS with distance like a road. Half angle is atan(13/d).
+
+     Windows: start line for a shot that finishes on target. For carry D and
+     curve C the ball sits y = C*(x/D)*(1-x/D) off the line at distance x, so a
+     15 yard draw over 150 m is only 1.58 m off the line at 20 m. Straight is
+     within about 5 yards of curve, a working shape runs 5 to 15.
+     --------------------------------------------------------------------- */
+  var CIRC = { 125:26, 145:32, 165:38, 185:43 };  // ft from the flag: inside scores
+  var BULL = { 125:22, 145:25, 165:28, 185:33 };  // ft from the flag: tour standard
+
+  function circleFt(d){ return CIRC[d] || (0.3*d - 11.5); }
+  function bullFt(d){ return BULL[d] || 0; }
+  // radius in feet over distance in feet, so this is the HALF angle directly
+  function ftHalfAngle(ft, d){ return Math.atan(ft / (3*d)); }
+  function approachHalfAngle(d){ return ftHalfAngle(circleFt(d), d); }
+  function corridorHalfAngle(d){ return Math.atan(13 / d); }
+
+  var WIN_STRAIGHT = 1.5 * Math.PI/180;   // inner edge of a working shape
+  var WIN_OUTER    = 4.5 * Math.PI/180;   // beyond this is too much curve
+
+  var state = {
+    mode: "approach",
+    dist: 145,
+    fov: 69,                 // horizontal field of view, degrees
+    elev: 14,                // window grid height above the flag, degrees
+    rowh: 4,                 // each window row, degrees
+    aim: null                // {x,y} in css pixels, where she tapped
+  };
+
+  var DISTS = {
+    approach: [125, 145, 165, 185],
+    driver:   [200, 220, 240, 260],
+    windows:  [130, 145, 165, 185]
+  };
+
+  /* Pinhole projection. Using tan rather than a linear degrees-to-pixels ratio
+     matters at the edges: a linear map is out by several per cent by 20
+     degrees off centre, which would quietly widen every target. */
+  function scaleK(){
+    var vw = video.videoWidth, vh = video.videoHeight;
+    if(!vw || !vh) return cv.width / (2 * Math.tan(state.fov*Math.PI/360));
+    // object-fit: cover, so work out how much of the frame is actually on screen
+    var s = Math.max(cv.width / vw, cv.height / vh);
+    return (vw * s / 2) / Math.tan(state.fov * Math.PI / 360);
+  }
+  function dx(theta){ return Math.tan(theta) * scaleK(); }
+
+  function aimPoint(){
+    return state.aim
+      ? { x: state.aim.x * DPR, y: state.aim.y * DPR }
+      : { x: cv.width/2, y: cv.height/2 };
+  }
+
+  /* ---- drawing --------------------------------------------------------- */
+  function line(x1,y1,x2,y2,col,w,dash){
+    ctx.save();
+    ctx.strokeStyle = col; ctx.lineWidth = w * DPR;
+    ctx.setLineDash(dash ? dash.map(function(v){ return v*DPR; }) : []);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.restore();
+  }
+  function tag(text, x, y, col, align){
+    ctx.save();
+    ctx.font = (600) + " " + (12*DPR) + "px 'IBM Plex Mono', ui-monospace, monospace";
+    ctx.textAlign = align || "center"; ctx.textBaseline = "middle";
+    var w = ctx.measureText(text).width + 12*DPR, h = 20*DPR;
+    var bx = align === "left" ? x : (align === "right" ? x - w : x - w/2);
+    ctx.fillStyle = "rgba(0,0,0,.62)";
+    ctx.beginPath(); ctx.roundRect(bx, y - h/2, w, h, 5*DPR); ctx.fill();
+    ctx.fillStyle = col; ctx.fillText(text, align === "left" ? x + 6*DPR
+                      : (align === "right" ? x - 6*DPR : x), y);
+    ctx.restore();
+  }
+
+  function drawCross(p){
+    var r = 13 * DPR;
+    line(p.x - r, p.y, p.x + r, p.y, "rgba(255,255,255,.75)", 1.2);
+    line(p.x, p.y - r, p.x, p.y + r, "rgba(255,255,255,.75)", 1.2);
+  }
+
+  function drawApproach(){
+    var p = aimPoint(), d = state.dist;
+    var half = approachHalfAngle(d), w = dx(half);
+    var bull = bullFt(d), bw = bull ? dx(ftHalfAngle(bull, d)) : 0;
+    var top = p.y - 70*DPR, bot = p.y + 70*DPR;
+
+    ctx.save();
+    // the bullseye first, so the scoring circle draws over it
+    if(bw){
+      ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.lineWidth = 1.6*DPR;
+      ctx.setLineDash([6*DPR, 5*DPR]);
+      ctx.beginPath();
+      ctx.moveTo(p.x - bw, p.y - 44*DPR); ctx.lineTo(p.x - bw, p.y + 44*DPR);
+      ctx.moveTo(p.x + bw, p.y - 44*DPR); ctx.lineTo(p.x + bw, p.y + 44*DPR);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.strokeStyle = "#d2006a"; ctx.lineWidth = 3*DPR;
+    ctx.beginPath(); ctx.moveTo(p.x - w, top); ctx.lineTo(p.x - w, bot);
+    ctx.moveTo(p.x + w, top); ctx.lineTo(p.x + w, bot); ctx.stroke();
+    // the ground line between them, which is all the depth there really is
+    ctx.lineWidth = 1.6*DPR; ctx.strokeStyle = "rgba(210,0,106,.55)";
+    ctx.beginPath(); ctx.moveTo(p.x - w, p.y); ctx.lineTo(p.x + w, p.y); ctx.stroke();
+    ctx.restore();
+
+    drawCross(p);
+    tag(Math.round(circleFt(d) * 2) + " ft across", p.x, bot + 16*DPR, "#ffffff");
+    tag((half*2*180/Math.PI).toFixed(2) + "° wide", p.x, top - 16*DPR, "#b9c3bc");
+    // on the left edge, so it does not sit on top of the scoring bracket
+    if(bw) tag(bull + " ft", p.x - bw, p.y - 54*DPR, "rgba(255,255,255,.8)");
+  }
+
+  function drawDriver(){
+    var p = aimPoint(), d = state.dist;
+    var band = [
+      { d: d - 20, col: "rgba(255,255,255,.34)", w: 1.4, lab: (d-20) + " yd" },
+      { d: d,      col: "#d2006a",               w: 3,   lab: d + " yd" },
+      { d: d + 20, col: "rgba(255,255,255,.34)", w: 1.4, lab: (d+20) + " yd" }
+    ];
+    band.forEach(function(b, i){
+      var w = dx(corridorHalfAngle(b.d));
+      var h = (i === 1 ? 74 : 52) * DPR;
+      ctx.save();
+      ctx.strokeStyle = b.col; ctx.lineWidth = b.w * DPR;
+      ctx.beginPath();
+      ctx.moveTo(p.x - w, p.y - h); ctx.lineTo(p.x - w, p.y + h);
+      ctx.moveTo(p.x + w, p.y - h); ctx.lineTo(p.x + w, p.y + h);
+      ctx.stroke(); ctx.restore();
+      if(i !== 1) tag(b.lab, p.x + w, p.y + h + 14*DPR, "#b9c3bc", "left");
+    });
+    drawCross(p);
+    var hw = corridorHalfAngle(d);
+    tag("26 yd lane", p.x, p.y + 74*DPR + 16*DPR, "#ffffff");
+    tag((hw*2*180/Math.PI).toFixed(2) + "° at " + d + " yd", p.x, p.y - 74*DPR - 16*DPR, "#b9c3bc");
+  }
+
+  function drawWindows(){
+    var p = aimPoint();
+    var rise = dx(state.elev * Math.PI/180);          // grid centre above the flag
+    var rh   = dx(state.rowh * Math.PI/180);          // one row tall
+    var cy   = p.y - rise;
+    var inner = dx(WIN_STRAIGHT), outer = dx(WIN_OUTER);
+
+    var rows = [ {k:-1, lab:"HIGH"}, {k:0, lab:"MIDDLE"}, {k:1, lab:"LOW"} ];
+    rows.forEach(function(r){
+      var y0 = cy + r.k*rh - rh/2, y1 = y0 + rh;
+      function cell(x0, x1, n, strong){
+        ctx.save();
+        ctx.strokeStyle = strong ? "#d2006a" : "rgba(255,255,255,.55)";
+        ctx.lineWidth = (strong ? 2.4 : 1.4) * DPR;
+        ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.font = "600 " + (15*DPR) + "px 'IBM Plex Mono', ui-monospace, monospace";
+        ctx.fillStyle = strong ? "#ffffff" : "rgba(255,255,255,.85)";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(String(n), (x0+x1)/2, (y0+y1)/2);
+        ctx.restore();
+      }
+      if(r.k === 0){
+        // the straight window, centred on the target line
+        cell(p.x - inner, p.x + inner, 3, true);
+      } else {
+        var n1 = r.k === -1 ? 1 : 4, n2 = r.k === -1 ? 2 : 5;
+        cell(p.x - outer, p.x - inner, n1, false);   // fade side for a right hander
+        cell(p.x + inner, p.x + outer, n2, false);   // draw side
+      }
+    });
+
+    // the target line, so it is obvious the windows hang above the flag
+    line(p.x, cy - 1.5*rh, p.x, p.y, "rgba(255,255,255,.28)", 1.2, [5,5]);
+    drawCross(p);
+    tag("start line, 20 m out", p.x, cy + 1.5*rh + 16*DPR, "#b9c3bc");
+    /* The ball is genuinely well above the flag at 20 m, so with the phone
+       pointed at the flag the grid often sits off the top of the screen. Say
+       so rather than leaving her looking at an empty frame. */
+    if(cy - 1.5*rh < 40*DPR) tag("tilt up to see the grid", p.x, p.y + 40*DPR, "#ffd27f");
+  }
+
+  function paint(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(state.mode === "approach") drawApproach();
+    else if(state.mode === "driver") drawDriver();
+    else drawWindows();
+    hud();
+  }
+
+  /* Repaint every frame rather than on demand. The scale depends on
+     video.videoWidth, which is 0 until the camera reports its dimensions, so a
+     single paint at startup lands on the fallback and then never corrects
+     itself: the bracket sits at roughly a third of its true size for the whole
+     session. A few lines a frame costs nothing and it is always right. */
+  var running = false;
+  function loop(){
+    if(!running) return;
+    paint();
+    requestAnimationFrame(loop);
+  }
+
+  function hud(){
+    var f = document.getElementById("hudFig"), s = document.getElementById("hudSub");
+    var d = state.dist;
+    if(state.mode === "approach"){
+      var a = approachHalfAngle(d)*2*180/Math.PI;
+      f.textContent = "Inside " + circleFt(d) + " ft at " + d + " yd";
+      s.textContent = Math.round(circleFt(d)*2) + " ft across · " + a.toFixed(2) +
+                      "° wide · dashed is the " + bullFt(d) + " ft bullseye";
+    } else if(state.mode === "driver"){
+      var c = corridorHalfAngle(d)*2*180/Math.PI;
+      f.textContent = "26 yd corridor at " + d + " yd";
+      s.textContent = c.toFixed(2) + "° wide · narrows the further she hits it";
+    } else {
+      f.textContent = "Five windows · " + d + " yd shot";
+      s.textContent = "straight within 1.5° · working shape 1.5° to 4.5°";
+    }
+  }
+
+  /* ---- chrome ---------------------------------------------------------- */
+  function buildDists(){
+    var host = document.getElementById("dists");
+    host.innerHTML = "";
+    DISTS[state.mode].forEach(function(d){
+      var b = document.createElement("button");
+      b.className = "chip sm" + (d === state.dist ? " on" : "");
+      b.textContent = d + " yd";
+      b.addEventListener("click", function(){ state.dist = d; buildDists(); paint(); });
+      host.appendChild(b);
+    });
+  }
+  document.getElementById("modes").addEventListener("click", function(e){
+    var b = e.target.closest("[data-mode]"); if(!b) return;
+    state.mode = b.getAttribute("data-mode");
+    [].forEach.call(this.querySelectorAll(".chip"), function(c){
+      c.classList.toggle("on", c === b);
+    });
+    if(DISTS[state.mode].indexOf(state.dist) === -1) state.dist = DISTS[state.mode][1];
+    document.getElementById("winFold").hidden = state.mode !== "windows";
+    document.getElementById("tip").textContent = state.mode === "windows"
+      ? "Tap the flag. The windows hang above it, where the ball actually is at 20 m."
+      : "Tap the flag on screen to put the target there.";
+    buildDists(); paint();
+  });
+
+  function slider(id, valId, key, suffix, digits){
+    var el = document.getElementById(id), out = document.getElementById(valId);
+    function upd(){
+      state[key] = parseFloat(el.value);
+      out.textContent = state[key].toFixed(digits) + suffix;
+      paint();
+    }
+    el.addEventListener("input", upd); upd();
+  }
+
+  cv.addEventListener("click", function(e){
+    var r = cv.getBoundingClientRect();
+    state.aim = { x: e.clientX - r.left, y: e.clientY - r.top };
+    paint();
+  });
+
+  function size(){
+    cv.width  = Math.round(cv.clientWidth  * DPR);
+    cv.height = Math.round(cv.clientHeight * DPR);
+    paint();
+  }
+  window.addEventListener("resize", size);
+  window.addEventListener("orientationchange", function(){ setTimeout(size, 300); });
+
+  document.getElementById("begin").addEventListener("click", function(){
+    var err = document.getElementById("err");
+    err.textContent = "";
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      err.textContent = "This browser will not give a page the camera. Open it in Safari, over https.";
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } },
+      audio: false
+    }).then(function(stream){
+      video.srcObject = stream;
+      /* Do not wait on play(). Depending on the autoplay policy it can reject
+         or simply never settle, and the whole page is then stuck behind a
+         button that already worked. Reveal the scope, start playing best
+         effort, and let the feed catch up. */
+      try{ var pr = video.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){}
+      document.getElementById("start").hidden = true;
+      sheet.hidden = false;
+      buildDists();
+      slider("fov",  "fovV",  "fov",  "°", 0);
+      slider("elev", "elevV", "elev", "°", 0);
+      slider("rowh", "rowV",  "rowh", "°", 1);
+      size();
+      running = true; loop();
+    }).catch(function(e){
+      err.textContent = "The camera was refused (" + (e && e.name ? e.name : "unknown") +
+        "). On iPhone this page has to be on https and opened in Safari, and the camera "
+        + "permission has to be allowed for the site.";
+    });
+  });
+})();
+</script>
+</body>
+</html>
