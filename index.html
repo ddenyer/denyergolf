@@ -861,6 +861,12 @@
   .rose .rq{fill:url(#gGreen); stroke:#8fbc7e; stroke-width:1.4}
   .rose .rst{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.5; stroke-dasharray:4 3}
   .rguide line{stroke:#6e9c62; stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
+  .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
+    fill:var(--muted); pointer-events:none}
+  .gnum text.key{fill:var(--ink-2); font-weight:600}
+  .gnum.mid text{font-size:12.5px}
+  .garrow{stroke:var(--muted); stroke-width:1; fill:none; pointer-events:none}
+  .gtip{fill:var(--muted); pointer-events:none}
   /* The league table. Her own row is the one she looks for, so it is the only
      one carrying weight, and the score column is monospaced so the numbers line
      up as a ladder rather than reading as prose. */
@@ -2499,7 +2505,13 @@ function bandText(dist, tc){
   return (dist - yd) + "\u2013" + (dist + yd) + " yards \u00b7 " + yd +
          " either side, or " + numWord(yd) + " paces";
 }
-function tgtText(s){
+function tgtText(s, a){
+  /* On a quartered target the numbers are drawn on the picture, so the line
+     above it is an instruction rather than a second copy of them. It stops one
+     word short of the scope chip that follows it, and only when there is one. */
+  if(a && a.quads && aimTarget(s)){
+    return "Tap the segment where the ball lands. If you are unsure, use the";
+  }
   var b = bandText(s.dist, s.tc);
   return s.tgt + (b ? " \u00b7 " + b : "");
 }
@@ -5594,7 +5606,7 @@ function buildSessionCards(a, last){
     var body = document.createElement("div");
     var tracked = trackKind(a, s);
     if(s.metrics) body.appendChild(monitorNote());
-    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, null, a, s));
+    body.appendChild(tracked ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s, a), setParts(s), last, null, a, s));
     if(s.guide && GUIDES[s.guide] && !tracked){
       var w = document.createElement("div"); w.className="dgwrap";
       w.innerHTML = GUIDES[s.guide].svg;
@@ -6399,7 +6411,7 @@ function buildSessionList(a, last){
       current.appendChild(wrap); host.appendChild(current);
     }
     if(s.metrics) wrap.appendChild(monitorNote());
-    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s), setParts(s), last, s.guide, a, s));
+    wrap.appendChild(trackKind(a, s) ? shotRow(a, s, last) : scoreRow(s.label, tgtText(s, a), setParts(s), last, s.guide, a, s));
     if(s.metrics) wrap.appendChild(metricRow(s, last));
   });
   if(a.compete){
@@ -6525,7 +6537,11 @@ function hitWord(a, s){
 }
 
 /* ---- geometry ---- */
-var ROSE_CX = 150, ROSE_CY = 170, ROSE_R = 136, ROSE_IN = 54;
+/* The board grew from 300x318 to make room for the guides to carry their own
+   numbers down the right and across the top. Everything that places a marker
+   reads these, so the marks follow without being touched. */
+var ROSE_CX = 160, ROSE_CY = 196, ROSE_R = 136, ROSE_IN = 54;
+var ROSE_W = 360, ROSE_H = 360;
 function polar(cx, cy, rad, deg){
   var t = deg*Math.PI/180;
   return [cx + rad*Math.sin(t), cy - rad*Math.cos(t)];
@@ -6559,17 +6575,31 @@ var QUADS = [
    at the target. Scaled against the circle rather than fixed, so it means the
    same distance at 185 as it does at 125: at 26 ft it is a third of the way out,
    at 43 ft a fifth. Floored so it stays big enough to hit with a thumb. */
-var STIFF_FT = 8;
+var STIFF_FT = 3;                       /* one club */
 function stiffR(tc){
   var m = /^([\d.]+)\s*ft/.exec(String(tc || ""));
   if(!m) return 0;
-  var ft = parseFloat(m[1]);
-  if(!(ft > STIFF_FT)) return 0;
-  return Math.max(15, Math.round(ROSE_IN * STIFF_FT / ft));
+  if(!(parseFloat(m[1]) > STIFF_FT)) return 0;
+  /* Not to scale, and it cannot be: one club inside a 26 ft circle is 6px
+     across here and 4px at 185 yards, too small to see or to hit with a thumb.
+     The rest of the picture is schematic in the same way (the outer ring is at
+     no real distance either), so the label carries the meaning. */
+  return 17;
 }
 
-function roseSvg(centreLabel, tappable, bull, quads, band){
+/* Yards for the girls, feet in the data. The stored figure stays exact and goes
+   on deciding the point; everything they read is converted. Rounding to whole
+   yards is deliberate: nobody judges eight and a half yards at 125, and the
+   guides, the width and the band all come off this one number so they cannot
+   drift apart. */
+function ydRadius(tc){
+  var m = /^([\d.]+)\s*ft/.exec(String(tc || ""));
+  return m ? Math.round(parseFloat(m[1]) / 3) : 0;
+}
+
+function roseSvg(centreLabel, tappable, bull, quads, dist){
   var CX = ROSE_CX, CY = ROSE_CY, out = "";
+  var yd = ydRadius(centreLabel);
   out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
   ZONES.forEach(function(z, i){
     out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
@@ -6605,22 +6635,43 @@ function roseSvg(centreLabel, tappable, bull, quads, band){
   /* Guides tangent to the scoring circle. Unlabelled here: the numbers are
      written under the card by bandText, where there is room to read them and no
      marker can land on top of them. */
-  if(quads && band){
+  if(quads && dist && yd){
+    var rx = CX + ROSE_R + 34, ty = CY - ROSE_R - 20;
     out += '<g class="rguide">'+
-      '<line x1="'+(CX-ROSE_R)+'" y1="'+(CY-ROSE_IN)+'" x2="'+(CX+ROSE_R)+'" y2="'+(CY-ROSE_IN)+'"></line>'+
-      '<line x1="'+(CX-ROSE_R)+'" y1="'+(CY+ROSE_IN)+'" x2="'+(CX+ROSE_R)+'" y2="'+(CY+ROSE_IN)+'"></line>'+
-      '<line x1="'+(CX-ROSE_IN)+'" y1="'+(CY-ROSE_R)+'" x2="'+(CX-ROSE_IN)+'" y2="'+(CY+ROSE_R)+'"></line>'+
-      '<line x1="'+(CX+ROSE_IN)+'" y1="'+(CY-ROSE_R)+'" x2="'+(CX+ROSE_IN)+'" y2="'+(CY+ROSE_R)+'"></line>'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+(CY-ROSE_IN)+'" x2="'+rx+'" y2="'+(CY-ROSE_IN)+'"></line>'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+CY+'" x2="'+rx+'" y2="'+CY+'"></line>'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+(CY+ROSE_IN)+'" x2="'+rx+'" y2="'+(CY+ROSE_IN)+'"></line>'+
+      '<line x1="'+(CX-ROSE_IN)+'" y1="'+(ty)+'" x2="'+(CX-ROSE_IN)+'" y2="'+(CY+ROSE_R+6)+'"></line>'+
+      '<line x1="'+(CX+ROSE_IN)+'" y1="'+(ty)+'" x2="'+(CX+ROSE_IN)+'" y2="'+(CY+ROSE_R+6)+'"></line>'+
+      '</g>';
+    /* The yardages that score, read off the circle, so the picture and the
+       point can never say different things. */
+    out += '<g class="gnum">'+
+      '<text x="'+(rx+4)+'" y="'+(CY-ROSE_IN+4)+'">'+(dist+yd)+'</text>'+
+      '<text x="'+(rx+4)+'" y="'+(CY+4)+'" class="key">'+dist+'</text>'+
+      '<text x="'+(rx+4)+'" y="'+(CY+ROSE_IN+4)+'">'+(dist-yd)+'</text>'+
+      '</g>';
+    /* How far off line still scores, with the arrows pointing at the edge each
+       one measures. A step is near enough a yard, which is the point of saying
+       both: she can pace it out. */
+    out += '<g class="gnum mid">'+
+      '<text x="'+(CX-ROSE_IN-8)+'" y="'+(ty+4)+'" text-anchor="end">'+yd+'y</text>'+
+      '<text x="'+(CX+ROSE_IN+8)+'" y="'+(ty+4)+'" text-anchor="start">'+yd+'y</text>'+
+      '<path class="garrow" d="M'+(CX-ROSE_IN-4)+' '+ty+' L'+(CX-14)+' '+ty+'"></path>'+
+      '<path class="garrow" d="M'+(CX+ROSE_IN+4)+' '+ty+' L'+(CX+14)+' '+ty+'"></path>'+
+      '<path class="gtip" d="M'+(CX-ROSE_IN-4)+' '+ty+' l6 -4 v8 z"></path>'+
+      '<path class="gtip" d="M'+(CX+ROSE_IN+4)+' '+ty+' l-6 -4 v8 z"></path>'+
       '</g>';
   }
   out += pinAt(CX, CY - 3, quads ? 20 : 30);   // the hole itself lands on the centre
   // both numbers live in the pill, where no marker can land on them
-  var cap = (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull
-                                        : (quads ? '  \u00b7  dead inside ' + STIFF_FT + ' ft' : ''));
-  var capW = (bull || quads) ? 208 : 128;
+  var cap = quads
+    ? (yd*2) + 'y / steps wide  \u00b7  middle 1 club'
+    : (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
+  var capW = quads ? 250 : (bull ? 208 : 128);
   out += '<g class="caption"><rect class="cappill" x="'+(150-capW/2)+'" y="3" width="'+capW+'" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
-  return '<svg viewBox="0 0 300 318" class="rose" role="group" aria-label="Where the ball finished">'+
+  return '<svg viewBox="0 0 '+ROSE_W+' '+ROSE_H+'" class="rose" role="group" aria-label="Where the ball finished">'+
          out+'<g class="marks"></g></svg>';
 }
 /* Ball markers keep to the inner half of each ring segment; the labels have the outer
@@ -6764,7 +6815,7 @@ function shapeSvg(a, set, tappable){
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
   return roseSvg(set.tc || "In", tappable, set.bull,
-                 !!(a && a.quads) && !!set.dist, bandText(set.dist, set.tc));
+                 !!(a && a.quads) && !!set.dist, set.dist);
 }
 function markR(a){
   var sh = areaShape(a);
@@ -7204,7 +7255,7 @@ function shotRow(a, s, last, cfg){
   var wantsSlope = !cfg && (kind === "lag" || areaShape(a) === "clock");
 
   var row = document.createElement("div"); row.className = "set shotset";
-  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s)+aimChip(a, s)+'</div></div>';
+  if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s, a)+aimChip(a, s)+'</div></div>';
   if(wantsSlope) row.appendChild(slopeBox(kind, s, function(){ diag.__key = null; paint(); }));
 
   var ask = document.createElement("p"); ask.className = "shotask";
@@ -9700,7 +9751,8 @@ function aimPaint(){
   g.moveTo(p.x, p.y - 13*D); g.lineTo(p.x, p.y + 13*D);
   g.stroke(); g.restore();
 
-  tag(t.c * 2 + " ft across", p.x, bot + 16*D, "#ffffff");
+  tag(t.clubs ? (t.c * 2) + " ft across" : (Math.round(t.c/3) * 2) + "y across",
+      p.x, bot + 16*D, "#ffffff");
   tag((half * 2 * 180 / Math.PI).toFixed(2) + "° wide", p.x, top - 16*D, "#b9c3bc");
   if(bw) tag(t.b + " ft", p.x - bw, p.y - 54*D, "rgba(255,255,255,.8)");
 
@@ -9721,18 +9773,21 @@ function aimPaint(){
     tag("wider than the frame · step back", p.x, p.y + 104*D, "#ffd27f");
   }
 
-  e.fig.textContent = (t.clubs ? "Inside " + (t.c/3) + " club" + (t.c/3 > 1 ? "s" : "")
-                               : "Inside " + t.c + " ft")
-                      + " at " + dd + " " + t.unit
-                      + (dd !== t.dist ? " (set: " + t.dist + ")" : "");
+  var ydR = Math.round(t.c / 3);
+  e.fig.textContent = (t.clubs
+      ? "Inside " + (t.c/3) + " club" + (t.c/3 > 1 ? "s" : "")
+      : "Target " + (ydR * 2) + "y wide")
+    + " at " + dd + " " + t.unit
+    + (dd !== t.dist ? " (set: " + t.dist + ")" : "");
   /* Depth cannot be drawn. Seen from the tee this circle is under a twentieth of
      a degree from front edge to back, a line rather than an area, so the yardage
      band is written out instead, to tie to the markers on the range. */
-  var yd = Math.round(t.c / 3);
-  e.sub.textContent = (t.c * 2) + " ft across · " +
-    (half * 2 * 180 / Math.PI).toFixed(2) + "° · " +
-    (t.clubs ? "" : (dd - yd) + " to " + (dd + yd) + " " + t.unit + " · ") +
-    yd + " either side" + (t.b ? " · dashed " + t.b + " ft" : "");
+  /* Depth cannot be drawn: from the tee this circle is under a twentieth of a
+     degree front edge to back, a line rather than an area. So it is written. */
+  e.sub.textContent = (t.clubs ? (t.c * 2) + " ft across"
+                               : (dd - ydR) + " to " + (dd + ydR) + " " + t.unit) +
+    " · " + ydR + "y / steps either side · " +
+    (half * 2 * 180 / Math.PI).toFixed(2) + "°";
 }
 
 function aimSize(){
