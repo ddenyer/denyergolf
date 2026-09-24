@@ -855,6 +855,27 @@
   .rose .rc{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
   .fringe{fill:#94bd84; pointer-events:none}
   .rose .rb{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.6; stroke-dasharray:5 4}
+  /* The quadrants are all green, because all four score. The lines between them
+     are divisions of one target, not edges of four, so they are lighter than the
+     ring outside and the whole circle still reads as a single thing. */
+  .rose .rq{fill:url(#gGreen); stroke:#8fbc7e; stroke-width:1.4}
+  .rose .rst{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.5; stroke-dasharray:4 3}
+  .rguide line{stroke:#6e9c62; stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
+  /* The league table. Her own row is the one she looks for, so it is the only
+     one carrying weight, and the score column is monospaced so the numbers line
+     up as a ladder rather than reading as prose. */
+  table.league{width:100%; border-collapse:collapse; margin:10px 0 4px}
+  table.league td{padding:5px 2px; font-size:13px; border-bottom:1px solid var(--line)}
+  table.league td.lgname{color:var(--ink-2)}
+  table.league td.lgscore{width:56px; text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-weight:600; color:var(--ink)}
+  table.league td.lgplace{width:52px; text-align:right; font-size:11.5px; color:var(--accent)}
+  /* The panel is already accent-wash, so a wash highlight is no highlight at
+     all: her own row has to be the solid fill or it disappears into the box. */
+  table.league tr.mine td{background:var(--accent-fill); color:#ffffff; font-weight:700}
+  table.league tr.mine td.lgname{color:#ffffff; border-radius:6px 0 0 6px; padding-left:8px}
+  table.league tr.mine td.lgplace{color:#ffffff; border-radius:0 6px 6px 0; padding-right:8px}
+  table.league tr:last-child td{border-bottom:0}
   .rose .rb:hover, .rose .rb.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-dasharray:none; stroke-width:2.6}
   .rbl{fill:#3c4a38; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
     text-anchor:middle; pointer-events:none}
@@ -1455,7 +1476,7 @@
     <h2 style="margin-top:22px">Proximity by distance</h2>
     <p class="note" style="margin:0 0 10px">What tour players actually leave themselves from each distance. Average proximity is the middle of the field, not the target.</p>
     <div class="cardscroll"><table class="btable" id="proxTable"></table></div>
-    <p class="note" style="margin-top:12px"><button type="button" id="aimFromBench" class="vid aimc" style="font-size:12.5px">⊙ open the aim scope</button>
+    <p class="note" style="margin-top:12px"><button type="button" id="aimFromBench" class="vid aimc" style="font-size:12.5px">⊙ open the scope</button>
       Hold the camera up and see how wide the approach circles actually are. They barely
       change angular size from 110 yards out to 185, because the circle grows in step with
       the distance.</p>
@@ -1577,7 +1598,7 @@
     <div class="asfig" id="asFig">&nbsp;</div>
     <div class="assub" id="asSub">&nbsp;</div>
   </div>
-  <button id="asClose" aria-label="Close the aim scope">&times;</button>
+  <button id="asClose" aria-label="Close the scope">&times;</button>
   <div id="asSheet" hidden>
     <div class="asrow" id="asDists"></div>
     <label class="asslide"><span id="asDistLab">Distance to the flag</span>
@@ -1595,10 +1616,12 @@
   </div>
   <div id="asStart">
     <div class="ascard">
-      <h2>Aim scope</h2>
-      <p>Shows the target at its true size through the camera. Line it up, see what
-         sits behind the edges on the range, and use those as the target for the
-         session. It measures nothing and records nothing.</p>
+      <h2>The scope</h2>
+      <p><b>Range-find the flag first</b> to get the real distance, set it below, then
+         use the scope to picture the target. The scope shows you how wide the target
+         is. It measures nothing and records nothing.</p>
+      <p>Line it up, see what sits behind the edges on the range, and use those as
+         the target for the session.</p>
       <button id="asGo">Start the camera</button>
       <div id="asErr"></div>
     </div>
@@ -1780,24 +1803,24 @@ var AREAS = [
   ],
   placing:{n:45, p:0.66, sd:0.065, field:"tour players"} },
 
-{ id:11, no:2, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
+{ id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
   /* The circle is the LPGA 66% circle for that carry, read off the club-matched
      proximity curve. The bullseye is the PGA circle from the same yardage: inside it
      the ball was tour standard for a man playing a shorter club from the same spot. */
   plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.55, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.55, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", bull:"25 ft", dist:145, r2:0.55, r1:0.41, word:"145 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", bull:"25 ft", dist:145, r2:0.55, r1:0.41, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", dist:145, r2:0.55, word:"145 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", dist:145, r2:0.55, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", bull:"28 ft", dist:165, r2:0.55, r1:0.41, word:"165 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", bull:"28 ft", dist:165, r2:0.55, r1:0.41, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", dist:165, r2:0.55, word:"165 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", dist:165, r2:0.55, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", bull:"33 ft", dist:185, r2:0.55, r1:0.41, word:"185 yards", tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", bull:"33 ft", dist:185, r2:0.55, r1:0.41, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", dist:185, r2:0.55, word:"185 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", dist:185, r2:0.55, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
@@ -1826,7 +1849,7 @@ var AREAS = [
   ],
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:2, no:3, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
+{ id:2, no:3, quads:true, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
   targets:"30y → 11 ft · 50y → 17 ft · 70y → 19 ft · 90y → 20 ft · tighter dispersion · low, normal and high on command",
   plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
@@ -2387,29 +2410,29 @@ function area(id){
    the balance chart and the question of whether she practised approach at all. */
 function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
 var PRACTICE = [
-{ id:"p-approach-short", type:11, track:true,
+{ id:"p-approach-short", type:11, track:true, quads:true,
   name:"Approach \u00b7 short irons", sub:"110, 125, 140 and 155 yards \u00b7 the scoring clubs",
   targets:"GIR 67 \u2192 73% \u00b7 proximity inside the circle \u00b7 pin high, not short",
   plan:"10 min warm-up \u2192 45 min: eight sets of five, 40 balls, full routine every one",
   sets:[
-    {id:"a", label:"110y", short:"110 yards", tc:"24 ft", bull:"20 ft", dist:110, r2:0.55, r1:0.41, word:"110 yards",
-     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"b", guide:"windows", label:"110y \u00b7 five windows", tc:"24 ft", bull:"20 ft", dist:110, r2:0.55, r1:0.41, word:"110 yards",
+    {id:"a", label:"110y", short:"110 yards", tc:"24 ft", dist:110, r2:0.55, word:"110 yards",
+     tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"b", guide:"windows", label:"110y \u00b7 five windows", tc:"24 ft", dist:110, r2:0.55, word:"110 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"125y", short:"125 yards", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards",
-     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"d", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", bull:"22 ft", dist:125, r2:0.55, r1:0.41, word:"125 yards",
+    {id:"c", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.55, word:"125 yards",
+     tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"d", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.55, word:"125 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"140y", short:"140 yards", tc:"30 ft", bull:"24 ft", dist:140, r2:0.55, r1:0.41, word:"140 yards",
-     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"f", guide:"windows", label:"140y \u00b7 five windows", tc:"30 ft", bull:"24 ft", dist:140, r2:0.55, r1:0.41, word:"140 yards",
+    {id:"e", label:"140y", short:"140 yards", tc:"30 ft", dist:140, r2:0.55, word:"140 yards",
+     tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"f", guide:"windows", label:"140y \u00b7 five windows", tc:"30 ft", dist:140, r2:0.55, word:"140 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"155y", short:"155 yards", tc:"34 ft", bull:"27 ft", dist:155, r2:0.55, r1:0.41, word:"155 yards",
-     tgt:"Inside the circle scores. The bullseye is a PGA-standard ball from here", max:5},
-    {id:"h", guide:"windows", label:"155y \u00b7 five windows", tc:"34 ft", bull:"27 ft", dist:155, r2:0.55, r1:0.41, word:"155 yards",
+    {id:"g", label:"155y", short:"155 yards", tc:"34 ft", dist:155, r2:0.55, word:"155 yards",
+     tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"h", guide:"windows", label:"155y \u00b7 five windows", tc:"34 ft", dist:155, r2:0.55, word:"155 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
@@ -2459,13 +2482,22 @@ function areaTitle(a){
 }
 /* A 7 ft circle round a 50-yard flag is a 48 to 52 yard shot. Saying it that way
    turns an abstract target into a number she can aim at. */
+var NUM_WORD = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+                "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
+                "eighteen","nineteen","twenty"];
+function numWord(n){ return NUM_WORD[n] || String(n); }
 function bandText(dist, tc){
   if(!dist || !tc) return "";
   var m = /^([\d.]+)\s*ft/.exec(String(tc));
   if(!m) return "";
   var yd = Math.round(parseFloat(m[1]) / 3);
   if(!yd) return "";
-  return (dist - yd) + "\u2013" + (dist + yd) + " yards scores";
+  /* Whole yards, not a decimal. Nobody judges eight and a half yards at 125,
+     and the band beside it is already rounded the same way, so a decimal here
+     made the card disagree with itself. The pace is the gloss because a pace is
+     about a yard and the short game already counts in them. */
+  return (dist - yd) + "\u2013" + (dist + yd) + " yards \u00b7 " + yd +
+         " either side, or " + numWord(yd) + " paces";
 }
 function tgtText(s){
   var b = bandText(s.dist, s.tc);
@@ -6002,7 +6034,12 @@ function ordinalPlace(n){
    towards the score; the split is the diagnostic. */
 function testSplit(a, sess){
   var out = {n:0, in_:0, bull:0, straight:{n:0, in_:0}, shaped:{n:0, in_:0},
-             good:{n:0, in_:0}, awk:{n:0, in_:0}, extra:[], byId:{}};
+             good:{n:0, in_:0}, awk:{n:0, in_:0}, extra:[], byId:{},
+             /* where the ones that scored finished. oldIn counts balls that
+                scored before the target was split, which have no quarter and
+                must not be guessed at. */
+             q:{qSL:0, qSR:0, qLL:0, qLR:0, st:0}, oldIn:0,
+             missShort:0, missLong:0};
   a.sets.forEach(function(st){
     var kind = trackKind(a, st); if(!kind) return;
     var list = (sess.shots||{})[st.id]; if(!list) return;
@@ -6024,7 +6061,15 @@ function testSplit(a, sess){
       out.n++; bucket.n++;
       var lie = st.lie ? out[st.lie === "awk" ? "awk" : "good"] : null;
       if(lie) lie.n++;
-      if(inFor(calls[i], x.z)){ out.in_++; bucket.in_++; if(lie) lie.in_++; }
+      if(inFor(calls[i], x.z)){
+        out.in_++; bucket.in_++; if(lie) lie.in_++;
+        if(out.q[x.z] != null) out.q[x.z]++;
+        else out.oldIn++;                 // "c" or "b": in, but no quarter recorded
+      } else {
+        var dp = depthOf(x.z);
+        if(dp === "short") out.missShort++;
+        else if(dp === "long") out.missLong++;
+      }
       if(x.z === "b") out.bull++;
     });
   });
@@ -6061,6 +6106,90 @@ function rowNote(tg){
     + ", so the thinnest reads to within about " + err
     + " points either way. Treat one bad number as a hint, not a finding.";
 }
+/* The league table.
+   tablesFor() gives place-for-score. A table needs the inverse, score-for-place,
+   so walk the scores upward and take the first one that reaches each band. Doing
+   it this way rather than with a second model means the table can never disagree
+   with the placing printed above it: both read the same array. */
+var BANDS = [
+  {to:1,   lab:"Best of the hundred"},
+  {to:10,  lab:"Top ten"},
+  {to:20,  lab:"11 to 20"},
+  {to:30,  lab:"21 to 30"},
+  {to:40,  lab:"31 to 40"},
+  {to:50,  lab:"41 to 50"},
+  {to:60,  lab:"51 to 60"},
+  {to:70,  lab:"61 to 70"},
+  {to:80,  lab:"71 to 80"},
+  {to:90,  lab:"81 to 90"},
+  {to:100, lab:"91 to 100"}
+];
+function leagueRows(count, n){
+  var out = [];
+  BANDS.forEach(function(bd){
+    var need = null;
+    for(var k=0;k<=n;k++){ if(count[k] <= bd.to){ need = k; break; } }
+    out.push({lab:bd.lab, to:bd.to, need:need});
+  });
+  return out;
+}
+function leagueTable(count, n, score){
+  var rows = leagueRows(count, n);
+  var place = count[Math.min(n, score)];
+  var mineAt = -1, next = null;
+  rows.forEach(function(r, i){
+    if(r.need == null) return;
+    if(score >= r.need && mineAt < 0) mineAt = i;     // best band she has reached
+  });
+  for(var j = mineAt - 1; j >= 0; j--){
+    if(rows[j].need != null){ next = rows[j]; break; }
+  }
+  var html = '<table class="league"><tbody>' + rows.map(function(r, i){
+    if(r.need == null) return "";
+    var mine = i === mineAt;
+    return '<tr'+(mine ? ' class="mine"' : '')+'>'+
+      '<td class="lgname">'+r.lab+'</td>'+
+      '<td class="lgscore">'+(r.need ? r.need + (r.to === 1 ? "+" : "") : "\u2013")+'</td>'+
+      '<td class="lgplace">'+(mine ? ordinalPlace(place) : "")+'</td></tr>';
+  }).join("") + '</tbody></table>';
+  var gap = next ? (next.need - score) : 0;
+  var foot = next
+    ? '<p class="plnote">'+gap+' more '+(gap === 1 ? 'point' : 'points')+
+      ' to reach '+next.lab.toLowerCase()+'.</p>'
+    : '<p class="plnote">Nothing above this. That is the top of the table.</p>';
+  return html + foot;
+}
+
+/* Short or long, which is the whole reason the target was split. Balls hit
+   before the split have no quarter, so they are named and left out rather than
+   folded in: a bias worked out from half the evidence is worse than none. */
+function biasBlock(a, t){
+  if(!a.quads) return "";
+  var sIn = t.q.qSL + t.q.qSR, lIn = t.q.qLL + t.q.qLR;
+  var known = sIn + lIn + t.q.st;
+  var sAll = sIn + t.missShort, lAll = lIn + t.missLong;
+  if(known + t.missShort + t.missLong < 8) return "";
+  var tot = sAll + lAll, html = "";
+  if(tot){
+    var sp = Math.round(100 * sAll / tot);
+    var lean = Math.abs(sp - 50);
+    html += '<div class="plrow"><span>Short <b>'+sAll+'</b></span>'+
+            '<span>Long <b>'+lAll+'</b></span>'+
+            (t.q.st ? '<span>Stone dead <b>'+t.q.st+'</b></span>' : '')+'</div>';
+/* Says what happened and stops. What to do about it is the coach's job, and
+       a line of advice under every session stops being read by the third one. */
+    if(lean >= 15 && tot >= 12){
+      html += '<p class="plnote">'+(sp > 50 ? sp + ' per cent finished short.'
+                                            : (100-sp) + ' per cent finished past the flag.')+'</p>';
+    }
+  }
+  if(t.oldIn){
+    html += '<p class="plnote">'+t.oldIn+' of these were logged before the target was split, '+
+            'so they count towards the score but not towards short or long.</p>';
+  }
+  return html;
+}
+
 function placingBlock(a, sess){
   var spec = a.placing; if(!spec) return "";
   var t = testSplit(a, sess);
@@ -6092,6 +6221,7 @@ function placingBlock(a, sess){
       (spec.bullP ? 'inside two clubs' : (areaShape(a) === 'clock' ? 'holed on the clock' : 'inside the circle'))+'</span></div>'+
     (full
       ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
+        leagueTable(tab.count, spec.n, t.in_)+
         (spec.bullP ? '<p class="plread">Inside one club, <b>'+
           ordinalPlace(tablesFor({n:spec.n, p:spec.bullP, sd:spec.bullSd || 0.035}).count[Math.min(spec.n, t.bull)])+
           '</b> of the same hundred.</p>' : '')+
@@ -6104,11 +6234,12 @@ function placingBlock(a, sess){
       (t.shaped.n ? '<span>Shaped <b>'+pctText(t.shaped.in_, t.shaped.n)+'</b> ('+t.shaped.in_+' of '+t.shaped.n+')</span>' : '')+
       (t.good.n ? '<span>Good lie <b>'+pctText(t.good.in_, t.good.n)+'</b> ('+t.good.in_+' of '+t.good.n+')</span>' : '')+
       (t.awk.n ? '<span>Awkward <b>'+pctText(t.awk.in_, t.awk.n)+'</b> ('+t.awk.in_+' of '+t.awk.n+')</span>' : '')+
-      (a.sets.some(function(x){ return x.bull; }) ? '<span>'+(spec.bullP ? 'Inside one club' : 'Bullseye')+' <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
+      (t.bull ? '<span>'+(spec.bullP ? 'Inside one club' : 'Bullseye')+' <b>'+t.bull+'</b> of '+t.n+'</span>' : '')+
       t.extra.filter(function(g){ return g.n; }).map(function(g){
         return '<span>'+g.lab+' <b>'+pctText(g.in_, g.n)+'</b> ('+g.in_+' of '+g.n+')</span>';
       }).join("")+
     '</div>'+
+    biasBlock(a, t)+
     (rows ? '<div class="plrow tgt">'+rows+'</div>'+
             '<p class="plnote">'+rowNote(tg)+'</p>' : '')+
     '</div>';
@@ -6349,12 +6480,28 @@ ZONE_LABEL.wayLeft = "Deep rough, left"; ZONE_LABEL.wayRight = "Deep rough, righ
 ZONE_LABEL.bunker = "Short, in the bunker";
 ZONE_LABEL.l = "Missed left"; ZONE_LABEL.r = "Missed right";
 ZONE_LABEL.b = "In the bullseye";
+ZONE_LABEL.qLR = "In, long right";  ZONE_LABEL.qSR = "In, short right";
+ZONE_LABEL.qSL = "In, short left";  ZONE_LABEL.qLL = "In, long left";
+ZONE_LABEL.st  = "Stone dead";
 var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
                  g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
 for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
 /* Two rings now: "b" is the bullseye inside "c". Both are a pass; only "b" is a
    tour-standard ball. Everything that used to ask z === "c" asks this instead. */
-function isIn(z){ return z === "c" || z === "b"; }
+var QUAD_IDS = {qLR:1, qSR:1, qSL:1, qLL:1, st:1};
+/* Every quadrant and the stiff centre score exactly what the old single circle
+   scored, which is the whole point: splitting the target changed where the ball
+   is recorded, never what it is worth. Old sessions stored "c" or "b" and still
+   pass here untouched, so nothing anyone has already hit is re-scored. */
+function isIn(z){ return z === "c" || z === "b" || !!QUAD_IDS[z]; }
+function isQuad(z){ return !!QUAD_IDS[z]; }
+/* Short or long, for the bias picture. Null where it was never recorded, which
+   is every ball hit before the target was split. */
+function depthOf(z){
+  if(z === "qSL" || z === "qSR" || z === "short" || z === "shortL" || z === "shortR") return "short";
+  if(z === "qLR" || z === "qLL" || z === "long"  || z === "longL"  || z === "longR")  return "long";
+  return null;
+}
 function zoneIndex(id){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].id===id) return i; } return -1; }
 function zoneLabel(a, z){
   if(z == null) return "not logged";
@@ -6399,7 +6546,29 @@ function pinAt(cx, cy, h){
          '<ellipse class="hole" cx="'+cx+'" cy="'+(cy+3)+'" rx="5" ry="2.4"></ellipse></g>';
 }
 var ROSE_BULL = 31;
-function roseSvg(centreLabel, tappable, bull){
+/* The four quadrants of the scoring circle, in the same vocabulary as the ring
+   outside them, so "short left" means the same thing whether she scored or not.
+   Angles run clockwise from straight up, matching polar() and ZONES. */
+var QUADS = [
+  {id:"qLR", lab:"Long R",  a0:0,   a1:90},
+  {id:"qSR", lab:"Short R", a0:90,  a1:180},
+  {id:"qSL", lab:"Short L", a0:180, a1:270},
+  {id:"qLL", lab:"Long L",  a0:270, a1:360}
+];
+/* Stone dead is a flagstick, about 8 ft, because that is the one ruler standing
+   at the target. Scaled against the circle rather than fixed, so it means the
+   same distance at 185 as it does at 125: at 26 ft it is a third of the way out,
+   at 43 ft a fifth. Floored so it stays big enough to hit with a thumb. */
+var STIFF_FT = 8;
+function stiffR(tc){
+  var m = /^([\d.]+)\s*ft/.exec(String(tc || ""));
+  if(!m) return 0;
+  var ft = parseFloat(m[1]);
+  if(!(ft > STIFF_FT)) return 0;
+  return Math.max(15, Math.round(ROSE_IN * STIFF_FT / ft));
+}
+
+function roseSvg(centreLabel, tappable, bull, quads, band){
   var CX = ROSE_CX, CY = ROSE_CY, out = "";
   out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
   ZONES.forEach(function(z, i){
@@ -6409,16 +6578,46 @@ function roseSvg(centreLabel, tappable, bull){
     out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
   });
   out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
-  out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
-         (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
-  if(bull){
-    out += '<circle class="rz rb" data-z="b" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_BULL+'"'+
-           (tappable ? ' role="button" tabindex="0" aria-label="In the bullseye"' : '')+'></circle>';
+  var sr = quads ? stiffR(centreLabel) : 0;
+  if(!sr) quads = false;          // no circle to split, so leave the picture alone
+  if(quads){
+    /* Every one of these scores. They exist to say WHERE the good ones finished,
+       which is where a bias like "always short" hides: a ball twenty feet short
+       and one twenty feet past score the same and look identical without this. */
+    QUADS.forEach(function(q){
+      out += '<path class="rz rq" data-z="'+q.id+'" d="'+
+             sectorPath(CX, CY, sr, ROSE_IN, q.a0, q.a1)+'"'+
+             (tappable ? ' role="button" tabindex="0" aria-label="'+q.lab+', in the target"' : '')+'></path>';
+    });
+    /* A ball that finishes stone dead would otherwise be thrown into a quadrant
+       on a coin toss, and those are her best shots. They get their own zone so
+       they cannot muddy the short-and-long picture. */
+    out += '<circle class="rz rst" data-z="st" cx="'+CX+'" cy="'+CY+'" r="'+sr+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="Stone dead, inside a flagstick"' : '')+'></circle>';
+  } else {
+    out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
+    if(bull){
+      out += '<circle class="rz rb" data-z="b" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_BULL+'"'+
+             (tappable ? ' role="button" tabindex="0" aria-label="In the bullseye"' : '')+'></circle>';
+    }
   }
-  out += pinAt(CX, CY - 3, 30);   // the hole itself lands on the centre
+  /* Guides tangent to the scoring circle. Unlabelled here: the numbers are
+     written under the card by bandText, where there is room to read them and no
+     marker can land on top of them. */
+  if(quads && band){
+    out += '<g class="rguide">'+
+      '<line x1="'+(CX-ROSE_R)+'" y1="'+(CY-ROSE_IN)+'" x2="'+(CX+ROSE_R)+'" y2="'+(CY-ROSE_IN)+'"></line>'+
+      '<line x1="'+(CX-ROSE_R)+'" y1="'+(CY+ROSE_IN)+'" x2="'+(CX+ROSE_R)+'" y2="'+(CY+ROSE_IN)+'"></line>'+
+      '<line x1="'+(CX-ROSE_IN)+'" y1="'+(CY-ROSE_R)+'" x2="'+(CX-ROSE_IN)+'" y2="'+(CY+ROSE_R)+'"></line>'+
+      '<line x1="'+(CX+ROSE_IN)+'" y1="'+(CY-ROSE_R)+'" x2="'+(CX+ROSE_IN)+'" y2="'+(CY+ROSE_R)+'"></line>'+
+      '</g>';
+  }
+  out += pinAt(CX, CY - 3, quads ? 20 : 30);   // the hole itself lands on the centre
   // both numbers live in the pill, where no marker can land on them
-  var cap = (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
-  var capW = bull ? 208 : 128;
+  var cap = (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull
+                                        : (quads ? '  \u00b7  dead inside ' + STIFF_FT + ' ft' : ''));
+  var capW = (bull || quads) ? 208 : 128;
   out += '<g class="caption"><rect class="cappill" x="'+(150-capW/2)+'" y="3" width="'+capW+'" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
   return '<svg viewBox="0 0 300 318" class="rose" role="group" aria-label="Where the ball finished">'+
@@ -6430,6 +6629,16 @@ var ROSE_SPREAD = [[0,81],[-17,75],[17,75],[-17,89],[17,89],[0,93],[-9,82],[9,82
 var CENTRE_ANG = [180, 120, 240, 90, 270, 150, 210];
 function roseMark(zoneId, n){
   if(zoneId==="b") return polar(ROSE_CX, ROSE_CY, 15, CENTRE_ANG[n % CENTRE_ANG.length]);
+  if(zoneId==="st") return polar(ROSE_CX, ROSE_CY, 9, CENTRE_ANG[n % CENTRE_ANG.length]);
+  for(var q=0;q<QUADS.length;q++){
+    if(QUADS[q].id === zoneId){
+      // spread them along the quadrant's arc so several balls stay countable
+      var mid = (QUADS[q].a0 + QUADS[q].a1) / 2;
+      var spread = [0, -18, 18, -30, 30, -9, 9, -24, 24, 0];
+      var rad = [0.72, 0.72, 0.72, 0.86, 0.86, 0.58, 0.58, 0.72, 0.72, 0.9][n % 10];
+      return polar(ROSE_CX, ROSE_CY, ROSE_IN*rad, mid + spread[n % spread.length]);
+    }
+  }
   if(zoneId==="c") return polar(ROSE_CX, ROSE_CY, ROSE_IN*0.80, CENTRE_ANG[n % CENTRE_ANG.length]);
   var i = zoneIndex(zoneId); if(i<0) return [ROSE_CX, ROSE_CY];
   var m = ROSE_SPREAD[n % ROSE_SPREAD.length];
@@ -6554,7 +6763,8 @@ function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
-  return roseSvg(set.tc || "In", tappable, set.bull);
+  return roseSvg(set.tc || "In", tappable, set.bull,
+                 !!(a && a.quads) && !!set.dist, bandText(set.dist, set.tc));
 }
 function markR(a){
   var sh = areaShape(a);
@@ -7101,9 +7311,9 @@ function shotRow(a, s, last, cfg){
               "|" + (c.bull||"");
     if(key !== diag.__key){
       var low = slopeNow();
-      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull}, true);
+      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist}, true);
       var main = st === "w" ? gridSvg(gridOf(c), true) : pic;
-      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull}, false) : gridSvg(gridOf(c), false));
+      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist}, false) : gridSvg(gridOf(c), false));
       diag.innerHTML = '<div class="diagmain">'+main+'</div>'+
         (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":word||"grid")+'">'+side+'</button>' : '');
       diag.__key = key;
@@ -9386,11 +9596,11 @@ function aimChip(a, s){
   if(!aimTarget(s)) return "";
   return '<button type="button" class="vid aimc" data-aim-area="' + (a && a.id) +
     '" data-aim="' + s.id +
-    '" aria-label="See this target at its true size through the camera">' +
+    '" aria-label="Scope this target at its true size through the camera">' +
     '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true">' +
     '<circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" stroke-width="1.2"/>' +
     '<path d="M5 0.6 L5 2.4 M5 7.6 L5 9.4 M0.6 5 L2.4 5 M7.6 5 L9.4 5" ' +
-    'stroke="currentColor" stroke-width="1.2"/></svg>aim</button>';
+    'stroke="currentColor" stroke-width="1.2"/></svg>scope</button>';
 }
 
 var aim = { list: [], i: 0, fov: 69, spot: null, stream: null, raf: 0, on: false, adj: 0 };
@@ -9515,9 +9725,14 @@ function aimPaint(){
                                : "Inside " + t.c + " ft")
                       + " at " + dd + " " + t.unit
                       + (dd !== t.dist ? " (set: " + t.dist + ")" : "");
+  /* Depth cannot be drawn. Seen from the tee this circle is under a twentieth of
+     a degree from front edge to back, a line rather than an area, so the yardage
+     band is written out instead, to tie to the markers on the range. */
+  var yd = Math.round(t.c / 3);
   e.sub.textContent = (t.c * 2) + " ft across · " +
-    (half * 2 * 180 / Math.PI).toFixed(2) + "° wide" +
-    (t.b ? " · dashed is " + t.b + " ft" : "");
+    (half * 2 * 180 / Math.PI).toFixed(2) + "° · " +
+    (t.clubs ? "" : (dd - yd) + " to " + (dd + yd) + " " + t.unit + " · ") +
+    yd + " either side" + (t.b ? " · dashed " + t.b + " ft" : "");
 }
 
 function aimSize(){
