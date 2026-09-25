@@ -1839,13 +1839,13 @@ var AREAS = [
   targets:"GIR 67 → 73% · driving accuracy 71 → 82% · driving distance 272+ · 150y ± 9 yd · club-head speed + 5 mph · a fade on demand",
   plan:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, full routine every ball) → 10 min compete",
   sets:[
-    {id:"a", label:"Approach 125y", tgt:"Within 15 ft. Tour average from here is about 22 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 15 ft",
+    {id:"a", label:"Approach 125y", tgt:"Within 5 yards. Tour average from here is about 7 yards. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 5 yards",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"Approach 150y", tgt:"Within 20 ft. Tour average from here is about 28 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
-    {id:"d", guide:"windows", label:"Five windows · 150y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 20 ft",
+    {id:"c", label:"Approach 150y", tgt:"Within 7 yards. Tour average from here is about 9 yards. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"d", guide:"windows", label:"Five windows · 150y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 7 yards",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"i", label:"Approach 175y", tgt:"Within 24 ft. Tour average from here is about 35 ft. Hit the number, not the club: club up into the wind, down with it.", max:5},
+    {id:"i", label:"Approach 175y", tgt:"Within 8 yards. Tour average from here is about 12 yards. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"e", label:"Driver · 10 balls", tgt:"40-yd target (20 each side), a fairway. Speed measured across all ten",
       max:10, metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed · mph", metricNote:"The average of the ten, and the fastest and slowest"},
     {id:"f", label:"3-wood", tgt:"35-yd target (17 each side)", max:5},
@@ -1856,19 +1856,19 @@ var AREAS = [
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
 { id:2, no:3, quads:true, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
-  targets:"30y → 11 ft · 50y → 17 ft · 70y → 19 ft · 90y → 20 ft · tighter dispersion · low, normal and high on command",
+  targets:"30y → 8y wide · 50y → 12y wide · 70y → 12y wide · 90y → 14y wide · tighter dispersion · low, normal and high on command",
   plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Inside 11 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
     {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Inside 17 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
     {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Inside 19 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
     {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Inside 20 ft scores · the LPGA 66% circle from here", max:5},
+    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
     {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
@@ -6323,12 +6323,22 @@ function summaryBlock(a, sess){
     var ids = shapeZones(a).map(function(z){ return z.id; });
     if(ids.indexOf("c") === -1) ids.unshift("c");
     if(ids.indexOf("b") === -1) ids.unshift("b");
-    var svg = heatSvg(shapeSvg(a, {tc:""}, false), ids, pool.t, pool.n, function(id){
+    /* Quartering the target split "c" into five zones. This list still named
+       only the old one, so on an approach card every ball that SCORED vanished
+       from the picture headed "where every ball finished" while the heading
+       went on claiming all sixty. The misses showed; the good ones did not. */
+    if(a.quads) ["st","qLR","qSR","qSL","qLL"].forEach(function(z){
+      if(ids.indexOf(z) === -1) ids.unshift(z);
+    });
+    var heatTc = "";
+    (a.sets || []).forEach(function(x){ if(!heatTc && x.tc && /ft$/.test(x.tc)) heatTc = x.tc; });
+    var svg = heatSvg(shapeSvg(a, {tc:heatTc}, false), ids, pool.t, pool.n, function(id){
       if(id === "b") return [ROSE_CX, ROSE_CY - 26];
       if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 40];
       return shapeMark(a, id, 0);
     });
     var inN = (pool.t.c||0) + (pool.t.b||0) + (areaShape(a) === "corridor" ? (pool.t.short||0) : 0);
+    if(a.quads) ["st","qLR","qSR","qSL","qLL"].forEach(function(z){ inN += (pool.t[z]||0); });
     html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
       'In the target ' + pctText(inN, pool.n) + ' of the time' +
       (pool.t.b ? ' · inside the bullseye ' + pctText(pool.t.b, pool.n) : '') + '.');
@@ -6814,8 +6824,7 @@ function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
-  return roseSvg(set.tc || "In", tappable, set.bull,
-                 !!(a && a.quads) && !!set.dist, set.dist);
+  return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist);
 }
 function markR(a){
   var sh = areaShape(a);
@@ -7592,7 +7601,7 @@ var DECK_TARGETS = {
   charlotte:{
     10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "Club-head speed +5 mph"],
     11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
-    2:["30y \u2192 11 ft \u00b7 50y \u2192 17 ft", "70y \u2192 19 ft \u00b7 90y \u2192 20 ft", "Tighter 30\u201390y dispersion"],
+    2:["30y \u2192 8y wide \u00b7 50y \u2192 12y wide", "70y \u2192 12y wide \u00b7 90y \u2192 14y wide", "Tighter 30\u201390y dispersion"],
     3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
     4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
     5:["Pin high on approaches, not short", "Hit the flag", "Play away from the short side"]
@@ -7600,7 +7609,7 @@ var DECK_TARGETS = {
   annabel:{
     10:["Driving accuracy 71 \u2192 82%", "Driving distance 272+", "A fade on demand, every time"],
     11:["GIR 67 \u2192 73%", "150y \u00b1 9 yd", "Pin high on approaches, not short"],
-    2:["30y \u2192 11 ft \u00b7 50y \u2192 17 ft", "70y \u2192 19 ft \u00b7 90y \u2192 20 ft", "Tighter 30\u201390y dispersion"],
+    2:["30y \u2192 8y wide \u00b7 50y \u2192 12y wide", "70y \u2192 12y wide \u00b7 90y \u2192 14y wide", "Tighter 30\u201390y dispersion"],
     3:["Up and down 50 \u2192 60%+", "Bunker save 30 \u2192 50%", "Within one club from anywhere"],
     4:["Under 29 putts a round", "6 ft 70% \u00b7 9 ft 50% \u00b7 12 ft 30%", "Lag 90% inside 3 ft"],
     5:["Doubles \u2264 1 a round", "Think avoid double, not miracle", "Play away from the short side"]
