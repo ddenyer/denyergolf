@@ -112,7 +112,7 @@
     letter-spacing:.01em}
   .brand span{color:var(--accent)}
   .player{
-    display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line);
+    display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line-strong);
     border-radius:999px; padding:3px 4px 3px 11px;
   }
   .player input{
@@ -176,7 +176,7 @@
     background:var(--accent-wash); border:0; border-radius:var(--radius);
     box-shadow:var(--card); padding:11px 14px; margin-bottom:16px; font-size:13px; color:var(--ink-2);
   }
-  .banner button{background:none; border:1px solid var(--line-strong); border-radius:6px; padding:4px 9px; font-size:12px; font-weight:600}
+  .banner button{background:none; border:1px solid var(--line-strong); border-radius:9px; padding:4px 9px; font-size:12px; font-weight:600}
 
   /* ---------- the five areas, as tiles ----------
      One pale tint per area, pinned for good, and a solid black mark at the size
@@ -292,12 +292,12 @@
   .planline{font-size:12.5px; color:var(--muted); margin:0 0 16px}
   input[type="date"]{
     font:inherit; font-size:13px; background:var(--surface); color:var(--ink);
-    border:1px solid var(--line); border-radius:7px; padding:5px 8px;
+    border:1px solid var(--line-strong); border-radius:10px; padding:5px 8px;
   }
 
   .setgroup{margin-top:16px}
   .setgroup > .eyebrow{display:block; margin:0 0 7px}
-  .sets{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .sets{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden}
   .set{background:var(--surface); padding:11px 13px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center}
   .set .lbl{font-weight:600; font-size:14px; letter-spacing:-.005em}
   .set .tgt{font-size:12px; color:var(--muted); margin-top:2px; max-width:42ch}
@@ -352,22 +352,22 @@
   /* ---------- targets ---------- */
   .targets .thd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:3px}
   .targets .edit{
-    background:none; border:1px solid var(--line-strong); border-radius:6px; padding:2px 9px;
+    background:none; border:1px solid var(--line-strong); border-radius:9px; padding:2px 9px;
     font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); flex:none;
   }
   .targets .edit:hover{border-color:var(--accent-fill); color:var(--accent)}
   .targets textarea{
     width:100%; font:inherit; font-size:13px; color:var(--ink); background:var(--surface-2);
-    border:1px solid var(--line-strong); border-radius:8px; padding:9px 10px; min-height:70px; resize:vertical; margin-top:4px;
+    border:1px solid var(--line-strong); border-radius:11px; padding:9px 10px; min-height:70px; resize:vertical; margin-top:4px;
   }
   .targets .trow{display:flex; gap:7px; margin-top:8px}
-  .targets .trow button{border-radius:7px; padding:6px 13px; font-size:12.5px; font-weight:600; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink-2)}
+  .targets .trow button{border-radius:10px; padding:6px 13px; font-size:12.5px; font-weight:600; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink-2)}
   .targets .trow button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
 
   /* ---------- cards ---------- */
   .modebar{display:flex; justify-content:flex-end; margin:10px 0 0}
   .modetoggle{
-    background:none; border:1px solid var(--line-strong); border-radius:7px; padding:5px 11px;
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:12px; padding:6px 12px;
     font-size:11.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
   }
   .modetoggle:hover{border-color:var(--accent-fill); color:var(--accent)}
@@ -376,7 +376,7 @@
   .progfill{height:100%; background:var(--accent-fill); border-radius:2px; transition:width .18s ease}
   .progtxt{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); white-space:nowrap}
   .pcard{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:16px 16px 18px;
   }
   .pcardhd{
@@ -407,9 +407,9 @@
   .pcard .loadf input{width:96px; height:58px; font-size:22px}
   .pcard .repsrow input{width:58px; height:58px; font-size:22px}
   .pcard .targets{margin-top:0}
-  .pcard .dgwrap{margin-top:14px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:10px}
+  .pcard .dgwrap{margin-top:14px; background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:11px; padding:10px}
   .pcard .dgwrap svg.dg{width:100%; height:min(34vh, 260px)}
-  .rvlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+  .rvlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:11px; overflow:hidden}
   .rvrow{background:var(--surface); padding:9px 12px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; font-size:13.5px; cursor:pointer}
   .rvrow:hover{background:var(--surface-2)}
   .rvrow b{font-family:"IBM Plex Mono",monospace; font-size:14px}
@@ -417,16 +417,18 @@
   .rvtot{display:flex; justify-content:space-between; align-items:baseline; margin-top:14px; padding-top:12px; border-top:1px solid var(--line-strong)}
   .rvtot .f{font-family:"IBM Plex Mono",monospace; font-size:28px; font-weight:600}
   .nav{
-    background:var(--surface-2); border:1px solid var(--line-strong); border-radius:9px;
-    padding:11px 14px; font-size:14px; font-weight:600; color:var(--ink-2); flex:none;
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:16px;
+    padding:12px 15px; font-size:14px; font-weight:600; color:var(--ink-2); flex:none;
   }
-  .nav.next{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff; padding:11px 18px}
+  .nav:active{transform:translateY(1px)}
+  .nav.next{background:var(--accent-fill); color:#ffffff; padding:12px 19px;
+    box-shadow:0 8px 20px -12px var(--tile-cast)}
   .nav.back{padding:11px 16px; font-size:15px}
   .nav.back[disabled]{opacity:.38; cursor:default}
   :root[data-theme="dark"] .nav.next{color:#0e1310}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nav.next{color:#0e1310}}
 
-  .rules{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--line);
+  .rules{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface); border:0; box-shadow:var(--card);
          border-radius:var(--radius); padding:13px 15px; margin:12px 0 0}
   .rules .cgroup{flex:1; min-width:210px; margin-bottom:0 !important}
   .rulelist{margin:6px 0 0; padding-left:17px; display:flex; flex-direction:column; gap:4px}
@@ -435,7 +437,7 @@
 
   /* ---------- conditions ---------- */
   .condbox{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:11px 13px 12px; margin:0 0 4px;
   }
   .condbox > .eyebrow{display:block; margin-bottom:9px}
@@ -444,7 +446,7 @@
   .condrow > span{font-size:11.5px; color:var(--muted); font-weight:600; padding-top:7px}
   .chips{display:flex; flex-wrap:wrap; gap:5px}
   .chips button{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
+    background:var(--surface-2); border:1px solid var(--line-strong); border-radius:999px;
     padding:6px 12px; font-size:12.5px; font-weight:600; color:var(--ink-2); line-height:1.2;
   }
   .chips button[aria-pressed="true"]{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
@@ -454,7 +456,7 @@
 
   .cseg{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px}
   .cseg button{
-    background:var(--surface-2); border:1px solid var(--line); border-radius:7px;
+    background:var(--surface-2); border:1px solid var(--line-strong); border-radius:10px;
     padding:5px 11px; font-size:12.5px; font-weight:600; color:var(--muted);
   }
   .cseg button[aria-selected="true"]{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--ink)}
@@ -467,7 +469,7 @@
   .cbar.thin .bfill{background:var(--line-strong)}
   .refline{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--ink-2); opacity:.55}
   .verdict{
-    background:var(--accent-wash); border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--accent-wash); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:10px 13px; font-size:13.5px; color:var(--ink); margin:2px 0 14px;
   }
   .verdict b{color:var(--accent)}
@@ -475,7 +477,7 @@
   /* ---------- gym ---------- */
   .seg{display:flex; gap:4px; margin:12px 0 4px; flex-wrap:wrap}
   .seg button{
-    background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 12px;
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:11px; padding:8px 12px;
     font-size:13px; font-weight:600; color:var(--ink-2); text-align:left; line-height:1.25;
   }
   .seg button b{display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600}
@@ -487,7 +489,7 @@
   .prep div em{font-style:normal; color:var(--muted); font-size:12px; font-family:"IBM Plex Mono",monospace}
   .prepdone{margin-top:10px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600}
   .prepdone input{width:18px; height:18px; accent-color:var(--accent-fill)}
-  .exlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .exlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden}
   .ex{background:var(--surface); padding:11px 13px}
   .exhd{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap}
   .ex .nm{font-weight:600; font-size:14px; letter-spacing:-.005em}
@@ -528,7 +530,7 @@
     padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));
   }
   .lbcard{
-    background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:12px;
+    background:var(--surface); color:var(--ink); border:0; box-shadow:var(--card); border-radius:14px;
     max-width:520px; width:100%; padding:14px 16px 18px; box-shadow:0 18px 50px rgba(0,0,0,.35);
   }
   .lbhd{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px}
@@ -537,7 +539,7 @@
   .lbimg{background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:12px; text-align:center}
   svg.dg{display:block; width:100%; height:min(56vh, 460px); margin:0 auto}
   .ex .dgwrap{margin:2px 0 12px; padding:10px 6px 4px; background:var(--surface-2);
-    border:1px solid var(--line); border-radius:9px}
+    border:0; box-shadow:var(--card); border-radius:12px}
   .ex .dgwrap svg.dg{height:auto; max-height:min(30vh, 210px)}
   .ex .dgwrap.shots{padding:10px 10px 8px}
   .shotgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px}
@@ -558,7 +560,7 @@
   .slab{font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600; width:60px; flex:none}
   .sboxes{display:flex; gap:5px; flex-wrap:wrap}
   .sbox{
-    min-width:62px; height:56px; padding:0 8px; border-radius:9px; border:1px solid var(--line);
+    min-width:62px; height:56px; padding:0 8px; border-radius:12px; border:0; box-shadow:var(--card);
     background:var(--surface-2); display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:2px; line-height:1.1;
   }
@@ -595,10 +597,10 @@
   .notes label{display:block; margin-bottom:6px}
   .notes textarea{
     width:100%; font:inherit; font-size:14px; color:var(--ink); background:var(--surface);
-    border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px; min-height:74px; resize:vertical;
+    border:1px solid var(--line-strong); border-radius:var(--radius); padding:10px 12px; min-height:74px; resize:vertical;
   }
   details.prepbox{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:11px 13px 12px; margin-top:16px;
   }
   details.prepbox > summary{
@@ -615,20 +617,27 @@
   details.setup summary{cursor:pointer; font-weight:600; color:var(--accent); font-size:12.5px}
   details.setup p{margin:8px 0 0; max-width:64ch}
 
+  /* The same glass as the bar it replaces while a session is open, so the foot
+     of the screen does not change material depending on which screen she is on. */
   .totalbar{
-    position:fixed; left:0; right:0; bottom:0; z-index:40;
-    background:var(--surface); border-top:1px solid var(--line-strong);
-    padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    position:fixed; left:0; right:0; bottom:0; z-index:40; border-top:0;
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
+    box-shadow:0 1px 0 rgba(255,255,255,.55) inset, 0 0 0 1px var(--tile-edge),
+      0 -10px 34px -16px var(--tile-cast);
+    padding:11px 16px calc(11px + env(safe-area-inset-bottom, 0px));
   }
   .totalin{max-width:760px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px}
-  .tot{display:flex; align-items:baseline; gap:8px}
+  .tot{display:flex; align-items:baseline; gap:8px; flex:1 1 auto; min-width:0; flex-wrap:wrap}
   .tot .fig{font-family:"IBM Plex Mono", monospace; font-size:26px; font-weight:600; font-variant-numeric:tabular-nums}
   .tot .of{font-family:"IBM Plex Mono", monospace; font-size:14px; color:var(--muted)}
-  .tot .vs{font-size:12px; color:var(--muted); line-height:1.3}
+  .tot .vs{font-size:12px; color:var(--muted); line-height:1.3; min-width:0}
   .save{
-    background:var(--accent-fill); color:#ffffff; border:0; border-radius:9px;
-    padding:11px 18px; font-weight:700; font-size:14px;
+    background:var(--accent-fill); color:#ffffff; border:0; border-radius:16px;
+    padding:12px 19px; font-weight:700; font-size:14px;
+    box-shadow:0 8px 20px -12px var(--tile-cast);
   }
+  .save:active{transform:translateY(1px)}
   .save[disabled]{opacity:.45}
   .pad{height:78px}
 
@@ -709,7 +718,7 @@
   .chartcard .hd .nm{font-weight:600; font-size:14px}
   .chartcard .hd .pb{font-size:12px; color:var(--muted)}
   svg.line{display:block; width:100%; height:auto}
-  .hlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-top:6px}
+  .hlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden; margin-top:6px}
   .hrow{background:var(--surface); padding:10px 13px; display:grid; grid-template-columns:auto 1fr auto auto; gap:11px; align-items:center; font-size:13px}
   .hrow .d{font-family:"IBM Plex Mono", monospace; font-size:12px; color:var(--muted); width:6.5ch}
   .hrow .s{font-family:"IBM Plex Mono", monospace; font-weight:600}
@@ -757,7 +766,7 @@
   .tstat b{font-family:"IBM Plex Mono", ui-monospace, monospace; color:var(--ink)}
   .tacts{display:flex; align-items:center; gap:11px; margin-top:12px; flex-wrap:wrap}
   .tacts button.pri{background:var(--accent-fill); border:1px solid var(--accent-fill); color:#ffffff;
-    border-radius:8px; padding:8px 15px; font-family:Archivo, sans-serif; font-size:13.5px;
+    border-radius:11px; padding:8px 15px; font-family:Archivo, sans-serif; font-size:13.5px;
     font-weight:600; cursor:pointer}
   .twhere{font-size:12px; color:var(--muted)}
 
@@ -776,7 +785,7 @@
     letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
 
   .mxsts{display:flex; flex-direction:column; gap:7px}
-  .mxst{background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+  .mxst{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:14px;
     padding:11px 13px}
   .mxst.on{background:var(--surface); border:2px solid var(--accent-fill); padding:14px 14px 15px}
   .mxst.on h3{margin:5px 0 6px; font-size:17px; font-weight:600; line-height:1.25}
@@ -816,7 +825,7 @@
   .mxres.won .eyebrow{color:#a8d5bd}
   .mxres.won p{color:#d6e8dd}
   .mxres.out{background:var(--surface); border:1px solid var(--line-strong)}
-  .mxres.card{background:var(--surface); border:1px solid var(--line)}
+  .mxres.card{background:var(--surface); border:0; box-shadow:var(--card)}
   .mxres .mxbig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
     font-size:46px; font-weight:600; line-height:1; letter-spacing:-1.1px; margin:4px 0 8px}
   .mxres p{margin:0; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
@@ -838,8 +847,8 @@
 
   .mxruns{margin-top:16px}
   .mxrunrow{display:flex; gap:6px; flex-wrap:wrap; margin:7px 0 6px}
-  .mxrun{min-width:38px; padding:6px 9px; border-radius:8px; background:var(--surface);
-    border:1px solid var(--line); text-align:center;
+  .mxrun{min-width:38px; padding:6px 9px; border-radius:11px; background:var(--surface);
+    border:0; box-shadow:var(--card); text-align:center;
     font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--ink-2)}
   .mxrun.best{border-color:var(--up); color:var(--up); font-weight:600}
   .mxrun.now{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--ink)}
@@ -896,12 +905,12 @@
     box-shadow:inset 0 0 0 1px var(--accent-fill)}
   .mxlap .cell.nil{background:var(--bg); color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
   .mxlap .cell.next{box-shadow:inset 0 0 0 2px var(--accent-fill)}
-  .benchlink{background:var(--surface); border:1px solid var(--line-strong); border-radius:9px;
+  .benchlink{background:var(--surface); border:1px solid var(--line-strong); border-radius:12px;
     padding:11px 15px; font-family:Archivo, sans-serif; font-size:14px; font-weight:600;
     color:var(--accent); cursor:pointer}
   .testpick .testrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px}
   .tsel{flex:1 1 150px; min-width:140px; background:var(--surface); color:var(--ink);
-    border:1px solid var(--line-strong); border-radius:8px; padding:8px 9px; font-size:13.5px}
+    border:1px solid var(--line-strong); border-radius:11px; padding:8px 9px; font-size:13.5px}
   .tsel.wide{flex:1 1 100%}
   .testpick .eyebrow{display:block}
   .tstep{flex:none}
@@ -918,18 +927,18 @@
   .duecard h2{margin:6px 0 4px; font-size:23px; line-height:1.15}
   .duecard p{margin:0 0 6px; font-size:14.5px; color:var(--ink-2)}
   .dueacts{display:flex; gap:9px; margin-top:16px; flex-wrap:wrap}
-  .dueacts button{border-radius:9px; padding:11px 17px; font-family:Archivo, sans-serif;
+  .dueacts button{border-radius:12px; padding:11px 17px; font-family:Archivo, sans-serif;
     font-size:14.5px; font-weight:600; cursor:pointer;
     background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink)}
   .dueacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
-  .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px;
+  .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:11px;
     padding:8px 14px; font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
     color:var(--ink); cursor:pointer}
   .openacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .empty{color:var(--muted); font-size:13.5px; padding:22px 0; text-align:center}
   .tools{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px}
-  .tools button{background:var(--surface); border:1px solid var(--line-strong); border-radius:8px; padding:8px 13px; font-size:13px; font-weight:600}
+  .tools button{background:var(--surface); border:1px solid var(--line-strong); border-radius:11px; padding:8px 13px; font-size:13px; font-weight:600}
   .status{font-size:12px; color:var(--muted); margin-top:12px}
 
   @media (max-width:430px){
@@ -948,7 +957,7 @@
   .hrow .x{cursor:pointer}
   .pastwrap{margin-top:4px}
   .pastsum{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px}
-  .pastsum div{background:var(--surface); border:1px solid var(--line); border-radius:9px;
+  .pastsum div{background:var(--surface); border:0; box-shadow:var(--card); border-radius:12px;
     padding:9px 13px; min-width:76px}
   .pastsum b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:19px; font-weight:600; color:var(--ink); line-height:1.1}
@@ -962,7 +971,7 @@
   .pastrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600; color:var(--ink)}
   .pastrow .sub{display:block; font-size:11.5px; color:var(--muted); margin-top:1px}
   .pastnotes{background:var(--surface); border:0; box-shadow:var(--card);
-    border-left:3px solid var(--accent-fill); border-radius:9px; padding:13px 15px; margin-top:18px}
+    border-left:3px solid var(--accent-fill); border-radius:12px; padding:13px 15px; margin-top:18px}
   .pastnotes .eyebrow{margin-bottom:6px}
   .pastnotes p{margin:0; font-size:14px; line-height:1.55; color:var(--ink-2); white-space:pre-wrap}
   .pastcond{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:6px}
@@ -1129,7 +1138,7 @@
   .wc.called .wsub{fill:#a80050}
   .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
 
-  .slopebox{margin:12px 0 2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+  .slopebox{margin:12px 0 2px; padding:10px 12px; border:0; box-shadow:var(--card); border-radius:14px;
     background:var(--surface-2)}
   .slopebox .eyebrow{display:block; margin-bottom:7px}
   /* the run, at the top of every page of the session */
@@ -1180,7 +1189,7 @@
   .modes{margin-bottom:14px}
   .modes .eyebrow{display:block; margin-bottom:8px}
   .mrow{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px}
-  .mtile{background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+  .mtile{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:14px;
     padding:10px 11px; text-align:center}
   .mtile b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:22px;
     color:var(--ink); line-height:1.1}
@@ -1265,7 +1274,7 @@
   .shottally{display:flex; gap:16px; margin-top:12px; font-size:13px; color:var(--muted)}
   .shottally b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; color:var(--ink)}
   .shotacts{display:flex; gap:8px; margin-top:11px}
-  .shotacts button{background:var(--surface-2); border:1px solid var(--line-strong); border-radius:7px;
+  .shotacts button{background:var(--surface-2); border:1px solid var(--line-strong); border-radius:10px;
     padding:7px 13px; font-family:Archivo, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
   .pastrose{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 4px}
   @media (max-width:520px){ .pastrose{grid-template-columns:1fr} }
@@ -1280,11 +1289,11 @@
   .blist li em{color:var(--muted); font-style:normal}
   .bedit{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:center; margin-bottom:7px}
   .bedit span{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; color:var(--muted)}
-  .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:7px;
+  .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:10px;
     border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
     font-family:Archivo, sans-serif; font-size:14px}
   .carryask{margin:0 0 9px; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
-  .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:9px;
+  .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:12px;
     padding:10px 12px; margin-bottom:12px; font-size:13px; line-height:1.45; color:var(--ink-2)}
   .banner.monitor b{color:var(--ink)}
 
@@ -1292,7 +1301,7 @@
   .shotdiag{position:relative; display:block; margin-top:4px}
   .diagmain{display:flex; justify-content:center}
   .inset{position:absolute; top:0; right:0; width:96px; padding:4px; cursor:pointer;
-    background:var(--surface); border:1px solid var(--line-strong); border-radius:9px;
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:12px;
     box-shadow:0 4px 14px rgba(0,0,0,.10)}
   .inset svg{width:100%; height:auto; display:block; pointer-events:none}
   .inset:hover{border-color:var(--accent-fill)}
@@ -1422,8 +1431,8 @@
   #faultbar .faultmsg, #stuckbar .faultmsg{font-family:Archivo, sans-serif; font-size:14.5px;
     line-height:1.38; color:var(--ink)}
   #faultbar .faultrow, #stuckbar .faultrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-  #faultbar button, #stuckbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:9px;
-    border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  #faultbar button, #stuckbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:12px;
+    border:1px solid var(--line-strong); background:var(--bg); color:var(--ink);
     font-family:Archivo, sans-serif; font-size:14px; font-weight:600; cursor:pointer}
   #faultbar button.faultgo, #stuckbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
   :root[data-theme="dark"] #faultbar button.faultgo, :root[data-theme="dark"] #stuckbar button.faultgo{color:#12030a}
@@ -1473,7 +1482,7 @@
     padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));
     display:flex; flex-direction:column; gap:9px; max-height:58vh; overflow-y:auto}
   .asrow{display:flex; gap:7px; flex-wrap:wrap}
-  .aschip{flex:1 1 auto; min-height:40px; padding:0 12px; border-radius:9px;
+  .aschip{flex:1 1 auto; min-height:40px; padding:0 12px; border-radius:12px;
     border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05);
     color:#f2f5f2; font-family:"IBM Plex Mono",ui-monospace,monospace;
     font-size:13px; font-weight:600; cursor:pointer}
@@ -1920,7 +1929,7 @@
     <button class="nav back" id="navBack" aria-label="Previous page">← Back</button>
     <div class="tot">
       <span class="fig" id="totFig">0</span><span class="of" id="totOf">/ 55</span>
-      <span class="vs" id="totVs" style="white-space:nowrap"></span>
+      <span class="vs" id="totVs"></span>
     </div>
     <button class="nav next" id="navNext">Next →</button>
     <button class="save" id="saveBtn">Save session</button>
@@ -2020,7 +2029,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"one home page instead of two, the five areas as tiles that rotate on how long since each was last played, a bar at the foot of the screen, and the whole app on one surface" };
+var BUILD = { on:"2026-09-26", note:"one home page with the five areas as tiles that rotate on how long since each was last played, a glass bar at the foot of every screen, and every panel, card and control on one surface" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
