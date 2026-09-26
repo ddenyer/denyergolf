@@ -860,6 +860,20 @@
      ring outside and the whole circle still reads as a single thing. */
   .rose .rq{fill:url(#gGreen); stroke:#8fbc7e; stroke-width:1.4}
   .rose .rst{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.5; stroke-dasharray:4 3}
+  /* The four rings on the short game target, lighter the closer in, so the picture
+     reads inward without a legend. They are the same at every station: what varies
+     is what each one is worth, which is the dashed line's job to show. */
+  .rose .sgr-q4{fill:#a4cc90; stroke:#6e9c62; stroke-width:1.3}
+  .rose .sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
+  .rose .sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
+  .rose .sgh{fill:#22331d; stroke:#f2f8ec; stroke-width:1.6}
+  /* Where the LPGA field's average ball finishes from this station and this lie.
+     Inside one club off the collar, outside four from a plugged bunker. */
+  .sgfield{fill:none; stroke:#22331d; stroke-width:2; stroke-dasharray:6 4;
+    opacity:.8; pointer-events:none}
+  .sglab text{fill:#2f4a27; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:12.5px; font-weight:700; text-anchor:middle; pointer-events:none}
+  .choled.sm text{font-size:14px}
   .rguide line{stroke:#6e9c62; stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
   .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
     fill:var(--muted); pointer-events:none}
@@ -1486,7 +1500,7 @@
       Hold the camera up and see how wide the approach circles actually are. They barely
       change angular size from 110 yards out to 185, because the circle grows in step with
       the distance.</p>
-    <p class="note">For scale, Minjee Lee's +2.02 strokes-gained approach season, the best of the ShotLink era bar Tiger in 2006: 12 ft from 100-125 in the fairway, 16.4 ft from 125-150, 20 ft from 150-175, 22.5 ft from 175-200.</p>
+    <p class="note">For scale, Minjee Lee's +2.02 strokes-gained approach season, the best of the ShotLink era bar Tiger in 2006: 4 yards from 100-125 in the fairway, 5.5 from 125-150, 6.5 from 150-175, 7.5 from 175-200.</p>
   </section>
 
   <!-- ONE PAST SESSION -->
@@ -1560,6 +1574,7 @@
     <h1 id="goalsProject" hidden></h1>
     <p class="lede">Outcome, then what has to improve to get there, then what you do in the week.</p>
     <div id="goalsBody"></div>
+    <p class="note" id="buildStamp"></p>
   </section>
 
   <!-- COACH -->
@@ -1692,7 +1707,7 @@
     <button class="nav back" id="navBack" aria-label="Previous page">← Back</button>
     <div class="tot">
       <span class="fig" id="totFig">0</span><span class="of" id="totOf">/ 55</span>
-      <span class="vs" id="totVs"></span>
+      <span class="vs" id="totVs" style="white-space:nowrap"></span>
     </div>
     <button class="nav next" id="navNext">Next →</button>
     <button class="save" id="saveBtn">Save session</button>
@@ -1790,6 +1805,9 @@ function guard(fn, label){
 }
 
 /* ============ the programme ============ */
+/* Bumped whenever anything that scores a session changes, so "is the new version
+   live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
+var BUILD = { on:"2026-09-26", note:"short game scored in strokes gained, five rings on the target" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
@@ -1901,34 +1919,41 @@ var AREAS = [
   ],
   placing:{n:60, p:0.628, sd:0.05, field:"tour players"} },
 
-{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces",
-  targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point inside two clubs, two points inside one",
+{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces", sg:true,
+  targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · every ball scored in strokes gained on the LPGA field",
   plan:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
-  /* Two rings, because on a practice green a club length is the only thing you can
-     actually measure. One club is about 3 ft, two clubs about 6 ft. The circles stay
-     the same all the way through and the tour rate does the varying instead: r2 is how
-     often an LPGA player finishes inside two clubs from that distance and that lie,
-     r1 inside one. Both are derived from the tour's own up-and-down and hole-out rates. */
+  /* Four rings and the hole, because on a practice green a club length is the only
+     thing you can measure: one club is about 3 ft, two about 6, four about 12. Knot
+     a string at those and it works anywhere.
+
+     The rings are the same at every station and the WORTH of one varies instead,
+     which is the whole reason for scoring in strokes gained. Inside two clubs is
+     +0.02 from 8 paces and +0.43 from a plugged bunker at 30, and the session score
+     is the sum of every ball, so it is a number of strokes against the LPGA field
+     rather than a count out of a maximum. Zero is the field exactly.
+
+     r1 and r2 stay, because the placing is still a count: how often an LPGA player
+     finishes inside two clubs (r2) and inside one (r1) from that distance and lie. */
   sets:[
-    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 1 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a2", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 2 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a3", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", tgt:"Set 3 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a4", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"2 clubs", bull:"1 club", dist:50, lie:"good", r1:0.070, r2:0.192, word:"50 paces", tgt:"Set 4 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.374, r2:0.821, word:"10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.028, r2:0.252, word:"30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"awk", r1:0.016, r2:0.183, word:"a downhill lie", tgt:"Set 1 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.004, r2:0.073, word:"the rough", tgt:"Set 2 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c3", gone:true, blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"awk", r1:0.066, r2:0.176, word:"a bare lie", tgt:"Set 3 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.214, r2:0.673, word:"the bunker at 10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.034, r2:0.278, word:"the bunker at 20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.009, r2:0.127, word:"the bunker at 30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.045, r2:0.323, word:"a downhill bunker lie", tgt:"Set 1 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.012, r2:0.158, word:"a plugged lie", tgt:"Set 2 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"f1", group:"Around the green", blk:"Around the green", label:"Off the collar \u00b7 8 paces", tc:"2 clubs", bull:"1 club", dist:8, lie:"tight", r1:0.323, r2:0.782, word:"the collar", tgt:"Set 1 of 4 \u00b7 tight lie, putter or wedge \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"f2", blk:"Around the green", label:"Short-sided \u00b7 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"awk", r1:0.162, r2:0.600, word:"a short-sided pin", tgt:"Set 2 of 4 \u00b7 no green to work with \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"f4", blk:"Around the green", label:"Tight lie \u00b7 bare \u00b7 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"tight", r1:0.073, r2:0.416, word:"a bare lie", tgt:"Set 3 of 4 \u00b7 no grass under it \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"f3", blk:"Around the green", label:"Into an upslope \u00b7 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.046, r2:0.328, word:"an upslope", tgt:"Set 4 of 4 \u00b7 use the bank \u00b7 a point inside two clubs, two inside one", balls:5, max:10}
+    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 1 of 4 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"a2", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 2 of 4 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"a3", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", tgt:"Set 3 of 4 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"a4", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:50, lie:"good", r1:0.070, r2:0.192, word:"50 paces", tgt:"Set 4 of 4 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:10, lie:"good", r1:0.374, r2:0.821, word:"10 paces", tgt:"Set 1 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 2 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"2 clubs", bull:"1 club", sgLie:"good", dist:30, lie:"good", r1:0.028, r2:0.252, word:"30 paces", tgt:"Set 3 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"awk", dist:20, lie:"awk", r1:0.016, r2:0.183, word:"a downhill lie", tgt:"Set 1 of 3 · you choose the loft · tap the ring it finished in", balls:5, max:10},
+    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"2 clubs", bull:"1 club", sgLie:"awk", dist:30, lie:"awk", r1:0.004, r2:0.073, word:"the rough", tgt:"Set 2 of 3 · you choose the loft · tap the ring it finished in", balls:5, max:10},
+    {id:"c3", gone:true, blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"2 clubs", bull:"1 club", sgLie:"awk", dist:40, lie:"awk", r1:0.066, r2:0.176, word:"a bare lie", tgt:"Set 3 of 3 · you choose the loft · tap the ring it finished in", balls:5, max:10},
+    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"2 clubs", bull:"1 club", sgLie:"sand", dist:10, lie:"good", r1:0.214, r2:0.673, word:"the bunker at 10 paces", tgt:"Set 1 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"sand", dist:20, lie:"good", r1:0.034, r2:0.278, word:"the bunker at 20 paces", tgt:"Set 2 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"2 clubs", bull:"1 club", sgLie:"sand", dist:30, lie:"good", r1:0.009, r2:0.127, word:"the bunker at 30 paces", tgt:"Set 3 of 3 · good lie · tap the ring it finished in", balls:5, max:10},
+    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"2 clubs", bull:"1 club", sgLie:"awk", dist:15, lie:"awk", r1:0.045, r2:0.323, word:"a downhill bunker lie", tgt:"Set 1 of 2 · you choose the loft · tap the ring it finished in", balls:5, max:10},
+    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"2 clubs", bull:"1 club", sgLie:"plug", dist:15, lie:"awk", r1:0.012, r2:0.158, word:"a plugged lie", tgt:"Set 2 of 2 · you choose the loft · tap the ring it finished in", balls:5, max:10},
+    {id:"f1", group:"Around the green", blk:"Around the green", label:"Off the collar \u00b7 8 paces", tc:"2 clubs", bull:"1 club", sgLie:"tight", dist:8, lie:"tight", r1:0.323, r2:0.782, word:"the collar", tgt:"Set 1 of 4 \u00b7 tight lie, putter or wedge \u00b7 tap the ring it finished in", balls:5, max:10},
+    {id:"f2", blk:"Around the green", label:"Short-sided \u00b7 10 paces", tc:"2 clubs", bull:"1 club", sgLie:"awk", dist:10, lie:"awk", r1:0.162, r2:0.600, word:"a short-sided pin", tgt:"Set 2 of 4 \u00b7 no green to work with \u00b7 tap the ring it finished in", balls:5, max:10},
+    {id:"f4", blk:"Around the green", label:"Tight lie \u00b7 bare \u00b7 15 paces", tc:"2 clubs", bull:"1 club", sgLie:"tight", dist:15, lie:"tight", r1:0.073, r2:0.416, word:"a bare lie", tgt:"Set 3 of 4 \u00b7 no grass under it \u00b7 tap the ring it finished in", balls:5, max:10},
+    {id:"f3", blk:"Around the green", label:"Into an upslope \u00b7 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"up", dist:20, lie:"good", r1:0.046, r2:0.328, word:"an upslope", tgt:"Set 4 of 4 \u00b7 use the bank \u00b7 tap the ring it finished in", balls:5, max:10}
   ],
   placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"tour players"} },
 
@@ -3116,7 +3141,7 @@ function buildGauntlet(a){
 
   host.appendChild(gtReachTable(a, d));
 
-  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
 
@@ -3185,7 +3210,7 @@ function buildCardSetup(a){
   host.appendChild(acts);
   $("cdBegin").addEventListener("click", cdBegin);
 
-  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   mxStop();
@@ -3271,7 +3296,7 @@ function buildCard(a){
   if(done) host.appendChild(cdStationTable(a, hits));
   else host.appendChild(cdStationList(a, false));
 
-  var nb = notesBlock("sessNotes", "Session notes — what worked · one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   mxStop();
@@ -4519,6 +4544,8 @@ function show(view){
   if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
   $("viewGoals").hidden = view!=="goals";
+  if(view === "goals" && $("buildStamp"))
+    $("buildStamp").textContent = "Version " + BUILD.on + " \u00b7 " + BUILD.note + ".";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
   $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
   $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
@@ -4652,9 +4679,11 @@ function sessionPraise(sess){
   if([25,50,100,200].indexOf(all.length) !== -1)
     return "That is " + all.length + " sessions logged" + (name ? ", " + name : "") + ". Keep going.";
 
-  var bestPrev = 0; prev.forEach(function(s){ if((s.total||0) > bestPrev) bestPrev = s.total||0; });
+  var bestPrev = -1e9; prev.forEach(function(s){ if((s.total||0) > bestPrev) bestPrev = s.total||0; });
   if(prev.length && (sess.total||0) > bestPrev)
-    return "Best " + label + " score yet: " + sess.total + " out of " + sess.max + ".";
+    return isSG(area(sess.areaId))
+      ? "Best " + label + " yet: " + fmtSG(sess.total) + " strokes on the field."
+      : "Best " + label + " score yet: " + sess.total + " out of " + sess.max + ".";
 
   if(sess.metrics && sess.metrics.chsFast){
     var fastPrev = 0;
@@ -4690,8 +4719,12 @@ function sessionPraise(sess){
     return "A clean sweep in compete: " + sess.compete + " out of " + sess.competeMax + ".";
 
   var last = prev.sort(function(x,y){ return x.date < y.date ? -1 : 1; }).slice(-1)[0];
-  if(last && (sess.total||0) > (last.total||0))
-    return "Up " + ((sess.total||0) - (last.total||0)) + " on last time at " + label + ".";
+  if(last && (sess.total||0) > (last.total||0)){
+    var gap = (sess.total||0) - (last.total||0);
+    return isSG(area(sess.areaId))
+      ? "Up " + fmtSG2(gap).replace(/^\+/, "") + " strokes on last time at " + label + "."
+      : "Up " + gap + " on last time at " + label + ".";
+  }
 
   var month = sess.date.slice(0,7);
   var thisMonth = inArea.filter(function(s){ return (s.date||"").slice(0,7) === month; }).length;
@@ -4922,10 +4955,13 @@ function processFor(areaId){
 function areaLive(a){
   var h = sessionsFor(a.id);
   if(!h.length) return "Nothing logged yet.";
-  var best = 0; h.forEach(function(s){ if((s.total||0) > best) best = s.total||0; });
+  var best = -1e9; h.forEach(function(s){ if((s.total||0) > best) best = s.total||0; });
   var last = h[h.length-1];
-  var bits = ["Last " + (last.total||0) + "/" + (last.max||areaMax(a)),
-              "best " + best, h.length + (h.length===1 ? " session" : " sessions")];
+  var bits = isSG(a)
+    ? ["Last " + fmtSG(last.total), "best " + fmtSG(best),
+       h.length + (h.length===1 ? " session" : " sessions")]
+    : ["Last " + (last.total||0) + "/" + (last.max||areaMax(a)),
+       "best " + best, h.length + (h.length===1 ? " session" : " sessions")];
   if(a.id === 10){
     var sr = speedRows();
     if(sr.length){ var pb = 0; sr.forEach(function(x){ if(x.f > pb) pb = x.f; });
@@ -5403,6 +5439,8 @@ function draftProgress(d){
     }
     return ((d.mx && d.mx.hits ? d.mx.hits.length : 0)) + " of " + cdShots(ma) + " shots";
   }
+  var da = area(d.areaId);
+  if(isSG(da)) return fmtSG(d.total) + " strokes over " + (d.balls || 0) + " balls";
   return (d.total||0) + " of " + (d.max||0) + " points scored";
 }
 function renderResume(){
@@ -5829,11 +5867,20 @@ function praiseShot(a, s, call, sh){
     }
   }
   var r1 = (call.r1 != null) ? call.r1 : s.r1, r2 = (call.r2 != null) ? call.r2 : s.r2;
+  /* A hole-out jumps the queue behind a run. It is the rarest thing she can do
+     and the only ball the model prices above a whole stroke, so it gets said in
+     strokes: that is the argument for scoring this way, made one ball at a time. */
+  if(!msg && sh.z === "h" && PRAISE.seen - PRAISE.at >= 3){
+    var hv = isSG(a) ? sgOfShot(s, "h") : null;
+    msg = '<span class="star">\u2605</span><b>Holed it</b><span class="sub">from '+where+
+          (hv != null ? '. Worth '+fmtSG2(hv)+' strokes on the field.' : '.')+'</span>';
+    ms = 3200;
+  }
   if(!msg && r2 != null && PRAISE.seen - PRAISE.at >= 5){   // one shot message in any five balls
-    if(sh.z === "b" && r1 != null && r1 <= 0.12)
+    if((sh.z === "b" || sh.z === "h") && r1 != null && r1 <= 0.12)
       msg = '<b>Inside one club</b><span class="sub">from '+where+
             '. One in '+oddsWord(r1)+' for a tour player.</span>';
-    else if(sh.z !== "b" && r2 <= 0.20)
+    else if(sh.z !== "b" && sh.z !== "h" && r2 <= 0.20)
       msg = '<b>Inside two clubs</b><span class="sub">from '+where+
             '. One in '+oddsWord(r2)+' on the LPGA.</span>';
   }
@@ -6002,6 +6049,167 @@ function betaNodes(m, sd, N){
   for(i=0;i<N;i++) out.push([xs[i], ws[i]/tot]);
   return out;
 }
+/* ============ strokes gained ============================================
+   What a ball was worth, in strokes, against the LPGA field.
+
+   SG = (expected strokes before the shot) - (strokes taken) - (expected
+   strokes after). The field needs one shot plus its expected putts, so
+   before = 1 + base. Holing: taken 1, after 0, so the gain is base itself.
+   Finishing at d: taken 1, after ePutts(d), so the gain is base - ePutts(d).
+   Getting that wrong by a stroke is easy: a hole-out leaves NO putt, not one.
+
+   Three pieces, each sourced rather than fitted to taste:
+
+   1. The putting curve, from the tool's own holing-out rates (4 ft 90%,
+      6 ft 68%, 9 ft 46%, 12 ft 32%), a logistic in log feet. It matches
+      published PGA make rates to within a point at 9 and 10 ft, which is
+      where most of this arithmetic happens. 50% sits at 8.5 ft, not 10.
+
+   2. Greenside proximity, a least squares line through the LPGA table's own
+      five greenside rows: 4.2 ft at 10 yards rising to 14.4 at 50. Straight
+      extrapolation below 10 yards drives proximity to nothing, which is not
+      what happens, so the fit keeps a floor of 2.19 ft.
+
+   3. Lie, as a multiplier on that proximity. These are the one part with no
+      published source: nobody publishes short game proximity by lie, so they
+      are judgement. The bunker and awkward figures check out against the one
+      outside figure I could find (from 20 yards in rough with 10 yards of
+      green, half the tour finishes outside 8 ft; this model says 9.9).
+
+   The bands are holed, 3 ft, 6 ft, 12 ft and past 12, the same at every
+   station because she has to be able to read them off a knotted string. The
+   standard does the varying instead: inside two clubs is worth +0.04 from
+   10 paces off a good lie and +0.42 from a plugged bunker at 15. Fixed rings,
+   varying worth.
+   ---------------------------------------------------------------------- */
+var SG_SIG = 0.559;              /* from the table's own two percentage columns */
+var SG_PA = 5.7309, SG_PB = -2.6573;
+var SG_GA = 2.19, SG_GB = 0.249; /* greenside proximity in feet, per yard */
+var SG_BANDS = [3, 6, 12];
+var SG_LIE = { good:1.00, up:1.20, sand:1.30, tight:1.35, awk:1.55, plug:2.10 };
+
+function sgMake(ft){ return ft < 1 ? 0.995 : 1/(1 + Math.exp(-(SG_PA + SG_PB*Math.log(ft)))); }
+function sgPutts(ft){ return ft < 0.3 ? 1 : 2 - sgMake(ft) + Math.max(0, (ft-20)/200); }
+
+/* quantiles of a standard normal, computed once: the proximity spread is
+   lognormal, so a set's whole distribution is these shifted and scaled */
+var SG_Q = (function(){
+  function ph(z){ return 0.5*(1 + sgErf(z/Math.SQRT2)); }
+  function inv(p){ var lo=-8, hi=8, m; for(var i=0;i<60;i++){ m=(lo+hi)/2; if(ph(m)<p) lo=m; else hi=m; } return m; }
+  var out=[], N=400;
+  for(var i=1;i<=N;i++) out.push(inv((i-0.5)/N));
+  return out;
+})();
+function sgErf(x){
+  var t = 1/(1 + 0.3275911*Math.abs(x));
+  var y = 1 - (((((1.061405429*t - 1.453152027)*t) + 1.421413741)*t - 0.284496736)*t + 0.254829592)*t*Math.exp(-x*x);
+  return x >= 0 ? y : -y;
+}
+/* the field's mean proximity for a set, in feet */
+function sgProx(set){
+  if(!set || set.dist == null) return null;
+  var lie = SG_LIE[set.sgLie] || SG_LIE.good;
+  return (SG_GA + SG_GB*set.dist) * lie;
+}
+var SG_CACHE = {};
+function sgBands(set){
+  var m = sgProx(set); if(m == null) return null;
+  var key = m.toFixed(3);
+  if(SG_CACHE[key]) return SG_CACHE[key];
+  var mu = Math.log(m) - SG_SIG*SG_SIG/2, i, j;
+  var d = SG_Q.map(function(z){ return Math.exp(mu + SG_SIG*z); });
+  var base = 0;
+  for(i=0;i<d.length;i++) base += sgPutts(d[i]);
+  base /= d.length;
+  var cuts = [0.35].concat(SG_BANDS).concat([1e9]), out = { base:base, prox:m, band:[], freq:[] };
+  for(j=0;j<cuts.length-1;j++){
+    var t=0, w=0;
+    for(i=0;i<d.length;i++){ if(d[i] < cuts[j] || d[i] > cuts[j+1]) continue; t += sgPutts(d[i]); w++; }
+    out.band.push(w ? base - t/w : base - sgPutts(Math.min(cuts[j+1], cuts[j]+1.5)));
+    out.freq.push(w/d.length);
+  }
+  SG_CACHE[key] = out;
+  return out;
+}
+/* which band a zone falls in: 0 inside 3 ft, 1 inside 6, 2 inside 12, 3 past 12 */
+var SG_ZONE = { b:0, c:1, q4:2 };
+function sgOfShot(set, z){
+  var B = sgBands(set); if(!B || z == null) return null;
+  if(z === "h") return B.base;                       /* holed: no putt left at all */
+  var i = SG_ZONE[z];
+  if(i == null) i = isIn(z) ? 1 : 3;                 /* old sessions: c or a miss */
+  return B.band[i];
+}
+/* ---- a session's strokes gained ----------------------------------------
+   The score is the sum of what every ball was worth, so inside two clubs from
+   10 paces and the same ring out of a plugged bunker are not the same score.
+
+   Every set is walked, retired ones included: a session logged against a set
+   that has since gone still scores, which is the whole reason those sets keep
+   their numbers. Balls logged before the four-club ring existed price on their
+   own terms, because sgOfShot reads the zone that was stored rather than the
+   rings on the screen today. */
+function isSG(a){ return !!(a && a.sg); }
+function sgSetSum(s, list){
+  if(!list) return null;
+  var sum = 0, n = 0;
+  list.forEach(function(sh){
+    if(!sh || sh.z == null) return;
+    var v = sgOfShot(s, sh.z);
+    if(v == null) return;
+    sum += v; n++;
+  });
+  return n ? {sg:sum, balls:n} : null;
+}
+function sgSession(a, sess){
+  if(!isSG(a) || !sess || !sess.shots) return null;
+  var sg = 0, n = 0;
+  (a.sets || []).forEach(function(s){
+    var r = sgSetSum(s, sess.shots[s.id]);
+    if(r){ sg += r.sg; n += r.balls; }
+  });
+  return n ? {sg:sg, balls:n} : null;
+}
+/* Holing every ball in the drill. Unreachable, and not the number she is chasing:
+   zero is, because zero is the LPGA field. It is here so a bar has somewhere to
+   fill to and a chart has a top. */
+function sgAreaCeil(a){
+  var t = 0;
+  liveSets(a).forEach(function(s){
+    var B = sgBands(s); if(!B) return;
+    t += ballsIn(s) * B.base;
+  });
+  return Math.round(t*10)/10;
+}
+/* How many balls a saved session actually has logged. Sessions from before the
+   strokes score existed do not carry the count, so it is worked out rather than
+   read, and a part-finished session reads its own number rather than 75. */
+function sgBallsLogged(sess){
+  var n = 0, k;
+  if(sess && sess.shots) for(k in sess.shots){
+    (sess.shots[k] || []).forEach(function(x){ if(x && x.z != null) n++; });
+  }
+  return n;
+}
+function sgAreaBalls(a){
+  var t = 0; liveSets(a).forEach(function(s){ t += ballsIn(s); }); return t;
+}
+/* Strokes read as strokes: a sign always, one decimal always, and a real minus
+   sign rather than a hyphen, so −0.4 and 0.4 cannot be mistaken for each other
+   at arm's length on a phone. */
+function fmtSG(v){
+  var x = Math.round((v||0)*10)/10;
+  return (x > 0 ? "+" : x < 0 ? "\u2212" : "") + Math.abs(x).toFixed(1);
+}
+function fmtSG2(v){
+  var x = Math.round((v||0)*100)/100;
+  return (x > 0 ? "+" : x < 0 ? "\u2212" : "") + Math.abs(x).toFixed(2);
+}
+/* One place that knows how an area's score is written, so a decimal never leaks
+   into a place that was built for a count. */
+function fmtScore(a, v){ return isSG(a) ? fmtSG(v) : String(v || 0); }
+function scoreOf(sess){ return sess ? (sess.total || 0) : 0; }
+
 function mixedBinom(n, m, sd){
   var s = m*(1-m)/(sd*sd) - 1, a = m*s, b = (1-m)*s, out = [], k;
   var base = lgammaJS(a) + lgammaJS(b) - lgammaJS(a+b);
@@ -6118,7 +6326,7 @@ function testSplit(a, sess){
         if(dp === "short") out.missShort++;
         else if(dp === "long") out.missLong++;
       }
-      if(x.z === "b") out.bull++;
+      if(x.z === "b" || x.z === "h") out.bull++;
     });
   });
   return out;
@@ -6197,14 +6405,27 @@ function leagueTable(count, n, score){
     var mine = i === mineAt;
     return '<tr'+(mine ? ' class="mine"' : '')+'>'+
       '<td class="lgname">'+r.lab+'</td>'+
-      '<td class="lgscore">'+(r.need ? r.need + (r.to === 1 ? "+" : "") : "\u2013")+'</td>'+
+      /* need of nought means any score reaches this band. It used to print an
+         en dash, which read as a broken cell rather than as "no bar to clear". */
+      '<td class="lgscore">'+(r.need == null ? "\u2013"
+                            : r.need === 0 ? "any"
+                            : r.need + (r.to === 1 ? "+" : ""))+'</td>'+
       '<td class="lgplace">'+(mine ? ordinalPlace(place) : "")+'</td></tr>';
   }).join("") + '</tbody></table>';
   var gap = next ? (next.need - score) : 0;
-  var foot = next
-    ? '<p class="plnote">'+gap+' more '+(gap === 1 ? 'point' : 'points')+
-      ' to reach '+next.lab.toLowerCase()+'.</p>'
-    : '<p class="plnote">Nothing above this. That is the top of the table.</p>';
+  /* Past the top band the table used to stop dead, so a very good session and an
+     extraordinary one read the same. Say how far clear she is instead, which keeps
+     a reason to hit the next one well. */
+  var foot;
+  if(next){
+    foot = '<p class="plnote">'+gap+' more '+(gap === 1 ? 'point' : 'points')+
+           ' to reach '+next.lab.toLowerCase()+'.</p>';
+  } else {
+    var over = rows[0] && rows[0].need != null ? score - rows[0].need : 0;
+    foot = '<p class="plnote">'+(over > 0
+      ? 'Top of the table, and '+over+' clear of what it takes to get there.'
+      : 'Top of the table, on the mark exactly.')+'</p>';
+  }
   return html + foot;
 }
 
@@ -6270,6 +6491,7 @@ function placingBlock(a, sess){
     (full
       ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
         leagueTable(tab.count, spec.n, t.in_)+
+        fieldNote(a, spec)+
         (spec.bullP ? '<p class="plread">Inside one club, <b>'+
           ordinalPlace(tablesFor({n:spec.n, p:spec.bullP, sd:spec.bullSd || 0.035}).count[Math.min(spec.n, t.bull)])+
           '</b> of the same hundred.</p>' : '')+
@@ -6292,13 +6514,29 @@ function placingBlock(a, sess){
             '<p class="plnote">'+rowNote(tg)+'</p>' : '')+
     '</div>';
 }
+/* The hundred she is measured against, named. Every rate in the tool is built from
+   LPGA figures, and the deck those come from quotes its benchmarks as top ten and
+   top hundred, so the field is the LPGA top hundred rather than a vague "tour
+   player". Saying so turns the placing from an opinion into a claim she can check. */
+var FIELD_MARK = {
+  10: "LPGA top 100: driving accuracy over 71 per cent, distance over 254 yards",
+  11: "LPGA top 100: greens in regulation over 67 per cent",
+  2:  "LPGA top 100: greens in regulation over 67 per cent",
+  3:  "LPGA top 100: up and down over 50 per cent, sand saves over 40 per cent",
+  4:  "LPGA top 100: under 30 putts a round"
+};
+function fieldNote(a, spec){
+  var mark = a && FIELD_MARK[a.id];
+  return '<p class="plnote">The hundred are the LPGA top hundred'+
+    (mark ? '. '+mark : '')+'.</p>';
+}
 function runLine(a, sess){
   var r = runStats(a, sess);
   if(!r.best) return "";
   var ever = bestRunEver(a.id, sess.id);
   return '<div class="runline"><span class="eyebrow">The run</span>'+
     '<p><b>'+r.best+' in a row</b> was the best of the session'+
-    (r.best > ever ? ' \u2014 and the best on ' + areaWord(a) + ' you have logged.'
+    (r.best > ever ? ', and the best on ' + areaWord(a) + ' you have logged.'
                    : (ever ? ' \u00b7 your best on ' + areaWord(a) + ' is ' + ever + '.' : '.'))+
     '</p></div>';
 }
@@ -6324,10 +6562,15 @@ function modeLabel(a, k){
   return heights ? "Heights" : "Windows";
 }
 function modeStats(a, sess){
-  var out = {};
-  MODE_ORDER.forEach(function(k){ out[k] = {v:0, m:0}; });
+  var out = {}, sg = isSG(a);
+  MODE_ORDER.forEach(function(k){ out[k] = {v:0, m:0, n:0}; });
   a.sets.forEach(function(s){
     var k = modeOf(a, s);
+    if(sg){
+      var r = sgSetSum(s, (sess.shots||{})[s.id]);
+      if(r){ out[k].v += r.sg; out[k].n += r.balls; out[k].m += r.balls; }
+      return;
+    }
     setParts(s).forEach(function(pt){
       out[k].v += (sess.scores && sess.scores[pt.key]) || 0;
       out[k].m += pt.max;
@@ -6338,10 +6581,18 @@ function modeStats(a, sess){
   return out;
 }
 function modeBlock(a, sess){
-  var st = modeStats(a, sess), out = "";
+  var st = modeStats(a, sess), out = "", sg = isSG(a);
   MODE_ORDER.forEach(function(k){
     var e = st[k];
     if(!e.m) return;
+    /* Compete is still a count even where the drill is not, so it keeps its
+       percentage while the rest read in strokes a ball. */
+    if(sg && k !== "compete"){
+      out += '<div class="mtile"><b>'+fmtSG(e.v)+'</b>'+
+             '<span>'+modeLabel(a, k)+'</span><span class="mn">'+
+             fmtSG2(e.v/e.n)+' a ball</span></div>';
+      return;
+    }
     out += '<div class="mtile"><b>'+Math.round(e.v/e.m*100)+'%</b>'+
            '<span>'+modeLabel(a, k)+'</span><span class="mn">'+e.v+' of '+e.m+'</span></div>';
   });
@@ -6366,18 +6617,40 @@ function summaryBlock(a, sess){
     if(a.quads) ["st","qLR","qSR","qSL","qLL"].forEach(function(z){
       if(ids.indexOf(z) === -1) ids.unshift(z);
     });
+    /* The four-club ring is a zone like any other on the picture. Holed is not:
+       it gets the dot's own count, so it is left out of the labelled ids and
+       named in the line underneath instead. */
+    if(isSG(a) && ids.indexOf("q4") === -1) ids.unshift("q4");
     var heatTc = "";
     (a.sets || []).forEach(function(x){ if(!heatTc && x.tc && /ft$/.test(x.tc)) heatTc = x.tc; });
     var svg = heatSvg(shapeSvg(a, {tc:heatTc}, false), ids, pool.t, pool.n, function(id){
+      /* On the short game rings the readings run down the axis the numbers do not
+         use, fanned a little so a percentage and the count under it never sit on
+         the next ring's percentage. */
+      if(isSG(a)){
+        if(id === "b")  return polar(ROSE_CX, ROSE_CY, (SGR.h+SGR.b)/2, 180);
+        if(id === "c")  return polar(ROSE_CX, ROSE_CY, (SGR.b+SGR.c)/2, 202);
+        if(id === "q4") return polar(ROSE_CX, ROSE_CY, (SGR.c+SGR.q4)/2, 158);
+        return shapeMark(a, id, 0);
+      }
       if(id === "b") return [ROSE_CX, ROSE_CY - 26];
       if(id === "c" && areaShape(a) !== "corridor") return [ROSE_CX, ROSE_CY + 40];
       return shapeMark(a, id, 0);
     });
     var inN = (pool.t.c||0) + (pool.t.b||0) + (areaShape(a) === "corridor" ? (pool.t.short||0) : 0);
     if(a.quads) ["st","qLR","qSR","qSL","qLL"].forEach(function(z){ inN += (pool.t[z]||0); });
-    html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
-      'In the target ' + pctText(inN, pool.n) + ' of the time' +
-      (pool.t.b ? ' · inside the bullseye ' + pctText(pool.t.b, pool.n) : '') + '.');
+    if(isSG(a)){
+      svg = svg.replace('<g class="marks">', '<g class="marks">' + holedBadge(pool.t.h || 0, HOLED_ROSE));
+      var sgIn = inN + (pool.t.h || 0);
+      html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
+        'Inside two clubs ' + pctText(sgIn, pool.n) + ' of the time · inside one ' +
+        pctText((pool.t.b||0) + (pool.t.h||0), pool.n) +
+        (pool.t.h ? ' · holed ' + pool.t.h : '') + '.');
+    } else {
+      html += sumCard('Where every ball finished · '+pool.n+' balls', svg,
+        'In the target ' + pctText(inN, pool.n) + ' of the time' +
+        (pool.t.b ? ' · inside the bullseye ' + pctText(pool.t.b, pool.n) : '') + '.');
+    }
   }
 
   /* The clock is drawn straight, as if every putt came from the bottom, so a session
@@ -6424,8 +6697,17 @@ function summaryBlock(a, sess){
 }
 
 function renderReview(host, a){
-  var d = state.draft, rows = "";
+  var d = state.draft, rows = "", sg = isSG(a);
   a.sets.forEach(function(s, i){
+    /* On strokes a set is one line, because the strokes do not split into parts,
+       and the number beside it is what those five balls were worth. */
+    if(sg){
+      var r = sgSetSum(s, (d.shots||{})[s.id]);
+      if(!r) return;
+      rows += '<div class="rvrow'+(r.sg < 0 ? ' miss' : '')+'" data-go="'+(i+1)+'">'+
+              '<span>'+s.label+'</span><b>'+fmtSG2(r.sg)+'</b></div>';
+      return;
+    }
     setParts(s).forEach(function(pt){
       var v = d.scores[pt.key]||0;
       rows += '<div class="rvrow'+(v===0?' miss':'')+'" data-go="'+(i+1)+'">'+
@@ -6435,7 +6717,9 @@ function renderReview(host, a){
   var sum = summaryBlock(a, d);
   host.innerHTML = (sum ? sum.innerHTML : "") + '<div class="rvlist">'+rows+'</div>'+
     '<div class="rvtot"><span class="eyebrow">Session score</span>'+
-    '<span class="f">'+(d.total||0)+' <span style="color:var(--muted);font-size:16px">/ '+d.max+'</span></span></div>'+
+    (isSG(a)
+      ? '<span class="f">'+fmtSG(d.total)+' <span style="color:var(--muted);font-size:16px">strokes on the field</span></span></div>'
+      : '<span class="f">'+(d.total||0)+' <span style="color:var(--muted);font-size:16px">/ '+d.max+'</span></span></div>')+
     '<p class="note">Tap any line to go back and change it.</p>';
   var tp = tourPanel(a);
   if(tp) host.appendChild(tp);
@@ -6467,7 +6751,7 @@ function buildSessionList(a, last){
     cw.appendChild(competeBlock(a));
     cg.appendChild(cw); host.appendChild(cg);
   }
-  var nb = notesBlock("sessNotes", "Session notes \u2014 what worked \u00b7 one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes \u00b7 what worked \u00b7 one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   var ce = document.createElement("div"); ce.id = "sessChecksEnd"; ce.style.marginTop = "16px";
@@ -6541,6 +6825,10 @@ ZONE_LABEL.b = "In the bullseye";
 ZONE_LABEL.qLR = "In, long right";  ZONE_LABEL.qSR = "In, short right";
 ZONE_LABEL.qSL = "In, short left";  ZONE_LABEL.qLL = "In, long left";
 ZONE_LABEL.st  = "Stone dead";
+/* The short game's own two: the hole itself, and the ring between two clubs and
+   four. Everything past four clubs keeps the eight directional names. */
+ZONE_LABEL.h  = "Holed";
+ZONE_LABEL.q4 = "Inside four clubs";
 var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
                  g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
 for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
@@ -6551,7 +6839,11 @@ var QUAD_IDS = {qLR:1, qSR:1, qSL:1, qLL:1, st:1};
    scored, which is the whole point: splitting the target changed where the ball
    is recorded, never what it is worth. Old sessions stored "c" or "b" and still
    pass here untouched, so nothing anyone has already hit is re-scored. */
-function isIn(z){ return z === "c" || z === "b" || !!QUAD_IDS[z]; }
+/* "h" joins them: holed is inside one club by definition, so it passes the count
+   test the placing is built on. "q4" does not, and must not: four clubs is outside
+   two, so the four-club ring is a miss for the count and a number for the strokes.
+   That is the one place the two scores disagree, and they are meant to. */
+function isIn(z){ return z === "c" || z === "b" || z === "h" || !!QUAD_IDS[z]; }
 function isQuad(z){ return !!QUAD_IDS[z]; }
 /* Short or long, for the bias picture. Null where it was never recorded, which
    is every ball hit before the target was split. */
@@ -6608,6 +6900,28 @@ function pinAt(cx, cy, h){
          '<ellipse class="hole" cx="'+cx+'" cy="'+(cy+3)+'" rx="5" ry="2.4"></ellipse></g>';
 }
 var ROSE_BULL = 31;
+/* The short game's five bands: the hole, then one, two and four clubs, then
+   everything past. Plain stacked circles rather than annuli, drawn largest first
+   so the smaller one always paints over it and a tap lands on the ring the thumb
+   is actually over. A real annulus needs two half-arcs and getting that wrong
+   draws nothing at all, which is a bug worth designing out rather than fixing. */
+var SGR = { h:16, b:40, c:66, q4:100 };
+/* Feet to picture radius, so the field's average can be drawn in the same space
+   as the rings. Not to scale and it cannot be: one club inside a 12 ft circle is
+   a few pixels here. The rings carry the meaning; this only has to put the dashed
+   line in the right band. Past four clubs it runs out to the rough at 24 ft. */
+var SG_RING_FT = [[0, SGR.h], [3, SGR.b], [6, SGR.c], [12, SGR.q4], [24, ROSE_R]];
+function sgRingR(ft){
+  var T = SG_RING_FT, i;
+  if(!(ft > T[0][0])) return T[0][1];
+  for(i=0;i<T.length-1;i++){
+    if(ft <= T[i+1][0]){
+      var f = (ft - T[i][0]) / (T[i+1][0] - T[i][0]);
+      return T[i][1] + f*(T[i+1][1] - T[i][1]);
+    }
+  }
+  return ROSE_R;
+}
 /* The four quadrants of the scoring circle, in the same vocabulary as the ring
    outside them, so "short left" means the same thing whether she scored or not.
    Angles run clockwise from straight up, matching polar() and ZONES. */
@@ -6643,17 +6957,20 @@ function ydRadius(tc){
   return m ? Math.round(parseFloat(m[1]) / 3) : 0;
 }
 
-function roseSvg(centreLabel, tappable, bull, quads, dist){
+function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
   var CX = ROSE_CX, CY = ROSE_CY, out = "";
   var yd = ydRadius(centreLabel);
+  /* On the short game target the directional ring starts where the last scoring
+     ring ends, so everything outside four clubs still says which way it went. */
+  var inR = sgSet ? SGR.q4 : ROSE_IN;
   out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
   ZONES.forEach(function(z, i){
-    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
-           (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+'"' : '')+'></path>';
-    var p = polar(CX, CY, 114, i*45);
+    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,inR,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+', past four clubs"' : '')+'></path>';
+    var p = polar(CX, CY, 118, i*45);
     out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
   });
-  out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
+  if(!sgSet) out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
   var sr = quads ? stiffR(centreLabel) : 0;
   if(!sr) quads = false;          // no circle to split, so leave the picture alone
   if(quads){
@@ -6670,6 +6987,30 @@ function roseSvg(centreLabel, tappable, bull, quads, dist){
        they cannot muddy the short-and-long picture. */
     out += '<circle class="rz rst" data-z="st" cx="'+CX+'" cy="'+CY+'" r="'+sr+'"'+
            (tappable ? ' role="button" tabindex="0" aria-label="Stone dead, inside a flagstick"' : '')+'></circle>';
+  } else if(sgSet){
+    [["q4", SGR.q4, "Inside four clubs"],
+     ["c",  SGR.c,  "Inside two clubs"],
+     ["b",  SGR.b,  "Inside one club"]].forEach(function(r){
+      out += '<circle class="rz sgr sgr-'+r[0]+'" data-z="'+r[0]+'" cx="'+CX+'" cy="'+CY+'" r="'+r[1]+'"'+
+             (tappable ? ' role="button" tabindex="0" aria-label="'+r[2]+'"' : '')+'></circle>';
+    });
+    /* The field's average, drawn where it falls. This is the argument for varying
+       worth made as a picture: from the collar the dashed line sits inside one
+       club, from a plugged bunker it sits outside four, and she can see which ring
+       she has to beat before she plays the shot. */
+    var fp = sgProx(sgSet);
+    if(fp) out += '<circle class="sgfield" cx="'+CX+'" cy="'+CY+'" r="'+f1(sgRingR(fp))+'"></circle>';
+    /* Holed is a small dark dot with a count in it, the way the putting clock does
+       it. A hole-out has no "where it finished" to draw. */
+    out += '<circle class="rz sgh" data-z="h" cx="'+CX+'" cy="'+CY+'" r="'+SGR.h+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="Holed"' : '')+'></circle>';
+    /* The rings named straight up, which is the one direction no ball marker
+       uses, so a number and a marker can never land on each other. */
+    out += '<g class="sglab">'+
+      '<text x="'+CX+'" y="'+(CY - (SGR.h+SGR.b)/2 + 5)+'">1</text>'+
+      '<text x="'+CX+'" y="'+(CY - (SGR.b+SGR.c)/2 + 5)+'">2</text>'+
+      '<text x="'+CX+'" y="'+(CY - (SGR.c+SGR.q4)/2 + 5)+'">4</text>'+
+      '</g>';
   } else {
     out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
            (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
@@ -6709,12 +7050,15 @@ function roseSvg(centreLabel, tappable, bull, quads, dist){
       '<path class="gtip" d="M'+(CX+ROSE_IN+4)+' '+ty+' l-6 -4 v8 z"></path>'+
       '</g>';
   }
-  out += pinAt(CX, CY - 3, quads ? 20 : 30);   // the hole itself lands on the centre
+  // on the short game target the dot IS the hole, so a flag beside it is a second one
+  if(!sgSet) out += pinAt(CX, CY - 3, quads ? 20 : 30);
   // both numbers live in the pill, where no marker can land on them
-  var cap = quads
-    ? (yd*2) + 'y / steps wide  \u00b7  middle 1 club'
-    : (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
-  var capW = quads ? 250 : (bull ? 208 : 128);
+  var cap = sgSet
+    ? 'clubs from the hole  \u00b7  dashed = the field'
+    : quads
+      ? (yd*2) + 'y / steps wide  \u00b7  middle 1 club'
+      : (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
+  var capW = sgSet ? 262 : quads ? 250 : (bull ? 208 : 128);
   out += '<g class="caption"><rect class="cappill" x="'+(150-capW/2)+'" y="3" width="'+capW+'" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
   return '<svg viewBox="0 0 '+ROSE_W+' '+ROSE_H+'" class="rose" role="group" aria-label="Where the ball finished">'+
@@ -6724,7 +7068,34 @@ function roseSvg(centreLabel, tappable, bull, quads, dist){
    half to themselves, so a busy zone never writes over its own name. */
 var ROSE_SPREAD = [[0,81],[-17,75],[17,75],[-17,89],[17,89],[0,93],[-9,82],[9,82],[0,76],[0,87]];
 var CENTRE_ANG = [180, 120, 240, 90, 270, 150, 210];
-function roseMark(zoneId, n){
+/* Markers on the short game rings sit at mid-band and keep away from straight up,
+   which belongs to the ring numbers. */
+/* Markers keep to the lower two thirds of the circle, sixty degrees apart, which
+   is the closest five can sit at the inner ring without touching. Straight up is
+   left empty for the ring numbers, and each band is turned a little off the one
+   inside it so the first ball of each does not stack on one line. */
+var SG_ANG = [180, 240, 120, 300, 60, 210, 150, 270, 90, 165];
+var SG_TURN = { b:0, c:20, q4:-22 };
+function sgBandR(zoneId){
+  if(zoneId === "b")  return (SGR.h + SGR.b)/2;
+  if(zoneId === "c")  return (SGR.b + SGR.c)/2;
+  if(zoneId === "q4") return (SGR.c + SGR.q4)/2;
+  return 0;
+}
+function roseMark(zoneId, n, sg){
+  if(sg){
+    var r = sgBandR(zoneId);
+    if(r) return polar(ROSE_CX, ROSE_CY, r,
+                       (SG_TURN[zoneId] || 0) + SG_ANG[n % SG_ANG.length]);
+    /* past four clubs: the outer ring, whose markers keep to its inner half so
+       the direction labels beyond them stay readable */
+    var oi = zoneIndex(zoneId);
+    if(oi >= 0){
+      var om = [[0,112],[-14,107],[14,107],[-14,117],[14,117],[0,103],[-7,112],[7,112],[0,120],[0,109]][n % 10];
+      return polar(ROSE_CX, ROSE_CY, om[1], oi*45 + om[0]);
+    }
+    return [ROSE_CX, ROSE_CY];
+  }
   if(zoneId==="b") return polar(ROSE_CX, ROSE_CY, 15, CENTRE_ANG[n % CENTRE_ANG.length]);
   if(zoneId==="st") return polar(ROSE_CX, ROSE_CY, 9, CENTRE_ANG[n % CENTRE_ANG.length]);
   for(var q=0;q<QUADS.length;q++){
@@ -6860,7 +7231,8 @@ function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
-  return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist);
+  return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist,
+                 isSG(a) ? set : null);
 }
 function markR(a){
   var sh = areaShape(a);
@@ -6870,7 +7242,7 @@ function shapeMark(a, zoneId, n, st){
   var sh = areaShape(a);
   if(sh === "corridor") return corrMark(zoneId, n);
   if(sh === "clock") return clockMark(zoneId, n, st);
-  return roseMark(zoneId, n);
+  return roseMark(zoneId, n, isSG(a));
 }
 function shapeZones(a){
   var sh = areaShape(a);
@@ -7017,11 +7389,15 @@ function slopeAsk(kind){
   return kind === "lag" ? "Which way does the ladder run?" : "Which station is the low side?";
 }
 
-/* A holed putt does not get a marker: the hole itself counts them, in white. */
-function holedBadge(n){
+/* A holed shot does not get a marker: the hole itself counts them, in white. The
+   short game target borrows it, which is what David asked for and is also the only
+   thing that fits: a 16 px dot has room for a number and not for five balls. */
+var HOLED_ROSE = {cx:ROSE_CX, cy:ROSE_CY, r:SGR.h, dy:5, sm:true};
+function holedBadge(n, K){
   if(!n) return "";
-  return '<g class="choled"><circle cx="'+CLOCK.cx+'" cy="'+CLOCK.cy+'" r="17"></circle>'+
-         '<text x="'+CLOCK.cx+'" y="'+(CLOCK.cy+6)+'">'+n+'</text></g>';
+  K = K || {cx:CLOCK.cx, cy:CLOCK.cy, r:17, dy:6};
+  return '<g class="choled'+(K.sm ? " sm" : "")+'"><circle cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.r+'"></circle>'+
+         '<text x="'+K.cx+'" y="'+(K.cy+K.dy)+'">'+n+'</text></g>';
 }
 var CLOCK_SPREAD = [[0,25],[180,25],[90,25],[270,25],[45,25],[225,25],[135,25],[315,25]];
 var CLOCK_COLS = [-36,-12,12,36], CLOCK_RINGS = [56,78];
@@ -7241,7 +7617,7 @@ function tallyShots(calls, shots){
     var c = calls[i] || {};
     if(c.kind === "w" && sh.w === c.win) w++;
     // where there are two rings the inner one is worth both points
-    if(shotPoint(c, sh)) t += (c.two && sh.z === "b") ? 2 : 1;
+    if(shotPoint(c, sh)) t += (c.two && (sh.z === "b" || sh.z === "h")) ? 2 : 1;
   });
   return {w:w, t:t, total:w+t};
 }
@@ -7344,17 +7720,19 @@ function shotRow(a, s, last, cfg){
   /* On the clock the picture turns with the station, so every ball already logged is
      drawn in the frame on the screen now: left still means left as you stood over it. */
   function targetMarks(){
-    var seen = {}, out = "", st = call().st, holed = 0, isClock = areaShape(a) === "clock";
+    var seen = {}, out = "", st = call().st, holed = 0,
+        isClock = areaShape(a) === "clock", sg = isSG(a);
     shots.forEach(function(x, i){
       if(!x || x.z == null) return;
       if(isClock && isIn(x.z)){ holed++; return; }
+      if(sg && x.z === "h"){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = shapeMark(a, x.z, n, st);
       out += '<g class="mk'+(inFor(calls[i], x.z)?" hit":"")+(i===cur?" now":"")+'">'+
              '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+markR(a)+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
-    return out + holedBadge(holed);
+    return out + (isClock ? holedBadge(holed) : holedBadge(holed, HOLED_ROSE));
   }
   function lagMarks(){
     var seen = {}, out = "";
@@ -7463,6 +7841,16 @@ function shotRow(a, s, last, cfg){
     }
 
     var sc = tallyShots(calls, shots);
+    /* On strokes the points out of ten say nothing she can use, so the set line
+       carries the count she can see on the picture and what those balls were
+       worth. Compete keeps its own count either way. */
+    if(!cfg && isSG(a)){
+      var nIn = 0, nLog = 0;
+      shots.forEach(function(x){ if(x && x.z != null){ nLog++; if(isIn(x.z)) nIn++; } });
+      var r = sgSetSum(s, shots);
+      tally.innerHTML = '<span>Inside two clubs <b>'+nIn+'</b>/'+nLog+'</span>'+
+                        '<span>Strokes <b>'+fmtSG2(r ? r.sg : 0)+'</b></span>';
+    } else
     tally.innerHTML = cfg
       ? '<span>Compete <b>'+sc.total+'</b>/'+cfg.max+'</span>'
       : (anyWindow
@@ -7617,7 +8005,7 @@ var COURSE_RULES = [
   ["Manage the course", ["Aggressive swing, conservative target","Default to the fat of the green",
     "Never short-side yourself","Take enough club","How do I avoid a double"]],
   ["Get your head right", ["It's OK to make mistakes","Target and shot shape, not mechanics",
-    "One shot at a time","Control the controllables","Be your own caddie \u2014 commit"]]
+    "One shot at a time","Control the controllables","Be your own caddie, commit"]]
 ];
 /* Targets and swing checks are three bullets. Anything stored as the old single
    string is split on the middle dot so nothing already saved is lost. */
@@ -7861,9 +8249,26 @@ function updateTotal(){
   if(!d.scores) d.scores = {};
   var t = 0; a.sets.forEach(function(s){ setParts(s).forEach(function(p){ t += (d.scores[p.key]||0); }); });
   d.total = t;
-  $("totFig").textContent = String(t);
-  $("totOf").textContent = "/ " + d.max;
-  $("totVs").innerHTML = "";
+  /* The short game keeps the per-set counts in d.scores, because the placing and
+     the review rows are built on them, but the SCORE is the strokes. It is worked
+     out from the taps every time rather than accumulated, so undoing a ball takes
+     its worth back off. */
+  if(isSG(a)){
+    var sgr = sgSession(a, d) || {sg:0, balls:0};
+    d.total = Math.round(sgr.sg*100)/100;
+    d.max = sgAreaCeil(a);
+    d.balls = sgr.balls;
+    $("totFig").textContent = fmtSG(sgr.sg);
+    $("totOf").textContent = "strokes";
+    /* The bar is one line on a phone. Anything longer than a count wraps into
+       four lines and shoves the Next button off the screen, which is how it
+       first came out. What the number MEANS belongs in the explainer. */
+    $("totVs").innerHTML = sgr.balls ? sgr.balls + "/" + sgAreaBalls(a) : "";
+  } else {
+    $("totFig").textContent = String(t);
+    $("totOf").textContent = "/ " + d.max;
+    $("totVs").innerHTML = "";
+  }
   renderRun();
   $("saveBtn").textContent = "Save session";
   $("saveBtn").disabled = false;
@@ -8040,7 +8445,7 @@ function buildGymList(g, last){
     b.ex.forEach(function(e){ list.appendChild(exRow(e, last)); });
     grp.appendChild(list); host.appendChild(grp);
   });
-  var nb = notesBlock("gymNotes", "Session notes — what moved well · what to load next time");
+  var nb = notesBlock("gymNotes", "Session notes · what moved well · what to load next time");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   renderPrep();
@@ -8113,7 +8518,7 @@ function repNote(e, reps){
 function rampSpec(e, load){
   if(!e.ramp || !e.load) return [];
   return e.ramp.map(function(r){
-    return { top: (load ? kgText(roundKit(load*r[0], e.kit, load)) + " " + (e.unit||"kg") : "\u2014"),
+    return { top: (load ? kgText(roundKit(load*r[0], e.kit, load)) + " " + (e.unit||"kg") : "\u2013"),
              sub: repNote(e, r[1]), pct: Math.round(r[0]*100)+"%" };
   });
 }
@@ -8159,7 +8564,7 @@ function exRow(e, last){
     var lf = document.createElement("div"); lf.className="loadf";
     var ls = document.createElement("span"); ls.textContent = "Working " + (e.unit||"kg");
     var li = document.createElement("input");
-    li.type="number"; li.min="0"; li.step="0.5"; li.inputMode="decimal"; li.placeholder="—";
+    li.type="number"; li.min="0"; li.step="0.5"; li.inputMode="decimal"; li.placeholder="–";
     li.setAttribute("aria-label", e.name+" working load in "+(e.unit||"kg"));
     if(lv && lv.load) li.placeholder = String(lv.load);
     if(d.load != null) li.value = String(d.load);
@@ -8221,7 +8626,7 @@ function exRow(e, last){
     var sr = document.createElement("div"); sr.className="srow";
     sr.innerHTML = '<span class="slab">'+(warm.length ? "Working × "+e.sets : "Sets × "+e.sets)+'</span>';
     var sb = document.createElement("div"); sb.className="sboxes";
-    var topLine = e.load ? ((eff != null ? kgText(eff) : "—") + " " + (e.unit||"kg")) : repNote(e, e.tgt);
+    var topLine = e.load ? ((eff != null ? kgText(eff) : "–") + " " + (e.unit||"kg")) : repNote(e, e.tgt);
     var subLine = e.load ? repNote(e, e.tgt) : "";
     for(var i=0;i<e.sets;i++) sb.appendChild(setBox(topLine, subLine));
     sr.appendChild(sb); grid.appendChild(sr);
@@ -8258,7 +8663,7 @@ function isReady(e){
 function markReady(scope, e){
   var host = scope.querySelector ? scope.querySelector('[data-flag]') : null;
   if(!host) return;
-  host.innerHTML = (e && isReady(e)) ? '<span class="ready">Earned it — add a little load next time</span>' : "";
+  host.innerHTML = (e && isReady(e)) ? '<span class="ready">Earned it. Add a little load next time</span>' : "";
 }
 function clearRest(){
   if(state.restTimer){ clearInterval(state.restTimer); state.restTimer = null; }
@@ -8271,7 +8676,7 @@ function startRest(btn, secs){
     if(left <= 0){
       clearRest();
       btn.setAttribute("data-done", "1");
-      btn.textContent = "\u2713 Rested \u2014 next";
+      btn.textContent = "\u2713 Rested, next";
       return;
     }
     var m = Math.floor(left/60), s = left % 60;
@@ -8377,32 +8782,46 @@ function saveCurrent(){
 }
 
 /* ---------- history ---------- */
-function lineChart(sessions, max, label){
+function lineChart(sessions, max, label, sg){
+  /* Strokes carry a sign, so both margins have to hold one more character than a
+     count does: without it the minus on the bottom tick falls off the left edge
+     of the picture and a score reads as its own opposite. */
   var w=560, h=150, l=34, r=44, tp=12, bt=24;
+  if(sg){ l=48; r=58; }
   var vals = sessions.map(function(s){ return s.total; });
   var hi = Math.max(max, Math.max.apply(null, vals));
   var lo = 0;
+  /* In strokes the interesting line is nought, not the ceiling: nought is the
+     LPGA field. So the scale is the data with the field in it either way, rounded
+     out to whole strokes, and the dashed line moves from "max" to the field. */
+  if(sg){
+    var dmin = Math.min.apply(null, vals), dmax = Math.max.apply(null, vals);
+    hi = Math.max(2, Math.ceil(Math.max(dmax, 0) + 1));
+    lo = Math.min(-2, Math.floor(Math.min(dmin, 0) - 1));
+    max = 0;
+  }
+  function fmt(v){ return sg ? fmtSG(v) : String(v); }
   var n = sessions.length;
   function X(i){ return n===1 ? l+(w-l-r)/2 : l + i*(w-l-r)/(n-1); }
   function Y(v){ return tp + (1-(v-lo)/(hi-lo))*(h-tp-bt); }
-  var grid="", ticks=[0, Math.round(hi/2), hi];
+  var grid="", ticks = sg ? [lo, 0, hi] : [0, Math.round(hi/2), hi];
   ticks.forEach(function(t){
     grid += '<line x1="'+l+'" x2="'+(w-r)+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>'+
-            '<text x="'+(l-7)+'" y="'+(Y(t)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">'+t+'</text>';
+            '<text x="'+(l-7)+'" y="'+(Y(t)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">'+fmt(t)+'</text>';
   });
   var pts = sessions.map(function(s,i){ return X(i).toFixed(1)+","+Y(s.total).toFixed(1); });
   var dots = sessions.map(function(s,i){
     return '<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(s.total).toFixed(1)+'" r="4" fill="var(--accent-fill)" stroke="var(--surface)" stroke-width="2">'+
-           '<title>'+fmtDate(s.date)+" · "+s.total+" of "+s.max+'</title></circle>';
+           '<title>'+fmtDate(s.date)+" · "+(sg ? fmt(s.total)+" strokes" : s.total+" of "+s.max)+'</title></circle>';
   }).join("");
   var lastX = X(n-1), lastY = Y(sessions[n-1].total);
   var target = '<line x1="'+l+'" x2="'+(w-r)+'" y1="'+Y(max).toFixed(1)+'" y2="'+Y(max).toFixed(1)+'" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="3 3"/>'+
-               '<text x="'+(w-r+6)+'" y="'+(Y(max)+4).toFixed(1)+'" font-size="10" fill="var(--muted)">max</text>';
+               '<text x="'+(w-r+6)+'" y="'+(Y(max)+4).toFixed(1)+'" font-size="10" fill="var(--muted)">'+(sg ? "field" : "max")+'</text>';
   return '<svg class="line" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+label+' session scores over time">'+
     grid + target +
     (n>1 ? '<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--accent-fill)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' : '') +
     dots +
-    '<text x="'+(lastX+8)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">'+sessions[n-1].total+'</text>'+
+    '<text x="'+(lastX+8)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">'+fmt(sessions[n-1].total)+'</text>'+
     '<text x="'+l+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)">'+fmtDate(sessions[0].date)+'</text>'+
     (n>1 ? '<text x="'+(w-r)+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)" text-anchor="end">'+fmtDate(sessions[n-1].date)+'</text>' : '')+
     '</svg>';
@@ -8586,7 +9005,17 @@ function renderConditions(){
     return s.kind==="practice" && [1,2,3,10,11].indexOf(s.areaId)!==-1 && s.cond && s.cond.venue==="out" && s.max;
   });
   if(sel!=="all") pool = pool.filter(function(s){ return s.areaId===+sel; });
-  var pct = function(s){ return s.total/s.max*100; };
+  /* Percentage of the maximum is not a thing a strokes score has, so the short
+     game contributes its count instead: how often the ball finished inside two
+     clubs. That is the same kind of number as the others, which is what the bars
+     need to be comparable at all. */
+  var pct = function(s){
+    if(isSG(area(s.areaId))){
+      var z = sessionZones(s), n = sgBallsLogged(s);
+      return n ? (z.c / n) * 100 : 0;
+    }
+    return s.total/s.max*100;
+  };
 
   if(pool.length < 2){
     host.insertAdjacentHTML("beforeend",
@@ -9195,13 +9624,14 @@ function renderProgress(){
     var hist = sessionsFor(a.id);
     if(!hist.length) return;
     any=true;
-    var best=0; hist.forEach(function(s){ if(s.total>best) best=s.total; });
+    var best=-1e9; hist.forEach(function(s){ if(s.total>best) best=s.total; });
     var card = document.createElement("div"); card.className="chartcard";
     var played = hist.filter(function(s){ return s.won!=null; });
     var wonN = played.filter(function(s){ return s.won; }).length;
-    card.innerHTML = '<div class="hd"><span class="nm">'+areaTitle(a)+'</span><span class="pb num">best '+best+' / '+areaMax(a)+
+    card.innerHTML = '<div class="hd"><span class="nm">'+areaTitle(a)+'</span><span class="pb num">'+
+                     (isSG(a) ? 'best '+fmtSG(best)+' strokes' : 'best '+best+' / '+areaMax(a))+
                      (played.length ? ' · compete won '+wonN+'/'+played.length : '')+'</span></div>'+
-                     lineChart(hist, areaMax(a), a.name);
+                     lineChart(hist, isSG(a) ? 0 : areaMax(a), a.name, isSG(a));
     host.appendChild(card);
 
     /* Speed is measured on the driver set, which lives in Tee shots now. It used
@@ -9291,7 +9721,9 @@ function renderSessions(){
     var note = x.notes ? x.notes.replace(/</g,"&lt;") : "";
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
-      '<span class="s">'+(x.kind==="gym" ? x.total+"/"+x.max+" sets" : x.total+"/"+x.max)+'</span>'+
+      '<span class="s">'+(x.kind==="gym" ? x.total+"/"+x.max+" sets"
+                          : isSG(area(x.areaId)) ? fmtSG(x.total)
+                          : x.total+"/"+x.max)+'</span>'+
       '<button class="x" title="Delete" aria-label="Delete session">\u00d7</button>'+
       '<span class="nt"><span class="pill '+st.key+'">'+st.word+'</span>'+
         (meta ? '<b>'+meta+'</b>' : "")+(meta && note ? " \u00b7 " : "")+note+'</span>'+
@@ -9346,10 +9778,12 @@ function pastShots(a, set, sess){
   var calls = callsFor(a, set);
 
   function marks(list){
-    var seen = {}, out = "", holed = 0, isClock = areaShape(a) === "clock" && kind !== "lag";
+    var seen = {}, out = "", holed = 0, sg = isSG(a),
+        isClock = areaShape(a) === "clock" && kind !== "lag";
     list.forEach(function(x, i){
       if(!x || x.z == null) return;
       if(isClock && isIn(x.z)){ holed++; return; }
+      if(sg && x.z === "h"){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
       var p = kind === "lag" ? lagMark(x.z, n) : shapeMark(a, x.z, n, null);
       var hit = kind === "lag" ? shotPoint(calls[i], x) : inFor(calls[i], x.z);
@@ -9357,7 +9791,7 @@ function pastShots(a, set, sess){
              (kind === "lag" ? 10 : markR(a))+'"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
     });
-    return out + (isClock ? holedBadge(holed) : "");
+    return out + (isClock ? holedBadge(holed) : sg ? holedBadge(holed, HOLED_ROSE) : "");
   }
   function wmarks(list){
     var seen = {}, out = "";
@@ -9406,10 +9840,15 @@ function openPast(s){
     return;
   }
 
+  var sgA = !isGym && isSG(area(s.areaId));
   h += '<div class="pastsum">'+
-       '<div><b>'+(s.total||0)+'</b><span>'+(isGym ? "sets done" : "scored")+'</span></div>'+
-       '<div><b>'+(s.max||0)+'</b><span>out of</span></div>'+
-       (s.max ? '<div><b>'+Math.round((s.total||0)/s.max*100)+'%</b><span>of the max</span></div>' : '')+
+       (sgA
+         ? '<div><b>'+fmtSG(s.total)+'</b><span>strokes on the field</span></div>'+
+           '<div><b>'+(s.balls || sgBallsLogged(s))+'</b><span>balls</span></div>'+
+           '<div><b>'+fmtSG2((s.total||0)/Math.max(1, s.balls || sgBallsLogged(s)))+'</b><span>a ball</span></div>'
+         : '<div><b>'+(s.total||0)+'</b><span>'+(isGym ? "sets done" : "scored")+'</span></div>'+
+           '<div><b>'+(s.max||0)+'</b><span>out of</span></div>'+
+           (s.max ? '<div><b>'+Math.round((s.total||0)/s.max*100)+'%</b><span>of the max</span></div>' : ''))+
        (!isGym && s.compete ? '<div><b>'+s.compete+'</b><span>competing</span></div>' : '')+
        (!isGym && s.won != null ? '<div><b>'+(s.won ? "Won" : "Lost")+'</b><span>the game</span></div>' : '')+
        '</div>';
@@ -9427,7 +9866,7 @@ function openPast(s){
       var rows = "";
       b.ex.forEach(function(e){
         var v = (s.ex && s.ex[e.id]) || {};
-        var right = v.load ? kgText(v.load) + " " + (e.unit||"kg") : (v.done ? "done" : "\u2014");
+        var right = v.load ? kgText(v.load) + " " + (e.unit||"kg") : (v.done ? "done" : "\u2013");
         rows += '<div class="pastrow"><span>'+e.name+
                 (e.pre ? '<span class="sub">'+e.pre+'</span>' : '')+'</span>'+
                 '<b>'+right+(v.load && v.done ? " \u00b7 done" : "")+'</b></div>';
@@ -9454,8 +9893,8 @@ function openPast(s){
     }
     if(s.metrics && (s.metrics.chsFast || s.metrics.chsSlow)){
       h += '<p class="pastgrp">Club head speed</p>'+
-           '<div class="pastrow"><span>Fastest of the ten</span><b>'+(s.metrics.chsFast||"\u2014")+' mph</b></div>'+
-           '<div class="pastrow"><span>Slowest of the ten</span><b>'+(s.metrics.chsSlow||"\u2014")+' mph</b></div>';
+           '<div class="pastrow"><span>Fastest of the ten</span><b>'+(s.metrics.chsFast||"\u2013")+' mph</b></div>'+
+           '<div class="pastrow"><span>Slowest of the ten</span><b>'+(s.metrics.chsSlow||"\u2013")+' mph</b></div>';
     }
   }
 
@@ -9469,12 +9908,15 @@ function openPast(s){
 
 /* ---------- export ---------- */
 function sessionZones(sess){
-  var t = {c:0, b:0, wayLeft:0, wayRight:0};
+  var t = {c:0, b:0, h:0, q4:0, wayLeft:0, wayRight:0};
   ZONES.forEach(function(z){ t[z.id] = 0; });
   if(!sess.shots) return t;
   for(var k in sess.shots){
     (sess.shots[k]||[]).forEach(function(x){
       if(!x || x.z == null) return;
+      /* The columns nest, so a holed ball counts in all three: it is holed, it is
+         inside one club and it is inside two. */
+      if(x.z === "h"){ t.h++; t.b++; t.c++; return; }
       if(x.z === "b"){ t.b++; t.c++; return; }     // the bullseye is inside the circle
       if(t[x.z] != null) t[x.z]++;
     });
@@ -9499,11 +9941,12 @@ function csv(){
     var c = s.cond || {}, zt = sessionZones(s);
     lines.push([
       q(pname[s.playerId]||""), s.date, q(label), s.kind,
-      s.total||0, s.max||0, s.max ? Math.round(s.total/s.max*100) : "",
+      s.total||0, s.max||0,
+      isSG(area(s.areaId)) ? "" : (s.max ? Math.round(s.total/s.max*100) : ""),
       c.venue||"", c.surface||"", c.temp||"", c.windStr||"", c.windDir||"", c.rain||"", c.speed||"",
       s.bestRun||"", s.compete||0, s.won==null?"":(s.won?"yes":"no"),
       (s.metrics&&s.metrics.chsFast)||"", (s.metrics&&s.metrics.chsSlow)||"", kl,
-      zt.c, zt.b, zt.long, zt.longR, zt.right, zt.shortR, zt.short, zt.shortL, zt.left, zt.longL, zt.wayLeft, zt.wayRight,
+      zt.c, zt.b, zt.h, zt.q4, zt.long, zt.longR, zt.right, zt.shortR, zt.short, zt.shortL, zt.left, zt.longL, zt.wayLeft, zt.wayRight,
       q(s.notes||"")
     ].join(","));
   });
@@ -9513,12 +9956,14 @@ function csv(){
 function summary(){
   var out = [];
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
-  out.push("Longer · Closer · Lower — " + (p?p.name:"") );
+  out.push("Longer · Closer · Lower · " + (p?p.name:"") );
   AREAS.forEach(function(a){
     var h = sessionsFor(a.id);
     if(!h.length){ if(!a.retired) out.push(areaTitle(a)+": no sessions"); return; }
-    var best=0; h.forEach(function(s){ if(s.total>best) best=s.total; });
-    out.push(areaTitle(a)+": last "+h[h.length-1].total+"/"+areaMax(a)+", best "+best+", "+h.length+" sessions");
+    var best=-1e9; h.forEach(function(s){ if(s.total>best) best=s.total; });
+    out.push(areaTitle(a)+": "+(isSG(a)
+      ? "last "+fmtSG(h[h.length-1].total)+" strokes, best "+fmtSG(best)
+      : "last "+h[h.length-1].total+"/"+areaMax(a)+", best "+best)+", "+h.length+" sessions");
   });
   var sr = speedRows();
   if(sr.length){
@@ -9568,25 +10013,38 @@ var TOURINFO = {
               "The placing takes 45 balls at a 66% chance, allows for the fact that some tour players are better than others, and works out how many of a hundred of them would have beaten your score. 1st means almost nobody would.",
               "Club head speed is measured, not placed. The average of the fifteen is the one that tracks progress: the fastest of fifteen reads about 4 mph high and moves twice as much between sessions."] },
   11:{ title:"The tour numbers behind this",
-       rows:[["LPGA average proximity, 125 yd","26 ft"],["145 yd","32 ft"],["165 yd","38 ft"],["185 yd","43 ft"],
-             ["PGA average, the bullseye ring","22 to 33 ft"]],
+       rows:[["LPGA average proximity, 125 yd","9 yards"],["145 yd","11 yards"],["165 yd","13 yards"],["185 yd","14 yards"],
+             ["PGA average, the bullseye ring","7 to 11 yards"]],
        lines:["The circle is where a tour player's average ball from that distance finishes.",
-              "Because the miss spreads out in every direction, a bit over half of tour shots land inside their own average, not two thirds. The placing uses 55%, which is what that works out to.",
-              "So a ball inside the circle is a tour-standard ball, and 33 of 60 is about what a tour player would do.",
+              "Of the balls that find the green, about 72% are inside the circle, and that holds at all four distances. That is the check that the circles grow at the right rate.",
+              "What falls away with distance is finding the green at all: 80% at 125 yards, 62% at 185. Multiply the two and the circle is hit 58% of the time at 125 and 43% at 185.",
+              "The placing pools those four to 52%, so 31 of 60 is about what a tour player would do.",
               "The bullseye is the PGA circle sitting inside the LPGA one. It is counted separately at the end, and shaped balls count in the same pool as straight ones."] },
   2:{ title:"The tour numbers behind this",
-       rows:[["LPGA average proximity, 30 yd","11 ft"],["50 yd","17 ft"],["70 yd","19 ft"],["90 yd","20 ft"]],
+       rows:[["LPGA average proximity, 30 yd","4 yards"],["50 yd","6 yards"],["70 yd","6 yards"],["90 yd","7 yards"]],
        lines:["Same idea as the approach circles: this is where a tour player's average wedge from that distance finishes.",
-              "No inner ring here. The PGA circles are only a foot tighter and nobody can tell 11 feet from 10 by eye.",
-              "A bit over half of tour wedges finish inside their own average, so the placing uses 55%. 33 of 60 is tour standard."] },
+              "Fifty and seventy both round to six yards, which is not a rounding error. The circle barely grows across that stretch, because the shot barely gets harder.",
+              "No inner ring here. The PGA circles are barely tighter and nobody can tell four yards from three and a half by eye.",
+              "Between 62% and 65% of tour wedges finish inside, so the placing uses 63%. 38 of 60 is tour standard."] },
   3:{ title:"The tour numbers behind this",
-       rows:[["LPGA sand save","45%"],["LPGA scrambling","50 to 60%"],
-             ["Inside two clubs, tour, from 20 paces","37%"],["From a plugged lie","18%"],
-             ["Inside one club, over the whole session","11%"]],
-       lines:["Nobody publishes short game proximity by distance and lie, so these come the other way round: take the up-and-down and hole-out rates the tour does publish, and work back to where the ball must be finishing.",
-              "Two clubs is about six feet, one club about three. They are the only targets you can actually measure on a green with the club in your hand.",
-              "The rate changes with every shot, so a ball inside two clubs from 10 paces is ordinary and the same ball from a plugged lie is a one in six. That is why the messages only speak on the hard ones.",
-              "Over 75 shots a tour player gets about 19 inside two clubs and 9 inside one."] },
+       rows:[["Holed, from 20 paces","+1.34"],
+             ["Inside one club, 3 ft","+0.31"],
+             ["Inside two clubs, 6 ft","+0.19"],
+             ["Inside four clubs, 12 ft","\u22120.12"],
+             ["Past four clubs","\u22120.48"],
+             ["The same two clubs, plugged at 15","+0.42"],
+             ["LPGA sand save","40 to 50%"],["LPGA scrambling","50 to 60%"],
+             ["Inside two clubs, tour, from 20 paces","45%"],["From a plugged lie","16%"],
+             ["Inside one club, over the whole session","10%"]],
+       lines:["Strokes gained asks one question of every shot: was it worth more or less than the field would have managed? The field needs this shot plus whatever putts it usually leaves itself. Finish closer than that and the number is positive.",
+              "So the rings never move and what they are worth does. Inside two clubs is +0.04 from 10 paces off a good lie, where the field is nearly inside a club anyway, and +0.42 from a plugged bunker at 15. Same ring, ten times the value.",
+              "Holing out is worth between +1.18 and +1.69 depending on the shot, because the field leaves itself a putt and you did not. The hardest hole-out is only about 1.4 times the easiest, not six times: the hard ones start further away, so the field has already given most of that back.",
+              "Nought is the LPGA field exactly. A tour player playing all 75 balls to their own standard scores 0.0, and that is the check these numbers have to pass before any of the rest means anything.",
+              "The dashed ring on the target is where the field\'s average ball finishes from that station and that lie. Beat the dashed ring and the number goes positive. Off the collar it sits inside one club; from a plugged lie it sits outside four.",
+              "Nobody publishes short game proximity by distance and lie, so this comes the other way round: the LPGA proximity table gives the spread, the tour make rates give the putts left, and the lie is a multiplier on top.",
+              "Two clubs is about six feet, one club about three, four clubs about twelve. They are the only targets you can measure on a green with the club in your hand, or with a string knotted at three, six and twelve feet.",
+              "Two routes to the same place. The proximity table and the up-and-down rates agree on how often a tour player finishes inside two clubs to within about a point, 38 against 39, which is as close as two separate derivations have any right to be.",
+              "The placing stays a count, because a placing among a hundred players is a count. Over 75 shots a tour player gets about 30 inside two clubs and 8 inside one."] },
   4:{ title:"The tour numbers behind this",
        rows:[["Tour make rate, 4 ft","90%"],["6 ft","68%"],["9 ft","46%"],["12 ft","32%"],
              ["The clock, all 55 putts","65%"]],
@@ -10043,7 +10501,7 @@ $("playerName").addEventListener("change", function(){
 $("playerSwitch").addEventListener("click", function(){
   var i = state.players.map(function(p){ return p.id; }).indexOf(state.activePlayer);
   if(state.players.length === 1){
-    var nm = prompt("Add a second player — their name:");
+    var nm = prompt("Add a second player. Their name:");
     if(!nm) return;
     var np = {id:uid(), name:nm.trim()}; seedByName(np);
     state.players.push(np);
