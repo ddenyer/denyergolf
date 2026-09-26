@@ -877,6 +877,30 @@
   .rose .rz.sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
   .rose .rz.sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
   .rose .rz.sgh{fill:#22331d; stroke:#f2f8ec; stroke-width:1.6}
+  /* The full swing rings. Same trap as the short game's: these all carry .rz,
+     and .rose .rz sets a fill, so a fill attribute would lose to it. Three
+     classes each, keyed on position from the outside in rather than on the zone
+     id, so the outermost scoring band is the same shade on a wedge card with two
+     rings and an approach card with three. The dividing lines are lighter than
+     the ring outside them, because they divide one target rather than bounding
+     four. */
+  .rose .rz.fsq{stroke:#7ba86c; stroke-width:1.5}
+  .rose .rz.fsb0{fill:#a4cc90}
+  .rose .rz.fsb1{fill:#c6e2b4}
+  .rose .rz.fsin{fill:#eaf6e0; stroke:#6e9c62; stroke-width:1.5}
+  /* The same pink as the scope, and the same two weights: the aim pair solid,
+     the pair on the scoring ring lighter, so the two pictures read as one target
+     seen two ways rather than as two different diagrams. */
+  .fsaim line{stroke:#e0187f; stroke-width:3.4; pointer-events:none}
+  .fsaim line.far{stroke-width:2.4; opacity:.55}
+  .fslp text{fill:#2f4a27; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:13px; font-weight:700; text-anchor:start; pointer-events:none}
+  .fslp text.up{font-size:10.5px; font-weight:500; fill:#546f4a}
+  text.fsmiss{fill:#546f4a; font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:11.5px; font-weight:600; text-anchor:middle; pointer-events:none}
+  /* The LPGA line runs left from its own swatch, and a text-anchor attribute
+     loses to the rule above however it is written on the element. */
+  .fsfoot text.fsmiss{text-anchor:start}
   .sglead{stroke:#3f5c37; stroke-width:1.2; stroke-dasharray:3 4; opacity:.8;
     pointer-events:none}
   /* Where the LPGA field's average ball finishes from this station and this lie.
@@ -1270,6 +1294,15 @@
   #asHud .asfig{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; font-weight:600}
   #asHud .assub{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px;
     color:#b9c3bc; margin-top:2px}
+  /* The key. Each name carries a short piece of the line it names, drawn in that
+     line's own weight and colour, so there is nothing to match up by position. */
+  #asHud .assub .askey{display:inline-flex; align-items:center; margin-right:11px;
+    white-space:nowrap}
+  #asHud .assub .asunit{color:#7f8d7a; font-size:10px}
+  #asHud .asw{display:inline-block; width:15px; height:0; margin-right:5px;
+    border-top:3px solid #d2006a}
+  #asHud .asw.far{border-top-width:2px; opacity:.55}
+  #asHud .asw.lp{border-top:2px dashed #0e1210; box-shadow:0 0 0 1px rgba(255,255,255,.45)}
   #asClose{position:absolute; z-index:30; right:10px; background:rgba(0,0,0,.45);
     top:calc(8px + env(safe-area-inset-top,0px));
     border:1px solid rgba(255,255,255,.22); color:#f2f5f2; border-radius:9px;
@@ -1822,7 +1855,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"short game scored in strokes gained, rings true to the distances" };
+var BUILD = { on:"2026-09-26", note:"wedges and approaches on fixed rings, scored in strokes gained, with the scope's uprights on the card" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
@@ -1843,7 +1876,7 @@ var AREAS = [
   ],
   placing:{n:45, p:0.66, sd:0.065, field:"tour players"} },
 
-{ id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
+{ id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true, sg:true, sgKind:"app",
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
   /* WHERE THE RATES COME FROM  (rebuilt 25 Sep 2026, LPGA proximity table)
 
@@ -1874,22 +1907,29 @@ var AREAS = [
      approach session placed near the bottom of the hundred. */
   plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.58, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.58, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"a", label:"125y", short:"125 yards", tc:"40 ft", dist:125, r1:0.168, r2:0.845, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"40 ft", dist:125, r1:0.168, r2:0.845, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", dist:145, r2:0.56, word:"145 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", dist:145, r2:0.56, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"c", label:"145y", short:"145 yards", tc:"40 ft", dist:145, r1:0.110, r2:0.772, word:"145 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"40 ft", dist:145, r1:0.110, r2:0.772, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", dist:165, r2:0.51, word:"165 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", dist:165, r2:0.51, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"e", label:"165y", short:"165 yards", tc:"40 ft", dist:165, r1:0.072, r2:0.700, word:"165 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"40 ft", dist:165, r1:0.072, r2:0.700, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", dist:185, r2:0.43, word:"185 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", dist:185, r2:0.43, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"g", label:"185y", short:"185 yards", tc:"40 ft", dist:185, r1:0.050, r2:0.630, word:"185 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"40 ft", dist:185, r1:0.050, r2:0.630, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
   ],
-  placing:{n:60, p:0.519, sd:0.05, field:"tour players"} },
+  placing:{n:60, p:0.737, sd:0.05, bullP:0.100, field:"tour players"},
+  /* Sessions hit before 26 Sep 2026 counted their balls against a circle that
+     grew with the shot, 26 ft at 125 out to 43 at 185. Judging that count
+     against the 13 pace ring would move a session that placed 48th to 100th
+     overnight, and nothing she did would have changed. Every ball logged on
+     the new rings carries a stamp, so a session is placed against the field
+     whose target it was actually hitting at. */
+  placingWas:{n:60, p:0.519, sd:0.05, field:"tour players"} },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -1913,26 +1953,27 @@ var AREAS = [
   ],
   compete:{calls:true, max:10, label:"Compete · 10 min", tgt:"Random targets with a partner, or 10 balls, odds against evens if alone. The ball must be in the target to score."} },
 
-{ id:2, no:3, quads:true, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true,
+{ id:2, no:3, quads:true, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true, sg:true, sgKind:"pitch",
   targets:"30y → 8y wide · 50y → 12y wide · 70y → 12y wide · 90y → 14y wide · tighter dispersion · low, normal and high on command",
   plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.62, word:"30 yards", tgt:"Inside the circle scores · the LPGA 62% circle from here", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, r2:0.62, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"a", label:"30y", short:"30 yards", tc:"20 ft", dist:30, r1:0.352, r2:0.782, word:"30 yards", tgt:"Inside the circle scores · the LPGA 62% circle from here", max:5},
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"20 ft", dist:30, r1:0.352, r2:0.782, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.65, word:"50 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, r2:0.65, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"c", label:"50y", short:"50 yards", tc:"20 ft", dist:50, r1:0.282, r2:0.720, word:"50 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"20 ft", dist:50, r1:0.282, r2:0.720, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.65, word:"70 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
-    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, r2:0.65, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"e", label:"70y", short:"70 yards", tc:"20 ft", dist:70, r1:0.220, r2:0.650, word:"70 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
+    {id:"i", guide:"heights", label:"70y · five heights", tc:"20 ft", dist:70, r1:0.220, r2:0.650, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.60, word:"90 yards", tgt:"Inside the circle scores · the LPGA 60% circle from here", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r2:0.60, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r1:0.175, r2:0.587, word:"90 yards", tgt:"Inside the circle scores · the LPGA 60% circle from here", max:5},
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r1:0.175, r2:0.587, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. A point inside each target", max:20}
   ],
-  placing:{n:60, p:0.628, sd:0.05, field:"tour players"} },
+  placing:{n:60, p:0.685, sd:0.05, bullP:0.257, field:"tour players"},
+  placingWas:{n:60, p:0.628, sd:0.05, field:"tour players"} },
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces", sg:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · every ball scored in strokes gained on the LPGA field",
@@ -1993,6 +2034,15 @@ var AREAS = [
   setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Six rounds is 30 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
   }
 ];
+
+/* The ring scheme belongs to the area, but almost every scoring call has a set
+   in its hand and not always the area it came from. Copied down once, here,
+   rather than repeated on thirty set literals where one would eventually be
+   missed and price its balls on the greenside model by accident. */
+AREAS.forEach(function(a){
+  if(!a.sgKind) return;
+  (a.sets || []).forEach(function(s){ if(s.dist != null) s.sgKind = a.sgKind; });
+});
 
 var GUIDES = {
   windows:{ title:"Five windows", svg:"<svg viewBox=\"0 0 300 442\" class=\"dg\" role=\"img\" aria-label=\"Five windows: two high, one middle, two low, with five ball flights from the ball below\"> <line x1=\"150\" y1=\"8\" x2=\"150\" y2=\"54\" stroke=\"var(--line-strong)\" stroke-width=\"2\"/> <path d=\"M150 8 L182 19 L150 30 Z\" fill=\"var(--accent-fill)\"/> <rect x=\"34\" y=\"62\" width=\"232\" height=\"278\" rx=\"7\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-dasharray=\"5 5\"/> <g fill=\"none\" stroke=\"var(--accent-fill)\" stroke-width=\"2.2\" stroke-linecap=\"round\"> <path d=\"M150 386 C 132 340 88 240 94 146\"/> <path d=\"M150 386 C 168 340 212 240 206 146\"/> <path d=\"M150 386 L 150 226\"/> <path d=\"M150 386 C 140 360 110 330 94 306\"/> <path d=\"M150 386 C 160 360 190 330 206 306\"/> </g> <g fill=\"var(--surface)\" stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <rect x=\"48\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"104\" y=\"164\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"48\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> </g> <g fill=\"var(--ink)\" font-family=\"IBM Plex Mono, ui-monospace, monospace\" font-size=\"21\" font-weight=\"600\" text-anchor=\"middle\"> <text x=\"94\" y=\"123\">1</text><text x=\"206\" y=\"123\">2</text> <text x=\"150\" y=\"203\">3</text> <text x=\"94\" y=\"283\">4</text><text x=\"206\" y=\"283\">5</text> </g> <g fill=\"var(--muted)\" font-family=\"Archivo, sans-serif\" font-size=\"10.5\" font-weight=\"600\" letter-spacing=\"0.9\" text-anchor=\"middle\"> <text x=\"150\" y=\"76\">HIGH</text><text x=\"150\" y=\"156\">MIDDLE</text><text x=\"150\" y=\"236\">LOW</text> </g> <circle cx=\"150\" cy=\"406\" r=\"20\" fill=\"var(--surface-2)\" stroke=\"var(--line-strong)\" stroke-width=\"1.6\"/> </svg>", steps:[
@@ -5891,6 +5941,19 @@ function praiseShot(a, s, call, sh){
           (hv != null ? '. Worth '+fmtSG2(hv)+' strokes on the field.' : '.')+'</span>';
     ms = 3200;
   }
+  /* The full swing rings have their own names. "Inside one club" is a chip's
+     language and would be nonsense at 185 yards, where the tightest ring is
+     three paces and the field averages twelve. */
+  var fsk = fsKind(a);
+  if(!msg && fsk && PRAISE.seen - PRAISE.at >= 5){
+    var rings = FS_RINGS[fsk];
+    if(sh.z === "st" && r1 != null)
+      msg = '<b>Inside '+fsPaces(rings[0])+' paces</b><span class="sub">from '+where+
+            '. One in '+oddsWord(r1)+' on the LPGA.</span>';
+    else if(FS_BAND_IDS[0].indexOf(sh.z) !== -1 && rings.length > 2)
+      msg = '<b>Inside '+fsPaces(rings[1])+' paces</b><span class="sub">from '+where+
+            '. Better than the field, which averages '+fsPaces(sgFsProx(fsk, s.dist))+'.</span>';
+  } else
   if(!msg && r2 != null && PRAISE.seen - PRAISE.at >= 5){   // one shot message in any five balls
     if((sh.z === "b" || sh.z === "h") && r1 != null && r1 <= 0.12)
       msg = '<b>Inside one club</b><span class="sub">from '+where+
@@ -6152,7 +6215,109 @@ function sgBands(set){
 }
 /* which band a zone falls in: 0 inside 3 ft, 1 inside 6, 2 inside 12, 3 past 12 */
 var SG_ZONE = { b:0, c:1, q4:2 };
-function sgOfShot(set, z){
+
+/* ---- the full swing model ----------------------------------------------
+   The greenside model above prices a chip: proximity comes from a yards to pin
+   line times a lie multiplier, and whatever is left is a putt. A wedge or an
+   approach needs two things it does not have.
+
+   The proximity comes from a different published line. And a ball that finishes
+   off the green does not leave a putt, it leaves a chip, so out there it has to
+   be priced by the model above rather than by sgPutts. Without that the long
+   bands price a 60 ft approach as a long putt and the whole scale drifts.
+
+   Proximity, both LPGA:
+     approach   28.2 ft at 125-150 (midpoint 137) rising to 41.0 at 175-200
+                (midpoint 187). A straight line between them, extended.
+     wedges     the 50-75, 75-100 and 100-125 rows lifted 5%. From inside a
+                hundred yards both tours play the same wedge, so the gap closes
+                to a few per cent rather than the twenty it is at 185.
+
+   Spread: 0.60 on a wedge, following the greenside figure, and 0.70 on an
+   approach. The approach figure is the one number here with no source. It moves
+   the bands by about a tenth of a stroke either way and nothing else.
+
+   The rings no longer move with the distance. Ten and twenty feet on a wedge,
+   ten twenty and forty on an approach, and forty is also the edge of an average
+   green, so the outermost ring and "off the green" are the same line. Fixed
+   rings, varying worth, exactly as the short game does it. */
+var SG_GREEN = 40;                   /* a green's radius: 5,500 sq ft, 27 yd across */
+var SG_FS = {
+  pitch: { sig:0.60, rings:[10, 20] },
+  app:   { sig:0.70, rings:[10, 20, SG_GREEN] }
+};
+/* A ball off the green is a chip from where it stopped, on the mix of lies she
+   will actually find round a green. The greenside model prices each one. */
+var SG_MISSMIX = [["good",0.45], ["tight",0.20], ["awk",0.20], ["sand",0.15]];
+function sgMissCost(ft){
+  var paces = Math.max(5, Math.min(40, ft/3)), t = 0;
+  SG_MISSMIX.forEach(function(L){
+    t += L[1] * (1 + sgBands({dist:paces, sgLie:L[0]}).base);
+  });
+  return t;
+}
+function sgLeft(ft){ return ft < SG_GREEN ? sgPutts(ft) : sgMissCost(ft); }
+function sgFsProx(kind, d){
+  if(kind === "app") return 28.2 + (d - 137)/50 * (41.0 - 28.2);
+  var P = d <= 62 ? 16.1 : d <= 87 ? 18.1 : 20.0;
+  if(d < 50) P = 16.1 - (50 - d)*0.09;
+  return P * 1.05;
+}
+var SG_FS_CACHE = {};
+function sgFsBands(kind, d){
+  var K = SG_FS[kind];
+  if(!K || d == null) return null;
+  var key = kind + ":" + d;
+  if(SG_FS_CACHE[key]) return SG_FS_CACHE[key];
+  var m = sgFsProx(kind, d), mu = Math.log(m) - K.sig*K.sig/2, i, j;
+  var q = SG_Q.map(function(z){ return Math.exp(mu + K.sig*z); });
+  var base = 0;
+  for(i=0;i<q.length;i++) base += sgLeft(q[i]);
+  base /= q.length;
+  var cuts = [0].concat(K.rings).concat([1e9]);
+  var out = { base:base, prox:m, band:[], freq:[] };
+  for(j=0;j<cuts.length-1;j++){
+    var t=0, w=0;
+    for(i=0;i<q.length;i++){
+      if(q[i] < cuts[j] || q[i] >= cuts[j+1]) continue;
+      t += sgLeft(q[i]); w++;
+    }
+    out.band.push(w ? base - t/w : 0);
+    out.freq.push(w/q.length);
+  }
+  SG_FS_CACHE[key] = out;
+  return out;
+}
+/* The rings are numbered from the middle out, so the zone ids map straight on.
+   q2 only exists on the approach, which is the only area with three rings. */
+var SG_FS_ZONE = { st:0, qLR:1, qSR:1, qSL:1, qLL:1, q2LR:2, q2SR:2, q2SL:2, q2LL:2 };
+/* Balls logged before the rings were fixed, when the scoring circle grew with
+   the shot. Those zones mean different distances, so they are priced on their
+   own terms rather than being read as today's rings: the old approach circle
+   ran 26 to 43 ft, which is this scheme's outer band, and the old wedge circle
+   11 to 20 ft, which is its middle one. Old "st" was inside a club, well inside
+   the tightest ring either way. */
+var SG_FS_OLD = { st:0, b:0, h:0 };
+function sgFsOfShot(kind, d, z, v){
+  var B = sgFsBands(kind, d);
+  if(!B || z == null) return null;
+  var last = B.band.length - 1, i;
+  if(v === SG_FS_V){
+    i = SG_FS_ZONE[z];
+  } else {
+    i = SG_FS_OLD[z];
+    if(i == null && isIn(z)) i = (kind === "app") ? 2 : 1;
+  }
+  if(i == null || i > last) i = last;
+  return B.band[i];
+}
+/* Stamped on every ball logged against the fixed rings, so a ball hit under the
+   old growing circle is never read as though it were hit under these. */
+var SG_FS_V = 2;
+function fsKind(a){ return (a && a.sgKind) || null; }
+
+function sgOfShot(set, z, v){
+  if(set && set.sgKind) return sgFsOfShot(set.sgKind, set.dist, z, v);
   var B = sgBands(set); if(!B || z == null) return null;
   if(z === "h") return B.base;                       /* holed: no putt left at all */
   var i = SG_ZONE[z];
@@ -6174,7 +6339,7 @@ function sgSetSum(s, list){
   var sum = 0, n = 0;
   list.forEach(function(sh){
     if(!sh || sh.z == null) return;
-    var v = sgOfShot(s, sh.z);
+    var v = sgOfShot(s, sh.z, sh.v);
     if(v == null) return;
     sum += v; n++;
   });
@@ -6479,7 +6644,7 @@ function biasBlock(a, t){
 }
 
 function placingBlock(a, sess){
-  var spec = a.placing; if(!spec) return "";
+  var spec = placingFor(a, sess); if(!spec) return "";
   var t = testSplit(a, sess);
   if(!t.n) return "";
   var full = t.n >= spec.n, tab = full ? tablesFor(spec) : null;
@@ -6850,12 +7015,18 @@ ZONE_LABEL.st  = "Stone dead";
 ZONE_LABEL.h    = "Holed";
 ZONE_LABEL.q4   = "Inside four clubs";
 ZONE_LABEL.miss = "Past four clubs";
+/* The full swing rings. The middle band is quartered like the old scoring circle
+   was, and on the approach there is a second quartered band outside it. Named in
+   paces, because paces is what the card is labelled in and what she can walk. */
+ZONE_LABEL.q2LR = "Long right, outer ring";  ZONE_LABEL.q2SR = "Short right, outer ring";
+ZONE_LABEL.q2SL = "Short left, outer ring";  ZONE_LABEL.q2LL = "Long left, outer ring";
 var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
                  g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
 for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
 /* Two rings now: "b" is the bullseye inside "c". Both are a pass; only "b" is a
    tour-standard ball. Everything that used to ask z === "c" asks this instead. */
-var QUAD_IDS = {qLR:1, qSR:1, qSL:1, qLL:1, st:1};
+var QUAD_IDS = {qLR:1, qSR:1, qSL:1, qLL:1, st:1,
+                q2LR:1, q2SR:1, q2SL:1, q2LL:1};
 /* Every quadrant and the stiff centre score exactly what the old single circle
    scored, which is the whole point: splitting the target changed where the ball
    is recorded, never what it is worth. Old sessions stored "c" or "b" and still
@@ -6869,8 +7040,10 @@ function isQuad(z){ return !!QUAD_IDS[z]; }
 /* Short or long, for the bias picture. Null where it was never recorded, which
    is every ball hit before the target was split. */
 function depthOf(z){
-  if(z === "qSL" || z === "qSR" || z === "short" || z === "shortL" || z === "shortR") return "short";
-  if(z === "qLR" || z === "qLL" || z === "long"  || z === "longL"  || z === "longR")  return "long";
+  if(z === "qSL" || z === "qSR" || z === "q2SL" || z === "q2SR" ||
+     z === "short" || z === "shortL" || z === "shortR") return "short";
+  if(z === "qLR" || z === "qLL" || z === "q2LR" || z === "q2LL" ||
+     z === "long"  || z === "longL"  || z === "longR")  return "long";
   return null;
 }
 function zoneIndex(id){ for(var i=0;i<ZONES.length;i++){ if(ZONES[i].id===id) return i; } return -1; }
@@ -6983,9 +7156,37 @@ function ydRadius(tc){
   return m ? Math.round(parseFloat(m[1]) / 3) : 0;
 }
 
-function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
+/* ---------- the full swing rings ----------------------------------------
+   Fixed at every station, the way the short game's are, so the picture means
+   the same thing at 30 yards and at 185 and the varying is done by what each
+   ring is worth. One scale for both areas, 2.4 units to the foot, so the wedge
+   target is visibly half the approach target because it is half.
+
+   Outermost is the scoring ring: past it the ball is a miss and the eight
+   directions say which way. Innermost stays whole, the way stone dead did:
+   splitting it would put four names on a circle 48 units across. */
+/* 2.1 units to the foot. Not chosen for the rings: chosen for the ring of
+   direction names outside them, which needs about fifty units of band to hold
+   "Short R" without the word touching either edge. At 2.4 the approach scoring
+   ring reached 96 and left the names 40 units to sit in, and they spilled over
+   both lines. */
+var FS_PERFT = 2.1;
+var FS_RINGS = { pitch:[10, 20], app:[10, 20, 40] };
+/* From the middle out, one id per band. The innermost circle is not a band. */
+var FS_BAND_IDS = [["qLR","qSR","qSL","qLL"], ["q2LR","q2SR","q2SL","q2LL"]];
+function fsR(ft){ return FS_PERFT * ft; }
+function fsScoreFt(kind){ var r = FS_RINGS[kind]; return r[r.length-1]; }
+/* The ring the scope puts its solid pink pair on: one in from the scoring ring,
+   so 3 paces on a wedge and 7 on an approach. It is the line she aims at, which
+   is not the same as the line she scores by, and the card says so by carrying
+   the same two uprights in the same pink. */
+function fsAimFt(kind){ var r = FS_RINGS[kind]; return r[r.length-2]; }
+function fsPaces(ft){ return Math.round(ft/3); }
+
+function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet, fs){
   var CX = sgSet ? SGC.cx : ROSE_CX, CY = sgSet ? SGC.cy : ROSE_CY, out = "";
   var yd = ydRadius(centreLabel);
+  if(fs) return fsRoseSvg(fs, tappable, dist, centreLabel);
   /* On the short game target the directional ring starts where the last scoring
      ring ends, so everything outside four clubs still says which way it went. */
   /* Which way a chip missed has never been part of this drill and the quadrants
@@ -7136,6 +7337,121 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
   return '<svg viewBox="0 0 '+ROSE_W+' '+ROSE_H+'" class="rose" role="group" aria-label="Where the ball finished">'+
          out+'<g class="marks"></g></svg>';
 }
+
+/* The wedge and approach target. Same frame as the rose above and the same eight
+   directions outside, because those were the part of the old picture that worked:
+   what has changed is that the circle inside them no longer grows with the shot. */
+function fsRoseSvg(kind, tappable, dist, centreLabel){
+  var rings = FS_RINGS[kind], scoreFt = fsScoreFt(kind), rS = fsR(scoreFt);
+  var CX = ROSE_CX, CY = ROSE_CY, out = "", i;
+  var pace = fsPaces(scoreFt);
+  out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
+  /* outside the scoring ring is a miss, and which way it missed still matters */
+  /* The names sit out at seven tenths of the miss band and the balls that land
+     there sit in the inner third, so a ball never comes to rest on a word. */
+  var labR = rS + (ROSE_R - rS)*0.72;
+  ZONES.forEach(function(z, k){
+    out += '<path class="rz" data-z="'+z.id+'" d="'+
+           sectorPath(CX, CY, rS, ROSE_R, k*45-22.5, k*45+22.5)+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+', outside '+pace+' paces"' : '')+'></path>';
+    var p = polar(CX, CY, labR, k*45);
+    out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
+  });
+  out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+f1(rS+7)+'"></circle>';
+  /* The bands, outermost first so each one paints over the fringe of the last.
+     Quartered by one cross that runs out from the innermost circle, which is why
+     the quadrants are drawn as sectors rather than as circles with lines on top:
+     a tap has to land in a quadrant, not on a line. */
+  for(i = rings.length - 1; i >= 1; i--){
+    var r0 = fsR(rings[i-1]), r1 = fsR(rings[i]), ids = FS_BAND_IDS[i-1];
+    var cls = "fsb" + (rings.length - 1 - i);
+    QUADS.forEach(function(q, qi){
+      out += '<path class="rz fsq '+cls+'" data-z="'+ids[qi]+'" d="'+
+             sectorPath(CX, CY, r0, r1, q.a0, q.a1)+'"'+
+             (tappable ? ' role="button" tabindex="0" aria-label="'+q.lab+', '+
+               fsPaces(rings[i-1])+' to '+fsPaces(rings[i])+' paces"' : '')+'></path>';
+    });
+  }
+  out += '<circle class="rz fsin" data-z="st" cx="'+CX+'" cy="'+CY+'" r="'+fsR(rings[0])+'"'+
+         (tappable ? ' role="button" tabindex="0" aria-label="Inside '+fsPaces(rings[0])+' paces"' : '')+'></circle>';
+  /* Where the LPGA field's average ball finishes from this number. At 185 it
+     lands on the scoring ring itself, which is the honest reading: from there
+     the average tour approach finishes on the edge of the green. */
+  var prox = (dist != null) ? sgFsProx(kind, dist) : null;
+  if(prox != null){
+    var pr = Math.min(ROSE_R - 4, fsR(prox));
+    out += '<circle class="sgfield" cx="'+CX+'" cy="'+CY+'" r="'+f1(pr)+'"></circle>';
+  }
+  /* The scope's uprights, drawn on the card. Through the camera these are the
+     two pink lines she lines the phone up against; here they are the same pair
+     standing on the same ring, so the picture she aims with and the picture she
+     scores on are visibly one target. Straight because they measure width only:
+     from behind the ball depth cannot be drawn. Not tappable, and drawn last so
+     nothing covers them. */
+  var aimR = fsR(fsAimFt(kind));
+  /* Both pairs the scope draws: the heavy one on the aim ring and the light one
+     on the scoring ring, which on an approach is the edge of the green. Only the
+     top half, because below the middle line they would run through "Short" and
+     the two captions, and one half is enough to read a width off. */
+  var aimTop = f1(CY - rS - 18);
+  out += '<g class="fsaim">'+
+    '<line class="far" x1="'+f1(CX-rS)+'" y1="'+aimTop+'" x2="'+f1(CX-rS)+'" y2="'+CY+'"></line>'+
+    '<line class="far" x1="'+f1(CX+rS)+'" y1="'+aimTop+'" x2="'+f1(CX+rS)+'" y2="'+CY+'"></line>'+
+    '<line x1="'+f1(CX-aimR)+'" y1="'+aimTop+'" x2="'+f1(CX-aimR)+'" y2="'+CY+'"></line>'+
+    '<line x1="'+f1(CX+aimR)+'" y1="'+aimTop+'" x2="'+f1(CX+aimR)+'" y2="'+CY+'"></line>'+
+    '</g>';
+  out += pinAt(CX, CY - 3, 20);
+  /* The guides, on the scoring ring, because that is the only circle wide enough
+     to carry an arrow and a number at both ends of it. */
+  if(dist){
+    var gx = CX + ROSE_R + 34, ty = CY - ROSE_R - 20;
+    out += '<g class="rguide">'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY-rS)+'" x2="'+gx+'" y2="'+f1(CY-rS)+'"></line>'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+CY+'" x2="'+gx+'" y2="'+CY+'"></line>'+
+      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY+rS)+'" x2="'+gx+'" y2="'+f1(CY+rS)+'"></line>'+
+      /* stopped just under the ring they are tangent to. Run to the foot of the
+         picture, the way the old ones did, they cross the LPGA caption. */
+      '<line x1="'+f1(CX-rS)+'" y1="'+ty+'" x2="'+f1(CX-rS)+'" y2="'+f1(CY+rS+10)+'"></line>'+
+      '<line x1="'+f1(CX+rS)+'" y1="'+ty+'" x2="'+f1(CX+rS)+'" y2="'+f1(CY+rS+10)+'"></line>'+
+      '</g>';
+    out += '<g class="gnum">'+
+      '<text x="'+(gx+4)+'" y="'+f1(CY-rS+4)+'">'+(dist+pace)+'</text>'+
+      '<text x="'+(gx+4)+'" y="'+(CY+4)+'" class="key">'+dist+'</text>'+
+      '<text x="'+(gx+4)+'" y="'+f1(CY+rS+4)+'">'+(dist-pace)+'</text>'+
+      '</g>';
+    out += '<g class="gnum mid">'+
+      '<text x="'+f1(CX-rS/2)+'" y="'+(ty+4)+'" text-anchor="middle">'+pace+'y</text>'+
+      '<text x="'+f1(CX+rS/2)+'" y="'+(ty+4)+'" text-anchor="middle">'+pace+'y</text>'+
+      '<path class="garrow" d="M'+f1(CX-rS)+' '+ty+' L'+f1(CX-rS/2-13)+' '+ty+'"></path>'+
+      '<path class="garrow" d="M'+f1(CX-rS/2+13)+' '+ty+' L'+CX+' '+ty+'"></path>'+
+      '<path class="garrow" d="M'+f1(CX+rS)+' '+ty+' L'+f1(CX+rS/2+13)+' '+ty+'"></path>'+
+      '<path class="garrow" d="M'+f1(CX+rS/2-13)+' '+ty+' L'+CX+' '+ty+'"></path>'+
+      '<path class="gtip" d="M'+f1(CX-rS)+' '+ty+' l6 -4 v8 z"></path>'+
+      '<path class="gtip" d="M'+f1(CX+rS)+' '+ty+' l-6 -4 v8 z"></path>'+
+      '<path class="garrow" d="M'+CX+' '+(ty-5)+' L'+CX+' '+(ty+5)+'"></path>'+
+      '</g>';
+  }
+  /* Every ring named once, in paces, because paces is what she can walk out and
+     what the scope says too. The feet are nobody's unit on a golf course. */
+  var cap = 'aim ' + fsPaces(fsAimFt(kind)) + ' · rings ' +
+            rings.map(fsPaces).join(' · ') + ' paces';
+  out += '<g class="caption"><rect class="cappill" x="'+(150-116)+'" y="3" width="232" height="26" rx="13"></rect>'+
+         '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
+  /* Both captions under the picture rather than on leaders into it. The dashed
+     circle moves with the distance, and at 165 and 185 it lands within a few
+     units of the ring of direction names, where any leader out to the left runs
+     straight through "Short L". Type under the card cannot collide with anything. */
+  if(prox != null){
+    out += '<g class="fsfoot"><line class="sgfield" x1="'+(CX-92)+'" y1="'+(ROSE_H-26)+
+           '" x2="'+(CX-70)+'" y2="'+(ROSE_H-26)+'"></line>'+
+           '<text class="fsmiss" x="'+(CX-62)+'" y="'+(ROSE_H-22)+
+           '" text-anchor="start">LPGA average '+fsPaces(prox)+' paces</text></g>';
+  }
+  out += '<text class="fsmiss" x="'+CX+'" y="'+(ROSE_H-5)+'">outside '+pace+
+         ' paces is '+(kind === "app" ? "off the green" : "a miss")+'</text>';
+  return '<svg viewBox="0 0 '+ROSE_W+' '+ROSE_H+'" class="rose" role="group" aria-label="Where the ball finished">'+
+         out+'<g class="marks"></g></svg>';
+}
 /* Ball markers keep to the inner half of each ring segment; the labels have the outer
    half to themselves, so a busy zone never writes over its own name. */
 var ROSE_SPREAD = [[0,81],[-17,75],[17,75],[-17,89],[17,89],[0,93],[-9,82],[9,82],[0,76],[0,87]];
@@ -7156,7 +7472,35 @@ function sgBandR(zoneId){
      close to the ring, because further out the picture has faded to nothing. */
   return SGC.q4 + (SGC.out - SGC.q4)*0.30;
 }
-function roseMark(zoneId, n, sg){
+/* Markers on the full swing rings. Each band gets its own radius and its own
+   twist, so the first ball of one band never stacks on the first of the next,
+   and the innermost circle keeps its own little spread the way stone dead did. */
+var FS_SPREAD = [0, -18, 18, -30, 30, -9, 9, -24, 24, 0];
+function fsMark(kind, zoneId, n){
+  var rings = FS_RINGS[kind], rS = fsR(fsScoreFt(kind));
+  if(zoneId === "st") return polar(ROSE_CX, ROSE_CY, fsR(rings[0])*0.55,
+                                   CENTRE_ANG[n % CENTRE_ANG.length]);
+  for(var b = 0; b < FS_BAND_IDS.length && b < rings.length - 1; b++){
+    var k = FS_BAND_IDS[b].indexOf(zoneId);
+    if(k < 0) continue;
+    var r0 = fsR(rings[b]), r1 = fsR(rings[b+1]);
+    var mid = (QUADS[k].a0 + QUADS[k].a1) / 2;
+    /* Kept within a quarter of the band of its middle. A band here is 21 units
+       across and a marker is 8 across, so anything wider than this and a ball
+       hangs over the ring it is meant to be sitting in. The spreading is done
+       with the angle, which has the whole quarter to play with. */
+    var rad = [0.5, 0.5, 0.5, 0.62, 0.62, 0.38, 0.38, 0.5, 0.5, 0.62][n % 10];
+    return polar(ROSE_CX, ROSE_CY, r0 + (r1-r0)*rad,
+                 mid + FS_SPREAD[n % FS_SPREAD.length]);
+  }
+  /* an old ball from the growing circle, or one of the eight directions */
+  var i = zoneIndex(zoneId);
+  if(i < 0) return polar(ROSE_CX, ROSE_CY, rS*0.7, CENTRE_ANG[n % CENTRE_ANG.length]);
+  var band = ROSE_R - rS, m = ROSE_SPREAD[n % ROSE_SPREAD.length];
+  return polar(ROSE_CX, ROSE_CY, rS + band*0.16 + band*0.18*(n % 3), i*45 + m[0]);
+}
+function roseMark(zoneId, n, sg, fs){
+  if(fs) return fsMark(fs, zoneId, n);
   if(sg) return polar(SGC.cx, SGC.cy, sgBandR(zoneId),
                       (SG_TURN[zoneId] || 0) + SG_ANG[n % SG_ANG.length]);
   if(zoneId==="b") return polar(ROSE_CX, ROSE_CY, 15, CENTRE_ANG[n % CENTRE_ANG.length]);
@@ -7294,21 +7638,25 @@ function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
+  var fs = fsKind(a);
   return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist,
-                 isSG(a) ? set : null);
+                 (isSG(a) && !fs) ? set : null, fs);
 }
 function markR(a){
   var sh = areaShape(a);
   /* The one club ring is 20 units wide and has to hold five balls. At 13 they
      overlap each other and spill into the ring outside. */
-  if(isSG(a)) return 11;
+  /* The full swing bands are 21 units wide at this scale, so a marker any
+     bigger than this touches both edges of the ring it is sitting in. */
+  if(isSG(a)) return fsKind(a) ? 8 : 11;
   return sh === "corridor" ? 11 : (sh === "clock" ? 11 : 13);
 }
 function shapeMark(a, zoneId, n, st){
   var sh = areaShape(a);
   if(sh === "corridor") return corrMark(zoneId, n);
   if(sh === "clock") return clockMark(zoneId, n, st);
-  return roseMark(zoneId, n, isSG(a));
+  var fs = fsKind(a);
+  return roseMark(zoneId, n, isSG(a) && !fs, fs);
 }
 var SG_ZONES = [{id:"miss", lab:"Past four clubs"}];
 function shapeZones(a){
@@ -7920,8 +8268,15 @@ function shotRow(a, s, last, cfg){
       var nIn = 0, nLog = 0;
       shots.forEach(function(x){ if(x && x.z != null){ nLog++; if(isIn(x.z)) nIn++; } });
       var r = sgSetSum(s, shots);
-      tally.innerHTML = '<span>Inside two clubs <b>'+nIn+'</b>/'+nLog+'</span>'+
-                        '<span>Strokes <b>'+fmtSG2(r ? r.sg : 0)+'</b></span>';
+      /* On a windows set the count she wants beside the strokes is the window,
+         not the ring: the ring is already priced in the strokes figure, and two
+         counts of the same balls beside each other read as a contradiction. */
+      var fsk = fsKind(a);
+      var lead = anyWindow
+        ? '<span>'+parts[0].label+' <b>'+sc.w+'</b>/'+parts[0].max+'</span>'
+        : '<span>'+(fsk ? "Inside "+fsPaces(fsScoreFt(fsk))+" paces"
+                        : "Inside two clubs")+' <b>'+nIn+'</b>/'+nLog+'</span>';
+      tally.innerHTML = lead + '<span>Strokes <b>'+fmtSG2(r ? r.sg : 0)+'</b></span>';
     } else
     tally.innerHTML = cfg
       ? '<span>Compete <b>'+sc.total+'</b>/'+cfg.max+'</span>'
@@ -7938,6 +8293,11 @@ function shotRow(a, s, last, cfg){
     var wasDone = shotDone(s, shots[cur], calls[cur]);
     var sh = shots[cur] || {};
     for(var k in patch) sh[k] = patch[k];
+    /* Which ring scheme this ball was hit under. Without it a session logged
+       against the old circle, which grew with the shot, would be re-priced years
+       later as though it had been hit at today's fixed rings, and her history
+       would quietly change under her. */
+    if(patch.z != null && fsKind(a)) sh.v = SG_FS_V;
     shots[cur] = sh;
     phase = null;
     var fresh = patch.z != null && !wasDone;
@@ -9369,8 +9729,23 @@ var HEADLINE = {
 
    Only a full test gets one. Forty balls of a sixty-ball session is a good
    practice and not a result. */
+/* Which field a session is judged against. The rings on these two areas changed
+   on 26 Sep 2026 and the count means a different thing either side of that, so
+   the count is compared with the field that was in front of her at the time.
+   A session with no ball carrying the new stamp was hit on the old rings: that
+   covers sessions logged with the steppers too, which have no zones at all. */
+function placingFor(a, sess){
+  if(!a || !a.placing) return null;
+  if(!a.placingWas || !sess) return a.placing;
+  var shots = sess.shots, k, i, list;
+  if(shots) for(k in shots){
+    list = shots[k] || [];
+    for(i=0;i<list.length;i++) if(list[i] && list[i].v === SG_FS_V) return a.placing;
+  }
+  return a.placingWas;
+}
 function sessionPlacing(a, sess){
-  var spec = a && a.placing; if(!spec) return null;
+  var spec = placingFor(a, sess); if(!spec) return null;
   var t = testSplit(a, sess);
   if(!t.n || t.n < spec.n) return null;
   var tab = tablesFor(spec);
@@ -9748,9 +10123,10 @@ function sessionMeta(sess){
   var a = area(sess.areaId), bits = [];
   if(!a) return "";
   if(sess.bestRun) bits.push("run " + sess.bestRun);
-  if(a.placing){
+  var pspec = placingFor(a, sess);
+  if(pspec){
     var t = testSplit(a, sess);
-    if(t.n >= a.placing.n) bits.push(ordinalPlace(tablesFor(a.placing).count[Math.min(a.placing.n, t.in_)]) + " of 100");
+    if(t.n >= pspec.n) bits.push(ordinalPlace(tablesFor(pspec).count[Math.min(pspec.n, t.in_)]) + " of 100");
   }
   if(sess.compete) bits.push("compete " + sess.compete);
   return bits.join(" \u00b7 ");
@@ -10094,19 +10470,30 @@ var TOURINFO = {
               "The placing takes 45 balls at a 66% chance, allows for the fact that some tour players are better than others, and works out how many of a hundred of them would have beaten your score. 1st means almost nobody would.",
               "Club head speed is measured, not placed. The average of the fifteen is the one that tracks progress: the fastest of fifteen reads about 4 mph high and moves twice as much between sessions."] },
   11:{ title:"The tour numbers behind this",
-       rows:[["LPGA average proximity, 125 yd","9 yards"],["145 yd","11 yards"],["165 yd","13 yards"],["185 yd","14 yards"],
-             ["PGA average, the bullseye ring","7 to 11 yards"]],
-       lines:["The circle is where a tour player's average ball from that distance finishes.",
-              "Of the balls that find the green, about 72% are inside the circle, and that holds at all four distances. That is the check that the circles grow at the right rate.",
-              "What falls away with distance is finding the green at all: 80% at 125 yards, 62% at 185. Multiply the two and the circle is hit 58% of the time at 125 and 43% at 185.",
-              "The placing pools those four to 52%, so 31 of 60 is about what a tour player would do.",
-              "The bullseye is the PGA circle sitting inside the LPGA one. It is counted separately at the end, and shaped balls count in the same pool as straight ones."] },
+       rows:[["Inside 3 paces, 125 yd","+0.51"],
+             ["Inside 7 paces","+0.10"],
+             ["Inside 13 paces","\u22120.11"],
+             ["Off the green","\u22120.54"],
+             ["The same 7 paces at 185 yd","+0.30"],
+             ["LPGA average proximity, 125 yd","8 paces"],
+             ["185 yd","13 paces"]],
+       lines:["Three rings at every distance now: 3 paces, 7 and 13. Thirteen paces is also the edge of an average green, so the outer ring and finding the green are one line.",
+              "Every ball is scored in strokes gained on the LPGA field, so the rings never move and what each one is worth does. Inside 7 paces is worth +0.10 from 125 yards and +0.30 from 185, because from 185 the field averages 13 paces and from 125 it averages 8.",
+              "The field comes out at exactly nought at all four distances. A positive session means she beat the tour from those numbers, and by how much.",
+              "The two pink uprights stand on the 7 pace ring. That is the line the scope draws through the camera, and it is where strokes gained crosses zero from 125 and 145.",
+              "Finding the green falls away with distance: 84% at 125 yards, 63% at 185. The placing pools the four to 74%."] },
   2:{ title:"The tour numbers behind this",
-       rows:[["LPGA average proximity, 30 yd","4 yards"],["50 yd","6 yards"],["70 yd","6 yards"],["90 yd","7 yards"]],
-       lines:["Same idea as the approach circles: this is where a tour player's average wedge from that distance finishes.",
-              "Fifty and seventy both round to six yards, which is not a rounding error. The circle barely grows across that stretch, because the shot barely gets harder.",
-              "No inner ring here. The PGA circles are barely tighter and nobody can tell four yards from three and a half by eye.",
-              "Between 62% and 65% of tour wedges finish inside, so the placing uses 63%. 38 of 60 is tour standard."] },
+       rows:[["Inside 3 paces, 30 yd","+0.32"],
+             ["Inside 7 paces","\u22120.09"],
+             ["Outside 7 paces","\u22120.35"],
+             ["The same 3 paces at 90 yd","+0.43"],
+             ["LPGA average proximity, 30 yd","5 paces"],
+             ["90 yd","7 paces"]],
+       lines:["Two rings, 3 paces and 7, the same at every distance. Outside 7 paces is a miss.",
+              "Every ball is scored in strokes gained on the LPGA field, so what each ring is worth does the varying. Inside 3 paces is worth +0.32 from 30 yards and +0.43 from 90, because the further back she is the more that ball is worth.",
+              "Seven paces from 30 yards is worth slightly less than nothing, at \u22120.09. The field averages 5 paces from there, so seven is behind it. By 70 yards the same ring is worth +0.01 and by 90 it is +0.05.",
+              "The two pink uprights stand on the 3 pace ring, which is what the scope draws through the camera. It is the tightest target in the app outside the putting green.",
+              "The placing pools the four distances to 69% inside 7 paces."] },
   3:{ title:"The tour numbers behind this",
        rows:[["Holed, from 20 paces","+1.34"],
              ["Inside one club, 3 ft","+0.31"],
@@ -10193,6 +10580,16 @@ var AS_FOV = "lcl.aim.fov.v1";
    putt has no aiming circle because the hole is the target. */
 function aimTarget(s){
   if(!s || !s.dist || !s.tc) return null;
+  /* A full swing set carries two rings and the field's average, all three of
+     which the scope draws. The ring she aims at is one in from the scoring ring,
+     because the scoring ring at 165 yards is 9 degrees wide and nobody aims at a
+     nine degree target: she aims at the middle of the green and the outer pair
+     tells her where the green stops. */
+  if(s.sgKind){
+    return { label: s.short || s.label, dist: s.dist, unit: "yd", clubs: false,
+             fs: s.sgKind, c: fsAimFt(s.sgKind), b: 0,
+             out: fsScoreFt(s.sgKind), lpga: sgFsProx(s.sgKind, s.dist) };
+  }
   var ft = /^(\d+) ft$/.exec(s.tc), cl = /^(\d+) clubs?$/.exec(s.tc);
   var c = ft ? +ft[1] : cl ? +cl[1] * 3 : 0;      /* the tool: one club is about 3 ft */
   if(!c) return null;
@@ -10231,7 +10628,7 @@ function aimChip(a, s){
   /* Not on the short game. The scope exists to show a target at its true angular
      size when it is a hundred and fifty yards away and you cannot walk to it. A
      ring on the green in front of her is measured with the club in her hand. */
-  if(isSG(a)) return "";
+  if(isSG(a) && !fsKind(a)) return "";
   if(!aimTarget(s)) return "";
   return '<button type="button" class="vid aimc" data-aim-area="' + (a && a.id) +
     '" data-aim="' + s.id +
@@ -10333,6 +10730,31 @@ function aimPaint(){
     g.moveTo(p.x + bw, p.y - 44*D); g.lineTo(p.x + bw, p.y + 44*D);
     g.stroke(); g.restore();
   }
+  /* The two marks that only the full swing scope carries, drawn before the aim
+     pair so the aim pair sits on top of both. The outer one is the same pink,
+     thinner and faded, because it is the edge of the target rather than a second
+     thing to aim at. The LPGA average goes on a white underline: plain black
+     disappears into turf and plain white disappears into sky, and it has to be
+     legible against both in the same frame. */
+  if(t.fs){
+    var ow = aimDx(aimHalf(t.out, dd)), lw = aimDx(aimHalf(t.lpga, dd));
+    g.save();
+    g.strokeStyle = "rgba(210,0,106,.5)"; g.lineWidth = 1.6*D;
+    g.beginPath();
+    g.moveTo(p.x - ow, top + 14*D); g.lineTo(p.x - ow, bot - 14*D);
+    g.moveTo(p.x + ow, top + 14*D); g.lineTo(p.x + ow, bot - 14*D);
+    g.stroke();
+    [-1, 1].forEach(function(side){
+      var x = p.x + side*lw;
+      g.setLineDash([]);
+      g.strokeStyle = "rgba(255,255,255,.5)"; g.lineWidth = 3.4*D;
+      g.beginPath(); g.moveTo(x, p.y - 34*D); g.lineTo(x, p.y + 34*D); g.stroke();
+      g.setLineDash([3*D, 4*D]);
+      g.strokeStyle = "#12160f"; g.lineWidth = 1.5*D;
+      g.beginPath(); g.moveTo(x, p.y - 34*D); g.lineTo(x, p.y + 34*D); g.stroke();
+    });
+    g.restore();
+  }
   g.save();
   g.strokeStyle = "#d2006a"; g.lineWidth = 3*D;
   g.beginPath();
@@ -10348,10 +10770,16 @@ function aimPaint(){
   g.moveTo(p.x, p.y - 13*D); g.lineTo(p.x, p.y + 13*D);
   g.stroke(); g.restore();
 
-  tag(t.clubs ? (t.c * 2) + " ft across" : (Math.round(t.c/3) * 2) + "y across",
-      p.x, bot + 16*D, "#ffffff");
-  tag((half * 2 * 180 / Math.PI).toFixed(2) + "° wide", p.x, top - 16*D, "#b9c3bc");
-  if(bw) tag(t.b + " ft", p.x - bw, p.y - 54*D, "rgba(255,255,255,.8)");
+  /* Three marks now, and three captions over them turned the frame into a chart.
+     The key lives in the strip at the top instead, where it names each mark with
+     a piece of that mark's own line, and the picture goes back to being a
+     photograph with two pink lines on it. */
+  if(!t.fs){
+    tag(t.clubs ? (t.c * 2) + " ft across" : (Math.round(t.c/3) * 2) + "y across",
+        p.x, bot + 16*D, "#ffffff");
+    tag((half * 2 * 180 / Math.PI).toFixed(2) + "° wide", p.x, top - 16*D, "#b9c3bc");
+    if(bw) tag(t.b + " ft", p.x - bw, p.y - 54*D, "rgba(255,255,255,.8)");
+  }
 
   /* Close in, a target can be wider than the phone can see: two clubs at ten
      paces is 22 degrees and the frame, cropped to portrait, is nearer twenty.
@@ -10371,6 +10799,23 @@ function aimPaint(){
   }
 
   var ydR = Math.round(t.c / 3);
+  /* The key, as a strip above the picture. Each mark is named beside a short
+     piece of its own line, so nothing has to be matched up by position, and
+     everything is in paces because paces is what the card is labelled in and
+     what she can walk out on the green. */
+  if(t.fs){
+    e.fig.textContent = dd + " " + t.unit + "  ·  " +
+      (half * 2 * 180 / Math.PI).toFixed(1) + "° wide" +
+      (dd !== t.dist ? "   (set: " + t.dist + ")" : "");
+    e.sub.innerHTML =
+      '<span class="askey"><i class="asw aim"></i>aim ' + fsPaces(t.c) + '</span>' +
+      '<span class="askey"><i class="asw far"></i>' + fsPaces(t.out) + ' ' +
+        (t.fs === "app" ? "green" : "miss") + '</span>' +
+      '<span class="askey"><i class="asw lp"></i>LPGA ' + fsPaces(t.lpga) + '</span>' +
+      '<span class="asunit">paces from the flag</span>';
+    return;
+  }
+  e.sub.textContent = "";
   e.fig.textContent = (t.clubs
       ? "Inside " + (t.c/3) + " club" + (t.c/3 > 1 ? "s" : "")
       : "Target " + (ydR * 2) + "y wide")
