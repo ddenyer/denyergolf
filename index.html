@@ -863,6 +863,7 @@
   /* The four rings on the short game target, lighter the closer in, so the picture
      reads inward without a legend. They are the same at every station: what varies
      is what each one is worth, which is the dashed line's job to show. */
+  .rose .sgr-miss{fill:#6b9a5f; stroke:#527a47; stroke-width:1.3}
   .rose .sgr-q4{fill:#a4cc90; stroke:#6e9c62; stroke-width:1.3}
   .rose .sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
   .rose .sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
@@ -872,7 +873,8 @@
   .sgfield{fill:none; stroke:#22331d; stroke-width:2; stroke-dasharray:6 4;
     opacity:.8; pointer-events:none}
   .sglab text{fill:#2f4a27; font-family:"IBM Plex Mono", ui-monospace, monospace;
-    font-size:12.5px; font-weight:700; text-anchor:middle; pointer-events:none}
+    font-size:13px; font-weight:700; text-anchor:middle; pointer-events:none}
+  .sglab text.ft{font-size:11px; font-weight:500; fill:#4a6640}
   .choled.sm text{font-size:14px}
   .rguide line{stroke:#6e9c62; stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
   .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
@@ -5921,7 +5923,10 @@ function poolShots(a, sess){
       }
       if(x.z != null){
         if(kind === "clock"){ cl[x.z] = (cl[x.z]||0)+1; cn++; }
-        else { t[x.z] = (t[x.z]||0)+1; n++; }
+        else {
+          var z = (kind === "sg" && !SG_ZONE[x.z] && x.z !== "h") ? "miss" : x.z;
+          t[z] = (t[z]||0)+1; n++;
+        }
       }
       if(x.w != null){
         w[x.w] = (w[x.w]||0)+1; wn++;
@@ -5933,7 +5938,8 @@ function poolShots(a, sess){
   }
   if(sess.shots) a.sets.forEach(function(s){
     var k = trackKind(a, s);
-    var kind = k === "lag" ? "lag" : (areaShape(a) === "clock" ? "clock" : "target");
+    var kind = k === "lag" ? "lag" : (areaShape(a) === "clock" ? "clock"
+                                     : isSG(a) ? "sg" : "target");
     eat(sess.shots[s.id], null, kind, s.guide);
   });
   eat(sess.competeShots, sess.competeCalls, areaShape(a) === "clock" ? "clock" : "target", "windows");
@@ -6628,9 +6634,10 @@ function summaryBlock(a, sess){
          use, fanned a little so a percentage and the count under it never sit on
          the next ring's percentage. */
       if(isSG(a)){
-        if(id === "b")  return polar(ROSE_CX, ROSE_CY, (SGR.h+SGR.b)/2, 180);
-        if(id === "c")  return polar(ROSE_CX, ROSE_CY, (SGR.b+SGR.c)/2, 202);
-        if(id === "q4") return polar(ROSE_CX, ROSE_CY, (SGR.c+SGR.q4)/2, 158);
+        if(id === "b")    return polar(ROSE_CX, ROSE_CY, (SGR.h+SGR.b)/2, 180);
+        if(id === "c")    return polar(ROSE_CX, ROSE_CY, (SGR.b+SGR.c)/2, 200);
+        if(id === "q4")   return polar(ROSE_CX, ROSE_CY, (SGR.c+SGR.q4)/2, 160);
+        if(id === "miss") return polar(ROSE_CX, ROSE_CY, (SGR.q4+ROSE_R)/2, 180);
         return shapeMark(a, id, 0);
       }
       if(id === "b") return [ROSE_CX, ROSE_CY - 26];
@@ -6827,8 +6834,9 @@ ZONE_LABEL.qSL = "In, short left";  ZONE_LABEL.qLL = "In, long left";
 ZONE_LABEL.st  = "Stone dead";
 /* The short game's own two: the hole itself, and the ring between two clubs and
    four. Everything past four clubs keeps the eight directional names. */
-ZONE_LABEL.h  = "Holed";
-ZONE_LABEL.q4 = "Inside four clubs";
+ZONE_LABEL.h    = "Holed";
+ZONE_LABEL.q4   = "Inside four clubs";
+ZONE_LABEL.miss = "Past four clubs";
 var LAG_LABEL = {g0:"Short of 1", g1:"Between 1 and 2", g2:"Between 2 and 3",
                  g3:"Between 3 and 4", g4:"Between 4 and 5", g5:"Past 5"};
 for(var _lk in LAG_LABEL) ZONE_LABEL[_lk] = LAG_LABEL[_lk];
@@ -6905,12 +6913,20 @@ var ROSE_BULL = 31;
    so the smaller one always paints over it and a tap lands on the ring the thumb
    is actually over. A real annulus needs two half-arcs and getting that wrong
    draws nothing at all, which is a bug worth designing out rather than fixing. */
-var SGR = { h:16, b:40, c:66, q4:100 };
+var SGR = { h:17, b:46, c:76, q4:110 };
 /* Feet to picture radius, so the field's average can be drawn in the same space
    as the rings. Not to scale and it cannot be: one club inside a 12 ft circle is
    a few pixels here. The rings carry the meaning; this only has to put the dashed
    line in the right band. Past four clubs it runs out to the rough at 24 ft. */
 var SG_RING_FT = [[0, SGR.h], [3, SGR.b], [6, SGR.c], [12, SGR.q4], [24, ROSE_R]];
+/* Each ring names itself, in clubs and in the feet a knotted string measures.
+   Two lines, because one line of "4 clubs (12 ft)" is wider than the inner band
+   is tall, and the numbers have to say the same thing at every ring. */
+var SG_LAB = [
+  ["b",  "1 club",  "(3 ft)"],
+  ["c",  "2 clubs", "(6 ft)"],
+  ["q4", "4 clubs", "(12 ft)"]
+];
 function sgRingR(ft){
   var T = SG_RING_FT, i;
   if(!(ft > T[0][0])) return T[0][1];
@@ -6962,15 +6978,22 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
   var yd = ydRadius(centreLabel);
   /* On the short game target the directional ring starts where the last scoring
      ring ends, so everything outside four clubs still says which way it went. */
-  var inR = sgSet ? SGR.q4 : ROSE_IN;
   out += '<circle class="rbed" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_R+2)+'"></circle>';
-  ZONES.forEach(function(z, i){
-    out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,inR,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
-           (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+', past four clubs"' : '')+'></path>';
-    var p = polar(CX, CY, 118, i*45);
-    out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
-  });
-  if(!sgSet) out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
+  /* Which way a chip missed has never been part of this drill and the quadrants
+     came across from the approach rose by inheritance rather than by decision.
+     Past four clubs is one ring here. */
+  if(sgSet){
+    out += '<circle class="rz sgr sgr-miss" data-z="miss" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_R+'"'+
+           (tappable ? ' role="button" tabindex="0" aria-label="Past four clubs"' : '')+'></circle>';
+  } else {
+    ZONES.forEach(function(z, i){
+      out += '<path class="rz" data-z="'+z.id+'" d="'+sectorPath(CX,CY,ROSE_IN,ROSE_R,i*45-22.5,i*45+22.5)+'"'+
+             (tappable ? ' role="button" tabindex="0" aria-label="'+z.lab+'"' : '')+'></path>';
+      var p = polar(CX, CY, 114, i*45);
+      out += '<text class="rzl" x="'+f1(p[0])+'" y="'+f1(p[1]+4)+'">'+z.lab+'</text>';
+    });
+    out += '<circle class="fringe" cx="'+CX+'" cy="'+CY+'" r="'+(ROSE_IN+7)+'"></circle>';
+  }
   var sr = quads ? stiffR(centreLabel) : 0;
   if(!sr) quads = false;          // no circle to split, so leave the picture alone
   if(quads){
@@ -6999,18 +7022,30 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
        club, from a plugged bunker it sits outside four, and she can see which ring
        she has to beat before she plays the shot. */
     var fp = sgProx(sgSet);
-    if(fp) out += '<circle class="sgfield" cx="'+CX+'" cy="'+CY+'" r="'+f1(sgRingR(fp))+'"></circle>';
+    if(fp){
+      /* Drawn as an arc with a gap at the top rather than a closed circle, because
+         its radius moves with the shot and straight up belongs to the ring names.
+         The gap is held at a constant width in pixels, so it stays out of the way
+         of a name whether it falls at the inner ring or the outer one. */
+      var fr = sgRingR(fp), g = Math.asin(Math.min(0.92, 34/fr))*180/Math.PI;
+      var p0 = polar(CX, CY, fr, g), p1 = polar(CX, CY, fr, 360-g);
+      out += '<path class="sgfield" d="M'+f1(p0[0])+' '+f1(p0[1])+
+             ' A'+f1(fr)+' '+f1(fr)+' 0 1 1 '+f1(p1[0])+' '+f1(p1[1])+'"></path>';
+    }
     /* Holed is a small dark dot with a count in it, the way the putting clock does
        it. A hole-out has no "where it finished" to draw. */
     out += '<circle class="rz sgh" data-z="h" cx="'+CX+'" cy="'+CY+'" r="'+SGR.h+'"'+
            (tappable ? ' role="button" tabindex="0" aria-label="Holed"' : '')+'></circle>';
-    /* The rings named straight up, which is the one direction no ball marker
-       uses, so a number and a marker can never land on each other. */
-    out += '<g class="sglab">'+
-      '<text x="'+CX+'" y="'+(CY - (SGR.h+SGR.b)/2 + 5)+'">1</text>'+
-      '<text x="'+CX+'" y="'+(CY - (SGR.b+SGR.c)/2 + 5)+'">2</text>'+
-      '<text x="'+CX+'" y="'+(CY - (SGR.c+SGR.q4)/2 + 5)+'">4</text>'+
-      '</g>';
+    /* Named straight up, which is the one direction no ball marker uses, so a
+       number and a marker can never land on each other. The club length is what
+       she can measure standing there; the feet are for the knotted string. */
+    out += '<g class="sglab">';
+    SG_LAB.forEach(function(L){
+      var y = CY - (SGR[L[0]] + (L[0] === "b" ? SGR.h : L[0] === "c" ? SGR.b : SGR.c))/2;
+      out += '<text x="'+CX+'" y="'+f1(y - 2)+'">'+L[1]+'</text>'+
+             '<text class="ft" x="'+CX+'" y="'+f1(y + 11)+'">'+L[2]+'</text>';
+    });
+    out += '</g>';
   } else {
     out += '<circle class="rz rc" data-z="c" cx="'+CX+'" cy="'+CY+'" r="'+ROSE_IN+'"'+
            (tappable ? ' role="button" tabindex="0" aria-label="In the target"' : '')+'></circle>';
@@ -7054,11 +7089,11 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
   if(!sgSet) out += pinAt(CX, CY - 3, quads ? 20 : 30);
   // both numbers live in the pill, where no marker can land on them
   var cap = sgSet
-    ? 'clubs from the hole  \u00b7  dashed = the field'
+    ? (sgProx(sgSet) ? 'dashed = where the field finishes' : 'clubs from the hole')
     : quads
       ? (yd*2) + 'y / steps wide  \u00b7  middle 1 club'
       : (centreLabel||"In") + (bull ? '  \u00b7  bull ' + bull : '');
-  var capW = sgSet ? 262 : quads ? 250 : (bull ? 208 : 128);
+  var capW = sgSet ? (sgProx(sgSet) ? 254 : 178) : quads ? 250 : (bull ? 208 : 128);
   out += '<g class="caption"><rect class="cappill" x="'+(150-capW/2)+'" y="3" width="'+capW+'" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
   return '<svg viewBox="0 0 '+ROSE_W+' '+ROSE_H+'" class="rose" role="group" aria-label="Where the ball finished">'+
@@ -7075,27 +7110,18 @@ var CENTRE_ANG = [180, 120, 240, 90, 270, 150, 210];
    left empty for the ring numbers, and each band is turned a little off the one
    inside it so the first ball of each does not stack on one line. */
 var SG_ANG = [180, 240, 120, 300, 60, 210, 150, 270, 90, 165];
-var SG_TURN = { b:0, c:20, q4:-22 };
+var SG_TURN = { b:0, c:20, q4:-22, miss:8 };
 function sgBandR(zoneId){
   if(zoneId === "b")  return (SGR.h + SGR.b)/2;
   if(zoneId === "c")  return (SGR.b + SGR.c)/2;
   if(zoneId === "q4") return (SGR.c + SGR.q4)/2;
-  return 0;
+  /* Everything else is past four clubs, including the eight directions a session
+     logged before the quadrants came off. They were all misses then too. */
+  return (SGR.q4 + ROSE_R)/2;
 }
 function roseMark(zoneId, n, sg){
-  if(sg){
-    var r = sgBandR(zoneId);
-    if(r) return polar(ROSE_CX, ROSE_CY, r,
-                       (SG_TURN[zoneId] || 0) + SG_ANG[n % SG_ANG.length]);
-    /* past four clubs: the outer ring, whose markers keep to its inner half so
-       the direction labels beyond them stay readable */
-    var oi = zoneIndex(zoneId);
-    if(oi >= 0){
-      var om = [[0,112],[-14,107],[14,107],[-14,117],[14,117],[0,103],[-7,112],[7,112],[0,120],[0,109]][n % 10];
-      return polar(ROSE_CX, ROSE_CY, om[1], oi*45 + om[0]);
-    }
-    return [ROSE_CX, ROSE_CY];
-  }
+  if(sg) return polar(ROSE_CX, ROSE_CY, sgBandR(zoneId),
+                      (SG_TURN[zoneId] || 0) + SG_ANG[n % SG_ANG.length]);
   if(zoneId==="b") return polar(ROSE_CX, ROSE_CY, 15, CENTRE_ANG[n % CENTRE_ANG.length]);
   if(zoneId==="st") return polar(ROSE_CX, ROSE_CY, 9, CENTRE_ANG[n % CENTRE_ANG.length]);
   for(var q=0;q<QUADS.length;q++){
@@ -7244,10 +7270,12 @@ function shapeMark(a, zoneId, n, st){
   if(sh === "clock") return clockMark(zoneId, n, st);
   return roseMark(zoneId, n, isSG(a));
 }
+var SG_ZONES = [{id:"miss", lab:"Past four clubs"}];
 function shapeZones(a){
   var sh = areaShape(a);
   if(sh === "corridor") return CORR_ZONES;
   if(sh === "clock") return CLOCK_ZONES;
+  if(isSG(a)) return SG_ZONES;
   return ZONES;
 }
 
@@ -9881,10 +9909,19 @@ function openPast(s){
         var g2 = set.group ? set.group.split("\u00b7")[0].trim() : "";
         if(g2 && g2 !== group){ group = g2; h += '<p class="pastgrp">'+g2+'</p>'; }
         var parts = setParts(set), bits = [];
-        parts.forEach(function(pt){
-          var v = (s.scores && s.scores[pt.key]) || 0;
-          bits.push((pt.label ? pt.label + " " : "") + v + "/" + pt.max);
-        });
+        if(isSG(a)){
+          /* Points out of ten say nothing here, and on a session saved before the
+             strokes existed they say zero, which is worse than nothing. The set
+             line carries what those balls were worth instead, and a set with no
+             balls logged carries nothing at all. */
+          var sgr = sgSetSum(set, (s.shots||{})[set.id]);
+          if(sgr) bits.push(fmtSG2(sgr.sg) + " over " + sgr.balls);
+        } else {
+          parts.forEach(function(pt){
+            var v = (s.scores && s.scores[pt.key]) || 0;
+            bits.push((pt.label ? pt.label + " " : "") + v + "/" + pt.max);
+          });
+        }
         h += '<div class="pastrow"><span>'+set.label+
              (set.tgt ? '<span class="sub">'+set.tgt+'</span>' : '')+'</span>'+
              '<b>'+bits.join(" \u00b7 ")+'</b></div>';
@@ -9908,7 +9945,7 @@ function openPast(s){
 
 /* ---------- export ---------- */
 function sessionZones(sess){
-  var t = {c:0, b:0, h:0, q4:0, wayLeft:0, wayRight:0};
+  var t = {c:0, b:0, h:0, q4:0, miss:0, wayLeft:0, wayRight:0};
   ZONES.forEach(function(z){ t[z.id] = 0; });
   if(!sess.shots) return t;
   for(var k in sess.shots){
