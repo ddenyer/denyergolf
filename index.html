@@ -1613,11 +1613,12 @@
     <p class="asnote" id="asTip">Tap the flag on screen to put the target there.</p>
     <details>
       <summary>Calibration</summary>
-      <label class="asslide"><span>Camera field of view</span><b id="asFovV">69&deg;</b></label>
+      <label class="asslide"><span>Camera view, widest side</span><b id="asFovV">69&deg;</b></label>
       <input type="range" id="asFov" min="40" max="100" step="0.5" value="69">
-      <p class="asnote">Everything scales off this, and it differs by phone. Set it
-        once: stand a measured distance from two things a measured distance apart
-        and nudge until the bracket sits on them. It is remembered after that.</p>
+      <p class="asnote">Everything scales off this, and it differs by phone. It is the
+        angle across the long side of the picture, so it does not change when you turn
+        the phone. Set it once: stand a measured distance from two things a measured
+        distance apart and nudge until the bracket sits on them. It is remembered.</p>
     </details>
   </div>
   <div id="asStart">
@@ -1811,27 +1812,51 @@ var AREAS = [
 
 { id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true,
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
-  /* The circle is the LPGA 66% circle for that carry, read off the club-matched
-     proximity curve. The bullseye is the PGA circle from the same yardage: inside it
-     the ball was tour standard for a man playing a shorter club from the same spot. */
+  /* WHERE THE RATES COME FROM  (rebuilt 25 Sep 2026, LPGA proximity table)
+
+     Source: the LPGA proximity table, yards-to-pin against green-hit % and average
+     proximity, 10 to 250 yards. Two columns of that table also fix the shape of the
+     dispersion: 61% of shots finish inside the average and 88% inside average plus a
+     half. For a lognormal, P(X < mean) is Phi(sigma/2), so sigma = 2*Phi_inv(0.61)
+     = 0.559, and that same sigma reproduces the 88% column to within four points.
+
+     Per set:  mean proximity (ft) = table proximity (yd) * 3
+               P(inside the circle | on the green) = Phi( (ln R - mu) / sigma ),
+                 mu = ln(mean) - sigma^2 / 2
+               r2 = that, times the green-hit % for the yardage, because a ball that
+                 misses the green misses the circle too and the drill counts misses.
+
+     125y / 26 ft: prox 22.0 ft, 72% on the green, 80% green hit -> 0.58
+     145y / 32 ft: prox 26.3 ft, 74%, 77% -> 0.56
+     165y / 38 ft: prox 32.1 ft, 72%, 71% -> 0.51
+     185y / 43 ft: prox 38.1 ft, 69%, 62% -> 0.43
+     placing p = 0.519, the pooled mean of the four.
+
+     The conditional rate is near constant at 72% across all four, which is the check
+     that the circle radii scale correctly with distance. What falls away with distance
+     is the chance of finding the green at all, and that is what r2 now carries.
+
+     Before this, the sets held r2 0.55 and the placing model held p 0.66. Those are
+     the same quantity and they disagreed by eleven points, which is why a fair
+     approach session placed near the bottom of the hundred. */
   plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.55, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.55, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"a", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.58, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.58, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", dist:145, r2:0.55, word:"145 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", dist:145, r2:0.55, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"c", label:"145y", short:"145 yards", tc:"32 ft", dist:145, r2:0.56, word:"145 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"d", guide:"windows", label:"145y \u00b7 five windows", tc:"32 ft", dist:145, r2:0.56, word:"145 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", dist:165, r2:0.55, word:"165 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", dist:165, r2:0.55, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"e", label:"165y", short:"165 yards", tc:"38 ft", dist:165, r2:0.51, word:"165 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"f", guide:"windows", label:"165y \u00b7 five windows", tc:"38 ft", dist:165, r2:0.51, word:"165 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", dist:185, r2:0.55, word:"185 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", dist:185, r2:0.55, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
+    {id:"g", label:"185y", short:"185 yards", tc:"43 ft", dist:185, r2:0.43, word:"185 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
+    {id:"h", guide:"windows", label:"185y \u00b7 five windows", tc:"43 ft", dist:185, r2:0.43, word:"185 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
       parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
   ],
-  placing:{n:60, p:0.66, sd:0.05, field:"tour players"} },
+  placing:{n:60, p:0.519, sd:0.05, field:"tour players"} },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -1859,22 +1884,22 @@ var AREAS = [
   targets:"30y → 8y wide · 50y → 12y wide · 70y → 12y wide · 90y → 14y wide · tighter dispersion · low, normal and high on command",
   plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
   sets:[
-    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
-    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, r2:0.55, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"a", label:"30y", short:"30 yards", tc:"11 ft", dist:30, r2:0.62, word:"30 yards", tgt:"Inside the circle scores · the LPGA 62% circle from here", max:5},
+    {id:"b", guide:"heights", label:"30y · five heights", tc:"11 ft", dist:30, r2:0.62, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
-    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, r2:0.55, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"c", label:"50y", short:"50 yards", tc:"17 ft", dist:50, r2:0.65, word:"50 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
+    {id:"d", guide:"heights", label:"50y · five heights", tc:"17 ft", dist:50, r2:0.65, word:"50 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
-    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, r2:0.55, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"e", label:"70y", short:"70 yards", tc:"19 ft", dist:70, r2:0.65, word:"70 yards", tgt:"Inside the circle scores · the LPGA 65% circle from here", max:5},
+    {id:"i", guide:"heights", label:"70y · five heights", tc:"19 ft", dist:70, r2:0.65, word:"70 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Inside the circle scores · the LPGA 66% circle from here", max:5},
-    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r2:0.55, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
+    {id:"f", label:"90y", short:"90 yards", tc:"20 ft", dist:90, r2:0.60, word:"90 yards", tgt:"Inside the circle scores · the LPGA 60% circle from here", max:5},
+    {id:"g", guide:"heights", label:"90y · five heights", tc:"20 ft", dist:90, r2:0.60, word:"90 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
       parts:[{id:"h", label:"Height", max:5},{id:"t", label:"Target", max:5}]},
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. A point inside each target", max:20}
   ],
-  placing:{n:60, p:0.66, sd:0.05, field:"tour players"} },
+  placing:{n:60, p:0.628, sd:0.05, field:"tour players"} },
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces",
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · a point inside two clubs, two points inside one",
@@ -1885,23 +1910,27 @@ var AREAS = [
      often an LPGA player finishes inside two clubs from that distance and that lie,
      r1 inside one. Both are derived from the tour's own up-and-down and hole-out rates. */
   sets:[
-    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.172, r2:0.365, word:"20 paces", tgt:"Set 1 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a2", blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 2 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a3", blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", tgt:"Set 3 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"a4", blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"2 clubs", bull:"1 club", dist:50, lie:"good", r1:0.070, r2:0.192, word:"50 paces", tgt:"Set 4 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.286, r2:0.479, word:"10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.172, r2:0.365, word:"20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"awk", r1:0.130, r2:0.289, word:"a downhill lie", tgt:"Set 1 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.066, r2:0.169, word:"the rough", tgt:"Set 2 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"c3", blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"awk", r1:0.066, r2:0.176, word:"a bare lie", tgt:"Set 3 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.149, r2:0.317, word:"the bunker at 10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.084, r2:0.221, word:"the bunker at 20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.055, r2:0.162, word:"the bunker at 30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.066, r2:0.175, word:"a downhill bunker lie", tgt:"Set 1 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
-    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.066, r2:0.175, word:"a plugged lie", tgt:"Set 2 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10}
+    {id:"a1", group:"Pitching & chipping", blk:"Pitching & chipping", label:"Release 1 · 50° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 1 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a2", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.117, r2:0.279, word:"30 paces", tgt:"Set 2 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a3", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"good", r1:0.087, r2:0.225, word:"40 paces", tgt:"Set 3 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"a4", gone:true, blk:"Pitching & chipping", label:"Release 1 · 50° · 50 paces", tc:"2 clubs", bull:"1 club", dist:50, lie:"good", r1:0.070, r2:0.192, word:"50 paces", tgt:"Set 4 of 4 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b1", blk:"Pitching & chipping", label:"Release 2 · 54° · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.374, r2:0.821, word:"10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b2", blk:"Pitching & chipping", label:"Release 2 · 54° · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.087, r2:0.452, word:"20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"b3", blk:"Pitching & chipping", label:"Release 2 · 58° · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.028, r2:0.252, word:"30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c1", blk:"Pitching & chipping", label:"Tricky lie · downhill · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"awk", r1:0.016, r2:0.183, word:"a downhill lie", tgt:"Set 1 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c2", blk:"Pitching & chipping", label:"Tricky lie · out of rough · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.004, r2:0.073, word:"the rough", tgt:"Set 2 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"c3", gone:true, blk:"Pitching & chipping", label:"Tricky lie · bare · 40 paces", tc:"2 clubs", bull:"1 club", dist:40, lie:"awk", r1:0.066, r2:0.176, word:"a bare lie", tgt:"Set 3 of 3 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d1", group:"Bunkers", blk:"Bunkers", label:"Bunker · good lie · 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"good", r1:0.214, r2:0.673, word:"the bunker at 10 paces", tgt:"Set 1 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d2", blk:"Bunkers", label:"Bunker · good lie · 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.034, r2:0.278, word:"the bunker at 20 paces", tgt:"Set 2 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"d3", blk:"Bunkers", label:"Bunker · good lie · 30 paces", tc:"2 clubs", bull:"1 club", dist:30, lie:"good", r1:0.009, r2:0.127, word:"the bunker at 30 paces", tgt:"Set 3 of 3 · good lie · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"e1", blk:"Bunkers", label:"Bunker · downhill lie · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.045, r2:0.323, word:"a downhill bunker lie", tgt:"Set 1 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"e2", blk:"Bunkers", label:"Bunker · plugged · 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"awk", r1:0.012, r2:0.158, word:"a plugged lie", tgt:"Set 2 of 2 · you choose the loft · a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"f1", group:"Around the green", blk:"Around the green", label:"Off the collar \u00b7 8 paces", tc:"2 clubs", bull:"1 club", dist:8, lie:"tight", r1:0.323, r2:0.782, word:"the collar", tgt:"Set 1 of 4 \u00b7 tight lie, putter or wedge \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"f2", blk:"Around the green", label:"Short-sided \u00b7 10 paces", tc:"2 clubs", bull:"1 club", dist:10, lie:"awk", r1:0.162, r2:0.600, word:"a short-sided pin", tgt:"Set 2 of 4 \u00b7 no green to work with \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"f4", blk:"Around the green", label:"Tight lie \u00b7 bare \u00b7 15 paces", tc:"2 clubs", bull:"1 club", dist:15, lie:"tight", r1:0.073, r2:0.416, word:"a bare lie", tgt:"Set 3 of 4 \u00b7 no grass under it \u00b7 a point inside two clubs, two inside one", balls:5, max:10},
+    {id:"f3", blk:"Around the green", label:"Into an upslope \u00b7 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.046, r2:0.328, word:"an upslope", tgt:"Set 4 of 4 \u00b7 use the bank \u00b7 a point inside two clubs, two inside one", balls:5, max:10}
   ],
-  placing:{n:75, p:0.259, sd:0.05, bullP:0.113, field:"tour players"} },
+  placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"tour players"} },
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
@@ -2415,34 +2444,40 @@ function area(id){
    and its runs, because all of those depend on the exact sets. What keys to the task:
    the balance chart and the question of whether she practised approach at all. */
 function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
+/* A set marked `gone` has been taken out of the drill but NOT out of the data.
+   New sessions never offer it; anything already logged against it still renders,
+   still totals and still counts, so a session she has played stays complete at
+   the number of stations she actually played. Read paths deliberately keep
+   iterating a.sets, because they skip a set with no shots anyway. */
+function liveSets(a){ return ((a && a.sets) || []).filter(function(s){ return !s.gone; }); }
 var PRACTICE = [
 { id:"p-approach-short", type:11, track:true, quads:true,
   name:"Approach \u00b7 short irons", sub:"110, 125, 140 and 155 yards \u00b7 the scoring clubs",
   targets:"GIR 67 \u2192 73% \u00b7 proximity inside the circle \u00b7 pin high, not short",
   plan:"10 min warm-up \u2192 45 min: eight sets of five, 40 balls, full routine every one",
   sets:[
-    {id:"a", label:"110y", short:"110 yards", tc:"24 ft", dist:110, r2:0.55, word:"110 yards",
+    {id:"a", label:"110y", short:"110 yards", tc:"24 ft", dist:110, r2:0.61, word:"110 yards",
      tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"b", guide:"windows", label:"110y \u00b7 five windows", tc:"24 ft", dist:110, r2:0.55, word:"110 yards",
+    {id:"b", guide:"windows", label:"110y \u00b7 five windows", tc:"24 ft", dist:110, r2:0.61, word:"110 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"c", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.55, word:"125 yards",
+    {id:"c", label:"125y", short:"125 yards", tc:"26 ft", dist:125, r2:0.58, word:"125 yards",
      tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"d", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.55, word:"125 yards",
+    {id:"d", guide:"windows", label:"125y \u00b7 five windows", tc:"26 ft", dist:125, r2:0.58, word:"125 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"e", label:"140y", short:"140 yards", tc:"30 ft", dist:140, r2:0.55, word:"140 yards",
+    {id:"e", label:"140y", short:"140 yards", tc:"30 ft", dist:140, r2:0.57, word:"140 yards",
      tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"f", guide:"windows", label:"140y \u00b7 five windows", tc:"30 ft", dist:140, r2:0.55, word:"140 yards",
+    {id:"f", guide:"windows", label:"140y \u00b7 five windows", tc:"30 ft", dist:140, r2:0.57, word:"140 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]},
-    {id:"g", label:"155y", short:"155 yards", tc:"34 ft", dist:155, r2:0.55, word:"155 yards",
+    {id:"g", label:"155y", short:"155 yards", tc:"34 ft", dist:155, r2:0.53, word:"155 yards",
      tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
-    {id:"h", guide:"windows", label:"155y \u00b7 five windows", tc:"34 ft", dist:155, r2:0.55, word:"155 yards",
+    {id:"h", guide:"windows", label:"155y \u00b7 five windows", tc:"34 ft", dist:155, r2:0.53, word:"155 yards",
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  placing:{n:40, p:0.55, sd:0.05, field:"tour players"} }
+  placing:{n:40, p:0.570, sd:0.05, field:"tour players"} }
 ];
 function customLib(kind){
   var o = (state.lib && state.lib[kind]) || [];
@@ -2520,7 +2555,7 @@ function setParts(s){
   return [{ key:s.id, label:null, max:s.max }];
 }
 function setMax(s){ var m=0; setParts(s).forEach(function(p){ m+=p.max; }); return m; }
-function areaMax(a){ var m=0; a.sets.forEach(function(s){ m+=setMax(s); }); return m; }
+function areaMax(a){ var m=0; liveSets(a).forEach(function(s){ m+=setMax(s); }); return m; }
 
 /* ============ conditional drill tests ============
    A test is a small area: same sets, same capture, same scoring, so it inherits the
@@ -5442,7 +5477,7 @@ function openSession(areaId, resume){
   } else {
     state.draft = { id:uid(), playerId:state.activePlayer, kind:"practice", areaId:areaId,
                     date:today(), scores:{}, metrics:{}, shots:{}, slope:{}, cond:{}, train:null, compete:0, competeMax:(competeSpec(a) ? competeSpec(a).max : (a.compete ? a.compete.max : 0)), won:null, notes:"", max:areaMax(a) };
-    a.sets.forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
+    liveSets(a).forEach(function(s){ setParts(s).forEach(function(pt){ state.draft.scores[pt.key]=0; }); });
   }
   state.gymDraft = null;
   state.runShown = 0;
@@ -5541,7 +5576,7 @@ function notesBlock(id, label){
 function competeSpec(a){
   if(!a || !a.track || !a.compete || !a.compete.calls) return null;
   var plain = [], windowed = false;
-  a.sets.forEach(function(s){
+  liveSets(a).forEach(function(s){
     if(s.parts && s.guide === "windows") windowed = true;
     else if(!s.parts && s.tc) plain.push({label:s.short || s.label, tc:s.tc});
   });
@@ -5597,12 +5632,13 @@ function competeBlock(a){
 
 function buildSessionCards(a, last){
   var host = $("sessCards"); host.innerHTML = "";
-  var cards = [], n = a.sets.length;
+  var live = liveSets(a);
+  var cards = [], n = live.length;
 
   cards.push(pcard('Before you start<b>'+a.name+'</b>', sessionIntro()));
   cards.push(pcard('Conditions<b>'+a.name+'</b>', condPage()));
 
-  a.sets.forEach(function(s, i){
+  live.forEach(function(s, i){
     var body = document.createElement("div");
     var tracked = trackKind(a, s);
     if(s.metrics) body.appendChild(monitorNote());
@@ -9703,12 +9739,21 @@ function aimDPR(){ return Math.min(window.devicePixelRatio || 1, 3); }
    out by several per cent by 20 degrees off centre and would quietly widen
    every target. The frame is drawn object-fit:cover, so work out how much of it
    is actually on screen before scaling. */
+/* The calibration figure is the field of view across the WIDEST side of the
+   frame, not across its width. Those are the same thing only in landscape, and
+   a phone held up to a flag is portrait: iOS then hands over a portrait frame
+   whose horizontal side is the narrow one, about 42 degrees rather than 69.
+   Reading 69 off the narrow side drew every target at well under half its true
+   width, which is exactly what Charlotte said she was seeing.
+
+   Taking the long side makes it orientation-proof: the long side always
+   subtends the stated angle, whichever way up the phone is. */
 function aimK(){
   var e = aimEls(), vw = e.cam.videoWidth, vh = e.cam.videoHeight;
   var half = Math.tan(aim.fov * Math.PI / 360);
   if(!vw || !vh) return e.cv.width / (2 * half);
-  var s = Math.max(e.cv.width / vw, e.cv.height / vh);
-  return (vw * s / 2) / half;
+  var s = Math.max(e.cv.width / vw, e.cv.height / vh);   // object-fit: cover
+  return (Math.max(vw, vh) * s / 2) / half;
 }
 function aimDx(theta){ return Math.tan(theta) * aimK(); }
 function aimHalf(ft, d){ return Math.atan(ft / (3 * d)); }
