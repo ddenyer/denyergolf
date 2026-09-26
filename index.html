@@ -7407,9 +7407,9 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
   /* The guides, on the scoring ring, because that is the only circle wide enough
      to carry an arrow and a number at both ends of it. */
   if(dist){
-    /* The scale sits twelve units above the picture rather than twenty: its
-       numbers are above its line, and at twenty they ran under the pill. */
-    var gx = CX + ROSE_R + 34, ty = CY - ROSE_R - 12;
+    /* With the pill gone the scale has the whole top of the card, so it sits
+       clear of the picture with its numbers above its own line. */
+    var gx = CX + ROSE_R + 34, ty = CY - ROSE_R - 24;
     /* Every ring gets a line and a number, not just the scoring one. The
        yardages down the right say what each ring means up and down the range,
        and the scale across the top says what it means across it. Before this
@@ -7451,12 +7451,9 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
     sc += '<text x="'+f1(CX+rS+9)+'" y="'+(ty+4)+'" text-anchor="start" class="in">y</text></g>';
     out += sc;
   }
-  /* Every ring named once, in paces, because paces is what she can walk out and
-     what the scope says too. The feet are nobody's unit on a golf course. */
-  var cap = 'aim ' + fsPaces(fsAimFt(kind)) + ' · rings ' +
-            rings.map(fsPaces).join(' · ') + ' paces';
-  out += '<g class="caption"><rect class="cappill" x="'+(150-116)+'" y="3" width="232" height="26" rx="13"></rect>'+
-         '<text class="rcl" x="150" y="21">'+cap+'</text></g>';
+  /* No pill. It named the rings in words directly above a ruler that names them
+     in numbers, which is the same sentence twice, and it cost the ruler the room
+     it needed to sit clear of the picture. */
   /* Both captions under the picture rather than on leaders into it. The dashed
      circle moves with the distance, and at 165 and 185 it lands within a few
      units of the ring of direction names, where any leader out to the left runs
