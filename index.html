@@ -917,6 +917,9 @@
   .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
     fill:var(--muted); pointer-events:none}
   .gnum text.key{fill:var(--ink-2); font-weight:600}
+  /* The rings inside the scoring one. Same numbers, a step quieter, so the
+     column reads as a scale with one figure picked out rather than a ladder. */
+  .gnum text.in{font-size:11.5px; fill:var(--muted); opacity:.85}
   .gnum.mid text{font-size:12.5px}
   .garrow{stroke:var(--muted); stroke-width:1; fill:none; pointer-events:none}
   .gtip{fill:var(--muted); pointer-events:none}
@@ -7404,32 +7407,49 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
   /* The guides, on the scoring ring, because that is the only circle wide enough
      to carry an arrow and a number at both ends of it. */
   if(dist){
-    var gx = CX + ROSE_R + 34, ty = CY - ROSE_R - 20;
-    out += '<g class="rguide">'+
-      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY-rS)+'" x2="'+gx+'" y2="'+f1(CY-rS)+'"></line>'+
-      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+CY+'" x2="'+gx+'" y2="'+CY+'"></line>'+
-      '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY+rS)+'" x2="'+gx+'" y2="'+f1(CY+rS)+'"></line>'+
-      /* stopped just under the ring they are tangent to. Run to the foot of the
-         picture, the way the old ones did, they cross the LPGA caption. */
-      '<line x1="'+f1(CX-rS)+'" y1="'+ty+'" x2="'+f1(CX-rS)+'" y2="'+f1(CY+rS+10)+'"></line>'+
-      '<line x1="'+f1(CX+rS)+'" y1="'+ty+'" x2="'+f1(CX+rS)+'" y2="'+f1(CY+rS+10)+'"></line>'+
-      '</g>';
-    out += '<g class="gnum">'+
-      '<text x="'+(gx+4)+'" y="'+f1(CY-rS+4)+'">'+(dist+pace)+'</text>'+
-      '<text x="'+(gx+4)+'" y="'+(CY+4)+'" class="key">'+dist+'</text>'+
-      '<text x="'+(gx+4)+'" y="'+f1(CY+rS+4)+'">'+(dist-pace)+'</text>'+
-      '</g>';
-    out += '<g class="gnum mid">'+
-      '<text x="'+f1(CX-rS/2)+'" y="'+(ty+4)+'" text-anchor="middle">'+pace+'y</text>'+
-      '<text x="'+f1(CX+rS/2)+'" y="'+(ty+4)+'" text-anchor="middle">'+pace+'y</text>'+
-      '<path class="garrow" d="M'+f1(CX-rS)+' '+ty+' L'+f1(CX-rS/2-13)+' '+ty+'"></path>'+
-      '<path class="garrow" d="M'+f1(CX-rS/2+13)+' '+ty+' L'+CX+' '+ty+'"></path>'+
-      '<path class="garrow" d="M'+f1(CX+rS)+' '+ty+' L'+f1(CX+rS/2+13)+' '+ty+'"></path>'+
-      '<path class="garrow" d="M'+f1(CX+rS/2-13)+' '+ty+' L'+CX+' '+ty+'"></path>'+
+    /* The scale sits twelve units above the picture rather than twenty: its
+       numbers are above its line, and at twenty they ran under the pill. */
+    var gx = CX + ROSE_R + 34, ty = CY - ROSE_R - 12;
+    /* Every ring gets a line and a number, not just the scoring one. The
+       yardages down the right say what each ring means up and down the range,
+       and the scale across the top says what it means across it. Before this
+       the innermost ring was the only circle on the card that was drawn, scored
+       and aimed at without ever saying what it was. */
+    var gl = '<g class="rguide">', gn = '<g class="gnum">';
+    rings.forEach(function(ft, k){
+      var r = fsR(ft), p = fsPaces(ft), inner = (k < rings.length - 1);
+      gl += '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY-r)+'" x2="'+gx+'" y2="'+f1(CY-r)+'"></line>'+
+            '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY+r)+'" x2="'+gx+'" y2="'+f1(CY+r)+'"></line>'+
+            /* stopped just under the ring they are tangent to: run to the foot of
+               the picture, the way the old ones did, they cross the captions */
+            '<line x1="'+f1(CX-r)+'" y1="'+ty+'" x2="'+f1(CX-r)+'" y2="'+f1(CY+r+10)+'"></line>'+
+            '<line x1="'+f1(CX+r)+'" y1="'+ty+'" x2="'+f1(CX+r)+'" y2="'+f1(CY+r+10)+'"></line>';
+      gn += '<text x="'+(gx+4)+'" y="'+f1(CY-r+4)+'"'+(inner ? ' class="in"' : '')+'>'+(dist+p)+'</text>'+
+            '<text x="'+(gx+4)+'" y="'+f1(CY+r+4)+'"'+(inner ? ' class="in"' : '')+'>'+(dist-p)+'</text>';
+    });
+    gl += '<line x1="'+(CX-ROSE_R-6)+'" y1="'+CY+'" x2="'+gx+'" y2="'+CY+'"></line></g>';
+    gn += '<text x="'+(gx+4)+'" y="'+(CY+4)+'" class="key">'+dist+'</text></g>';
+    out += gl + gn;
+    /* The scale across the top. A tick at every ring and the paces above it,
+       which is a ruler and not a pair of brackets: with three rings there is no
+       room for three brackets, and a number beside its own tick cannot be read
+       as the width of the gap it happens to sit over. */
+    var sc = '<g class="gnum mid">'+
+      '<path class="garrow" d="M'+f1(CX-rS)+' '+ty+' L'+f1(CX+rS)+' '+ty+'"></path>'+
       '<path class="gtip" d="M'+f1(CX-rS)+' '+ty+' l6 -4 v8 z"></path>'+
       '<path class="gtip" d="M'+f1(CX+rS)+' '+ty+' l-6 -4 v8 z"></path>'+
-      '<path class="garrow" d="M'+CX+' '+(ty-5)+' L'+CX+' '+(ty+5)+'"></path>'+
-      '</g>';
+      '<path class="garrow" d="M'+CX+' '+(ty-4)+' L'+CX+' '+(ty+4)+'"></path>';
+    rings.forEach(function(ft, k){
+      var r = fsR(ft), p = fsPaces(ft), inner = (k < rings.length - 1);
+      [-1, 1].forEach(function(side){
+        var x = CX + side*r;
+        sc += '<path class="garrow" d="M'+f1(x)+' '+(ty-4)+' L'+f1(x)+' '+(ty+4)+'"></path>'+
+              '<text x="'+f1(x)+'" y="'+(ty-8)+'" text-anchor="middle"'+
+              (inner ? ' class="in"' : '')+'>'+p+'</text>';
+      });
+    });
+    sc += '<text x="'+f1(CX+rS+9)+'" y="'+(ty+4)+'" text-anchor="start" class="in">y</text></g>';
+    out += sc;
   }
   /* Every ring named once, in paces, because paces is what she can walk out and
      what the scope says too. The feet are nobody's unit on a golf course. */
