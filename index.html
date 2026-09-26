@@ -10228,6 +10228,10 @@ function aimAreaById(id){
   return null;
 }
 function aimChip(a, s){
+  /* Not on the short game. The scope exists to show a target at its true angular
+     size when it is a hundred and fifty yards away and you cannot walk to it. A
+     ring on the green in front of her is measured with the club in her hand. */
+  if(isSG(a)) return "";
   if(!aimTarget(s)) return "";
   return '<button type="button" class="vid aimc" data-aim-area="' + (a && a.id) +
     '" data-aim="' + s.id +
