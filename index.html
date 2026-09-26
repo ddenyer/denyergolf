@@ -37,6 +37,10 @@
     /* one tint per area, pinned for good, so a tile is known by colour before
        it is read. Lifted off the washed cells in the reference bar. */
     --t-tee:#dce7f3; --t-app:#d9e9dd; --t-wedge:#f9e2c9; --t-short:#efe6d4; --t-putt:#e6e3ee;
+    /* The tint of wherever she is. Neutral on the screens that belong to no
+       one area, and that area's own colour the moment she opens it, so the
+       whole screen says where she is before she reads a word. */
+    --tint:#e4ecf2;
     --tile-ink:#0f1f2e; --tile-ink-2:#5b6b78;
     --tile-gloss:rgba(255,255,255,.78); --tile-gloss-2:rgba(255,255,255,.14);
     --tile-edge:rgba(15,31,46,.055); --tile-cast:rgba(12,28,44,.35);
@@ -57,6 +61,7 @@
     --card: 0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px var(--tile-edge),
             0 8px 18px -13px var(--tile-cast);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --tint:#18242e;
     --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
     --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
     --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
@@ -77,6 +82,7 @@
     --card: 0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px var(--tile-edge),
             0 8px 18px -13px var(--tile-cast);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --tint:#18242e;
     --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
     --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
     --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
@@ -90,6 +96,12 @@
     font-size:15px; line-height:1.45;
     -webkit-text-size-adjust:100%;
   }
+  /* the ground carries the tint too, faintly, from the top of the screen down */
+  body:before{content:""; position:fixed; left:0; right:0; top:0; height:400px; z-index:0;
+    pointer-events:none; opacity:.9;
+    background:linear-gradient(180deg, var(--tint), transparent);
+    transition:background .35s ease}
+  header.top, main, nav.tabs, .totalbar, #gate{position:relative; z-index:1}
   .wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:0 0}
   button{font:inherit; color:inherit; cursor:pointer}
   [hidden]{display:none !important}
@@ -100,9 +112,13 @@
   .eyebrow{font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); font-weight:600}
 
   /* ---------- header ---------- */
+  /* Glass, like the bar at the other end of the screen. Solid, it sat on top of
+     the tint as a grey slab and cut the colour off at the top of the page. */
   header.top{
     position:sticky; top:env(safe-area-inset-top, 0px); z-index:30;
-    background:var(--bg); border-bottom:1px solid var(--line);
+    background:var(--glass); border-bottom:0;
+    box-shadow:0 1px 0 var(--tile-edge);
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   }
   .topin{max-width:760px; margin:0 auto; padding:11px 16px 10px}
   .brandrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
@@ -173,7 +189,7 @@
 
   .banner{
     display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    background:var(--accent-wash); border:0; border-radius:var(--radius);
+    background:var(--tint); border:0; border-radius:var(--radius);
     box-shadow:var(--card); padding:11px 14px; margin-bottom:16px; font-size:13px; color:var(--ink-2);
   }
   .banner button{background:none; border:1px solid var(--line-strong); border-radius:9px; padding:4px 9px; font-size:12px; font-weight:600}
@@ -247,7 +263,7 @@
   .area .idx{
     display:flex; align-items:center; justify-content:center;
     min-width:27px; height:27px; padding:0 7px; box-sizing:border-box;
-    border-radius:9px; background:var(--accent-wash); color:var(--accent);
+    border-radius:9px; background:var(--tint); color:var(--accent);
     font-size:12px; font-weight:700; letter-spacing:-.02em; white-space:nowrap;
   }
   .area .nm{font-weight:600; font-size:15px; letter-spacing:-.005em}
@@ -283,16 +299,26 @@
   /* ---------- session ---------- */
   .backbtn{background:none; border:0; padding:0 0 10px; color:var(--muted); font-size:13px; font-weight:600}
   .shead{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap}
+  /* The hard rule down the left was the last of the old language: a white box
+     with a coloured edge, sitting under tiles made of tinted glass. Same
+     material as a tile now, washed rather than tinted, and the accent is
+     carried by the eyebrow instead of a border. */
   .targets{
-    background:var(--surface); border:0; border-left:3px solid var(--accent-fill);
-    border-radius:var(--radius); box-shadow:var(--card);
-    padding:11px 14px; margin:12px 0 6px; font-size:13px; color:var(--ink-2);
+    position:relative; overflow:hidden;
+    background:var(--tint); border:0; border-radius:var(--radius-lg);
+    box-shadow:var(--card); padding:13px 15px; margin:12px 0 6px;
+    font-size:13px; color:var(--ink-2);
   }
+  .targets:before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(86% 72% at 18% 6%, var(--tile-gloss), var(--tile-gloss-2) 58%,
+      rgba(255,255,255,0) 82%)}
+  .targets > *{position:relative; z-index:1}
+  .targets .eyebrow{color:var(--accent)}
   .targets .eyebrow{display:block; margin-bottom:3px}
   .planline{font-size:12.5px; color:var(--muted); margin:0 0 16px}
   input[type="date"]{
-    font:inherit; font-size:13px; background:var(--surface); color:var(--ink);
-    border:1px solid var(--line-strong); border-radius:10px; padding:5px 8px;
+    font:inherit; font-size:13px; background:var(--surface-2); color:var(--ink);
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); border-radius:12px; padding:5px 8px;
   }
 
   .setgroup{margin-top:16px}
@@ -352,13 +378,13 @@
   /* ---------- targets ---------- */
   .targets .thd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:3px}
   .targets .edit{
-    background:none; border:1px solid var(--line-strong); border-radius:9px; padding:2px 9px;
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:999px; padding:3px 11px;
     font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); flex:none;
   }
-  .targets .edit:hover{border-color:var(--accent-fill); color:var(--accent)}
+  .targets .edit:hover{color:var(--accent)}
   .targets textarea{
     width:100%; font:inherit; font-size:13px; color:var(--ink); background:var(--surface-2);
-    border:1px solid var(--line-strong); border-radius:11px; padding:9px 10px; min-height:70px; resize:vertical; margin-top:4px;
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); border-radius:12px; padding:9px 10px; min-height:70px; resize:vertical; margin-top:4px;
   }
   .targets .trow{display:flex; gap:7px; margin-top:8px}
   .targets .trow button{border-radius:10px; padding:6px 13px; font-size:12.5px; font-weight:600; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink-2)}
@@ -433,7 +459,10 @@
   .rules .cgroup{flex:1; min-width:210px; margin-bottom:0 !important}
   .rulelist{margin:6px 0 0; padding-left:17px; display:flex; flex-direction:column; gap:4px}
   .rulelist li{font-size:13px; color:var(--ink-2); line-height:1.4}
-  #sessChecks .targets{border-left-color:var(--ink-2)}
+  /* the checks are hers to tick off, not the season's targets, so they sit
+     on the plain surface with a plain eyebrow */
+  #sessChecks .targets{background:var(--surface-2)}
+  #sessChecks .targets .eyebrow{color:var(--muted)}
 
   /* ---------- conditions ---------- */
   .condbox{
@@ -486,14 +515,14 @@
   .prep{display:flex; flex-direction:column; gap:3px; margin-top:8px}
   .prep div{display:grid; grid-template-columns:18px 1fr auto; gap:8px; font-size:13px; color:var(--ink-2)}
   .prep div span:first-child{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:11.5px}
-  .prep div em{font-style:normal; color:var(--muted); font-size:12px; font-family:"IBM Plex Mono",monospace}
+  .prep div em{font-style:normal; color:var(--muted); font-size:12px; font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
   .prepdone{margin-top:10px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600}
   .prepdone input{width:18px; height:18px; accent-color:var(--accent-fill)}
   .exlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden}
   .ex{background:var(--surface); padding:11px 13px}
   .exhd{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap}
   .ex .nm{font-weight:600; font-size:14px; letter-spacing:-.005em}
-  .ex .pre{font-size:12px; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+  .ex .pre{font-size:12px; color:var(--muted); font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
   .ex .last{font-size:12px; color:var(--ink-2); width:100%; margin-top:1px}
   .exin{display:flex; gap:8px; align-items:flex-end; margin-top:9px; flex-wrap:wrap}
   .loadf{display:flex; flex-direction:column; gap:2px}
@@ -576,7 +605,7 @@
   }
   .donebtn[data-done="1"]{background:var(--up); border-color:var(--up); color:#fff}
   .donebtn[data-done="rest"]{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--accent);
-    font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums}
   .seg button.extra{border-style:dashed}
   .donebtn:hover{border-color:var(--accent-fill)}
   .ex + .ex .donebtn{margin-bottom:4px}
@@ -596,8 +625,8 @@
   .notes{margin-top:16px}
   .notes label{display:block; margin-bottom:6px}
   .notes textarea{
-    width:100%; font:inherit; font-size:14px; color:var(--ink); background:var(--surface);
-    border:1px solid var(--line-strong); border-radius:var(--radius); padding:10px 12px; min-height:74px; resize:vertical;
+    width:100%; font:inherit; font-size:14px; color:var(--ink); background:var(--surface-2);
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); border-radius:var(--radius); padding:10px 12px; min-height:74px; resize:vertical;
   }
   details.prepbox{
     background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
@@ -688,7 +717,7 @@
   table.btable td.key{color:var(--ink); font-weight:600}
   .youbar{
     display:flex; gap:18px; flex-wrap:wrap; align-items:baseline;
-    background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent-fill);
+    background:var(--tint); border:0; box-shadow:var(--card); 
     border-radius:var(--radius); padding:12px 14px; margin-bottom:14px;
   }
   .youbar div{min-width:92px}
@@ -776,12 +805,12 @@
   .mxfig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
     font-size:44px; font-weight:600; line-height:1; letter-spacing:-1px; color:var(--ink)}
   .mxfig.late{color:var(--down)}
-  .mxsub{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+  .mxsub{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
     color:var(--muted); margin-top:5px}
   .mxtry{margin-left:auto; text-align:right}
   .mxtry b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:26px; font-weight:600; line-height:1; color:var(--ink)}
-  .mxtry span{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px;
+  .mxtry span{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:10.5px;
     letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
 
   .mxsts{display:flex; flex-direction:column; gap:7px}
@@ -793,7 +822,7 @@
   .mxmini{display:flex; align-items:center; gap:11px; font-size:14px; color:var(--ink-2)}
   .mxdot{flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line-strong);
     display:flex; align-items:center; justify-content:center;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--muted)}
+    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
   .mxdot.ok{background:var(--up); border-color:var(--up); color:#ffffff}
 
   .mxacts{display:flex; gap:10px; margin:14px 0 4px}
@@ -836,7 +865,7 @@
   .mxscale i{display:block; height:12px; background:var(--accent-fill)}
   .mxscale u{position:absolute; top:0; width:2px; height:12px; background:var(--ink-2)}
   .mxends{display:flex; justify-content:space-between; margin-top:5px;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; color:var(--muted)}
+    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; color:var(--muted)}
 
   .mxpace{margin:0 0 12px !important}
   .mxhard{margin:8px 0 0; padding-top:8px; border-top:1px solid var(--line);
@@ -869,7 +898,7 @@
   .mxsrow .pts{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
     color:var(--muted); margin-top:2px}
   .mxfold{margin-top:16px; border-top:1px solid var(--line); padding-top:10px}
-  .mxfold summary{cursor:pointer; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .mxfold summary{cursor:pointer; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
   .mxfold summary:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
 
@@ -924,7 +953,7 @@
     display:flex; align-items:center; justify-content:center; padding:20px}
   .duecard{background:var(--surface); border-radius:16px; padding:22px 20px; max-width:400px;
     width:100%; max-height:88vh; overflow:auto; box-shadow:0 18px 50px rgba(0,0,0,.35)}
-  .duecard h2{margin:6px 0 4px; font-size:23px; line-height:1.15}
+  .duecard h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; margin:6px 0 4px; font-size:23px; line-height:1.15}
   .duecard p{margin:0 0 6px; font-size:14.5px; color:var(--ink-2)}
   .dueacts{display:flex; gap:9px; margin-top:16px; flex-wrap:wrap}
   .dueacts button{border-radius:12px; padding:11px 17px; font-family:Archivo, sans-serif;
@@ -970,8 +999,8 @@
   .pastrow:last-child{border-bottom:0}
   .pastrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600; color:var(--ink)}
   .pastrow .sub{display:block; font-size:11.5px; color:var(--muted); margin-top:1px}
-  .pastnotes{background:var(--surface); border:0; box-shadow:var(--card);
-    border-left:3px solid var(--accent-fill); border-radius:12px; padding:13px 15px; margin-top:18px}
+  .pastnotes{background:var(--tint); border:0; box-shadow:var(--card);
+    border-radius:var(--radius-lg); padding:14px 16px; margin-top:18px}
   .pastnotes .eyebrow{margin-bottom:6px}
   .pastnotes p{margin:0; font-size:14px; line-height:1.55; color:var(--ink-2); white-space:pre-wrap}
   .pastcond{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:6px}
@@ -997,7 +1026,7 @@
   .cappill{fill:#ffffff; stroke:#c8d3c4; stroke-width:1}
   .rcl, .gatelab{fill:#1f2a1c; font-family:Archivo, sans-serif; font-size:15px; font-weight:600;
     text-anchor:middle; pointer-events:none}
-  .gatelab{font-family:"IBM Plex Mono", ui-monospace, monospace}
+  .gatelab{font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
 
   /* the green */
   .rbed{fill:#6e9c62}
@@ -1097,7 +1126,7 @@
   table.league tr.mine td.lgplace{color:#ffffff; border-radius:0 6px 6px 0; padding-right:8px}
   table.league tr:last-child td{border-bottom:0}
   .rose .rb:hover, .rose .rb.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-dasharray:none; stroke-width:2.6}
-  .rbl{fill:#3c4a38; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+  .rbl{fill:#3c4a38; font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
     text-anchor:middle; pointer-events:none}
   .rose .rz:hover, .rose .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
   .pin{pointer-events:none}
@@ -1143,7 +1172,7 @@
   .slopebox .eyebrow{display:block; margin-bottom:7px}
   /* the run, at the top of every page of the session */
   .savetick{margin:-4px 0 10px; text-align:right; font-size:11.5px; color:var(--muted);
-    font-family:"IBM Plex Mono", ui-monospace, monospace}
+    font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
   .savetick.bad{color:#c8402f; font-weight:600}
   .runbar{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:0 0 14px}
   .runbox{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
@@ -1194,7 +1223,7 @@
   .mtile b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:22px;
     color:var(--ink); line-height:1.1}
   .mtile span{display:block; font-size:11.5px; color:var(--ink-2); margin-top:3px; line-height:1.25}
-  .mtile .mn{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--muted)}
+  .mtile .mn{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
   .slopetab{margin-top:12px}
   .slopetab .eyebrow{display:block; margin-bottom:6px}
   .strow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:7px 0;
@@ -1266,7 +1295,7 @@
   .ballrow .rowchips{display:flex; gap:7px; flex-wrap:wrap}
   .ballrow + .ballrow{border-top:1px solid var(--line); padding-top:10px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
-    background:var(--surface-2); color:var(--muted); font-family:"IBM Plex Mono", ui-monospace, monospace;
+    background:var(--surface-2); color:var(--muted); font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:14px; font-weight:600; cursor:pointer; padding:0}
   .ballchip.done{background:var(--surface); color:var(--ink); border-color:var(--ink-2)}
   .ballchip.good{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
@@ -1288,9 +1317,9 @@
   .blist li{font-size:14px; line-height:1.45; color:var(--ink-2)}
   .blist li em{color:var(--muted); font-style:normal}
   .bedit{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:center; margin-bottom:7px}
-  .bedit span{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; color:var(--muted)}
-  .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:10px;
-    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+  .bedit span{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:12px; color:var(--muted)}
+  .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:12px;
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); background:var(--surface-2); color:var(--ink);
     font-family:Archivo, sans-serif; font-size:14px}
   .carryask{margin:0 0 9px; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
   .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:12px;
@@ -1325,7 +1354,7 @@
 
   /* The greeting is the one line on the screen that is spoken rather than
      measured, so it is the one line that gets the serif. */
-  .banner.hello{background:var(--accent-wash); border:0; border-radius:var(--radius-lg);
+  .banner.hello{background:var(--tint); border:0; border-radius:var(--radius-lg);
     box-shadow:var(--card); padding:14px 16px; margin:0 0 14px;
     font-family:"Libre Caslon Display",Georgia,serif; font-size:19px;
     font-weight:400; color:var(--ink); line-height:1.3}
@@ -1369,16 +1398,17 @@
 
   /* ---- goals ---- */
   .goalgrp{margin-bottom:22px}
-  .goalgrp h2{font-size:19px; margin:0 0 3px}
+  .goalgrp h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:19px; margin:0 0 3px}
   .goalgrp .lede{margin:0 0 12px}
   .goalarea{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:14px; margin-bottom:12px}
   .gahd{display:flex; align-items:baseline; gap:9px; margin-bottom:10px}
   .gahd .n{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--accent)}
   .gahd b{font-family:Archivo, sans-serif; font-size:17px; font-weight:600}
-  .galive{margin:9px 0 12px; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .galive{margin:9px 0 12px; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:12.5px; color:var(--muted)}
-  .targets.proc{border-left-color:var(--line-strong)}
+  .targets.proc{background:var(--surface-2)}
+  .targets.proc .eyebrow{color:var(--muted)}
   #goalsProject{color:var(--accent); margin-top:2px}
 
   /* ---- the season mix ---- */
@@ -1402,7 +1432,7 @@
     font-weight:700; line-height:1.12; color:var(--ink); margin:2px 0 1px}
   .shotask .callwin{display:block; font-family:Archivo, sans-serif; font-size:17px;
     font-weight:600; color:var(--accent)}
-  .shotask .callband{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .shotask .callband{display:block; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; color:var(--muted)}
   .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
   .complead{min-height:0}
@@ -1459,7 +1489,7 @@
     padding:calc(10px + env(safe-area-inset-top,0px)) 58px 10px 14px;
     background:linear-gradient(to bottom,rgba(0,0,0,.62),transparent)}
   #asHud .asfig{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; font-weight:600}
-  #asHud .assub{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px;
+  #asHud .assub{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px;
     color:#b9c3bc; margin-top:2px}
   /* The key. Each name carries a short piece of the line it names, drawn in that
      line's own weight and colour, so there is nothing to match up by position. */
@@ -1484,11 +1514,11 @@
   .asrow{display:flex; gap:7px; flex-wrap:wrap}
   .aschip{flex:1 1 auto; min-height:40px; padding:0 12px; border-radius:12px;
     border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05);
-    color:#f2f5f2; font-family:"IBM Plex Mono",ui-monospace,monospace;
+    color:#f2f5f2; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; font-weight:600; cursor:pointer}
   .aschip.on{background:#d2006a; border-color:#d2006a; color:#fff}
   .asnote{font-size:12px; line-height:1.5; color:#8b9790; margin:0}
-  #asWrap details summary{font-family:"IBM Plex Mono",ui-monospace,monospace;
+  #asWrap details summary{font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
     font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase;
     color:#8b9790; cursor:pointer; padding:4px 0}
   .asslide{display:flex; align-items:center; gap:10px; font-size:12.5px; color:#b9c3bc}
@@ -1498,7 +1528,7 @@
   #asStart{position:absolute; inset:0; z-index:40; display:flex; align-items:center;
     justify-content:center; padding:24px; background:#0e1210; text-align:left}
   #asStart .ascard{max-width:420px}
-  #asStart h2{font-size:23px; margin:0 0 8px; letter-spacing:-.3px}
+  #asStart h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:23px; margin:0 0 8px; letter-spacing:-.3px}
   #asStart p{color:#b9c3bc; font-size:14.5px; line-height:1.55; margin:0 0 14px}
   #asGo{width:100%; min-height:54px; border:0; border-radius:11px; background:#d2006a;
     color:#fff; font-family:Archivo,sans-serif; font-size:17px; font-weight:600; cursor:pointer}
@@ -1506,37 +1536,52 @@
   /* the chip that opens it, alongside the existing diagram chip */
   .vid.aimc{color:var(--accent)}
 
-  /* ---- access gate ---- */
-  #gate{position:fixed; inset:0; z-index:200; background:var(--bg); display:flex;
-    align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto}
+  /* ---- access gate ----
+     The first screen anyone sees, so it is built out of the same parts as the
+     rest: the crest, the serif voice, a tile-surfaced card on a washed ground,
+     and one claret action. It used to be a white box with a hairline field. */
+  #gate{position:fixed; inset:0; z-index:200; display:flex;
+    align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto;
+    background:
+      radial-gradient(120% 60% at 18% 0%, var(--accent-wash), rgba(0,0,0,0) 62%),
+      var(--bg)}
   #gate[hidden]{display:none}
-  /* the same surface as a tile, so the first screen belongs to the app */
-  .gatecard{background:var(--surface); border:0; border-radius:var(--radius-lg);
-    max-width:420px; width:100%; padding:28px 24px 26px;
+  .gatecard{position:relative; overflow:hidden;
+    background:var(--surface); border:0; border-radius:26px;
+    max-width:420px; width:100%; padding:26px 24px 24px;
     box-shadow:0 1px 0 rgba(255,255,255,.75) inset, 0 0 0 1px var(--tile-edge),
       0 24px 54px -26px var(--tile-cast)}
+  .gatecard:before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(86% 60% at 18% 0%, var(--tile-gloss), var(--tile-gloss-2) 58%,
+      rgba(255,255,255,0) 82%)}
+  .gatecard > *{position:relative; z-index:1}
+  .gatemark{width:46px; height:46px; border-radius:999px;
+    border:1.6px solid var(--accent); color:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Libre Caslon Display",Georgia,serif; font-size:14px; line-height:1;
+    margin-bottom:16px}
   .gatecard h1{font-size:27px; line-height:1.14; margin:0 0 7px; letter-spacing:0}
   .gatecard .strap{font-family:"Libre Caslon Display",Georgia,serif; font-size:15px;
-    letter-spacing:.01em; text-transform:none; color:var(--ink-2); margin:0 0 18px}
+    letter-spacing:.01em; text-transform:none; color:var(--ink-2); margin:0 0 14px}
   .gatecard .strap span{color:var(--accent)}
   .gatecard p{margin:0 0 16px; color:var(--ink-2); font-size:14.5px; line-height:1.5}
-  .gatecard label{display:block; font-family:Archivo, sans-serif; font-size:10.5px; font-weight:600;
-    letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:7px}
-  .gatecard input{width:100%; box-sizing:border-box; padding:14px 15px; border-radius:13px;
-    border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:16px; letter-spacing:1.5px;
-    text-transform:uppercase}
-  .gatecard input:focus{outline:2px solid var(--accent-fill); outline-offset:1px}
-  .gatecard button{width:100%; margin-top:14px; padding:15px 16px; border:0;
+  .gatecard label{display:block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.11em; text-transform:uppercase; color:var(--accent); margin-bottom:7px}
+  .gatecard input{width:100%; box-sizing:border-box; padding:15px 16px; border-radius:16px;
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); background:var(--surface-2); color:var(--ink);
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; letter-spacing:2px;
+    text-transform:uppercase; text-align:center}
+  .gatecard input:focus{outline:0; box-shadow:inset 0 0 0 2px var(--accent-fill)}
+  .gatecard button{width:100%; margin-top:12px; padding:16px; border:0;
     border-radius:var(--radius-lg); background:var(--accent-fill); color:#ffffff;
     font-family:Archivo, sans-serif; font-size:16px; font-weight:600; cursor:pointer;
-    box-shadow:0 8px 20px -12px var(--tile-cast)}
+    box-shadow:0 10px 24px -14px var(--tile-cast)}
   .gatecard button:active{transform:translateY(1px)}
-  .gatecard button[disabled]{opacity:.55; cursor:default}
+  .gatecard button[disabled]{opacity:.55; cursor:default; transform:none}
   .gatemsg{margin-top:14px; font-size:13.5px; line-height:1.45; min-height:1em}
   .gatemsg.bad{color:var(--down)}
   .gatemsg.ok{color:var(--muted)}
-  .gatefoot{margin:20px 0 0; padding-top:16px; border-top:1px solid var(--line);
+  .gatefoot{margin:18px 0 0; padding-top:16px; border-top:1px solid var(--line);
     font-size:12.5px; color:var(--muted); line-height:1.5}
 
   /* ---- coach ---- */
@@ -1587,6 +1632,7 @@
 <body>
 <div id="gate">
   <div class="gatecard">
+    <div class="gatemark" aria-hidden="true">LCL</div>
     <p class="strap">Longer <span>&middot;</span> Closer <span>&middot;</span> Lower</p>
     <h1>Enter your access code</h1>
     <p>The code was sent with your invitation. It unlocks the programme on this device and stays unlocked.</p>
@@ -2029,7 +2075,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"one home page with the five areas as tiles that rotate on how long since each was last played, a glass bar at the foot of every screen, and every panel, card and control on one surface" };
+var BUILD = { on:"2026-09-26", note:"one home page of five tiles that rotate on how long since each area was last played, each area's pastel following her into its session and through every panel on the screen, and one typeface for the voice, one for the interface and one for the figures" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
@@ -4792,6 +4838,10 @@ function show(view){
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
   $("tabGoals").setAttribute("aria-selected", (view==="goals"||view==="bench")?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
+  /* Only a golf area owns a colour. The gym, the tests and the lists keep the
+     neutral, or five tints would be competing on a screen that is about none
+     of them. */
+  setTint(view === "session" && state.sessionType != null ? state.sessionType : null);
   /* The bar and the session's own footer both live at the foot of the screen,
      so one of them has to go. It is the bar: a session is a task with a Back
      and a Next of its own, and six destinations under a running score is an
@@ -5408,6 +5458,14 @@ var TILE = {
   3: {tint:"var(--t-short)", ic:"short", nm:"Short game", sub:"Chip, pitch, sand"},
   4: {tint:"var(--t-putt)",  ic:"putt",  nm:"Holing out", sub:"Putting"}
 };
+/* The tint follows her in. Open wedge play and the whole screen goes apricot,
+   the greeting, the targets and the ground with it; come back out and it
+   settles to the neutral. It is the same colour the tile was, which is the
+   point: the colour is the area's name, not the tile's decoration. */
+function setTint(typeId){
+  var sk = (typeId != null && typeof TILE !== "undefined") ? TILE[typeId] : null;
+  document.documentElement.style.setProperty("--tint", sk ? sk.tint : "");
+}
 function tIco(inner, size){
   return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="currentColor" '+
     'aria-hidden="true">'+inner+'</svg>';
@@ -5848,6 +5906,7 @@ function openSession(areaId, resume){
   if(!resume) resume = liveSessions().filter(function(x){
     return x.kind === "practice" && x.areaId === areaId; })[0] || null;
   var a = area(areaId);
+  state.sessionType = a ? typeOf(areaId) : null;
   /* No definition, no session. This used to walk straight into a.isTest below
      and throw, which left the home screen showing a perfectly good "Resume"
      bar whose button did nothing at all, on every load, for ever. Saying so is
