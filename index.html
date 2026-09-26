@@ -864,15 +864,19 @@
      reads inward without a legend. They are the same at every station: what varies
      is what each one is worth, which is the dashed line's job to show. */
   /* past four clubs has no outer line: the fill is a gradient that runs out */
-  /* pointer-events:all, because the fade reaches zero opacity at its edge and an
-     unpainted pixel is not a clickable one: without this a tap on the outer inch
-     of the miss ring quietly does nothing */
-  .rose .sgr-miss{stroke:none; pointer-events:all}
-  .rose .sgr-miss:hover, .rose .sgr-miss.on{fill:url(#sgfadeon); stroke:none}
-  .rose .sgr-q4{fill:#a4cc90; stroke:#6e9c62; stroke-width:1.3}
-  .rose .sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
-  .rose .sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
-  .rose .sgh{fill:#22331d; stroke:#f2f8ec; stroke-width:1.6}
+  /* Every one of these carries .rz as well, and .rose .rz already sets a fill and
+     a stroke. A fill= attribute on the element loses to any rule at all, so these
+     have to out-specify .rose .rz.on rather than merely follow it: without the
+     extra class the miss ring quietly rendered as the approach rose's rough, hard
+     outer edge and all, which is the one thing the fade exists to remove.
+     pointer-events:all because the fade reaches zero opacity at its edge, and an
+     unpainted pixel is not a clickable one. */
+  .rose .rz.sgr-miss{fill:url(#sgfade); stroke:none; pointer-events:all}
+  .rose .rz.sgr-miss:hover, .rose .rz.sgr-miss.on{fill:url(#sgfadeon); stroke:none}
+  .rose .rz.sgr-q4{fill:#a4cc90; stroke:#6e9c62; stroke-width:1.3}
+  .rose .rz.sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
+  .rose .rz.sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
+  .rose .rz.sgh{fill:#22331d; stroke:#f2f8ec; stroke-width:1.6}
   .sglead{stroke:#3f5c37; stroke-width:1.2; stroke-dasharray:3 4; opacity:.8;
     pointer-events:none}
   /* Where the LPGA field's average ball finishes from this station and this lie.
@@ -6998,7 +7002,7 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet){
         return '<radialGradient id="'+g[0]+'" gradientUnits="userSpaceOnUse" '+
                'cx="'+CX+'" cy="'+CY+'" r="'+SGC.out+'">'+
                '<stop offset="'+f1(SGC.q4/SGC.out)+'" stop-color="'+g[1]+'" stop-opacity="1"/>'+
-               '<stop offset="0.87" stop-color="'+g[1]+'" stop-opacity="0.4"/>'+
+               '<stop offset="0.91" stop-color="'+g[1]+'" stop-opacity="0.62"/>'+
                '<stop offset="1" stop-color="'+g[1]+'" stop-opacity="0"/>'+
                '</radialGradient>';
       }).join("") + '</defs>';
