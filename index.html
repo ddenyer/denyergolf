@@ -7397,9 +7397,14 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
      top half, because below the middle line they would run through "Short" and
      the two captions, and one half is enough to read a width off. */
   var aimTop = f1(CY - rS - 18);
+  /* The pair on the scoring ring stands out at the widest part of the picture,
+     where the eight direction names are, so it is kept to two thirds of the aim
+     pair's height and stops short of them. The aim pair is nearer the middle,
+     where there is nothing to cut through. */
+  var farTop = f1(CY - (rS + 18)*0.65);
   out += '<g class="fsaim">'+
-    '<line class="far" x1="'+f1(CX-rS)+'" y1="'+aimTop+'" x2="'+f1(CX-rS)+'" y2="'+CY+'"></line>'+
-    '<line class="far" x1="'+f1(CX+rS)+'" y1="'+aimTop+'" x2="'+f1(CX+rS)+'" y2="'+CY+'"></line>'+
+    '<line class="far" x1="'+f1(CX-rS)+'" y1="'+farTop+'" x2="'+f1(CX-rS)+'" y2="'+CY+'"></line>'+
+    '<line class="far" x1="'+f1(CX+rS)+'" y1="'+farTop+'" x2="'+f1(CX+rS)+'" y2="'+CY+'"></line>'+
     '<line x1="'+f1(CX-aimR)+'" y1="'+aimTop+'" x2="'+f1(CX-aimR)+'" y2="'+CY+'"></line>'+
     '<line x1="'+f1(CX+aimR)+'" y1="'+aimTop+'" x2="'+f1(CX+aimR)+'" y2="'+CY+'"></line>'+
     '</g>';
