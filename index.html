@@ -16,34 +16,63 @@
 <title>Longer Closer Lower</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Libre+Caslon+Display&display=swap">
 <style>
   :root{
-    --bg:#eef0ec; --surface:#ffffff; --surface-2:#f6f7f4;
-    --ink:#141a16; --ink-2:#4a564e; --muted:#77847b;
-    --line:#d7ddd6; --line-strong:#b6c0b8;
-    --accent:#a80050; --accent-fill:#d2006a; --accent-wash:#fce8f2;
-    --up:#1b6741; --down:#96382b;
-    --up-wash:#e2efe7; --down-wash:#f5e3e0;
+    /* Cool navy ground and a deep claret, off the championship study. The claret
+       is a shade off theirs on purpose: borrowing the structure is free, borrowing
+       the exact colour reads as merchandise. */
+    --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa;
+    --ink:#0f1f2e; --ink-2:#3b4d5e; --muted:#6b7d8c;
+    --line:#d5dde4; --line-strong:#b3c1cd;
+    --accent:#8d1b38; --accent-fill:#a81f42; --accent-wash:#f8ebee;
+    --gold:#b2872c; --heritage:#134734;
+    --up:#1f7a4d; --down:#a8540d;
+    --up-wash:#e4efe8; --down-wash:#f6ece0;
     --radius:10px;
+    /* one tint per area, pinned for good, so a tile is known by colour before
+       it is read. Lifted off the washed cells in the reference bar. */
+    --t-tee:#dce7f3; --t-app:#d9e9dd; --t-wedge:#f9e2c9; --t-short:#efe6d4; --t-putt:#e6e3ee;
+    --tile-ink:#0f1f2e; --tile-ink-2:#5b6b78;
+    --tile-gloss:rgba(255,255,255,.78); --tile-gloss-2:rgba(255,255,255,.14);
+    --tile-edge:rgba(15,31,46,.055); --tile-cast:rgba(12,28,44,.35);
+    --glass:rgba(252,253,254,.66);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#0e1310; --surface:#161d19; --surface-2:#1b231e;
-      --ink:#e8ece8; --ink-2:#aab5ad; --muted:#889389;
-      --line:#293229; --line-strong:#3d4a42;
-      --accent:#ff5fa8; --accent-fill:#ff2f90; --accent-wash:#330f22;
-      --up:#57b487; --down:#e08574;
-      --up-wash:#17261f; --down-wash:#2a1c19;
+      color-scheme: dark;
+    --bg:#0c141b; --surface:#131e27; --surface-2:#18242e;
+    --ink:#e7eef3; --ink-2:#bcccd7; --muted:#8497a4;
+    --line:#25333e; --line-strong:#3a4c59;
+    --accent:#e8607a; --accent-fill:#f2748c; --accent-wash:#33141d;
+    --gold:#d7ab55; --heritage:#4e9c7a;
+    --up:#57b487; --down:#e0a06b;
+    --up-wash:#17261f; --down-wash:#2a2119;
+    /* the same five, taken down rather than dimmed: a pale tint on a dark screen
+       glares, and a grey one stops telling them which area it is */
+    --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
+    --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
+    --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
+    --glass:rgba(24,36,46,.72);
     }
   }
   :root[data-theme="dark"]{
-    --bg:#0e1310; --surface:#161d19; --surface-2:#1b231e;
-    --ink:#e8ece8; --ink-2:#aab5ad; --muted:#889389;
-    --line:#293229; --line-strong:#3d4a42;
-    --accent:#ff5fa8; --accent-fill:#ff2f90; --accent-wash:#330f22;
-    --up:#57b487; --down:#e08574;
-    --up-wash:#17261f; --down-wash:#2a1c19;
+    color-scheme: dark;
+    --bg:#0c141b; --surface:#131e27; --surface-2:#18242e;
+    --ink:#e7eef3; --ink-2:#bcccd7; --muted:#8497a4;
+    --line:#25333e; --line-strong:#3a4c59;
+    --accent:#e8607a; --accent-fill:#f2748c; --accent-wash:#33141d;
+    --gold:#d7ab55; --heritage:#4e9c7a;
+    --up:#57b487; --down:#e0a06b;
+    --up-wash:#17261f; --down-wash:#2a2119;
+    /* the same five, taken down rather than dimmed: a pale tint on a dark screen
+       glares, and a grey one stops telling them which area it is */
+    --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
+    --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
+    --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
+    --glass:rgba(24,36,46,.72);
   }
 
   *{box-sizing:border-box}
@@ -67,9 +96,12 @@
     position:sticky; top:env(safe-area-inset-top, 0px); z-index:30;
     background:var(--bg); border-bottom:1px solid var(--line);
   }
-  .topin{max-width:760px; margin:0 auto; padding:10px 16px 0}
+  .topin{max-width:760px; margin:0 auto; padding:11px 16px 10px}
   .brandrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
-  .brand{font-weight:700; font-size:15px; letter-spacing:.02em}
+  /* Libre Caslon carries the name and the headings. Everything the tool asks
+     them to do stays in Archivo: the serif is the voice, not the interface. */
+  .brand{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:17px;
+    letter-spacing:.01em}
   .brand span{color:var(--accent)}
   .player{
     display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line);
@@ -83,16 +115,51 @@
     border:0; background:var(--surface-2); border-radius:999px; width:24px; height:24px;
     font-size:13px; line-height:1; color:var(--ink-2);
   }
-  nav.tabs{display:flex; gap:0; margin-top:8px; overflow-x:auto; scrollbar-width:none}
-  nav.tabs::-webkit-scrollbar{display:none}
-  nav.tabs button{
-    background:none; border:0; border-bottom:2px solid transparent; padding:8px 5px 9px;
-    font-size:12.5px; font-weight:600; color:var(--muted); letter-spacing:0; white-space:nowrap;
+  /* ---------- the bar ----------
+     Off the bottom of the screen rather than under the title, because this is
+     used one-handed on a range with a bucket in the other hand, and the top of
+     a phone is the part of it a thumb cannot reach. Floating glass, so the
+     screen carries on underneath it instead of stopping at a grey strip. */
+  nav.tabs{
+    position:fixed; left:0; right:0; bottom:0; z-index:40;
+    display:flex; margin:0 auto; max-width:560px; height:62px; padding-inline:6px;
+    padding-bottom:env(safe-area-inset-bottom, 0px); box-sizing:content-box;
+    border-radius:31px 31px 0 0; background:var(--glass);
+    -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
+    box-shadow:0 1px 0 rgba(255,255,255,.55) inset, 0 0 0 1px var(--tile-edge),
+      0 -10px 34px -16px var(--tile-cast);
+    overflow:hidden;
   }
-  nav.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent-fill)}
+  @media (min-width:600px){ nav.tabs{border-radius:31px; bottom:14px; overflow:visible} }
+  nav.tabs button{
+    flex:1; min-width:0; background:none; border:0; padding:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    font-size:9.5px; font-weight:500; color:var(--ink); letter-spacing:.01em; white-space:nowrap;
+    position:relative; height:62px;
+  }
+  nav.tabs button svg{position:relative; z-index:1}
+  nav.tabs button span{position:relative; z-index:1}
+  nav.tabs button[aria-selected="true"]{font-weight:700}
+  /* the warm lozenge behind the live one, and the seam under it. One only:
+     put it under all six and it stops saying anything. */
+  nav.tabs button[aria-selected="true"]:before{
+    content:""; position:absolute; left:50%; top:50%; width:58px; height:52px;
+    transform:translate(-50%,-50%); border-radius:19px; filter:blur(2px);
+    background:radial-gradient(72% 64% at 50% 38%, rgba(243,163,45,.55),
+      rgba(243,163,45,.17) 60%, rgba(243,163,45,0) 100%);
+  }
+  nav.tabs button[aria-selected="true"]:after{
+    content:""; position:absolute; left:50%; bottom:5px; width:50px; height:3px;
+    transform:translateX(-50%); border-radius:3px; filter:blur(.4px);
+    background:linear-gradient(90deg, rgba(243,163,45,0) 2%, rgba(243,163,45,.85) 18%,
+      rgba(226,92,86,.8) 42%, rgba(120,150,220,.75) 62%, rgba(96,196,168,.7) 80%,
+      rgba(243,163,45,0) 98%);
+  }
+  @media (max-width:340px){ nav.tabs button{font-size:8.5px} }
 
-  main{padding-block:18px 32px}
-  h1{font-size:22px; font-weight:700; letter-spacing:-.01em; margin:0 0 2px; text-wrap:balance}
+  main{padding-block:18px 108px}
+  h1{font-family:"Libre Caslon Display",Georgia,serif; font-size:25px; font-weight:400;
+     letter-spacing:0; margin:0 0 3px; text-wrap:balance; line-height:1.14}
   h2{font-size:14px; font-weight:700; margin:0 0 8px; letter-spacing:.01em}
   .lede{color:var(--ink-2); margin:0 0 18px; max-width:62ch; font-size:14px}
 
@@ -102,6 +169,60 @@
     padding:9px 12px; margin-bottom:16px; font-size:13px; color:var(--ink-2);
   }
   .banner button{background:none; border:1px solid var(--line-strong); border-radius:6px; padding:4px 9px; font-size:12px; font-weight:600}
+
+  /* ---------- the five areas, as tiles ----------
+     One pale tint per area, pinned for good, and a solid black mark at the size
+     their own bar gives an icon. The order rotates: longest since the last
+     session goes full width at the top, most recently played sits bottom right.
+     Rotating costs them the position they had learnt, and the tint is what pays
+     it back, so the colour must never move with the order. */
+  .tilegrid{display:grid; gap:9px; grid-template-columns:1fr 1fr}
+  .tl{
+    position:relative; border:0; overflow:hidden; border-radius:21px; min-height:118px;
+    display:flex; flex-direction:column; justify-content:flex-end; text-align:left;
+    padding:12px 13px; background:var(--tint); color:var(--tile-ink);
+    box-shadow:0 1px 0 rgba(255,255,255,.85) inset, 0 0 0 1px var(--tile-edge),
+      0 8px 18px -12px var(--tile-cast);
+  }
+  /* the one gradient that makes a flat tint read as glass rather than paint */
+  .tl:before{content:""; position:absolute; inset:0; z-index:0;
+    background:radial-gradient(86% 72% at 18% 6%, var(--tile-gloss), var(--tile-gloss-2) 58%,
+      rgba(255,255,255,0) 82%)}
+  .tl:active{transform:translateY(1px)}
+  .tl .ic{position:absolute; top:11px; left:12px; z-index:2; line-height:0; color:var(--tile-ink)}
+  .tl .fig{position:absolute; top:12px; right:13px; z-index:2;
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:14.5px; font-weight:600;
+    font-variant-numeric:tabular-nums}
+  .tl .fig.up{color:var(--up)} .tl .fig.dn{color:var(--down)} .tl .fig.flat{color:var(--tile-ink-2)}
+  .tl .nm{position:relative; z-index:2; font-size:13.5px; font-weight:700; letter-spacing:-.012em;
+    line-height:1.18}
+  .tl .sub{position:relative; z-index:2; font-size:10.5px; line-height:1.3; margin-top:3px;
+    color:var(--tile-ink-2)}
+  /* the focus tile runs the full width, so it is laid out across it rather than
+     stacked in the top left with two thirds of the tile left empty */
+  .tl.wide{grid-column:1 / -1; min-height:94px; flex-direction:row; align-items:center;
+    gap:15px; padding:13px 15px}
+  .tl.wide .ic{position:static; flex:0 0 auto}
+  .tl.wide .txt{position:relative; z-index:2; flex:1 1 auto; min-width:0}
+  .tl.wide .rt{position:relative; z-index:2; flex:0 0 auto; padding-left:12px;
+    display:flex; flex-direction:column; align-items:flex-end; gap:7px}
+  .tl.wide .fig{position:static; font-size:17px}
+  .tl.wide .nm{font-size:15px}
+  .tl.wide .sub{font-size:11px; margin-top:4px}
+  /* the seam belongs to the tile they are being sent to and nothing else */
+  .tl.wide:after{content:""; position:absolute; left:15px; right:15px; bottom:4px; height:3px;
+    z-index:3; border-radius:3px; filter:blur(.4px);
+    background:linear-gradient(90deg, rgba(243,163,45,0) 2%, rgba(243,163,45,.85) 20%,
+      rgba(226,92,86,.8) 44%, rgba(120,150,220,.78) 64%, rgba(96,196,168,.72) 82%,
+      rgba(243,163,45,0) 98%)}
+  .tl .tag{position:relative; z-index:2; align-self:flex-start; margin-top:7px; font-size:9.5px;
+    font-weight:700; letter-spacing:.05em; color:var(--accent); white-space:nowrap;
+    border:1px solid var(--accent); border-radius:5px; padding:1px 6px}
+  .tl.wide .tag{margin-top:0; align-self:auto}
+  .tl .tag.due{color:#fff; background:var(--accent-fill); border-color:var(--accent-fill)}
+  .tilehd{display:flex; align-items:baseline; justify-content:space-between; margin:0 0 10px}
+  .tilehd h2{margin:0; font-size:17px; font-weight:700; letter-spacing:-.012em}
+  .tilehd span{font-size:11.5px; font-weight:500; color:var(--muted)}
 
   /* ---------- area list ---------- */
   .arealist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
@@ -917,9 +1038,11 @@
   .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
     fill:var(--muted); pointer-events:none}
   .gnum text.key{fill:var(--ink-2); font-weight:600}
-  /* The rings inside the scoring one. Same numbers, a step quieter, so the
-     column reads as a scale with one figure picked out rather than a ladder. */
-  .gnum text.in{font-size:11.5px; fill:var(--muted); opacity:.85}
+  /* Weight goes on the ring they are AIMING at and on the distance itself.
+     Every other ring is a step back, so the column reads as a scale with the
+     target picked out of it rather than as a ladder of equal numbers. */
+  .gnum text:not(.in){font-weight:700; fill:var(--ink-2)}
+  .gnum text.in{font-size:11px; fill:var(--muted); opacity:.72; font-weight:400}
   .gnum.mid text{font-size:12.5px}
   .garrow{stroke:var(--muted); stroke-width:1; fill:none; pointer-events:none}
   .gtip{fill:var(--muted); pointer-events:none}
@@ -1360,11 +1483,11 @@
     text-transform:uppercase}
   .gatecard input:focus{outline:2px solid var(--accent-fill); outline-offset:1px}
   .gatecard button{width:100%; margin-top:14px; padding:13px 16px; border:0; border-radius:9px;
-    background:var(--accent-fill); color:#1c1405; font-family:Archivo, sans-serif;
+    background:var(--accent-fill); color:#ffffff; font-family:Archivo, sans-serif;
     font-size:15px; font-weight:600; cursor:pointer}
   .gatecard button[disabled]{opacity:.55; cursor:default}
   .gatemsg{margin-top:14px; font-size:13.5px; line-height:1.45; min-height:1em}
-  .gatemsg.bad{color:#a3302a}
+  .gatemsg.bad{color:var(--down)}
   .gatemsg.ok{color:var(--muted)}
   .gatefoot{margin:20px 0 0; padding-top:16px; border-top:1px solid var(--line);
     font-size:12.5px; color:var(--muted); line-height:1.5}
@@ -1442,16 +1565,18 @@
         <button class="coachlink" id="coachLink" type="button">Coach</button>
       </div>
     </div>
-    <nav class="tabs" role="tablist">
-      <button id="tabPractice" role="tab" aria-selected="true">Practice</button>
-      <button id="tabSC" role="tab" aria-selected="false">S&amp;C</button>
-      <button id="tabTests" role="tab" aria-selected="false">Tests</button>
-      <button id="tabSessions" role="tab" aria-selected="false">Sessions</button>
-      <button id="tabHistory" role="tab" aria-selected="false">Progress</button>
-      <button id="tabGoals" role="tab" aria-selected="false">Goals</button>
-    </nav>
   </div>
 </header>
+
+<nav class="tabs" role="tablist">
+  <button id="tabPractice" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
+  <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
+  <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Tests</span></button>
+  <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path></svg><span>Sessions</span></button>
+  <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Archivo, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
+  <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
+</nav>
+
 
 <main class="wrap">
 
@@ -1472,7 +1597,8 @@
     </div>
     <div id="homeAreas" hidden>
       <button class="backlink" id="homeBack">&larr; Welcome</button>
-      <div class="arealist" id="areaList"></div>
+      <div class="tilehd"><h2>The five areas</h2><span id="tileSort">Least played first</span></div>
+      <div class="tilegrid" id="areaList"></div>
     </div>
   </section>
 
@@ -1858,7 +1984,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"wedges and approaches on fixed rings, scored in strokes gained, with the scope's uprights on the card" };
+var BUILD = { on:"2026-09-26", note:"the front page rebuilt as five tiles that rotate on how long since each area was last played, a bar at the foot of the screen, and the aim ring given the weight on the scope card" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
@@ -4621,6 +4747,12 @@ function show(view){
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
   $("tabGoals").setAttribute("aria-selected", (view==="goals"||view==="bench")?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
+  /* The bar and the session's own footer both live at the foot of the screen,
+     so one of them has to go. It is the bar: a session is a task with a Back
+     and a Next of its own, and six destinations under a running score is an
+     invitation to walk out of a drill halfway through. */
+  var barEl = document.querySelector("nav.tabs");
+  if(barEl) barEl.hidden = (view==="session" || view==="gym");
   if(view!=="session" && view!=="gym"){
     state.deck = null; clearRest();
     var fl = $("runFlash");
@@ -5205,27 +5337,132 @@ function renderHomeGoals(){
     onSave: function(v){ var pl = playerObj(); if(pl){ pl.outcomes = v; saveEdit(); } }
   }));
 }
+/* The five areas as tiles. Two things are doing the work here.
+
+   The order: longest since the last session first, so the tile they have left
+   alone is the one that is full width at the top and the one they have hammered
+   is bottom right. A launcher that always listed them 1 to 5 was a table of
+   contents; this one is an instruction.
+
+   The tint: pinned to the area and never to the position. Rotating the order
+   costs them the place on the screen they had learnt, and the colour is what
+   pays it back, so the apricot tile is wedge play wherever it lands and they
+   find it without reading a word. */
+var TILE = {
+  10:{tint:"var(--t-tee)",   ic:"tee",   nm:"Tee shots",  sub:"Driver and woods"},
+  11:{tint:"var(--t-app)",   ic:"app",   nm:"Approach",   sub:"125 to 185 yards"},
+  2: {tint:"var(--t-wedge)", ic:"wedge", nm:"Wedge play", sub:"30 to 90 yards"},
+  3: {tint:"var(--t-short)", ic:"short", nm:"Short game", sub:"Chip, pitch, sand"},
+  4: {tint:"var(--t-putt)",  ic:"putt",  nm:"Holing out", sub:"Putting"}
+};
+function tIco(inner, size){
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="currentColor" '+
+    'aria-hidden="true">'+inner+'</svg>';
+}
+var TICON = {
+  /* a ball on a tee */
+  tee: function(z){ return tIco('<circle cx="12" cy="6.6" r="3.9"></circle>'+
+    '<path d="M8.4 12.1h7.2l-2.5 3.1V20a1.1 1.1 0 0 1-2.2 0v-4.8z"></path>', z); },
+  /* the flag on the green */
+  app: function(z){ return tIco('<path d="M8.2 3.4h1.9V21H8.2z"></path>'+
+    '<path d="M11.4 4.1 20 7.3l-8.6 3.2z"></path>', z); },
+  /* the wedge itself, a blade and a shaft */
+  wedge: function(z){ return tIco('<path d="M5.4 13.1 12.8 9.4a3.1 3.1 0 0 1 4.2 1.5l1.4 3a3.1 3.1 0 0 1-1.5 4.1'+
+    'l-7.4 3.6a3.1 3.1 0 0 1-4.1-1.5l-1.4-3a3.1 3.1 0 0 1 1.4-4.1z"></path>'+
+    '<path d="M13.7 8.4 18.3 2l1.8 1.3-4.7 6.4z"></path>', z); },
+  /* a ball dropping onto a green */
+  short: function(z){ return tIco('<circle cx="6.1" cy="6.4" r="3.1"></circle>'+
+    '<path d="M2.2 20.8c2.7-5.6 6.2-8.4 10.5-8.4s7.6 2.8 9.6 8.4z"></path>', z); },
+  /* the hole and the pin */
+  putt: function(z){ return tIco('<path d="M12 3.2h1.8v11.1H12z"></path>'+
+    '<path d="M15 3.8l6.4 2.4L15 8.6z"></path>'+
+    '<path d="M12.9 14.6c4.4 0 7.9 1.5 7.9 3.4s-3.5 3.4-7.9 3.4-7.9-1.5-7.9-3.4 3.5-3.4 7.9-3.4zm0 1.9c-3 0-5.4.7-5.4 1.5s2.4 1.5 5.4 1.5 5.4-.7 5.4-1.5-2.4-1.5-5.4-1.5z"></path>', z); }
+};
+/* Whole days between two ISO dates, read at noon so a clock change cannot turn
+   a gap of one into a gap of nought. */
+function daysBetween(iso, from){
+  if(!iso) return null;
+  var a = new Date(iso+"T12:00:00"), b = new Date((from||today())+"T12:00:00");
+  if(isNaN(a)) return null;
+  return Math.round((b - a) / 86400000);
+}
+function sinceWords(d){
+  if(d === null) return "not yet played";
+  if(d <= 0) return "today";
+  if(d === 1) return "yesterday";
+  if(d < 14) return d+" days ago";
+  if(d < 60) return Math.round(d/7)+" weeks ago";
+  return Math.round(d/30)+" months ago";
+}
+/* Sorting on days-since alone means an area they have never touched has no key
+   at all. It is the most neglected thing on the screen, so it sorts as if the
+   gap were longer than any real one rather than falling off the bottom. */
+function tileGap(t){
+  var hist = sessionsFor(practiceFor(t.id));
+  var last = hist.length ? hist[hist.length-1].date : null;
+  var d = daysBetween(last);
+  return { hist:hist, last:last, days:d, key:(d === null ? 1e6 : d) };
+}
+/* The figure in the corner: the last session as a share of what was on offer,
+   coloured by whether it beat the one before it. One measure for all five, so
+   the five numbers on the screen can be read against each other. */
+function tilePc(sess, a){
+  /* Against the max the session itself was played to, not today\'s. Sets get
+     added and dropped, and scoring an old session out of a newer total is how
+     a 45 of 45 turns into 78% months later. */
+  var max = (sess && sess.max) || areaMax(a);
+  if(!sess || !max) return null;
+  return Math.max(0, Math.min(100, Math.round(sess.total / max * 100)));
+}
+function tileFig(hist, a){
+  if(!hist.length) return {txt:"\u2013", cls:"flat"};
+  var pc = tilePc(hist[hist.length-1], a);
+  if(pc === null) return {txt:"\u2013", cls:"flat"};
+  var cls = "flat";
+  if(hist.length > 1){
+    var prev = tilePc(hist[hist.length-2], a);
+    if(prev !== null) cls = pc > prev ? "up" : pc < prev ? "dn" : "flat";
+  }
+  return {txt:pc+"%", cls:cls};
+}
 function renderHome(){
   renderStoreWarn();
   renderHello();
   renderHomeGoals();
   var host = $("areaList"); host.innerHTML = "";
-  liveAreas().forEach(function(t){
-    var pid = practiceFor(t.id), a = area(pid) || t;
-    var hist = sessionsFor(pid);
-    var b = document.createElement("button");
-    b.className="area"; b.type="button";
+  var rows = liveAreas().map(function(t){
+    var g = tileGap(t);
+    g.t = t; g.pid = practiceFor(t.id); g.a = area(g.pid) || t;
+    return g;
+  }).sort(function(x, y){
+    if(y.key !== x.key) return y.key - x.key;   /* longest gap first */
+    return areaNo(x.t) - areaNo(y.t);           /* and a stable tie */
+  });
+  rows.forEach(function(r, i){
+    var t = r.t, a = r.a, sk = TILE[t.id] || TILE[10];
+    var wide = (i === 0);
     var dueNow = testDue(t.id);
-    b.innerHTML =
-      '<div class="idx num">'+areaNo(t)+'</div>'+
-      '<div><div class="nm">'+t.name+
-        (dueNow ? ' <span class="duechip">test due</span>' : '')+'</div>'+
-        '<div class="sub">'+(isDefaultPractice(pid) ? t.sub : a.name+' \u00b7 '+(a.sub||""))+'</div></div>'+
-      '<div class="right">'+ sparkline(hist.map(function(s){return s.total;}), areaMax(a)) +
-        '<div class="lastscore">'+
-          '<div class="big num">'+hist.length+'</div>'+
-          '<div class="cap">'+(hist.length===1 ? "session" : "sessions")+'</div>'+
-        '</div></div>';
+    var nm = sk.nm || t.name;
+    var sub = isDefaultPractice(r.pid) ? sk.sub : a.name;
+    var fig = tileFig(r.hist, a);
+    var b = document.createElement("button");
+    b.className = "tl" + (wide ? " wide" : "");
+    b.type = "button";
+    b.style.setProperty("--tint", sk.tint);
+    b.setAttribute("aria-label", nm + ", " + sinceWords(r.days));
+    var icon = '<span class="ic">'+TICON[sk.ic](wide ? 46 : 34)+'</span>';
+    var figh = '<span class="fig '+fig.cls+'">'+fig.txt+'</span>';
+    var tags = (dueNow ? '<span class="tag due">Test due</span>' : "") +
+               (wide && !dueNow ? '<span class="tag">Start here</span>' : "");
+    var line = '<div class="nm">'+nm+'</div>'+
+               '<div class="sub">'+sub+' \u00b7 '+sinceWords(r.days)+'</div>';
+    if(wide){
+      b.innerHTML = icon +
+        '<div class="txt">'+line+'</div>'+
+        '<div class="rt">'+figh+tags+'</div>';
+    } else {
+      b.innerHTML = icon + figh + line + tags;
+    }
     b.addEventListener("click", function(){
       var due = testDue(t.id);
       if(due && showDue(due, t.id)) return;
@@ -7419,10 +7656,13 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
        yardages down the right say what each ring means up and down the range,
        and the scale across the top says what it means across it. Before this
        the innermost ring was the only circle on the card that was drawn, scored
-       and aimed at without ever saying what it was. */
+       and aimed at without ever saying what it was. Loud on the ring they are
+       aiming at, quiet on the rest: the scoring ring is where the ball has to
+       finish, the aim ring is where they are trying to hit it, and it is the
+       second of those they are reading the number for. */
     var gl = '<g class="rguide">', gn = '<g class="gnum">';
     rings.forEach(function(ft, k){
-      var r = fsR(ft), p = fsPaces(ft), inner = (k < rings.length - 1);
+      var r = fsR(ft), p = fsPaces(ft), inner = (ft !== fsAimFt(kind));
       gl += '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY-r)+'" x2="'+gx+'" y2="'+f1(CY-r)+'"></line>'+
             '<line x1="'+(CX-ROSE_R-6)+'" y1="'+f1(CY+r)+'" x2="'+gx+'" y2="'+f1(CY+r)+'"></line>'+
             /* stopped just under the ring they are tangent to: run to the foot of
@@ -7445,7 +7685,7 @@ function fsRoseSvg(kind, tappable, dist, centreLabel){
       '<path class="gtip" d="M'+f1(CX+rS)+' '+ty+' l-6 -4 v8 z"></path>'+
       '<path class="garrow" d="M'+CX+' '+(ty-4)+' L'+CX+' '+(ty+4)+'"></path>';
     rings.forEach(function(ft, k){
-      var r = fsR(ft), p = fsPaces(ft), inner = (k < rings.length - 1);
+      var r = fsR(ft), p = fsPaces(ft), inner = (ft !== fsAimFt(kind));
       [-1, 1].forEach(function(side){
         var x = CX + side*r;
         sc += '<path class="garrow" d="M'+f1(x)+' '+(ty-4)+' L'+f1(x)+' '+(ty+4)+'"></path>'+
