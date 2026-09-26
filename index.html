@@ -267,7 +267,7 @@
     font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:700; color:var(--muted);
     border:1px solid var(--line-strong); border-radius:999px; padding:1px 7px; vertical-align:2px; margin-left:7px;
   }
-  .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-top:18px}
+  .panel{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius); padding:14px; margin-top:18px}
   .panel h2{margin-bottom:10px}
   .note{font-size:12.5px; color:var(--muted); margin:10px 0 0; max-width:60ch}
 
@@ -704,7 +704,7 @@
   .glegend i.t10{background:var(--up); width:2.5px}
 
   /* ---------- history ---------- */
-  .chartcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:13px 14px; margin-bottom:12px}
+  .chartcard{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius); padding:13px 14px; margin-bottom:12px}
   .chartcard .hd{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px}
   .chartcard .hd .nm{font-weight:600; font-size:14px}
   .chartcard .hd .pb{font-size:12px; color:var(--muted)}
@@ -742,7 +742,7 @@
   .tourbody .note{margin-top:9px}
 
   /* ---- tests ---- */
-  .testcard{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  .testcard{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:14px 15px; margin-bottom:12px}
   .tchd{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
   .tchd .nm{font-family:Archivo, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
@@ -961,7 +961,7 @@
   .pastrow:last-child{border-bottom:0}
   .pastrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600; color:var(--ink)}
   .pastrow .sub{display:block; font-size:11.5px; color:var(--muted); margin-top:1px}
-  .pastnotes{background:var(--surface); border:1px solid var(--line);
+  .pastnotes{background:var(--surface); border:0; box-shadow:var(--card);
     border-left:3px solid var(--accent-fill); border-radius:9px; padding:13px 15px; margin-top:18px}
   .pastnotes .eyebrow{margin-bottom:6px}
   .pastnotes p{margin:0; font-size:14px; line-height:1.55; color:var(--ink-2); white-space:pre-wrap}
@@ -1137,7 +1137,7 @@
     font-family:"IBM Plex Mono", ui-monospace, monospace}
   .savetick.bad{color:#c8402f; font-weight:600}
   .runbar{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:0 0 14px}
-  .runbox{background:var(--surface); border:1px solid var(--line); border-radius:11px;
+  .runbox{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:9px 8px 8px; text-align:center}
   .runbox b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:27px;
     line-height:1.05; color:var(--ink)}
@@ -1302,7 +1302,7 @@
 
   /* ---- end-of-session summary ---- */
   .sumwrap{display:flex; flex-direction:column; gap:14px; margin-bottom:16px}
-  .sumcard{background:var(--surface-2); border:1px solid var(--line); border-radius:11px;
+  .sumcard{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:13px 13px 9px; text-align:center}
   .sumcard .eyebrow{display:block; margin-bottom:8px}
   .sumcard svg{width:100%; max-width:300px; height:auto; margin:0 auto; display:block}
@@ -1325,7 +1325,7 @@
     padding:11px 14px; margin:0 0 14px; font-family:Archivo, sans-serif; font-size:14.5px;
     color:#5c1410; line-height:1.45; display:block}
   .banner.warn b{color:#8c1d16}
-  .storebox{border:1px solid var(--line); border-radius:10px; background:var(--surface-2);
+  .storebox{border:0; box-shadow:var(--card); border-radius:var(--radius); background:var(--surface-2);
     padding:10px 13px; font-size:13.5px; color:var(--ink-2); line-height:1.45; margin-bottom:10px}
   .storebox b{color:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace}
   .storebox.bad{background:#fde7ea; border-color:#c8402f; color:#5c1410}
@@ -1362,7 +1362,7 @@
   .goalgrp{margin-bottom:22px}
   .goalgrp h2{font-size:19px; margin:0 0 3px}
   .goalgrp .lede{margin:0 0 12px}
-  .goalarea{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  .goalarea{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:14px; margin-bottom:12px}
   .gahd{display:flex; align-items:baseline; gap:9px; margin-bottom:10px}
   .gahd .n{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--accent)}
@@ -1398,9 +1398,11 @@
   .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
   .complead{min-height:0}
 
-  /* the welcome page */
   .homeproj{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400;
     color:var(--accent); margin:0 0 12px; font-size:27px; line-height:1.12}
+  /* under the tiles, not in front of them */
+  .homeseason{margin-top:20px}
+  .homeseason .targets{margin:0}
   .gonext{display:block; width:100%; margin-top:18px; padding:16px 18px; border:0;
     border-radius:var(--radius-lg); background:var(--accent-fill); color:#ffffff;
     font-family:Archivo, sans-serif; font-size:17px; font-weight:600; cursor:pointer;
@@ -1617,25 +1619,23 @@
 <main class="wrap">
 
   <!-- HOME -->
+  <!-- One page. The welcome screen charged a tap and gave back a greeting she
+       had already read, so the greeting moved up here and the season moved
+       under the tiles, where it sits beneath the thing it is the reason for. -->
   <section id="viewHome">
-    <div id="homeWelcome">
-      <p class="banner warn" id="storeWarn" hidden></p>
+    <p class="banner warn" id="storeWarn" hidden></p>
+    <div id="homeProj"></div>
     <p class="banner hello" id="helloBar" hidden></p>
-      <div class="banner resume" id="resumeBar" hidden>
-        <span id="resumeText"></span>
-        <span class="resacts">
-          <button id="resumeGo">Carry on</button>
-          <button id="resumeDrop" class="ghost">Discard</button>
-        </span>
-      </div>
-      <div id="homeGoals"></div>
-      <button class="gonext" id="homeNext">Next &rarr;</button>
+    <div class="banner resume" id="resumeBar" hidden>
+      <span id="resumeText"></span>
+      <span class="resacts">
+        <button id="resumeGo">Carry on</button>
+        <button id="resumeDrop" class="ghost">Discard</button>
+      </span>
     </div>
-    <div id="homeAreas" hidden>
-      <button class="backlink" id="homeBack">&larr; Welcome</button>
-      <div class="tilehd"><h2>The five areas</h2><span id="tileSort">Least played first</span></div>
-      <div class="tilegrid" id="areaList"></div>
-    </div>
+    <div class="tilehd"><h2>The five areas</h2><span id="tileSort">Least played first</span></div>
+    <div class="tilegrid" id="areaList"></div>
+    <div id="homeGoals" class="homeseason"></div>
   </section>
 
   <!-- SESSION -->
@@ -2020,7 +2020,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"the front page rebuilt as five tiles that rotate on how long since each area was last played, a bar at the foot of the screen, and the aim ring given the weight on the scope card" };
+var BUILD = { on:"2026-09-26", note:"one home page instead of two, the five areas as tiles that rotate on how long since each was last played, a bar at the foot of the screen, and the whole app on one surface" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
@@ -5353,19 +5353,27 @@ function renderGoals(){
   host.appendChild(ref);
 }
 
+/* There is only one home page now. The function stays because the tab and the
+   restore path both set a page number, and a thrown error there would take the
+   whole screen with it. */
 function homePage(n){
   state.homePage = n;
-  $("homeWelcome").hidden = n !== 0;
-  $("homeAreas").hidden = n !== 1;
-  if(n === 0){ renderHello(); renderStoreWarn(); }
+  renderHello(); renderStoreWarn();
 }
 function renderHomeGoals(){
   var host = $("homeGoals"); if(!host) return;
   host.innerHTML = "";
-  var proj = projectFor();
-  if(proj){
-    var h = document.createElement("h1"); h.className="homeproj"; h.textContent = proj;
-    host.appendChild(h);
+  /* The season's name is the page's title and belongs at the top; the three
+     outcomes belong under the tiles, where they read as the reason for what is
+     above them rather than as a gate in front of it. */
+  var head = $("homeProj");
+  if(head){
+    head.innerHTML = "";
+    var proj = projectFor();
+    if(proj){
+      var h = document.createElement("h1"); h.className="homeproj"; h.textContent = proj;
+      head.appendChild(h);
+    }
   }
   host.appendChild(bulletBox({
     eyebrow:"This season \u00b7 what it is all for",
@@ -11303,8 +11311,6 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
 
 /* ---------- wiring ---------- */
 $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
-$("homeNext").addEventListener("click", function(){ homePage(1); });
-$("homeBack").addEventListener("click", function(){ homePage(0); });
 $("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("tabTests").addEventListener("click", function(){ renderTests(); show("tests"); });
 $("dueGo").addEventListener("click", function(){ var id = state.dueTest; closeDue(); if(id) openTest(id); });
