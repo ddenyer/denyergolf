@@ -33,6 +33,7 @@
     /* one hairline, no lift. Nothing in this system floats. */
     --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#dce7f3; --t-app:#d9e9dd; --t-wedge:#f9e2c9; --t-short:#efe6d4; --t-putt:#e6e3ee;
+    --t-sc:#e2e6ef;
     --tint:#ffffff;
     --tile-ink:#222222; --tile-ink-2:#5c6670;
     --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
@@ -57,6 +58,7 @@
     --up-wash:#17261a; --down-wash:#2a1e17;
     --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --t-sc:#22262e;
     --tint:#121212;
     --tile-ink:#ebebeb; --tile-ink-2:#a2a2a4;
     --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
@@ -80,6 +82,7 @@
     --up-wash:#17261a; --down-wash:#2a1e17;
     --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
+    --t-sc:#22262e;
     --tint:#121212;
     --tile-ink:#ebebeb; --tile-ink-2:#a2a2a4;
     --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
@@ -221,7 +224,7 @@
   .tl{
     position:relative; border:0; overflow:hidden; border-radius:12px; min-height:118px;
     display:flex; flex-direction:column; justify-content:flex-end; text-align:left;
-    padding:12px 13px; background:var(--tint); color:var(--tile-ink);
+    padding:52px 13px 12px; background:var(--tint); color:var(--tile-ink);
     box-shadow:0 1px 0 rgba(255,255,255,.85) inset, 0 0 0 1px var(--tile-edge),
       0 0 0 0 var(--tile-cast);
   }
@@ -286,6 +289,10 @@
   .lastscore .big{font-size:18px; font-weight:600}
   .lastscore .cap{font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
     color:var(--muted); margin-top:2px}
+  /* Nothing done yet needs no figure: a nought over the words said it twice and
+     took the width the name wanted. */
+  .lastscore .cap.none{margin-top:0; text-transform:none; letter-spacing:0;
+    font-size:11px; line-height:1.3}
   .spark{display:block}
   .delta{font-size:12px; font-weight:600; padding:1px 6px; border-radius:5px}
   .delta.up{color:var(--up); background:var(--up-wash)}
@@ -295,6 +302,20 @@
   .optchip{
     font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:700; color:var(--muted);
     border:1px solid var(--line-strong); border-radius:999px; padding:1px 7px; vertical-align:2px; margin-left:7px;
+  }
+  /* A quiet rule between two kinds of thing on one page: the sessions she plans
+     a week around, and the ones she reaches for when the week does not hold. */
+  .grouphd{display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    margin:20px 2px 9px}
+  .grouphd:first-child{margin-top:4px}
+  .grouphd b{font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--muted)}
+  .grouphd span{font-size:11.5px; color:var(--muted)}
+  /* The drawn icon each S&C row now carries, on the tinted puck the tiles use,
+     in place of the letters S&C on two rows and a bare plus sign on three. */
+  .area .puck{
+    display:flex; align-items:center; justify-content:center; flex:none;
+    width:38px; height:38px; border-radius:11px; background:var(--t-sc); color:var(--ink);
   }
   .panel{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius); padding:14px; margin-top:18px}
   .panel h2{margin-bottom:10px}
@@ -793,8 +814,31 @@
   .tourbody .note{margin-top:9px}
 
   /* ---- tests ---- */
-  .testcard{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
-    padding:14px 15px; margin-bottom:12px}
+  /* Six tests, each one two paragraphs tall, made a page she had to scroll past
+     rather than read. The words are worth keeping, so they moved one tap in:
+     the list is now something she can see all of, and the test she came for
+     opens where it sits. */
+  .testcard{background:var(--surface); border:0; box-shadow:var(--card);
+    border-radius:12px; margin-bottom:9px; overflow:hidden}
+  .trow{display:grid; grid-template-columns:auto 1fr auto auto; gap:11px; align-items:center;
+    width:100%; text-align:left; background:none; border:0; padding:11px 12px}
+  .trow .puck{display:flex; align-items:center; justify-content:center; flex:none;
+    width:38px; height:38px; border-radius:11px; background:var(--tint); color:var(--tile-ink)}
+  .trow .tx{min-width:0}
+  .trow .nm{display:block; font-size:14px; font-weight:700; letter-spacing:-.01em;
+    color:var(--ink); line-height:1.2}
+  .trow .sub{display:block; font-size:11px; color:var(--muted); margin-top:3px;
+    line-height:1.3}
+  .trow .rt{text-align:right; flex:none; line-height:1.2}
+  .trow .rt b{display:block; font-size:15px; font-weight:700; color:var(--ink)}
+  .trow .rt span{font-size:10px; color:var(--muted)}
+  .trow .chev{flex:none; color:var(--muted); transition:transform .18s ease}
+  .trow[aria-expanded="true"] .chev{transform:rotate(90deg)}
+  .duechip{display:inline-block; margin-left:6px; font-size:9px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--accent);
+    border:1px solid var(--accent); border-radius:5px; padding:1px 5px; vertical-align:1.5px}
+  .tdet{padding:2px 13px 13px; border-top:1px solid var(--line)}
+  .tdet .note:first-child{margin-top:10px}
   .tchd{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
   .tchd .nm{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
   .tchd .sub{font-size:12.5px; color:var(--muted); margin-top:2px}
@@ -1761,6 +1805,9 @@
   <section id="viewSC" hidden>
     <h1>Strength &amp; conditioning</h1>
     <p class="lede">The gym and everything that goes with it. Movement prep before every session, speed work alongside.</p>
+    <div class="grouphd"><b>The programme</b><span>two to three a week</span></div>
+    <div class="tilegrid" id="scTiles"></div>
+    <div class="grouphd"><b>Alongside it</b><span>as and when</span></div>
     <div class="arealist" id="scList"></div>
   </section>
 
@@ -5212,6 +5259,15 @@ function importLib(kind){
 function renderTests(){
   var host = $("testList"); if(!host) return;
   host.innerHTML = "";
+  /* The figure on the right: her rate once there are enough balls to read one,
+     and the number of runs until then. A test never run says so rather than
+     showing a nought, which is a score she did not get. */
+  function testFig(t, runs, tot, pct, mxs){
+    if(!runs.length) return '<span>not run</span>';
+    if(mxs) return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
+    if(tot.n >= 40) return '<b>'+pct+'%</b><span>'+runs.length+' '+(runs.length===1?"run":"runs")+'</span>';
+    return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
+  }
   allTests().forEach(function(t){
     var a = area(t.area), runs = testSessions(t.id);
     var tot = {n:0, got:0};
@@ -5220,21 +5276,44 @@ function renderTests(){
     var fill = Math.min(100, Math.round(100*tot.n/(t.target||100)));
     var mxs = isMatrix(t) ? mxTestStat(t, runs) : null;
     if(mxs) fill = mxs.fill;
+    var sk = TILE[t.area] || TILE[10];
+    var due = testDue(t.area);
     var card = document.createElement("div"); card.className = "testcard";
+    var did = "tdet-" + t.id;
     card.innerHTML =
-      '<div class="tchd"><div><div class="nm">'+t.name+'</div>'+
-        '<div class="sub">'+(a ? a.name : "")+' \u00b7 '+t.sub+'</div></div>'+
-        '<div class="tcn"><b class="num">'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span></div></div>'+
-      '<p class="note">'+t.why+'</p>'+
-      '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
-      '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
-      '<p class="tstat">'+
-        (mxs ? mxs.text
-             : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
-                      : 'Nothing logged yet')+
-               ' \u00b7 aiming for '+(t.target||100))+'</p>'+
-      '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
-        '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>';
+      '<button type="button" class="trow" aria-expanded="false" aria-controls="'+did+'" '+
+        'style="--tint:'+sk.tint+'">'+
+        '<span class="puck">'+TICON[sk.ic](21)+'</span>'+
+        '<span class="tx"><span class="nm">'+t.name+
+          (due ? '<span class="duechip">due</span>' : '')+'</span>'+
+          '<span class="sub">'+((sk && sk.nm) || (a ? a.name : ""))+' \u00b7 '+t.sub+'</span></span>'+
+        '<span class="rt">'+testFig(t, runs, tot, pct, mxs)+'</span>'+
+        '<span class="chev">'+
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+          'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+          '<path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg></span>'+
+      '</button>'+
+      '<div class="tdet" id="'+did+'" hidden>'+
+        '<p class="note">'+t.why+'</p>'+
+        '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
+        '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
+        '<p class="tstat">'+
+          (mxs ? mxs.text
+               : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
+                        : 'Nothing logged yet')+
+                 ' \u00b7 aiming for '+(t.target||100))+'</p>'+
+        '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
+          '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>'+
+      '</div>';
+    var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
+    row.addEventListener("click", function(){
+      var open = row.getAttribute("aria-expanded") === "true";
+      row.setAttribute("aria-expanded", open ? "false" : "true");
+      det.hidden = open;
+    });
+    /* The one that is due opens on arrival, so the page has an opinion about
+       what she came for without five red buttons shouting at once. */
+    if(due && !isMatrix(t)){ row.setAttribute("aria-expanded","true"); det.hidden = false; }
     card.querySelector("[data-run]").addEventListener("click", function(){ openTest(t.id); });
     host.appendChild(card);
   });
@@ -5540,7 +5619,23 @@ var TICON = {
   /* the hole and the pin */
   putt: function(z){ return tIco('<path d="M12 3.2h1.8v11.1H12z"></path>'+
     '<path d="M15 3.8l6.4 2.4L15 8.6z"></path>'+
-    '<path d="M12.9 14.6c4.4 0 7.9 1.5 7.9 3.4s-3.5 3.4-7.9 3.4-7.9-1.5-7.9-3.4 3.5-3.4 7.9-3.4zm0 1.9c-3 0-5.4.7-5.4 1.5s2.4 1.5 5.4 1.5 5.4-.7 5.4-1.5-2.4-1.5-5.4-1.5z"></path>', z); }
+    '<path d="M12.9 14.6c4.4 0 7.9 1.5 7.9 3.4s-3.5 3.4-7.9 3.4-7.9-1.5-7.9-3.4 3.5-3.4 7.9-3.4zm0 1.9c-3 0-5.4.7-5.4 1.5s2.4 1.5 5.4 1.5 5.4-.7 5.4-1.5-2.4-1.5-5.4-1.5z"></path>', z); },
+  /* the gym and the three things that go alongside it: a bar, a bolt for
+     overspeed, a band stretched between two handles, and a body moving */
+  gym: function(z){ return tIco('<rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect>'+
+    '<rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect>'+
+    '<rect x="9.2" y="10.7" width="5.6" height="2.6"></rect>'+
+    '<rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect>'+
+    '<rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect>', z); },
+  bolt: function(z){ return tIco('<path d="M13.4 2.4 4.6 13.6h6L10 21.6l9-11.4h-6.2z"></path>', z); },
+  band: function(z){ return tIco('<rect x="1.4" y="8.1" width="4" height="7.8" rx="1.6"></rect>'+
+    '<rect x="18.6" y="8.1" width="4" height="7.8" rx="1.6"></rect>'+
+    '<path d="M5.9 11.1h12.2v1.9H5.9z"></path>'+
+    '<path d="M6.4 6.9C9.2 4.3 14.8 4.3 17.6 6.9l-1.3 1.4c-2.1-1.9-6.5-1.9-8.6 0z"></path>', z); },
+  move: function(z){ return tIco('<circle cx="12" cy="4.2" r="2.4"></circle>'+
+    '<path d="M11.1 7.8h1.8v6.1h-1.8z"></path>'+
+    '<path d="M7.6 9.6 12 8.1l4.4 1.5-.6 1.7L12 10l-3.8 1.3z"></path>'+
+    '<path d="m11.1 13.4 1.7.6-2.6 7.2-1.7-.6zm1.8 0 1.7-.6 2.6 7.2-1.7.6z"></path>', z); }
 };
 /* Whole days between two ISO dates, read at noon so a clock change cannot turn
    a gap of one into a gap of nought. */
@@ -5649,84 +5744,79 @@ function renderHome(){
 
 /* S&C has a tab of its own: it is a different kind of session from a golf area,
    and mixing four gym rows into the practice list buried the five that matter. */
+/* The names above carry an entity for the ampersand, which belongs in the
+   markup and not in a label a screen reader reads out. */
+function stripTags(h){
+  var d = document.createElement("div"); d.innerHTML = h;
+  return d.textContent || "";
+}
 function renderSC(){
-  var list = $("scList"); if(!list) return;
-  list.innerHTML = "";
-  // strength & conditioning
-  var gAll = coreGymSessions();
-  var gb = document.createElement("button");
-  gb.className="area"; gb.type="button";
-  gb.innerHTML = '<div class="idx num">S&amp;C</div>'+
-    '<div><div class="nm">Strength &amp; conditioning</div><div class="sub">Power, compound, support, trunk · September 2026 programme</div></div>'+
-    '<div class="right">'+
-      '<div class="lastscore">'+
-        '<div class="big num">'+gAll.length+'</div>'+
-        '<div class="cap">'+(gAll.length===1 ? "session" : "sessions")+'</div>'+
-      '</div></div>';
-  gb.addEventListener("click", function(){ openGym(); });
-  list.appendChild(gb);
-
-  /* The Nov 2025 pair, on its own card. renderSC builds every row by hand
-     rather than iterating GYM, so a session added to the array with no row
-     here is simply unreachable: it was listed nowhere and could not be opened.
-     Kept apart from the card above because the two are different programmes,
-     and interleaving them in one rotation would have her doing ramped
-     percentage work and paired supersets on alternate days. */
-  var nv = mine().filter(isNov);
-  var nb = document.createElement("button");
-  nb.className="area"; nb.type="button";
-  nb.innerHTML = '<div class="idx num">S&amp;C</div>'+
-    '<div><div class="nm">Strength 1 &amp; 2</div>'+
-    '<div class="sub">Paired supersets · Nov 2025 programme</div></div>'+
-    '<div class="right"><div class="lastscore">'+
-      '<div class="big num">'+nv.length+'</div>'+
-      '<div class="cap">'+(nv.length===1 ? "session" : "sessions")+'</div>'+
-    '</div></div>';
-  nb.addEventListener("click", function(){ openGym(novDue()); });
-  list.appendChild(nb);
-
-  // speed sticks, optional, counted on its own
-  var sp = mine().filter(isSpeed);
-  var sb = document.createElement("button");
-  sb.className="area"; sb.type="button";
-  sb.innerHTML = '<div class="idx num">+</div>'+
-    '<div><div class="nm">Speed sticks <span class="optchip">optional</span></div>'+
-    '<div class="sub">Overspeed · 12 min · twice a week alongside the gym</div></div>'+
-    '<div class="right"><div class="lastscore">'+
-      '<div class="big num">'+sp.length+'</div>'+
-      '<div class="cap">'+(sp.length===1 ? "session" : "sessions")+'</div>'+
-    '</div></div>';
-  sb.addEventListener("click", function(){ openGym(4); });
-  list.appendChild(sb);
-
-  // band session, optional, counted on its own
-  var bnd = mine().filter(isBand);
-  var bb2 = document.createElement("button");
-  bb2.className="area"; bb2.type="button";
-  bb2.innerHTML = '<div class="idx num">+</div>'+
-    '<div><div class="nm">Band session <span class="optchip">optional</span></div>'+
-    '<div class="sub">Away from the gym · 15 min · hotel or home, instead of a missed session</div></div>'+
-    '<div class="right"><div class="lastscore">'+
-      '<div class="big num">'+bnd.length+'</div>'+
-      '<div class="cap">'+(bnd.length===1 ? "session" : "sessions")+'</div>'+
-    '</div></div>';
-  bb2.addEventListener("click", function(){ openGym(5); });
-  list.appendChild(bb2);
-
-  // movement prep, on its own when they want it on its own
-  var pr = mine().filter(isPrep);
-  var pb = document.createElement("button");
-  pb.className="area"; pb.type="button";
-  pb.innerHTML = '<div class="idx num">+</div>'+
-    '<div><div class="nm">Movement prep</div>'+
-    '<div class="sub">Every session \u00b7 8\u201310 min \u00b7 or on its own</div></div>'+
-    '<div class="right"><div class="lastscore">'+
-      '<div class="big num">'+pr.length+'</div>'+
-      '<div class="cap">'+(pr.length===1 ? "session" : "sessions")+'</div>'+
-    '</div></div>';
-  pb.addEventListener("click", function(){ openGym(6); });
-  list.appendChild(pb);
-
+  var tiles = $("scTiles"), list = $("scList");
+  if(!tiles || !list) return;
+  tiles.innerHTML = ""; list.innerHTML = "";
+  /* Every row was written out by hand, five times over, which is how three of
+     them ended up with a bare plus sign where the other two had the letters
+     S&C. One table, one builder, and a row that is missing here is missing
+     everywhere rather than quietly unreachable. */
+  var PROG = [
+    {nm:"Strength &amp; conditioning", sub:"Power, compound, support, trunk",
+     ic:"gym", ss:coreGymSessions(),
+     go:function(){ openGym(); }},
+    {nm:"Strength 1 &amp; 2", sub:"Paired supersets",
+     ic:"gym", ss:mine().filter(isNov), go:function(){ openGym(novDue()); }}
+  ];
+  var ALSO = [
+    {nm:"Speed sticks", opt:1, ic:"bolt", ss:mine().filter(isSpeed),
+     sub:"Overspeed \u00b7 12 min \u00b7 twice a week alongside the gym",
+     go:function(){ openGym(4); }},
+    {nm:"Band session", opt:1, ic:"band", ss:mine().filter(isBand),
+     sub:"Away from the gym \u00b7 15 min \u00b7 instead of a missed session",
+     go:function(){ openGym(5); }},
+    {nm:"Movement prep", ic:"move", ss:mine().filter(isPrep),
+     sub:"Every session \u00b7 8\u201310 min \u00b7 or on its own",
+     go:function(){ openGym(6); }}
+  ];
+  /* The same line the practice tiles carry: when she last did it, and how many
+     times in all. A count on its own said nothing about whether she had been
+     near the gym this month. */
+  function metaOf(ss){
+    if(!ss || !ss.length) return "Not done yet";
+    var last = ss.map(function(x){ return x && x.date; })
+      .filter(Boolean).sort().pop();
+    var d = shortDate(last);
+    return (d ? d + " \u00b7 " : "") + ss.length +
+      (ss.length === 1 ? " session" : " sessions");
+  }
+  /* The gym takes the practice tile, so it reads as another area of the
+     programme rather than a page borrowed from somewhere else. */
+  PROG.forEach(function(o){
+    var b = document.createElement("button");
+    b.className = "tl"; b.type = "button";
+    b.style.setProperty("--tint", "var(--t-sc)");
+    b.setAttribute("aria-label", stripTags(o.nm) + ", " + metaOf(o.ss));
+    b.innerHTML = '<span class="ic">'+TICON[o.ic](34)+'</span>'+
+      '<div class="nm">'+o.nm+'</div>'+
+      '<div class="sub">'+o.sub+'</div>'+
+      '<div class="meta">'+metaOf(o.ss)+'</div>';
+    b.addEventListener("click", o.go);
+    tiles.appendChild(b);
+  });
+  ALSO.forEach(function(o){
+    var b = document.createElement("button");
+    b.className = "area"; b.type = "button";
+    var n = o.ss.length;
+    var rt = n
+      ? '<div class="big num">'+n+'</div><div class="cap">'+
+        metaOf(o.ss).split(" \u00b7 ")[0]+'</div>'
+      : '<div class="cap none">not done yet</div>';
+    b.innerHTML = '<span class="puck">'+TICON[o.ic](21)+'</span>'+
+      '<div><div class="nm">'+o.nm+
+        (o.opt ? ' <span class="optchip">optional</span>' : '')+'</div>'+
+        '<div class="sub">'+o.sub+'</div></div>'+
+      '<div class="right"><div class="lastscore">'+rt+'</div></div>';
+    b.addEventListener("click", o.go);
+    list.appendChild(b);
+  });
 }
 
 function renderBalance(){
