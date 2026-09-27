@@ -121,6 +121,33 @@
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   }
   .topin{max-width:760px; margin:0 auto; padding:11px 16px 10px}
+  /* The other axis. Pills rather than a second bar, because these are places she
+     goes on purpose now and then, not places she lives. */
+  nav.lookrow{display:flex; gap:7px; margin-top:9px; overflow-x:auto; scrollbar-width:none}
+  nav.lookrow::-webkit-scrollbar{display:none}
+  nav.lookrow button{
+    flex:none; display:flex; align-items:center; gap:6px;
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:999px;
+    padding:7px 13px 7px 10px; font-size:12.5px; font-weight:600; color:var(--ink-2);
+    white-space:nowrap;
+  }
+  nav.lookrow button svg{width:16px; height:16px; color:var(--ink)}
+  /* A tint alone was invisible in the dark, where the page tint and the card
+     surface are a shade apart. The live pill carries the accent instead, which
+     reads on either ground. */
+  nav.lookrow button[aria-selected="true"]{
+    background:var(--accent-wash); color:var(--accent); font-weight:700;
+    box-shadow:var(--card), 0 0 0 1.7px var(--accent) inset;
+  }
+  nav.lookrow button[aria-selected="true"] svg{color:var(--accent)}
+  /* Half strength, not hidden. Hiding the row she is not in would be cleaner and
+     wrong: she would not know the other half of the app was there. Half says
+     there is more here and you are not in it. */
+  nav.lookrow.dim button, nav.tabs.dim button{opacity:.5}
+  /* One dot, on the one destination that has something waiting. */
+  nav.tabs button .pip{position:absolute; top:9px; left:50%; margin-left:9px; z-index:2;
+    width:8px; height:8px; border-radius:999px; background:var(--accent-fill);
+    box-shadow:0 0 0 2px rgba(252,253,254,.95)}
   .brandrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
   /* Libre Caslon carries the name and the headings. Everything the tool asks
      them to do stays in Archivo: the serif is the voice, not the interface. */
@@ -158,7 +185,7 @@
   nav.tabs button{
     flex:1; min-width:0; background:none; border:0; padding:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    font-size:9.5px; font-weight:500; color:var(--ink); letter-spacing:.01em; white-space:nowrap;
+    font-size:10.5px; font-weight:500; color:var(--ink); letter-spacing:.01em; white-space:nowrap;
     position:relative; height:62px;
   }
   nav.tabs button svg{position:relative; z-index:1}
@@ -179,7 +206,7 @@
       rgba(226,92,86,.8) 42%, rgba(120,150,220,.75) 62%, rgba(96,196,168,.7) 80%,
       rgba(243,163,45,0) 98%);
   }
-  @media (max-width:340px){ nav.tabs button{font-size:8.5px} }
+  @media (max-width:340px){ nav.tabs button{font-size:9.5px} }
 
   main{padding-block:18px 108px}
   h1{font-family:"Libre Caslon Display",Georgia,serif; font-size:25px; font-weight:400;
@@ -1658,16 +1685,21 @@
         <button class="coachlink" id="coachLink" type="button">Coach</button>
       </div>
     </div>
-  </div>
+    <!-- Across the top: the three she goes to on purpose, now and then. -->
+    <nav class="lookrow" role="tablist" aria-label="Look back">
+      <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path></svg><span>Sessions</span></button>
+      <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Archivo, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
+      <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
+    </nav></div>
 </header>
 
-<nav class="tabs" role="tablist">
+<!-- Under the thumb: the three she opens the app for. The foot of the screen
+     is the only part one hand reaches without shifting grip, and Practice,
+     S&C and Tests are what she came to do several times a week. -->
+<nav class="tabs" role="tablist" aria-label="Practise">
   <button id="tabPractice" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
   <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Tests</span></button>
-  <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path></svg><span>Sessions</span></button>
-  <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Archivo, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
-  <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
 </nav>
 
 
@@ -2075,7 +2107,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-27", note:"all five areas score in strokes gained, the tee priced off her own speed and the lie she taps, and every ball she logs is counted, rotations included" };
+var BUILD = { on:"2026-09-27", note:"the app split two ways: Practice, S&C and Tests under the thumb, Goals, Sessions and Progress across the top, and a due test says so once, on the bar" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -4853,7 +4885,16 @@ function show(view){
      and a Next of its own, and six destinations under a running score is an
      invitation to walk out of a drill halfway through. */
   var barEl = document.querySelector("nav.tabs");
+  var lookEl = document.querySelector("nav.lookrow");
   if(barEl) barEl.hidden = (view==="session" || view==="gym");
+  /* Exactly one of the two rows holds the screen she is on, and the other steps
+     back to half strength so a glance says which way she moved last. */
+  var inDo = ["tabPractice","tabSC","tabTests"].some(function(id){
+    return $(id) && $(id).getAttribute("aria-selected") === "true"; });
+  if(barEl) barEl.classList.toggle("dim", !inDo);
+  if(lookEl) lookEl.classList.toggle("dim", inDo);
+  if(lookEl) lookEl.hidden = (view==="session" || view==="gym");
+  renderTestPip();
   pushView(view);
   if(view!=="session" && view!=="gym"){
     state.deck = null; clearRest();
@@ -5422,6 +5463,26 @@ function renderGoals(){
 /* There is only one home page now. The function stays because the tab and the
    restore path both set a page number, and a thrown error there would take the
    whole screen with it. */
+/* A test waiting is one fact, and it belongs in one place. With Tests a thumb
+   away it does not need to shout from a tile as well. */
+function anyTestDue(){
+  return liveAreas().some(function(t){ return !!testDue(t.id); });
+}
+function renderTestPip(){
+  var b = $("tabTests"); if(!b) return;
+  var pip = b.querySelector(".pip");
+  if(anyTestDue()){
+    if(!pip){
+      pip = document.createElement("span");
+      pip.className = "pip"; pip.setAttribute("aria-hidden", "true");
+      b.appendChild(pip);
+    }
+    b.setAttribute("aria-label", "Tests, one is due");
+  } else {
+    if(pip) pip.remove();
+    b.removeAttribute("aria-label");
+  }
+}
 function homePage(n){
   state.homePage = n;
   renderHello(); renderStoreWarn();
@@ -5570,8 +5631,10 @@ function renderHome(){
     b.setAttribute("aria-label", nm + ", " + sinceWords(r.days));
     var icon = '<span class="ic">'+TICON[sk.ic](wide ? 46 : 34)+'</span>';
     var figh = '<span class="fig '+fig.cls+'">'+fig.txt+'</span>';
-    var tags = (dueNow ? '<span class="tag due">Test due</span>' : "") +
-               (wide && !dueNow ? '<span class="tag">Start here</span>' : "");
+    /* A test waiting is said once, on the bar, where Tests is a thumb away.
+       Saying it here as well cost the tile the line that tells her how long it
+       has been, which is the thing this screen exists to say. */
+    var tags = wide ? '<span class="tag">Start here</span>' : "";
     var line = '<div class="nm">'+nm+'</div>'+
                '<div class="sub">'+sub+' \u00b7 '+sinceWords(r.days)+'</div>';
     if(wide){
