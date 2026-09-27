@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Practice scoring and tracking for elite golfers.">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef0ec">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1310">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
@@ -16,91 +16,95 @@
 <title>Longer Closer Lower</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Libre+Caslon+Display&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
   :root{
-    /* Cool navy ground and a deep claret, off the championship study. The claret
-       is a shade off theirs on purpose: borrowing the structure is free, borrowing
-       the exact colour reads as merchandise. */
-    --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa;
-    --ink:#0f1f2e; --ink-2:#3b4d5e; --muted:#6b7d8c;
-    --line:#d5dde4; --line-strong:#b3c1cd;
-    --accent:#8d1b38; --accent-fill:#a81f42; --accent-wash:#f8ebee;
-    --gold:#b2872c; --heritage:#134734;
-    --up:#1f7a4d; --down:#a8540d;
-    --up-wash:#e4efe8; --down-wash:#f6ece0;
-    --radius:14px; --radius-lg:21px;
-    /* every raised thing in the app now sits on the same surface as a tile:
-       a hairline edge, a highlight along the top, and a soft cast under it */
-    --card: 0 1px 0 rgba(255,255,255,.75) inset, 0 0 0 1px var(--tile-edge),
-            0 8px 18px -13px var(--tile-cast);
-    /* one tint per area, pinned for good, so a tile is known by colour before
-       it is read. Lifted off the washed cells in the reference bar. */
+    /* Near-black on white, coral for anything that acts. The five area tints
+       stay, because they are the one thing on the home screen she reads before
+       she reads a word. */
+    --bg:#ffffff; --surface:#ffffff; --surface-2:#f7f7f7;
+    --ink:#222222; --ink-2:#484848; --muted:#767676;
+    --line:#ebebeb; --line-strong:#dddddd;
+    --accent:#e0565b; --accent-fill:#d6484e; --accent-wash:#fdf0f1;
+    --gold:#9a7620; --heritage:#14614a;
+    --up:#008a05; --down:#c13515;
+    --up-wash:#eef7ee; --down-wash:#fdf0eb;
+    --radius:12px; --radius-lg:16px;
+    /* one hairline, no lift. Nothing in this system floats. */
+    --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#dce7f3; --t-app:#d9e9dd; --t-wedge:#f9e2c9; --t-short:#efe6d4; --t-putt:#e6e3ee;
-    /* The tint of wherever she is. Neutral on the screens that belong to no
-       one area, and that area's own colour the moment she opens it, so the
-       whole screen says where she is before she reads a word. */
-    --tint:#e4ecf2;
-    --tile-ink:#0f1f2e; --tile-ink-2:#5b6b78;
-    --tile-gloss:rgba(255,255,255,.78); --tile-gloss-2:rgba(255,255,255,.14);
-    --tile-edge:rgba(15,31,46,.055); --tile-cast:rgba(12,28,44,.35);
-    --glass:rgba(252,253,254,.66);
+    --tint:#ffffff;
+    --tile-ink:#222222; --tile-ink-2:#5c6670;
+    --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
+    --tile-edge:rgba(0,0,0,.08); --tile-cast:rgba(0,0,0,0);
+    --glass:#ffffff;
+    /* the aim tools. Grass is grass in both themes; the pick colour is the
+       accent, so selecting a zone looks like every other live thing. */
+    --turf-line:#7ba86c; --turf-line-2:#6e9c62; --turf-wash:#f2f8ec;
+    --turf-ink:#546f4a; --hole:#22331d;
+    --pick:#ffd9da; --pick-line:#d6484e; --pick-ink:#8a2226; --flag:#c13515;
+    --on-accent:#ffffff;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       color-scheme: dark;
-    --bg:#0c141b; --surface:#131e27; --surface-2:#18242e;
-    --ink:#e7eef3; --ink-2:#bcccd7; --muted:#8497a4;
-    --line:#25333e; --line-strong:#3a4c59;
-    --accent:#e8607a; --accent-fill:#f2748c; --accent-wash:#33141d;
+    --bg:#121212; --surface:#1c1c1e; --surface-2:#242426;
+    --ink:#ebebeb; --ink-2:#c4c4c4; --muted:#909090;
+    --line:#323234; --line-strong:#454547;
+    --accent:#ff6f74; --accent-fill:#ff8287; --accent-wash:#331c1e;
     --gold:#d7ab55; --heritage:#4e9c7a;
-    --up:#57b487; --down:#e0a06b;
-    --up-wash:#17261f; --down-wash:#2a2119;
-    /* the same five, taken down rather than dimmed: a pale tint on a dark screen
-       glares, and a grey one stops telling them which area it is */
-    --card: 0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px var(--tile-edge),
-            0 8px 18px -13px var(--tile-cast);
+    --up:#4fbf58; --down:#ff8a5c;
+    --up-wash:#17261a; --down-wash:#2a1e17;
+    --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
-    --tint:#18242e;
-    --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
-    --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
-    --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
-    --glass:rgba(24,36,46,.72);
+    --tint:#121212;
+    --tile-ink:#ebebeb; --tile-ink-2:#a2a2a4;
+    --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
+    --tile-edge:rgba(255,255,255,.13); --tile-cast:rgba(0,0,0,0);
+    --glass:#1c1c1e;
+    --turf-line:#5f8a53; --turf-line-2:#547a49; --turf-wash:#1a231a;
+    --turf-ink:#93ab86; --hole:#0b1209;
+    --pick:#4a2124; --pick-line:#ff8287; --pick-ink:#ffc9cb; --flag:#ff8a5c;
+    --on-accent:#121212;
+
     }
   }
   :root[data-theme="dark"]{
     color-scheme: dark;
-    --bg:#0c141b; --surface:#131e27; --surface-2:#18242e;
-    --ink:#e7eef3; --ink-2:#bcccd7; --muted:#8497a4;
-    --line:#25333e; --line-strong:#3a4c59;
-    --accent:#e8607a; --accent-fill:#f2748c; --accent-wash:#33141d;
+    --bg:#121212; --surface:#1c1c1e; --surface-2:#242426;
+    --ink:#ebebeb; --ink-2:#c4c4c4; --muted:#909090;
+    --line:#323234; --line-strong:#454547;
+    --accent:#ff6f74; --accent-fill:#ff8287; --accent-wash:#331c1e;
     --gold:#d7ab55; --heritage:#4e9c7a;
-    --up:#57b487; --down:#e0a06b;
-    --up-wash:#17261f; --down-wash:#2a2119;
-    /* the same five, taken down rather than dimmed: a pale tint on a dark screen
-       glares, and a grey one stops telling them which area it is */
-    --card: 0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px var(--tile-edge),
-            0 8px 18px -13px var(--tile-cast);
+    --up:#4fbf58; --down:#ff8a5c;
+    --up-wash:#17261a; --down-wash:#2a1e17;
+    --card: 0 0 0 1px var(--tile-edge);
     --t-tee:#1d2a38; --t-app:#1b2f26; --t-wedge:#382b1d; --t-short:#312b1e; --t-putt:#282434;
-    --tint:#18242e;
-    --tile-ink:#e7eef3; --tile-ink-2:#9fb0bc;
-    --tile-gloss:rgba(255,255,255,.085); --tile-gloss-2:rgba(255,255,255,.02);
-    --tile-edge:rgba(255,255,255,.07); --tile-cast:rgba(0,0,0,.6);
-    --glass:rgba(24,36,46,.72);
+    --tint:#121212;
+    --tile-ink:#ebebeb; --tile-ink-2:#a2a2a4;
+    --tile-gloss:rgba(255,255,255,0); --tile-gloss-2:rgba(255,255,255,0);
+    --tile-edge:rgba(255,255,255,.13); --tile-cast:rgba(0,0,0,0);
+    --glass:#1c1c1e;
+    --turf-line:#5f8a53; --turf-line-2:#547a49; --turf-wash:#1a231a;
+    --turf-ink:#93ab86; --hole:#0b1209;
+    --pick:#4a2124; --pick-line:#ff8287; --pick-ink:#ffc9cb; --flag:#ff8a5c;
+    --on-accent:#121212;
+
   }
 
   *{box-sizing:border-box}
   body{
     background:var(--bg); color:var(--ink);
-    font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-variant-numeric:tabular-nums;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:15px; line-height:1.45;
     -webkit-text-size-adjust:100%;
   }
   /* the ground carries the tint too, faintly, from the top of the screen down */
-  body:before{content:""; position:fixed; left:0; right:0; top:0; height:400px; z-index:0;
-    pointer-events:none; opacity:.9;
-    background:linear-gradient(180deg, var(--tint), transparent);
-    transition:background .35s ease}
+  /* The ground is white now, in both themes. The tint that used to wash
+     down the page belonged to the old system; here the tiles carry the
+     colour and nothing else does. setTint still runs and costs nothing. */
+  body:before{content:none}
   header.top, main, nav.tabs, .totalbar, #gate{position:relative; z-index:1}
   .wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:0 0}
   button{font:inherit; color:inherit; cursor:pointer}
@@ -108,7 +112,7 @@
   :focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
   @media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
 
-  .num{font-family:"IBM Plex Mono", ui-monospace, Menlo, monospace; font-variant-numeric:tabular-nums}
+  .num{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums}
   .eyebrow{font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); font-weight:600}
 
   /* ---------- header ---------- */
@@ -116,9 +120,8 @@
      the tint as a grey slab and cut the colour off at the top of the page. */
   header.top{
     position:sticky; top:env(safe-area-inset-top, 0px); z-index:30;
-    background:var(--glass); border-bottom:0;
-    box-shadow:0 1px 0 var(--tile-edge);
-    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    background:var(--surface); border-bottom:1px solid var(--line);
+    box-shadow:none;
   }
   .topin{max-width:760px; margin:0 auto; padding:11px 16px 10px}
   /* The other axis. Pills rather than a second bar, because these are places she
@@ -136,8 +139,8 @@
      surface are a shade apart. The live pill carries the accent instead, which
      reads on either ground. */
   nav.lookrow button[aria-selected="true"]{
-    background:var(--accent-wash); color:var(--accent); font-weight:700;
-    box-shadow:var(--card), 0 0 0 1.7px var(--accent) inset;
+    background:var(--surface); color:var(--accent); font-weight:700;
+    box-shadow:0 0 0 1.5px var(--accent) inset;
   }
   nav.lookrow button[aria-selected="true"] svg{color:var(--accent)}
   /* Half strength, not hidden. Hiding the row she is not in would be cleaner and
@@ -151,7 +154,7 @@
   .brandrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
   /* Libre Caslon carries the name and the headings. Everything the tool asks
      them to do stays in Archivo: the serif is the voice, not the interface. */
-  .brand{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:17px;
+  .brand{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em; font-size:17px;
     letter-spacing:.01em}
   .brand span{color:var(--accent)}
   .player{
@@ -175,13 +178,11 @@
     position:fixed; left:0; right:0; bottom:0; z-index:40;
     display:flex; margin:0 auto; max-width:560px; height:62px; padding-inline:6px;
     padding-bottom:env(safe-area-inset-bottom, 0px); box-sizing:content-box;
-    border-radius:31px 31px 0 0; background:var(--glass);
-    -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
-    box-shadow:0 1px 0 rgba(255,255,255,.55) inset, 0 0 0 1px var(--tile-edge),
-      0 -10px 34px -16px var(--tile-cast);
+    border-radius:0; background:var(--glass);
+    border-top:1px solid var(--line); box-shadow:none;
     overflow:hidden;
   }
-  @media (min-width:600px){ nav.tabs{border-radius:31px; bottom:14px; overflow:visible} }
+  @media (min-width:600px){ nav.tabs{max-width:none; overflow:visible} }
   nav.tabs button{
     flex:1; min-width:0; background:none; border:0; padding:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
@@ -190,26 +191,15 @@
   }
   nav.tabs button svg{position:relative; z-index:1}
   nav.tabs button span{position:relative; z-index:1}
-  nav.tabs button[aria-selected="true"]{font-weight:700}
-  /* the warm lozenge behind the live one, and the seam under it. One only:
-     put it under all six and it stops saying anything. */
-  nav.tabs button[aria-selected="true"]:before{
-    content:""; position:absolute; left:50%; top:50%; width:58px; height:52px;
-    transform:translate(-50%,-50%); border-radius:19px; filter:blur(2px);
-    background:radial-gradient(72% 64% at 50% 38%, rgba(243,163,45,.55),
-      rgba(243,163,45,.17) 60%, rgba(243,163,45,0) 100%);
-  }
-  nav.tabs button[aria-selected="true"]:after{
-    content:""; position:absolute; left:50%; bottom:5px; width:50px; height:3px;
-    transform:translateX(-50%); border-radius:3px; filter:blur(.4px);
-    background:linear-gradient(90deg, rgba(243,163,45,0) 2%, rgba(243,163,45,.85) 18%,
-      rgba(226,92,86,.8) 42%, rgba(120,150,220,.75) 62%, rgba(96,196,168,.7) 80%,
-      rgba(243,163,45,0) 98%);
-  }
+  /* The live one is simply the coloured one. The lozenge and its seam were
+     the old system talking; here colour alone says which. */
+  nav.tabs button{color:var(--muted)}
+  nav.tabs button[aria-selected="true"]{color:var(--accent); font-weight:700}
+  nav.tabs button[aria-selected="true"] svg{color:var(--accent)}
   @media (max-width:340px){ nav.tabs button{font-size:9.5px} }
 
   main{padding-block:18px 108px}
-  h1{font-family:"Libre Caslon Display",Georgia,serif; font-size:25px; font-weight:400;
+  h1{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:25px; font-weight:800; letter-spacing:-.022em;
      letter-spacing:0; margin:0 0 3px; text-wrap:balance; line-height:1.14}
   h2{font-size:14px; font-weight:700; margin:0 0 8px; letter-spacing:.01em}
   .lede{color:var(--ink-2); margin:0 0 18px; max-width:62ch; font-size:14px}
@@ -229,11 +219,11 @@
      it back, so the colour must never move with the order. */
   .tilegrid{display:grid; gap:9px; grid-template-columns:1fr 1fr}
   .tl{
-    position:relative; border:0; overflow:hidden; border-radius:21px; min-height:118px;
+    position:relative; border:0; overflow:hidden; border-radius:12px; min-height:118px;
     display:flex; flex-direction:column; justify-content:flex-end; text-align:left;
     padding:12px 13px; background:var(--tint); color:var(--tile-ink);
     box-shadow:0 1px 0 rgba(255,255,255,.85) inset, 0 0 0 1px var(--tile-edge),
-      0 8px 18px -12px var(--tile-cast);
+      0 0 0 0 var(--tile-cast);
   }
   /* the one gradient that makes a flat tint read as glass rather than paint */
   .tl:before{content:""; position:absolute; inset:0; z-index:0;
@@ -242,7 +232,7 @@
   .tl:active{transform:translateY(1px)}
   .tl .ic{position:absolute; top:11px; left:12px; z-index:2; line-height:0; color:var(--tile-ink)}
   .tl .fig{position:absolute; top:12px; right:13px; z-index:2;
-    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:14.5px; font-weight:600;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14.5px; font-weight:600;
     font-variant-numeric:tabular-nums}
   .tl .fig.up{color:var(--up)} .tl .fig.dn{color:var(--down)} .tl .fig.flat{color:var(--tile-ink-2)}
   .tl .nm{position:relative; z-index:2; font-size:13.5px; font-weight:700; letter-spacing:-.012em;
@@ -260,12 +250,8 @@
   .tl.wide .fig{position:static; font-size:17px}
   .tl.wide .nm{font-size:15px}
   .tl.wide .sub{font-size:11px; margin-top:4px}
-  /* the seam belongs to the tile they are being sent to and nothing else */
-  .tl.wide:after{content:""; position:absolute; left:15px; right:15px; bottom:4px; height:3px;
-    z-index:3; border-radius:3px; filter:blur(.4px);
-    background:linear-gradient(90deg, rgba(243,163,45,0) 2%, rgba(243,163,45,.85) 20%,
-      rgba(226,92,86,.8) 44%, rgba(120,150,220,.78) 64%, rgba(96,196,168,.72) 82%,
-      rgba(243,163,45,0) 98%)}
+  /* The tile she is being sent to is marked by its badge and its size. The
+     seam under it was the old system's flourish and has nothing to say here. */
   .tl .tag{position:relative; z-index:2; align-self:flex-start; margin-top:7px; font-size:9.5px;
     font-weight:700; letter-spacing:.05em; color:var(--accent); white-space:nowrap;
     border:1px solid var(--accent); border-radius:5px; padding:1px 6px}
@@ -373,12 +359,12 @@
     display:flex; align-items:baseline; gap:1px; min-width:64px; justify-content:center;
   }
   .stepper input{
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums;
     font-size:19px; font-weight:600; width:3.4ch; text-align:right; border:0; background:none; color:var(--ink);
     padding:0; -moz-appearance:textfield;
   }
   .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-  .stepper .max{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--muted)}
+  .stepper .max{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; color:var(--muted)}
 
   .set.metric{background:var(--surface-2); display:block}
   .set.metric .lbl{font-size:14px; color:var(--ink)}
@@ -395,7 +381,7 @@
   .mspin button:active{background:var(--accent-wash)}
   .mspin input::placeholder{color:var(--muted); font-size:13px; letter-spacing:0}
   .mfield input{
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums;
     font-size:17px; font-weight:600; width:62px; height:40px; text-align:center; color:var(--ink);
     background:var(--surface); border:1px solid var(--line-strong); border-radius:8px; -moz-appearance:textfield;
   }
@@ -427,7 +413,7 @@
   .prog{display:flex; align-items:center; gap:10px; margin:10px 0 14px}
   .progbar{flex:1; height:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:3px; overflow:hidden}
   .progfill{height:100%; background:var(--accent-fill); border-radius:2px; transition:width .18s ease}
-  .progtxt{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); white-space:nowrap}
+  .progtxt{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px; color:var(--muted); white-space:nowrap}
   .pcard{
     background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:16px 16px 18px;
@@ -465,12 +451,12 @@
   .rvlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:11px; overflow:hidden}
   .rvrow{background:var(--surface); padding:9px 12px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; font-size:13.5px; cursor:pointer}
   .rvrow:hover{background:var(--surface-2)}
-  .rvrow b{font-family:"IBM Plex Mono",monospace; font-size:14px}
+  .rvrow b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px}
   .rvrow.miss b{color:var(--muted)}
   .rvtot{display:flex; justify-content:space-between; align-items:baseline; margin-top:14px; padding-top:12px; border-top:1px solid var(--line-strong)}
-  .rvtot .f{font-family:"IBM Plex Mono",monospace; font-size:28px; font-weight:600}
+  .rvtot .f{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:28px; font-weight:600}
   .nav{
-    background:var(--surface); border:0; box-shadow:var(--card); border-radius:16px;
+    background:var(--surface); border:0; box-shadow:var(--card); border-radius:12px;
     padding:12px 15px; font-size:14px; font-weight:600; color:var(--ink-2); flex:none;
   }
   .nav:active{transform:translateY(1px)}
@@ -478,8 +464,8 @@
     box-shadow:0 8px 20px -12px var(--tile-cast)}
   .nav.back{padding:11px 16px; font-size:15px}
   .nav.back[disabled]{opacity:.38; cursor:default}
-  :root[data-theme="dark"] .nav.next{color:#0e1310}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nav.next{color:#0e1310}}
+  :root[data-theme="dark"] .nav.next{color:var(--on-accent)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nav.next{color:var(--on-accent)}}
 
   .rules{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface); border:0; box-shadow:var(--card);
          border-radius:var(--radius); padding:13px 15px; margin:12px 0 0}
@@ -506,8 +492,8 @@
     padding:6px 12px; font-size:12.5px; font-weight:600; color:var(--ink-2); line-height:1.2;
   }
   .chips button[aria-pressed="true"]{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
-  :root[data-theme="dark"] .chips button[aria-pressed="true"]{color:#0e1310}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chips button[aria-pressed="true"]{color:#0e1310}}
+  :root[data-theme="dark"] .chips button[aria-pressed="true"]{color:var(--on-accent)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chips button[aria-pressed="true"]{color:var(--on-accent)}}
   @media (max-width:430px){ .condrow{grid-template-columns:1fr; gap:3px} .condrow > span{padding-top:0} }
 
   .cseg{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px}
@@ -521,7 +507,7 @@
   .cbar{display:grid; grid-template-columns:96px 1fr 68px; gap:9px; align-items:center; font-size:12.5px; margin-bottom:5px}
   .cbar .btrack{position:relative}
   .cbar .n{text-align:right; color:var(--muted); font-size:11.5px}
-  .cbar .n b{color:var(--ink); font-size:13px; font-family:"IBM Plex Mono",monospace; font-weight:600}
+  .cbar .n b{color:var(--ink); font-size:13px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600}
   .cbar.thin .bfill{background:var(--line-strong)}
   .refline{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--ink-2); opacity:.55}
   .verdict{
@@ -541,28 +527,28 @@
   .seg button .due{color:var(--accent)}
   .prep{display:flex; flex-direction:column; gap:3px; margin-top:8px}
   .prep div{display:grid; grid-template-columns:18px 1fr auto; gap:8px; font-size:13px; color:var(--ink-2)}
-  .prep div span:first-child{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:11.5px}
-  .prep div em{font-style:normal; color:var(--muted); font-size:12px; font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
+  .prep div span:first-child{color:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px}
+  .prep div em{font-style:normal; color:var(--muted); font-size:12px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
   .prepdone{margin-top:10px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600}
   .prepdone input{width:18px; height:18px; accent-color:var(--accent-fill)}
   .exlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden}
   .ex{background:var(--surface); padding:11px 13px}
   .exhd{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap}
   .ex .nm{font-weight:600; font-size:14px; letter-spacing:-.005em}
-  .ex .pre{font-size:12px; color:var(--muted); font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
+  .ex .pre{font-size:12px; color:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
   .ex .last{font-size:12px; color:var(--ink-2); width:100%; margin-top:1px}
   .exin{display:flex; gap:8px; align-items:flex-end; margin-top:9px; flex-wrap:wrap}
   .loadf{display:flex; flex-direction:column; gap:2px}
   .loadf span, .repsf > span{font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600}
   .loadf input{
-    font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:16px; font-weight:600;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums; font-size:16px; font-weight:600;
     width:72px; height:42px; text-align:center; color:var(--ink); background:var(--surface-2);
     border:1px solid var(--line-strong); border-radius:8px; -moz-appearance:textfield;
   }
   .repsf{display:flex; flex-direction:column; gap:2px; flex:1; min-width:0}
   .repsrow{display:flex; gap:5px}
   .repsrow input{
-    font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:16px; font-weight:600;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums; font-size:16px; font-weight:600;
     width:46px; height:42px; text-align:center; color:var(--ink); background:var(--surface-2);
     border:1px solid var(--line-strong); border-radius:8px; -moz-appearance:textfield;
   }
@@ -586,7 +572,7 @@
     padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));
   }
   .lbcard{
-    background:var(--surface); color:var(--ink); border:0; box-shadow:var(--card); border-radius:14px;
+    background:var(--surface); color:var(--ink); border:0; box-shadow:var(--card); border-radius:12px;
     max-width:520px; width:100%; padding:14px 16px 18px; box-shadow:0 18px 50px rgba(0,0,0,.35);
   }
   .lbhd{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px}
@@ -603,9 +589,9 @@
   .shotgrid figure{margin:0}
   .shotgrid img{display:block; width:100%; height:auto; border-radius:7px;
     border:1px solid var(--line); background:var(--surface)}
-  .shotgrid figcaption{margin-top:5px; font-family:Archivo, sans-serif; font-size:10px;
+  .shotgrid figcaption{margin-top:5px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px;
     font-weight:600; letter-spacing:.9px; color:var(--muted); text-align:center}
-  .shotnote{margin:9px 0 2px; font-family:Archivo, sans-serif; font-size:11.5px;
+  .shotnote{margin:9px 0 2px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
     font-weight:600; color:var(--ink-2); text-align:center}
   #lbBody{margin:12px 0 0; padding-left:20px; display:flex; flex-direction:column; gap:7px}
   #lbBody li{font-size:13.5px; line-height:1.5; color:var(--ink-2)}
@@ -620,7 +606,7 @@
     background:var(--surface-2); display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:2px; line-height:1.1;
   }
-  .sbox .sv{font-family:"IBM Plex Mono",monospace; font-size:16px; font-weight:600; color:var(--ink)}
+  .sbox .sv{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
   .sbox .ss{font-size:9.5px; letter-spacing:.02em; color:var(--muted); font-weight:600; white-space:nowrap}
   .pcard .sbox{min-width:74px; height:64px}
   .pcard .sbox .sv{font-size:19px}
@@ -632,7 +618,7 @@
   }
   .donebtn[data-done="1"]{background:var(--up); border-color:var(--up); color:#fff}
   .donebtn[data-done="rest"]{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--accent);
-    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums}
   .seg button.extra{border-style:dashed}
   .donebtn:hover{border-color:var(--accent-fill)}
   .ex + .ex .donebtn{margin-bottom:4px}
@@ -680,16 +666,16 @@
     background:var(--glass);
     -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%);
     box-shadow:0 1px 0 rgba(255,255,255,.55) inset, 0 0 0 1px var(--tile-edge),
-      0 -10px 34px -16px var(--tile-cast);
+      0 0 0 0 var(--tile-cast);
     padding:11px 16px calc(11px + env(safe-area-inset-bottom, 0px));
   }
   .totalin{max-width:760px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px}
   .tot{display:flex; align-items:baseline; gap:8px; flex:1 1 auto; min-width:0; flex-wrap:wrap}
-  .tot .fig{font-family:"IBM Plex Mono", monospace; font-size:26px; font-weight:600; font-variant-numeric:tabular-nums}
-  .tot .of{font-family:"IBM Plex Mono", monospace; font-size:14px; color:var(--muted)}
+  .tot .fig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:26px; font-weight:600; font-variant-numeric:tabular-nums}
+  .tot .of{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; color:var(--muted)}
   .tot .vs{font-size:12px; color:var(--muted); line-height:1.3; min-width:0}
   .save{
-    background:var(--accent-fill); color:#ffffff; border:0; border-radius:16px;
+    background:var(--accent-fill); color:#ffffff; border:0; border-radius:12px;
     padding:12px 19px; font-weight:700; font-size:14px;
     box-shadow:0 8px 20px -12px var(--tile-cast);
   }
@@ -706,7 +692,7 @@
     font-weight:600; padding:7px 2px; background:var(--surface-2);
   }
   table.card thead tr.g th{border-bottom:1px solid var(--line-strong)}
-  table.card td.h{font-family:"IBM Plex Mono", monospace; font-size:12.5px; color:var(--ink-2); width:30px}
+  table.card td.h{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px; color:var(--ink-2); width:30px}
   table.card tr.par3 td.h{color:var(--accent)}
   .cell{
     width:34px; height:34px; border:0; background:none; display:flex; align-items:center; justify-content:center;
@@ -718,12 +704,12 @@
   }
   .cell[data-v="1"] span{background:var(--up); border-color:var(--up); color:#fff}
   .cell[data-v="0"] span{background:var(--down); border-color:var(--down); color:#fff}
-  :root[data-theme="dark"] .cell[data-v="1"] span,:root[data-theme="dark"] .cell[data-v="0"] span{color:#0e1310}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cell[data-v="1"] span,:root:not([data-theme="light"]) .cell[data-v="0"] span{color:#0e1310}}
+  :root[data-theme="dark"] .cell[data-v="1"] span,:root[data-theme="dark"] .cell[data-v="0"] span{color:var(--on-accent)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cell[data-v="1"] span,:root:not([data-theme="light"]) .cell[data-v="0"] span{color:var(--on-accent)}}
   td.sep{border-left:1px solid var(--line)}
   .roundsum{display:flex; gap:22px; flex-wrap:wrap; margin-top:14px}
   .roundsum div{min-width:120px}
-  .roundsum .fig{font-family:"IBM Plex Mono", monospace; font-size:27px; font-weight:600}
+  .roundsum .fig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:27px; font-weight:600}
   .par3row{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); margin:12px 0}
 
   /* ---------- benchmarks ---------- */
@@ -733,9 +719,9 @@
     font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600;
     background:var(--surface-2); vertical-align:bottom; border-bottom:1px solid var(--line-strong);
   }
-  table.btable td{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--ink-2)}
+  table.btable td{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; color:var(--ink-2)}
   table.btable .club{
-    position:sticky; left:0; text-align:left; font-family:Archivo, sans-serif; font-weight:600;
+    position:sticky; left:0; text-align:left; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600;
     color:var(--ink); background:var(--surface); border-right:1px solid var(--line);
   }
   table.btable thead .club{background:var(--surface-2)}
@@ -749,7 +735,7 @@
   }
   .youbar div{min-width:92px}
   .youbar .eyebrow{display:block; margin-bottom:2px}
-  .youbar .fig{font-family:"IBM Plex Mono", monospace; font-size:22px; font-weight:600}
+  .youbar .fig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:22px; font-weight:600}
   .youbar .gap{font-size:13px; font-weight:600}
   .tgt-top10{color:var(--up); background:var(--up-wash); border-radius:5px; padding:2px 8px; font-weight:700; font-size:12.5px}
   .tgt-mid{color:var(--accent); background:var(--accent-wash); border-radius:5px; padding:2px 8px; font-weight:700; font-size:12px}
@@ -761,8 +747,8 @@
   .gfill{position:absolute; left:0; top:0; bottom:0; background:var(--accent-fill); border-radius:3px 0 0 3px; min-width:2px}
   .gtick{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink-2)}
   .gtick.t10{background:var(--up); width:2.5px}
-  .gauge .gv{text-align:right; font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:13px}
-  .gauge .gv small{display:block; font-family:Archivo,sans-serif; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:.05em}
+  .gauge .gv{text-align:right; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600; font-size:13px}
+  .gauge .gv small{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:.05em}
   .glegend{display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:var(--muted); margin-top:10px}
   .glegend span{display:flex; align-items:center; gap:5px}
   .glegend i{width:2px; height:12px; background:var(--ink-2); display:inline-block}
@@ -776,41 +762,41 @@
   svg.line{display:block; width:100%; height:auto}
   .hlist{display:flex; flex-direction:column; gap:1px; background:var(--line); border:0; box-shadow:var(--card); border-radius:var(--radius); overflow:hidden; margin-top:6px}
   .hrow{background:var(--surface); padding:10px 13px; display:grid; grid-template-columns:auto 1fr auto auto; gap:11px; align-items:center; font-size:13px}
-  .hrow .d{font-family:"IBM Plex Mono", monospace; font-size:12px; color:var(--muted); width:6.5ch}
-  .hrow .s{font-family:"IBM Plex Mono", monospace; font-weight:600}
+  .hrow .d{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12px; color:var(--muted); width:6.5ch}
+  .hrow .s{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600}
   .hrow .x{background:none; border:0; color:var(--muted); font-size:15px; padding:0 2px; line-height:1}
   .hrow .nt{font-size:12px; color:var(--muted); grid-column:1/-1; margin-top:-2px}
-  .hrow .nt b{color:var(--ink-2); font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600}
+  .hrow .nt b{color:var(--ink-2); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600}
   .hrow.live{background:var(--accent-wash)}
-  .hrow .pill{display:inline-block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+  .hrow .pill{display:inline-block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px; font-weight:700;
     letter-spacing:.7px; text-transform:uppercase; padding:2px 7px; border-radius:999px;
     margin-right:7px; vertical-align:1px; border:1px solid var(--line-strong); color:var(--muted)}
   .hrow .pill.now{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
-  .hrow .pill.part{background:#fff3d6; border-color:#e6b94d; color:#8a5d00}
+  .hrow .pill.part{background:var(--up-wash); border-color:var(--gold); color:var(--gold)}
   .hrow .openacts{margin-top:7px}
   .hrow .openacts button{padding:5px 13px; font-size:12.5px}
   ol.lmsteps{margin:12px 0 4px; padding-left:22px; font-size:14.5px; line-height:1.55; color:var(--ink)}
   ol.lmsteps li{margin-bottom:7px}
   ol.lmsteps b{font-weight:600}
   .lmlink{margin:12px 0 0}
-  .lmlink a{font-family:Archivo, sans-serif; font-size:14px; font-weight:600; color:var(--accent)}
+  .lmlink a{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; font-weight:600; color:var(--accent)}
   .tourbox{margin-top:16px; border:1px solid var(--line-strong); border-radius:11px; overflow:hidden}
   .tourhd{width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px;
     background:var(--surface-2); border:0; padding:12px 14px; cursor:pointer; text-align:left;
-    font-family:Archivo, sans-serif; font-size:13.5px; font-weight:600; color:var(--ink)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13.5px; font-weight:600; color:var(--ink)}
   .tourhd .tchev{color:var(--muted); font-size:17px; transition:transform .15s}
   .tourbox.open .tourhd .tchev{transform:rotate(90deg)}
   .tourbody{padding:4px 14px 12px}
   table.tmini{width:100%; margin-top:8px}
   table.tmini td{padding:5px 0; font-size:13px; border-bottom:1px solid var(--line)}
-  table.tmini td.key{text-align:right; font-family:"IBM Plex Mono", ui-monospace, monospace; color:var(--ink)}
+  table.tmini td.key{text-align:right; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; color:var(--ink)}
   .tourbody .note{margin-top:9px}
 
   /* ---- tests ---- */
   .testcard{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:14px 15px; margin-bottom:12px}
   .tchd{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
-  .tchd .nm{font-family:Archivo, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
+  .tchd .nm{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:16px; font-weight:600; color:var(--ink)}
   .tchd .sub{font-size:12.5px; color:var(--muted); margin-top:2px}
   .tcn{text-align:right; flex:none}
   .tcn b{display:block; font-size:22px; line-height:1; color:var(--ink)}
@@ -819,29 +805,29 @@
     overflow:hidden; margin-top:12px}
   .tbar span{display:block; height:100%; background:var(--accent-fill)}
   .tstat{font-size:12.5px; color:var(--ink-2); margin:7px 0 0}
-  .tstat b{font-family:"IBM Plex Mono", ui-monospace, monospace; color:var(--ink)}
+  .tstat b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; color:var(--ink)}
   .tacts{display:flex; align-items:center; gap:11px; margin-top:12px; flex-wrap:wrap}
   .tacts button.pri{background:var(--accent-fill); border:1px solid var(--accent-fill); color:#ffffff;
-    border-radius:11px; padding:8px 15px; font-family:Archivo, sans-serif; font-size:13.5px;
+    border-radius:11px; padding:8px 15px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13.5px;
     font-weight:600; cursor:pointer}
   .twhere{font-size:12px; color:var(--muted)}
 
   /* ---- the two matrices ---- */
   .mxtop{display:flex; align-items:flex-end; gap:14px; margin:4px 0 14px}
   .mxtime{display:flex; flex-direction:column}
-  .mxfig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+  .mxfig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums;
     font-size:44px; font-weight:600; line-height:1; letter-spacing:-1px; color:var(--ink)}
   .mxfig.late{color:var(--down)}
-  .mxsub{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
+  .mxsub{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
     color:var(--muted); margin-top:5px}
   .mxtry{margin-left:auto; text-align:right}
-  .mxtry b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .mxtry b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:26px; font-weight:600; line-height:1; color:var(--ink)}
-  .mxtry span{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:10.5px;
+  .mxtry span{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10.5px;
     letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
 
   .mxsts{display:flex; flex-direction:column; gap:7px}
-  .mxst{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:14px;
+  .mxst{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:12px;
     padding:11px 13px}
   .mxst.on{background:var(--surface); border:2px solid var(--accent-fill); padding:14px 14px 15px}
   .mxst.on h3{margin:5px 0 6px; font-size:17px; font-weight:600; line-height:1.25}
@@ -849,12 +835,12 @@
   .mxmini{display:flex; align-items:center; gap:11px; font-size:14px; color:var(--ink-2)}
   .mxdot{flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line-strong);
     display:flex; align-items:center; justify-content:center;
-    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
   .mxdot.ok{background:var(--up); border-color:var(--up); color:#ffffff}
 
   .mxacts{display:flex; gap:10px; margin:14px 0 4px}
   .mxacts button{flex:1 1 0; min-height:56px; border-radius:10px;
-    font-family:Archivo, sans-serif; font-size:17px; font-weight:600; cursor:pointer}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; font-weight:600; cursor:pointer}
   .mxgo{border:0; background:var(--accent-fill); color:#ffffff}
   .mxgo.wide{min-height:62px; font-size:18px}
   .mxno{border:1.5px solid var(--line-strong); background:var(--surface); color:var(--ink)}
@@ -867,10 +853,10 @@
   .mxbands{display:flex; flex-direction:column; gap:8px; margin:14px 0 4px}
   .mxband{display:flex; align-items:center; gap:13px; width:100%; min-height:58px; padding:0 16px;
     border:1.5px solid var(--line-strong); border-radius:10px; background:var(--surface);
-    color:var(--ink); font-family:Archivo, sans-serif; cursor:pointer; text-align:left}
+    color:var(--ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; cursor:pointer; text-align:left}
   .mxband.best{border-color:var(--accent-fill); background:var(--accent-wash)}
   .mxband.miss{min-height:50px; border-color:var(--line); background:var(--surface-2); color:var(--ink-2)}
-  .mxband .pts{width:26px; flex:none; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .mxband .pts{width:26px; flex:none; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:25px; font-weight:600}
   .mxband.best .pts{color:var(--accent)}
   .mxband.miss .pts{font-size:21px; color:var(--muted)}
@@ -882,7 +868,7 @@
   .mxres.won p{color:#d6e8dd}
   .mxres.out{background:var(--surface); border:1px solid var(--line-strong)}
   .mxres.card{background:var(--surface); border:0; box-shadow:var(--card)}
-  .mxres .mxbig{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+  .mxres .mxbig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-variant-numeric:tabular-nums;
     font-size:46px; font-weight:600; line-height:1; letter-spacing:-1.1px; margin:4px 0 8px}
   .mxres p{margin:0; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
   .mxplace{margin-top:9px !important; font-size:15px !important; font-weight:600; color:var(--accent) !important}
@@ -892,7 +878,7 @@
   .mxscale i{display:block; height:12px; background:var(--accent-fill)}
   .mxscale u{position:absolute; top:0; width:2px; height:12px; background:var(--ink-2)}
   .mxends{display:flex; justify-content:space-between; margin-top:5px;
-    font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; color:var(--muted)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; color:var(--muted)}
 
   .mxpace{margin:0 0 12px !important}
   .mxhard{margin:8px 0 0; padding-top:8px; border-top:1px solid var(--line);
@@ -905,7 +891,7 @@
   .mxrunrow{display:flex; gap:6px; flex-wrap:wrap; margin:7px 0 6px}
   .mxrun{min-width:38px; padding:6px 9px; border-radius:11px; background:var(--surface);
     border:0; box-shadow:var(--card); text-align:center;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--ink-2)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; color:var(--ink-2)}
   .mxrun.best{border-color:var(--up); color:var(--up); font-weight:600}
   .mxrun.now{background:var(--accent-wash); border-color:var(--accent-fill); color:var(--ink)}
   .mxrun.now.best{background:var(--up-wash); border-color:var(--up); color:var(--up)}
@@ -916,16 +902,16 @@
   .mxsrow:last-of-type{border-bottom:0}
   .mxsrow .n{flex:none; width:22px; height:22px; border-radius:50%; background:var(--surface-2);
     border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; color:var(--ink-2)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--ink-2)}
   .mxsrow .b{display:flex; flex-direction:column; gap:2px; min-width:0}
   .mxsrow .b b{font-size:14.5px; font-weight:600}
   /* Not ".set": that class already exists for a scoring row and brings a white
      card with it, which made every station's setup look like an input box. */
   .mxsrow .cfg{font-size:12.5px; line-height:1.4; color:var(--ink-2)}
-  .mxsrow .pts{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+  .mxsrow .pts{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px;
     color:var(--muted); margin-top:2px}
   .mxfold{margin-top:16px; border-top:1px solid var(--line); padding-top:10px}
-  .mxfold summary{cursor:pointer; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+  .mxfold summary{cursor:pointer; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
   .mxfold summary:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
 
@@ -936,22 +922,22 @@
   .mxbar{flex:none; width:70px; height:8px; border-radius:4px; background:var(--bg); overflow:hidden}
   .mxbar i{display:block; height:8px; background:var(--up)}
   .mxrow b{flex:none; width:46px; text-align:right;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; color:var(--ink)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12px; color:var(--ink)}
 
   .mxgrid{margin-top:18px}
   .mxlap{display:flex; align-items:center; gap:7px; margin-bottom:5px}
-  .mxlap .ln{flex:none; width:13px; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .mxlap .ln{flex:none; width:13px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:11px; color:var(--muted)}
   /* Twelve cells across a phone is 21px each, so the gap has to carry the
      separation on its own. At 3px two scored cells side by side read as one
      wide block holding a two digit number. */
   .mxlap .cells{flex:1 1 auto; display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); gap:5px}
   .mxlap b{flex:none; width:22px; text-align:right;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; font-weight:600}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12px; font-weight:600}
   .mxlap .cell{height:20px; border-radius:3px; background:var(--surface);
     box-shadow:inset 0 0 0 1px var(--line);
     display:flex; align-items:center; justify-content:center;
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; color:var(--muted)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; color:var(--muted)}
   /* A white ring inside each scored cell. Without it two filled neighbours
      read as one wide cell holding a two digit number, and "1" beside "2"
      becomes twelve. */
@@ -962,7 +948,7 @@
   .mxlap .cell.nil{background:var(--bg); color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
   .mxlap .cell.next{box-shadow:inset 0 0 0 2px var(--accent-fill)}
   .benchlink{background:var(--surface); border:1px solid var(--line-strong); border-radius:12px;
-    padding:11px 15px; font-family:Archivo, sans-serif; font-size:14px; font-weight:600;
+    padding:11px 15px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; font-weight:600;
     color:var(--accent); cursor:pointer}
   .testpick .testrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px}
   .tsel{flex:1 1 150px; min-width:140px; background:var(--surface); color:var(--ink);
@@ -973,23 +959,23 @@
   .tstep .tevery{width:44px; text-align:center}
   .tlab{font-size:13px; color:var(--muted)}
   .tnote{margin-top:8px}
-  .duechip{display:inline-block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+  .duechip{display:inline-block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px; font-weight:700;
     letter-spacing:.7px; text-transform:uppercase; padding:2px 7px; border-radius:999px;
     background:var(--accent-fill); color:#ffffff; vertical-align:2px; margin-left:5px}
   .duewrap{position:fixed; inset:0; z-index:80; background:rgba(0,0,0,.45);
     display:flex; align-items:center; justify-content:center; padding:20px}
-  .duecard{background:var(--surface); border-radius:16px; padding:22px 20px; max-width:400px;
+  .duecard{background:var(--surface); border-radius:12px; padding:22px 20px; max-width:400px;
     width:100%; max-height:88vh; overflow:auto; box-shadow:0 18px 50px rgba(0,0,0,.35)}
-  .duecard h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; margin:6px 0 4px; font-size:23px; line-height:1.15}
+  .duecard h2{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em; margin:6px 0 4px; font-size:23px; line-height:1.15}
   .duecard p{margin:0 0 6px; font-size:14.5px; color:var(--ink-2)}
   .dueacts{display:flex; gap:9px; margin-top:16px; flex-wrap:wrap}
-  .dueacts button{border-radius:12px; padding:11px 17px; font-family:Archivo, sans-serif;
+  .dueacts button{border-radius:12px; padding:11px 17px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:14.5px; font-weight:600; cursor:pointer;
     background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink)}
   .dueacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
   .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:11px;
-    padding:8px 14px; font-family:Archivo, sans-serif; font-size:13px; font-weight:600;
+    padding:8px 14px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; font-weight:600;
     color:var(--ink); cursor:pointer}
   .openacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .empty{color:var(--muted); font-size:13.5px; padding:22px 0; text-align:center}
@@ -1015,16 +1001,16 @@
   .pastsum{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px}
   .pastsum div{background:var(--surface); border:0; box-shadow:var(--card); border-radius:12px;
     padding:9px 13px; min-width:76px}
-  .pastsum b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .pastsum b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:19px; font-weight:600; color:var(--ink); line-height:1.1}
-  .pastsum span{display:block; margin-top:3px; font-family:Archivo, sans-serif; font-size:9.5px;
+  .pastsum span{display:block; margin-top:3px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:9.5px;
     font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--muted)}
-  .pastgrp{font-family:Archivo, sans-serif; font-size:10px; font-weight:600; letter-spacing:1.1px;
+  .pastgrp{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px; font-weight:600; letter-spacing:1.1px;
     text-transform:uppercase; color:var(--muted); margin:16px 0 7px}
   .pastrow{display:grid; grid-template-columns:1fr auto; gap:12px; align-items:baseline;
     padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px; color:var(--ink-2)}
   .pastrow:last-child{border-bottom:0}
-  .pastrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600; color:var(--ink)}
+  .pastrow b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600; color:var(--ink)}
   .pastrow .sub{display:block; font-size:11.5px; color:var(--muted); margin-top:1px}
   .pastnotes{background:var(--tint); border:0; box-shadow:var(--card);
     border-radius:var(--radius-lg); padding:14px 16px; margin-top:18px}
@@ -1046,26 +1032,26 @@
   .rz, .wc, .stn{-webkit-tap-highlight-color:transparent}
   .rz:focus, .wc:focus{outline:none}
   .rz:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
-  .rzl{font-family:Archivo, sans-serif; font-size:13px; font-weight:600; text-anchor:middle;
+  .rzl{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; font-weight:600; text-anchor:middle;
     pointer-events:none; fill:#2b3a27}
   .rzl.vert{font-size:11px}
   .caption{pointer-events:none}
   .cappill{fill:#ffffff; stroke:#c8d3c4; stroke-width:1}
-  .rcl, .gatelab{fill:#1f2a1c; font-family:Archivo, sans-serif; font-size:15px; font-weight:600;
+  .rcl, .gatelab{fill:#1f2a1c; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:15px; font-weight:600;
     text-anchor:middle; pointer-events:none}
-  .gatelab{font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
+  .gatelab{font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
 
   /* the green */
-  .rbed{fill:#6e9c62}
+  .rbed{fill:var(--turf-line-2)}
   .rose .rz{fill:url(#gRough); stroke:#5b8450; stroke-width:1.1}
-  .rose .rc{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
+  .rose .rc{fill:url(#gGreen); stroke:var(--turf-line); stroke-width:1.4}
   .fringe{fill:#94bd84; pointer-events:none}
-  .rose .rb{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.6; stroke-dasharray:5 4}
+  .rose .rb{fill:var(--turf-wash); stroke:var(--turf-line); stroke-width:1.6; stroke-dasharray:5 4}
   /* The quadrants are all green, because all four score. The lines between them
      are divisions of one target, not edges of four, so they are lighter than the
      ring outside and the whole circle still reads as a single thing. */
   .rose .rq{fill:url(#gGreen); stroke:#8fbc7e; stroke-width:1.4}
-  .rose .rst{fill:#f2f8ec; stroke:#7ba86c; stroke-width:1.5; stroke-dasharray:4 3}
+  .rose .rst{fill:var(--turf-wash); stroke:var(--turf-line); stroke-width:1.5; stroke-dasharray:4 3}
   /* The four rings on the short game target, lighter the closer in, so the picture
      reads inward without a legend. They are the same at every station: what varies
      is what each one is worth, which is the dashed line's job to show. */
@@ -1079,10 +1065,10 @@
      unpainted pixel is not a clickable one. */
   .rose .rz.sgr-miss{fill:url(#sgfade); stroke:none; pointer-events:all}
   .rose .rz.sgr-miss:hover, .rose .rz.sgr-miss.on{fill:url(#sgfadeon); stroke:none}
-  .rose .rz.sgr-q4{fill:#a4cc90; stroke:#6e9c62; stroke-width:1.3}
-  .rose .rz.sgr-c{fill:#c6e2b4; stroke:#6e9c62; stroke-width:1.3}
-  .rose .rz.sgr-b{fill:#edf8e3; stroke:#6e9c62; stroke-width:1.4}
-  .rose .rz.sgh{fill:#22331d; stroke:#f2f8ec; stroke-width:1.6}
+  .rose .rz.sgr-q4{fill:#a4cc90; stroke:var(--turf-line-2); stroke-width:1.3}
+  .rose .rz.sgr-c{fill:#c6e2b4; stroke:var(--turf-line-2); stroke-width:1.3}
+  .rose .rz.sgr-b{fill:#edf8e3; stroke:var(--turf-line-2); stroke-width:1.4}
+  .rose .rz.sgh{fill:var(--hole); stroke:var(--turf-wash); stroke-width:1.6}
   /* The full swing rings. Same trap as the short game's: these all carry .rz,
      and .rose .rz sets a fill, so a fill attribute would lose to it. Three
      classes each, keyed on position from the outside in rather than on the zone
@@ -1090,23 +1076,23 @@
      rings and an approach card with three. The dividing lines are lighter than
      the ring outside them, because they divide one target rather than bounding
      four. */
-  .rose .rz.fsq{stroke:#7ba86c; stroke-width:1.5}
+  .rose .rz.fsq{stroke:var(--turf-line); stroke-width:1.5}
   .rose .rz.fsb0{fill:#a4cc90}
   .rose .rz.fsb1{fill:#c6e2b4}
-  .rose .rz.fsin{fill:#eaf6e0; stroke:#6e9c62; stroke-width:1.5}
+  .rose .rz.fsin{fill:#eaf6e0; stroke:var(--turf-line-2); stroke-width:1.5}
   /* The same pink as the scope, and the same two weights: the aim pair solid,
      the pair on the scoring ring lighter, so the two pictures read as one target
      seen two ways rather than as two different diagrams. */
-  .fsaim line{stroke:#e0187f; stroke-width:3.4; pointer-events:none}
+  .fsaim line{stroke:var(--pick-line); stroke-width:3.4; pointer-events:none}
   .fsaim line.far{stroke-width:2.4; opacity:.55}
-  .fslp text{fill:#2f4a27; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .fslp text{fill:#2f4a27; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; font-weight:700; text-anchor:start; pointer-events:none}
-  .fslp text.up{font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
-    font-size:10.5px; font-weight:500; fill:#546f4a}
+  .fslp text.up{font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
+    font-size:10.5px; font-weight:500; fill:var(--turf-ink)}
   /* A caption is a sentence. Mono is for figures that line up in a column, and
      setting a line of prose in it made the foot of every card read as output
      from something rather than as the card explaining itself. */
-  text.fsmiss{fill:#546f4a; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+  text.fsmiss{fill:var(--turf-ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:11.5px; font-weight:500; text-anchor:middle; pointer-events:none}
   /* The LPGA line runs left from its own swatch, and a text-anchor attribute
      loses to the rule above however it is written on the element. */
@@ -1115,18 +1101,18 @@
     pointer-events:none}
   /* Where the LPGA field's average ball finishes from this station and this lie.
      Inside one club off the collar, outside four from a plugged bunker. */
-  .sgfield{fill:none; stroke:#22331d; stroke-width:2; stroke-dasharray:6 4;
+  .sgfield{fill:none; stroke:var(--hole); stroke-width:2; stroke-dasharray:6 4;
     opacity:.85; pointer-events:none}
-  .sglab text{fill:#2f4a27; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .sglab text{fill:#2f4a27; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; font-weight:700; text-anchor:start; pointer-events:none}
-  .sglab text.up{font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
-    font-size:10.5px; font-weight:500; fill:#546f4a}
-  .sglab text.sgmiss{font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
-    font-size:11.5px; font-weight:500; fill:#546f4a; text-anchor:middle}
+  .sglab text.up{font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
+    font-size:10.5px; font-weight:500; fill:var(--turf-ink)}
+  .sglab text.sgmiss{font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
+    font-size:11.5px; font-weight:500; fill:var(--turf-ink); text-anchor:middle}
   .sglab text.sgmiss.ft{font-size:10.5px; font-weight:500; fill:#63795a}
   .choled.sm text{font-size:14px}
-  .rguide line{stroke:#6e9c62; stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
-  .gnum text{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13px;
+  .rguide line{stroke:var(--turf-line-2); stroke-width:1; stroke-dasharray:4 5; opacity:.5; pointer-events:none}
+  .gnum text{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px;
     fill:var(--muted); pointer-events:none}
   .gnum text.key{fill:var(--ink-2); font-weight:600}
   /* Weight goes on the ring they are AIMING at and on the distance itself.
@@ -1143,7 +1129,7 @@
   table.league{width:100%; border-collapse:collapse; margin:10px 0 4px}
   table.league td{padding:5px 2px; font-size:13px; border-bottom:1px solid var(--line)}
   table.league td.lgname{color:var(--ink-2)}
-  table.league td.lgscore{width:56px; text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace;
+  table.league td.lgscore{width:56px; text-align:right; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-weight:600; color:var(--ink)}
   table.league td.lgplace{width:52px; text-align:right; font-size:11.5px; color:var(--accent)}
   /* The panel is already accent-wash, so a wash highlight is no highlight at
@@ -1152,13 +1138,13 @@
   table.league tr.mine td.lgname{color:#ffffff; border-radius:6px 0 0 6px; padding-left:8px}
   table.league tr.mine td.lgplace{color:#ffffff; border-radius:0 6px 6px 0; padding-right:8px}
   table.league tr:last-child td{border-bottom:0}
-  .rose .rb:hover, .rose .rb.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-dasharray:none; stroke-width:2.6}
-  .rbl{fill:#3c4a38; font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
+  .rose .rb:hover, .rose .rb.on{fill:var(--pick); stroke:var(--accent-fill); stroke-dasharray:none; stroke-width:2.6}
+  .rbl{fill:#3c4a38; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px;
     text-anchor:middle; pointer-events:none}
-  .rose .rz:hover, .rose .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  .rose .rz:hover, .rose .rz.on{fill:var(--pick); stroke:var(--accent-fill); stroke-width:2.6}
   .pin{pointer-events:none}
   .pin line{stroke:#f4f6f2; stroke-width:2.4}
-  .pinflag{fill:#c8402f}
+  .pinflag{fill:var(--flag)}
   .hole{fill:#33482c}
 
   /* the fairway */
@@ -1173,9 +1159,9 @@
   .fcut{stroke:#8a6a3c; stroke-width:1.2}
   .treeline{fill:#3d6a36; pointer-events:none}
   .fpole{stroke:#55624f; stroke-width:2.2}
-  .fflag{fill:#c8402f}
+  .fflag{fill:var(--flag)}
   .fgate{stroke:#8d9a8a; stroke-width:1.2; stroke-dasharray:4 4}
-  .corr .rz:hover, .corr .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  .corr .rz:hover, .corr .rz.on{fill:var(--pick); stroke:var(--accent-fill); stroke-width:2.6}
   .corr .rzl.sandl{fill:#4a3a1e}
 
   /* the window frame */
@@ -1183,28 +1169,28 @@
   .wcell{fill:var(--surface); stroke:var(--ink-2); stroke-width:1.6; cursor:pointer}
   .wc:hover .wcell{fill:var(--accent-wash)}
   .wc:focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
-  .wc.called .wcell{fill:#f9b6d6; stroke:#d2006a; stroke-width:2.4}
-  .wc.called .wnum{fill:#7a0038}
+  .wc.called .wcell{fill:var(--pick); stroke:var(--pick-line); stroke-width:2.4}
+  .wc.called .wnum{fill:var(--pick-ink)}
   .wc.on .wcell{stroke:var(--ink); stroke-width:3.2}
-  .wnum{fill:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:21px;
+  .wnum{fill:var(--ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:21px;
     font-weight:600; text-anchor:middle; pointer-events:none}
-  .wlab{fill:var(--ink); font-family:Archivo, sans-serif; font-size:18px; font-weight:600; pointer-events:none}
-  .wsub{fill:var(--muted); font-family:Archivo, sans-serif; font-size:12.5px; pointer-events:none}
-  .wc.called .wlab{fill:#7a0038}
-  .wc.called .wsub{fill:#a80050}
+  .wlab{fill:var(--ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:18px; font-weight:600; pointer-events:none}
+  .wsub{fill:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px; pointer-events:none}
+  .wc.called .wlab{fill:var(--pick-ink)}
+  .wc.called .wsub{fill:var(--pick-ink)}
   .wball{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.6}
 
-  .slopebox{margin:12px 0 2px; padding:10px 12px; border:0; box-shadow:var(--card); border-radius:14px;
+  .slopebox{margin:12px 0 2px; padding:10px 12px; border:0; box-shadow:var(--card); border-radius:12px;
     background:var(--surface-2)}
   .slopebox .eyebrow{display:block; margin-bottom:7px}
   /* the run, at the top of every page of the session */
   .savetick{margin:-4px 0 10px; text-align:right; font-size:11.5px; color:var(--muted);
-    font-family:Archivo, "Helvetica Neue", Arial, sans-serif}
-  .savetick.bad{color:#c8402f; font-weight:600}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
+  .savetick.bad{color:var(--flag); font-weight:600}
   .runbar{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:0 0 14px}
   .runbox{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:9px 8px 8px; text-align:center}
-  .runbox b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:27px;
+  .runbox b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:27px;
     line-height:1.05; color:var(--ink)}
   .runbox span{display:block; font-size:10.5px; letter-spacing:0.6px; text-transform:uppercase;
     color:var(--muted); margin-top:3px; font-weight:600}
@@ -1213,9 +1199,9 @@
   .runbar.hot .runbox.now b{color:#ffffff}
   .runbar.hot .runbox.now span{color:#ffe3f1}
   .runflash{position:fixed; left:50%; top:40%; transform:translate(-50%,-50%); z-index:60;
-    background:var(--accent-fill); color:#ffffff; border-radius:16px; padding:16px 22px;
+    background:var(--accent-fill); color:#ffffff; border-radius:12px; padding:16px 22px;
     text-align:center; pointer-events:none; box-shadow:0 12px 34px rgba(0,0,0,.30)}
-  .runflash b{display:block; font-family:Archivo, sans-serif; font-size:26px; font-weight:700; line-height:1.1}
+  .runflash b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:26px; font-weight:700; line-height:1.1}
   .runflash .star{display:block; font-size:30px; line-height:1}
   .runflash .sub{display:block; font-size:13px; margin-top:3px; opacity:.92}
   .runflash{max-width:min(320px, calc(100vw - 40px))}
@@ -1229,12 +1215,12 @@
     border-radius:12px; background:var(--accent-wash)}
   .placing .eyebrow{display:block; margin-bottom:6px}
   .plbig{display:flex; align-items:baseline; gap:9px}
-  .plbig b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:40px; line-height:1; color:var(--ink)}
+  .plbig b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:40px; line-height:1; color:var(--ink)}
   .plbig span{font-size:13.5px; color:var(--ink-2)}
   .plread{margin:8px 0 0; font-size:15px; color:var(--ink); line-height:1.4}
-  .plread b{font-family:Archivo, sans-serif; font-weight:700; color:var(--accent)}
+  .plread b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:700; color:var(--accent)}
   .plrow{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:9px; font-size:12.5px; color:var(--ink-2)}
-  .plrow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px; color:var(--ink)}
+  .plrow b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; color:var(--ink)}
   .plrow.tgt{margin-top:6px; padding-top:8px; border-top:1px solid var(--accent-fill)}
   .plnote{margin:8px 0 0; font-size:12px; color:var(--ink-2); line-height:1.45}
   .runline{margin-bottom:14px}
@@ -1245,70 +1231,70 @@
   .modes{margin-bottom:14px}
   .modes .eyebrow{display:block; margin-bottom:8px}
   .mrow{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px}
-  .mtile{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:14px;
+  .mtile{background:var(--surface-2); border:0; box-shadow:var(--card); border-radius:12px;
     padding:10px 11px; text-align:center}
-  .mtile b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:22px;
+  .mtile b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:22px;
     color:var(--ink); line-height:1.1}
   .mtile span{display:block; font-size:11.5px; color:var(--ink-2); margin-top:3px; line-height:1.25}
-  .mtile .mn{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
+  .mtile .mn{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; color:var(--muted)}
   .slopetab{margin-top:12px}
   .slopetab .eyebrow{display:block; margin-bottom:6px}
   .strow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; padding:7px 0;
     border-bottom:1px solid var(--line); font-size:13.5px}
   .strow:last-child{border-bottom:0}
-  .strow b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:15px}
+  .strow b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:15px}
   .strow .sp{grid-column:1 / -1; font-size:12px; color:var(--muted)}
   .fall{pointer-events:none}
   .fall line, .fall path{stroke:#ffffff; stroke-width:5; stroke-opacity:.72; fill:none; stroke-linecap:round}
 
   /* the clock: five stations round the hole, left and right turning with the station */
-  .cbed{fill:url(#gGreen); stroke:#7ba86c; stroke-width:1.4}
-  .cpent{fill:none; stroke:#7ba86c; stroke-width:1.4; stroke-dasharray:6 5; pointer-events:none}
-  .cz{fill:rgba(255,255,255,.42); stroke:#7ba86c; stroke-width:1.2}
-  .cin{fill:rgba(255,255,255,.6); stroke:#7ba86c; stroke-width:1.4}
-  .clock .rz:hover, .clock .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  .cbed{fill:url(#gGreen); stroke:var(--turf-line); stroke-width:1.4}
+  .cpent{fill:none; stroke:var(--turf-line); stroke-width:1.4; stroke-dasharray:6 5; pointer-events:none}
+  .cz{fill:rgba(255,255,255,.42); stroke:var(--turf-line); stroke-width:1.2}
+  .cin{fill:rgba(255,255,255,.6); stroke:var(--turf-line); stroke-width:1.4}
+  .clock .rz:hover, .clock .rz.on{fill:var(--pick); stroke:var(--accent-fill); stroke-width:2.6}
   /* the hole never lights up: the count inside it is the confirmation */
-  .clock .rz.cin:hover, .clock .rz.cin.on{fill:rgba(255,255,255,.6); stroke:#7ba86c; stroke-width:1.4}
+  .clock .rz.cin:hover, .clock .rz.cin.on{fill:rgba(255,255,255,.6); stroke:var(--turf-line); stroke-width:1.4}
   /* a white halo so the label stays readable wherever the slope arrow lands */
-  .czl{fill:#2b3a27; font-family:Archivo, sans-serif; font-size:11px; font-weight:700;
+  .czl{fill:#2b3a27; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; font-weight:700;
     letter-spacing:1.1; text-anchor:middle; pointer-events:none;
     stroke:#eef5e9; stroke-width:3.2; paint-order:stroke fill}
-  .chole{fill:#22331d; pointer-events:none}
+  .chole{fill:var(--hole); pointer-events:none}
   .cline{stroke:#33482c; stroke-width:1.8; stroke-dasharray:6 4; pointer-events:none}
   .stn{pointer-events:none}
-  .stn circle{fill:#ffffff; stroke:#6e9c62; stroke-width:1.6}
-  .stn text{fill:#1f2a1c; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px;
+  .stn circle{fill:#ffffff; stroke:var(--turf-line-2); stroke-width:1.6}
+  .stn text{fill:#1f2a1c; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px;
     font-weight:600; text-anchor:middle}
-  .stn.on circle{fill:#f9b6d6; stroke:#d2006a; stroke-width:2.4}
-  .stn.on text{fill:#7a0038}
+  .stn.on circle{fill:var(--pick); stroke:var(--pick-line); stroke-width:2.4}
+  .stn.on text{fill:var(--pick-ink)}
 
   /* the lag ladder: the gaps are what gets tapped, not the targets */
   .lagedge{stroke:#8d9a8a; stroke-width:1.5; stroke-dasharray:6 5}
   .lagbase{stroke:#8ba57f; stroke-width:1.4; stroke-dasharray:6 5; pointer-events:none}
   .choled{pointer-events:none}
-  .choled circle{fill:#22331d}
-  .choled text{fill:#ffffff; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px;
+  .choled circle{fill:var(--hole)}
+  .choled text{fill:#ffffff; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px;
     font-weight:600; text-anchor:middle}
   .lz{fill:#e2efd9; stroke:#bcd3b0; stroke-width:1}
-  .lz.good{fill:#d8ebcb; stroke:#d2006a; stroke-width:1.6; stroke-dasharray:5 4}
-  .lag .rz:hover, .lag .rz.on{fill:#f9b6d6; stroke:var(--accent-fill); stroke-width:2.6}
+  .lz.good{fill:#d8ebcb; stroke:var(--pick-line); stroke-width:1.6; stroke-dasharray:5 4}
+  .lag .rz:hover, .lag .rz.on{fill:var(--pick); stroke:var(--accent-fill); stroke-width:2.6}
   .lagt{stroke:#4f7347; stroke-width:2; pointer-events:none}
-  .lagt.on{stroke:#d2006a; stroke-width:3.4}
-  .lagdot{fill:#6e9c62; pointer-events:none}
-  .lagdot.on{fill:#d2006a}
+  .lagt.on{stroke:var(--pick-line); stroke-width:3.4}
+  .lagdot{fill:var(--turf-line-2); pointer-events:none}
+  .lagdot.on{fill:var(--pick-line)}
   /* these two sit off the grass, on the page, so they follow the theme */
-  .lagn{fill:var(--ink-2); font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:14px;
+  .lagn{fill:var(--ink-2); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px;
     font-weight:600; text-anchor:end; pointer-events:none}
   .lagn.on{fill:var(--accent-fill)}
-  .lagfrom{fill:var(--muted); font-family:Archivo, sans-serif; font-size:12.5px; pointer-events:none}
+  .lagfrom{fill:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px; pointer-events:none}
 
   /* ball markers */
   .mk{pointer-events:none}
   .mk circle{fill:#1d2a19; stroke:#f2f6ef; stroke-width:2}
-  .mk text{fill:#f6f9f4; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .mk text{fill:#f6f9f4; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; font-weight:600; text-anchor:middle}
   .corr .mk text{font-size:12px}
-  .mk.hit circle{fill:#d2006a}
+  .mk.hit circle{fill:var(--pick-line)}
   .mk.hit text{fill:#ffffff}
   .mk.now circle{stroke:var(--accent-fill); stroke-width:3}
   .mk.hit.now circle{stroke:#3d0020; stroke-width:3}
@@ -1316,38 +1302,38 @@
   /* Balls come in fives, because five is where you stop and think. */
   .balls{display:flex; flex-direction:column; gap:10px; margin-top:14px}
   .ballrow{display:flex; align-items:center; gap:10px}
-  .ballrow .setlab{font-family:Archivo, sans-serif; font-size:10.5px; font-weight:700;
+  .ballrow .setlab{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; font-weight:700;
     letter-spacing:.7px; text-transform:uppercase; color:var(--muted);
     width:38px; flex:none; line-height:1.15}
   .ballrow .rowchips{display:flex; gap:7px; flex-wrap:wrap}
   .ballrow + .ballrow{border-top:1px solid var(--line); padding-top:10px}
   .ballchip{width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
-    background:var(--surface-2); color:var(--muted); font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+    background:var(--surface-2); color:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:14px; font-weight:600; cursor:pointer; padding:0}
   .ballchip.done{background:var(--surface); color:var(--ink); border-color:var(--ink-2)}
   .ballchip.good{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
   .ballchip.now{box-shadow:0 0 0 2px var(--accent-fill)}
   .shottally{display:flex; gap:16px; margin-top:12px; font-size:13px; color:var(--muted)}
-  .shottally b{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; color:var(--ink)}
+  .shottally b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; color:var(--ink)}
   .shotacts{display:flex; gap:8px; margin-top:11px}
   .shotacts button{background:var(--surface-2); border:1px solid var(--line-strong); border-radius:10px;
-    padding:7px 13px; font-family:Archivo, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
+    padding:7px 13px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
   .pastrose{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 4px}
   @media (max-width:520px){ .pastrose{grid-template-columns:1fr} }
   .pastrose .rz, .pastrose .wcell{cursor:default}
 
 
   /* ---- three-bullet targets and checks ---- */
-  .projname{font-family:Archivo, sans-serif; font-size:16px; font-weight:600; color:var(--accent);
+  .projname{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:16px; font-weight:600; color:var(--accent);
     margin:0 0 7px}
   .blist{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px}
   .blist li{font-size:14px; line-height:1.45; color:var(--ink-2)}
   .blist li em{color:var(--muted); font-style:normal}
   .bedit{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:center; margin-bottom:7px}
-  .bedit span{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:12px; color:var(--muted)}
+  .bedit span{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12px; color:var(--muted)}
   .bedit input{width:100%; box-sizing:border-box; padding:9px 10px; border-radius:12px;
     border:0; box-shadow:inset 0 0 0 1px var(--line-strong); background:var(--surface-2); color:var(--ink);
-    font-family:Archivo, sans-serif; font-size:14px}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px}
   .carryask{margin:0 0 9px; font-size:13.5px; line-height:1.45; color:var(--ink-2)}
   .banner.monitor{background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:12px;
     padding:10px 12px; margin-bottom:12px; font-size:13px; line-height:1.45; color:var(--ink-2)}
@@ -1374,7 +1360,7 @@
   .sumcard .note{margin:8px 0 0; text-align:left}
   .sumcard .rz, .sumcard .wcell{cursor:default}
   .sumcard .rz[style*="--heat"]{filter:none}
-  .pctmk text{fill:#12200f; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .pctmk text{fill:#12200f; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:15px; font-weight:600; text-anchor:middle; paint-order:stroke;
     stroke:#ffffff; stroke-width:3.2px; stroke-linejoin:round}
   .pctmk text.pctn{font-size:11px; fill:#3c4a38; stroke-width:2.6px}
@@ -1383,36 +1369,36 @@
      measured, so it is the one line that gets the serif. */
   .banner.hello{background:var(--tint); border:0; border-radius:var(--radius-lg);
     box-shadow:var(--card); padding:14px 16px; margin:0 0 14px;
-    font-family:"Libre Caslon Display",Georgia,serif; font-size:19px;
-    font-weight:400; color:var(--ink); line-height:1.3}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:19px;
+    font-weight:800; letter-spacing:-.022em; color:var(--ink); line-height:1.3}
 
-  .banner.warn{background:#fde7ea; border:1px solid #c8402f; border-radius:10px;
-    padding:11px 14px; margin:0 0 14px; font-family:Archivo, sans-serif; font-size:14.5px;
-    color:#5c1410; line-height:1.45; display:block}
-  .banner.warn b{color:#8c1d16}
+  .banner.warn{background:var(--down-wash); border:1px solid var(--flag); border-radius:10px;
+    padding:11px 14px; margin:0 0 14px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14.5px;
+    color:var(--flag); line-height:1.45; display:block}
+  .banner.warn b{color:var(--flag)}
   .storebox{border:0; box-shadow:var(--card); border-radius:var(--radius); background:var(--surface-2);
     padding:10px 13px; font-size:13.5px; color:var(--ink-2); line-height:1.45; margin-bottom:10px}
-  .storebox b{color:var(--ink); font-family:"IBM Plex Mono", ui-monospace, monospace}
-  .storebox.bad{background:#fde7ea; border-color:#c8402f; color:#5c1410}
-  .storebox.bad b{color:#8c1d16; font-family:Archivo, sans-serif}
+  .storebox b{color:var(--ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
+  .storebox.bad{background:var(--down-wash); border-color:var(--flag); color:var(--flag)}
+  .storebox.bad b{color:var(--flag); font-family:Figtree, "Helvetica Neue", Arial, sans-serif}
 
   /* ---- progress: goals and patterns ---- */
   .grow{padding:12px 0; border-top:1px solid var(--line)}
   .grow:first-of-type{border-top:0}
-  .gnm{font-family:Archivo, sans-serif; font-size:14.5px; font-weight:600; color:var(--ink)}
+  .gnm{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14.5px; font-weight:600; color:var(--ink)}
   .gsub{font-weight:400; color:var(--muted); font-size:12.5px}
-  .gval{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:24px;
+  .gval{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:24px;
     color:var(--ink); margin-top:3px}
-  .gunit{font-family:Archivo, sans-serif; font-size:14px; color:var(--muted)}
-  .gmove{font-family:Archivo, sans-serif; font-size:13px; color:var(--muted);
+  .gunit{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; color:var(--muted)}
+  .gmove{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; color:var(--muted);
     font-weight:400; line-height:1.5; margin-top:2px}
   .gmove.up{color:#2f7d46}
-  .gmove.down{color:#b83232}
+  .gmove.down{color:var(--down)}
   .swlist{list-style:none; margin:0 0 6px; padding:0}
   .swlist li{padding:7px 0; border-top:1px solid var(--line); font-size:13.5px;
     color:var(--ink-2); line-height:1.5}
   .swlist li:first-child{border-top:0}
-  .swarea{font-family:Archivo, sans-serif; font-weight:600; color:var(--ink)}
+  .swarea{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:600; color:var(--ink)}
   .goallist{margin:0 0 10px; padding:0 0 0 20px}
   .goallist li{font-size:14.5px; color:var(--ink); line-height:1.6; padding:1px 0}
 
@@ -1425,14 +1411,14 @@
 
   /* ---- goals ---- */
   .goalgrp{margin-bottom:22px}
-  .goalgrp h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:19px; margin:0 0 3px}
+  .goalgrp h2{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em; font-size:19px; margin:0 0 3px}
   .goalgrp .lede{margin:0 0 12px}
   .goalarea{background:var(--surface); border:0; box-shadow:var(--card); border-radius:var(--radius);
     padding:14px; margin-bottom:12px}
   .gahd{display:flex; align-items:baseline; gap:9px; margin-bottom:10px}
-  .gahd .n{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; color:var(--accent)}
-  .gahd b{font-family:Archivo, sans-serif; font-size:17px; font-weight:600}
-  .galive{margin:9px 0 12px; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+  .gahd .n{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; color:var(--accent)}
+  .gahd b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; font-weight:600}
+  .galive{margin:9px 0 12px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:12.5px; color:var(--muted)}
   .targets.proc{background:var(--surface-2)}
   .targets.proc .eyebrow{color:var(--muted)}
@@ -1448,34 +1434,34 @@
     border-radius:99px; overflow:visible}
   .sfill{position:absolute; left:0; top:0; bottom:0; background:var(--accent-fill); border-radius:99px}
   .starget{position:absolute; top:-4px; width:2px; height:18px; background:var(--ink-2); border-radius:1px}
-  .srow .n{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--ink)}
+  .srow .n{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; text-align:right; color:var(--ink)}
   .srow .n.off{color:var(--accent)}
-  .srow .w{font-family:"IBM Plex Mono", ui-monospace, monospace; text-align:right; color:var(--muted); font-size:12px}
+  .srow .w{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; text-align:right; color:var(--muted); font-size:12px}
 
   /* the compete call */
-  .shotask .callnum{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  .shotask .callnum{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:11.5px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted)}
-  .shotask .callclub{display:block; font-family:Archivo, sans-serif; font-size:30px;
+  .shotask .callclub{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:30px;
     font-weight:700; line-height:1.12; color:var(--ink); margin:2px 0 1px}
-  .shotask .callwin{display:block; font-family:Archivo, sans-serif; font-size:17px;
+  .shotask .callwin{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px;
     font-weight:600; color:var(--accent)}
-  .shotask .callband{display:block; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+  .shotask .callband{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; color:var(--muted)}
   .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
   .complead{min-height:0}
 
-  .homeproj{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400;
+  .homeproj{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em;
     color:var(--accent); margin:0 0 12px; font-size:27px; line-height:1.12}
   /* under the tiles, not in front of them */
   .homeseason{margin-top:20px}
   .homeseason .targets{margin:0}
   .gonext{display:block; width:100%; margin-top:18px; padding:16px 18px; border:0;
     border-radius:var(--radius-lg); background:var(--accent-fill); color:#ffffff;
-    font-family:Archivo, sans-serif; font-size:17px; font-weight:600; cursor:pointer;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; font-weight:600; cursor:pointer;
     box-shadow:0 8px 20px -12px var(--tile-cast)}
   .gonext:active{transform:translateY(1px)}
   .backlink{background:none; border:0; padding:2px 0 10px; cursor:pointer; color:var(--muted);
-    font-family:Archivo, sans-serif; font-size:14px; font-weight:600}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; font-weight:600}
   .backlink:hover{color:var(--accent)}
 
   /* the fault banner. Sits over everything, because a screen that failed to
@@ -1485,12 +1471,12 @@
     padding:13px 16px calc(13px + env(safe-area-inset-bottom,0px));
     background:var(--card); border-bottom:2px solid var(--accent);
     box-shadow:0 6px 24px rgba(0,0,0,.22)}
-  #faultbar .faultmsg, #stuckbar .faultmsg{font-family:Archivo, sans-serif; font-size:14.5px;
+  #faultbar .faultmsg, #stuckbar .faultmsg{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14.5px;
     line-height:1.38; color:var(--ink)}
   #faultbar .faultrow, #stuckbar .faultrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
   #faultbar button, #stuckbar button{flex:1 1 auto; min-height:40px; padding:9px 12px; border-radius:12px;
     border:1px solid var(--line-strong); background:var(--bg); color:var(--ink);
-    font-family:Archivo, sans-serif; font-size:14px; font-weight:600; cursor:pointer}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; font-weight:600; cursor:pointer}
   #faultbar button.faultgo, #stuckbar button.faultgo{border-color:transparent; background:var(--accent-fill); color:#ffffff}
   :root[data-theme="dark"] #faultbar button.faultgo, :root[data-theme="dark"] #stuckbar button.faultgo{color:#12030a}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #faultbar button.faultgo{color:#12030a}}
@@ -1504,8 +1490,8 @@
      bare class name would have restyled half the app, the way .set once put a
      white card round every station in The Hundred.
      --------------------------------------------------------------------- */
-  #asWrap{position:fixed; inset:0; z-index:9500; background:#0e1210; color:#f2f5f2;
-    font-family:Archivo,"Helvetica Neue",Arial,sans-serif; overflow:hidden;
+  #asWrap{position:fixed; inset:0; z-index:9500; background:var(--on-accent); color:#f2f5f2;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; overflow:hidden;
     -webkit-user-select:none; user-select:none}
   #asStage{position:absolute; inset:0; overflow:hidden; background:#000}
   #asCam{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -1515,8 +1501,8 @@
   #asHud{position:absolute; left:0; right:0; top:0; z-index:20; pointer-events:none;
     padding:calc(10px + env(safe-area-inset-top,0px)) 58px 10px 14px;
     background:linear-gradient(to bottom,rgba(0,0,0,.62),transparent)}
-  #asHud .asfig{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; font-weight:600}
-  #asHud .assub{font-family:Archivo, "Helvetica Neue", Arial, sans-serif; font-size:11px;
+  #asHud .asfig{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:15px; font-weight:600}
+  #asHud .assub{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px;
     color:#b9c3bc; margin-top:2px}
   /* The key. Each name carries a short piece of the line it names, drawn in that
      line's own weight and colour, so there is nothing to match up by position. */
@@ -1524,9 +1510,9 @@
     white-space:nowrap}
   #asHud .assub .asunit{color:#7f8d7a; font-size:10px}
   #asHud .asw{display:inline-block; width:15px; height:0; margin-right:5px;
-    border-top:3px solid #d2006a}
+    border-top:3px solid var(--pick-line)}
   #asHud .asw.far{border-top-width:2px; opacity:.55}
-  #asHud .asw.lp{border-top:2px dashed #0e1210; box-shadow:0 0 0 1px rgba(255,255,255,.45)}
+  #asHud .asw.lp{border-top:2px dashed var(--on-accent); box-shadow:0 0 0 1px rgba(255,255,255,.45)}
   #asClose{position:absolute; z-index:30; right:10px; background:rgba(0,0,0,.45);
     top:calc(8px + env(safe-area-inset-top,0px));
     border:1px solid rgba(255,255,255,.22); color:#f2f5f2; border-radius:9px;
@@ -1541,68 +1527,65 @@
   .asrow{display:flex; gap:7px; flex-wrap:wrap}
   .aschip{flex:1 1 auto; min-height:40px; padding:0 12px; border-radius:12px;
     border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05);
-    color:#f2f5f2; font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+    color:#f2f5f2; font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:13px; font-weight:600; cursor:pointer}
-  .aschip.on{background:#d2006a; border-color:#d2006a; color:#fff}
+  .aschip.on{background:var(--pick-line); border-color:var(--pick-line); color:#fff}
   .asnote{font-size:12px; line-height:1.5; color:#8b9790; margin:0}
-  #asWrap details summary{font-family:Archivo, "Helvetica Neue", Arial, sans-serif;
+  #asWrap details summary{font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase;
     color:#8b9790; cursor:pointer; padding:4px 0}
   .asslide{display:flex; align-items:center; gap:10px; font-size:12.5px; color:#b9c3bc}
   .asslide span{flex:1 1 auto}
-  .asslide b{font-family:"IBM Plex Mono",ui-monospace,monospace; color:#f2f5f2}
-  #asWrap input[type=range]{width:100%; accent-color:#d2006a}
+  .asslide b{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; color:#f2f5f2}
+  #asWrap input[type=range]{width:100%; accent-color:var(--pick-line)}
   #asStart{position:absolute; inset:0; z-index:40; display:flex; align-items:center;
-    justify-content:center; padding:24px; background:#0e1210; text-align:left}
+    justify-content:center; padding:24px; background:var(--on-accent); text-align:left}
   #asStart .ascard{max-width:420px}
-  #asStart h2{font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:23px; margin:0 0 8px; letter-spacing:-.3px}
+  #asStart h2{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em; font-size:23px; margin:0 0 8px; letter-spacing:-.3px}
   #asStart p{color:#b9c3bc; font-size:14.5px; line-height:1.55; margin:0 0 14px}
-  #asGo{width:100%; min-height:54px; border:0; border-radius:11px; background:#d2006a;
-    color:#fff; font-family:Archivo,sans-serif; font-size:17px; font-weight:600; cursor:pointer}
-  #asErr{margin-top:14px; color:#ff9db0; font-size:13.5px; line-height:1.5; min-height:1em}
+  #asGo{width:100%; min-height:54px; border:0; border-radius:11px; background:var(--pick-line);
+    color:#fff; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; font-weight:600; cursor:pointer}
+  #asErr{margin-top:14px; color:var(--accent); font-size:13.5px; line-height:1.5; min-height:1em}
   /* the chip that opens it, alongside the existing diagram chip */
   .vid.aimc{color:var(--accent)}
 
   /* ---- access gate ----
      The first screen anyone sees, so it is built out of the same parts as the
-     rest: the crest, the serif voice, a tile-surfaced card on a washed ground,
-     and one claret action. It used to be a white box with a hairline field. */
+     rest: the crest, the name, a hairline card on white, and one coral action,
+     the same as every screen behind it. */
   #gate{position:fixed; inset:0; z-index:200; display:flex;
     align-items:center; justify-content:center; padding:24px 18px; overflow-y:auto;
-    background:
-      radial-gradient(120% 60% at 18% 0%, var(--accent-wash), rgba(0,0,0,0) 62%),
-      var(--bg)}
+    /* the same white ground as every other screen. Nothing in this system
+       carries colour behind the page. */
+    background:var(--bg)}
   #gate[hidden]{display:none}
   .gatecard{position:relative; overflow:hidden;
-    background:var(--surface); border:0; border-radius:26px;
+    background:var(--surface); border:0; border-radius:16px;
     max-width:420px; width:100%; padding:26px 24px 24px;
-    box-shadow:0 1px 0 rgba(255,255,255,.75) inset, 0 0 0 1px var(--tile-edge),
-      0 24px 54px -26px var(--tile-cast)}
-  .gatecard:before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(86% 60% at 18% 0%, var(--tile-gloss), var(--tile-gloss-2) 58%,
-      rgba(255,255,255,0) 82%)}
+    box-shadow:0 0 0 1px var(--tile-edge)}
   .gatecard > *{position:relative; z-index:1}
   .gatemark{width:46px; height:46px; border-radius:999px;
     border:1.6px solid var(--accent); color:var(--accent);
     display:flex; align-items:center; justify-content:center;
-    font-family:"Libre Caslon Display",Georgia,serif; font-size:14px; line-height:1;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14px; font-weight:800;
+    letter-spacing:-.02em; line-height:1;
     margin-bottom:16px}
   .gatecard h1{font-size:27px; line-height:1.14; margin:0 0 7px; letter-spacing:0}
-  .gatecard .strap{font-family:"Libre Caslon Display",Georgia,serif; font-size:15px;
-    letter-spacing:.01em; text-transform:none; color:var(--ink-2); margin:0 0 14px}
+  .gatecard .strap{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:15px; font-weight:800;
+    letter-spacing:-.02em; text-transform:none; color:var(--ink-2); margin:0 0 14px}
   .gatecard .strap span{color:var(--accent)}
   .gatecard p{margin:0 0 16px; color:var(--ink-2); font-size:14.5px; line-height:1.5}
-  .gatecard label{display:block; font-family:Archivo, sans-serif; font-size:10px; font-weight:700;
+  .gatecard label{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10px; font-weight:700;
     letter-spacing:.11em; text-transform:uppercase; color:var(--accent); margin-bottom:7px}
-  .gatecard input{width:100%; box-sizing:border-box; padding:15px 16px; border-radius:16px;
+  .gatecard input{width:100%; box-sizing:border-box; padding:15px 16px; border-radius:12px;
     border:0; box-shadow:inset 0 0 0 1px var(--line-strong); background:var(--surface-2); color:var(--ink);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:17px; letter-spacing:2px;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; letter-spacing:2px;
     text-transform:uppercase; text-align:center}
   .gatecard input:focus{outline:0; box-shadow:inset 0 0 0 2px var(--accent-fill)}
   .gatecard button{width:100%; margin-top:12px; padding:16px; border:0;
     border-radius:var(--radius-lg); background:var(--accent-fill); color:#ffffff;
-    font-family:Archivo, sans-serif; font-size:16px; font-weight:600; cursor:pointer;
-    box-shadow:0 10px 24px -14px var(--tile-cast)}
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:16px; font-weight:600; cursor:pointer;
+    box-shadow:none}
   .gatecard button:active{transform:translateY(1px)}
   .gatecard button[disabled]{opacity:.55; cursor:default; transform:none}
   .gatemsg{margin-top:14px; font-size:13.5px; line-height:1.45; min-height:1em}
@@ -1613,44 +1596,44 @@
 
   /* ---- coach ---- */
   .coachlink{background:none; border:0; padding:4px 2px; cursor:pointer; color:var(--muted);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px; letter-spacing:1.2px;
+    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:10.5px; letter-spacing:1.2px;
     text-transform:uppercase}
   .coachlink:hover{color:var(--accent)}
   .coachbar{display:flex; align-items:center; justify-content:space-between; gap:12px;
     background:var(--accent-wash); border:1px solid var(--accent-fill); border-radius:9px;
     padding:9px 12px; margin-bottom:16px}
-  .coachbar span{font-family:Archivo, sans-serif; font-size:11px; font-weight:600;
+  .coachbar span{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; font-weight:600;
     letter-spacing:1px; text-transform:uppercase; color:var(--accent)}
   .coachbar button{background:var(--surface); border:1px solid var(--line-strong); border-radius:7px;
-    padding:6px 11px; font-family:Archivo, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
+    padding:6px 11px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px; cursor:pointer; color:var(--ink)}
   .pcardc{background:var(--surface); border:1px solid var(--line); border-radius:11px;
     padding:15px 15px 13px; margin-bottom:12px}
   .pcardc .hd{display:flex; align-items:baseline; justify-content:space-between; gap:10px;
     margin-bottom:11px}
-  .pcardc .who{font-family:Archivo, sans-serif; font-size:17px; font-weight:600; color:var(--ink)}
-  .pcardc .when{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px; color:var(--muted)}
+  .pcardc .who{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:17px; font-weight:600; color:var(--ink)}
+  .pcardc .when{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px; color:var(--muted)}
   .cgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:8px;
     margin-bottom:11px}
   .cstat{background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
     padding:8px 9px; text-align:center}
-  .cstat b{display:block; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:19px;
+  .cstat b{display:block; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:19px;
     font-weight:600; color:var(--ink); line-height:1.1}
-  .cstat span{display:block; margin-top:3px; font-family:Archivo, sans-serif; font-size:9.5px;
+  .cstat span{display:block; margin-top:3px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:9.5px;
     font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--muted)}
   .cstat.cold b{color:var(--muted)}
   .cnote{font-size:13px; color:var(--ink-2); line-height:1.5; margin:0 0 10px;
     padding-left:10px; border-left:2px solid var(--line-strong)}
-  .cnote em{display:block; font-style:normal; font-family:Archivo, sans-serif; font-size:9.5px;
+  .cnote em{display:block; font-style:normal; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:9.5px;
     font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
   .pcardc .acts{display:flex; gap:8px; flex-wrap:wrap}
   .pcardc .acts button{background:var(--surface-2); border:1px solid var(--line-strong);
-    border-radius:7px; padding:7px 12px; font-family:Archivo, sans-serif; font-size:12.5px;
+    border-radius:7px; padding:7px 12px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:12.5px;
     cursor:pointer; color:var(--ink)}
   .pcardc .acts button:hover{border-color:var(--accent-fill); color:var(--accent)}
   /* Remove player is final. It sits apart from the others and does not look
      like something to tap on the way past. */
   .pcardc .acts button.danger{margin-left:auto; color:var(--muted); border-style:dashed}
-  .pcardc .acts button.danger:hover{color:#b83232; border-color:#b83232; border-style:solid}
+  .pcardc .acts button.danger:hover{color:var(--flag); border-color:var(--flag); border-style:solid}
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
     margin-top:6px; background:var(--surface-2)}
   .cimport p{margin:0 0 10px; font-size:13px; color:var(--ink-2); line-height:1.5}
@@ -1688,7 +1671,7 @@
     <!-- Across the top: the three she goes to on purpose, now and then. -->
     <nav class="lookrow" role="tablist" aria-label="Look back">
       <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path></svg><span>Sessions</span></button>
-      <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Archivo, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
+      <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
       <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
     </nav></div>
 </header>
@@ -2107,7 +2090,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-27", note:"the app split two ways: Practice, S&C and Tests under the thumb, Goals, Sessions and Progress across the top, and a due test says so once, on the bar" };
+var BUILD = { on:"2026-09-27", note:"the app split two ways, Practice, S&C and Tests under the thumb and Goals, Sessions and Progress across the top, and back now steps a card at a time inside a session instead of throwing it away" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -2303,17 +2286,17 @@ AREAS.forEach(function(a){
 });
 
 var GUIDES = {
-  windows:{ title:"Five windows", svg:"<svg viewBox=\"0 0 300 442\" class=\"dg\" role=\"img\" aria-label=\"Five windows: two high, one middle, two low, with five ball flights from the ball below\"> <line x1=\"150\" y1=\"8\" x2=\"150\" y2=\"54\" stroke=\"var(--line-strong)\" stroke-width=\"2\"/> <path d=\"M150 8 L182 19 L150 30 Z\" fill=\"var(--accent-fill)\"/> <rect x=\"34\" y=\"62\" width=\"232\" height=\"278\" rx=\"7\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-dasharray=\"5 5\"/> <g fill=\"none\" stroke=\"var(--accent-fill)\" stroke-width=\"2.2\" stroke-linecap=\"round\"> <path d=\"M150 386 C 132 340 88 240 94 146\"/> <path d=\"M150 386 C 168 340 212 240 206 146\"/> <path d=\"M150 386 L 150 226\"/> <path d=\"M150 386 C 140 360 110 330 94 306\"/> <path d=\"M150 386 C 160 360 190 330 206 306\"/> </g> <g fill=\"var(--surface)\" stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <rect x=\"48\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"104\" y=\"164\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"48\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> </g> <g fill=\"var(--ink)\" font-family=\"IBM Plex Mono, ui-monospace, monospace\" font-size=\"21\" font-weight=\"600\" text-anchor=\"middle\"> <text x=\"94\" y=\"123\">1</text><text x=\"206\" y=\"123\">2</text> <text x=\"150\" y=\"203\">3</text> <text x=\"94\" y=\"283\">4</text><text x=\"206\" y=\"283\">5</text> </g> <g fill=\"var(--muted)\" font-family=\"Archivo, sans-serif\" font-size=\"10.5\" font-weight=\"600\" letter-spacing=\"0.9\" text-anchor=\"middle\"> <text x=\"150\" y=\"76\">HIGH</text><text x=\"150\" y=\"156\">MIDDLE</text><text x=\"150\" y=\"236\">LOW</text> </g> <circle cx=\"150\" cy=\"406\" r=\"20\" fill=\"var(--surface-2)\" stroke=\"var(--line-strong)\" stroke-width=\"1.6\"/> </svg>", steps:[
+  windows:{ title:"Five windows", svg:"<svg viewBox=\"0 0 300 442\" class=\"dg\" role=\"img\" aria-label=\"Five windows: two high, one middle, two low, with five ball flights from the ball below\"> <line x1=\"150\" y1=\"8\" x2=\"150\" y2=\"54\" stroke=\"var(--line-strong)\" stroke-width=\"2\"/> <path d=\"M150 8 L182 19 L150 30 Z\" fill=\"var(--accent-fill)\"/> <rect x=\"34\" y=\"62\" width=\"232\" height=\"278\" rx=\"7\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-dasharray=\"5 5\"/> <g fill=\"none\" stroke=\"var(--accent-fill)\" stroke-width=\"2.2\" stroke-linecap=\"round\"> <path d=\"M150 386 C 132 340 88 240 94 146\"/> <path d=\"M150 386 C 168 340 212 240 206 146\"/> <path d=\"M150 386 L 150 226\"/> <path d=\"M150 386 C 140 360 110 330 94 306\"/> <path d=\"M150 386 C 160 360 190 330 206 306\"/> </g> <g fill=\"var(--surface)\" stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <rect x=\"48\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"84\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"104\" y=\"164\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"48\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> <rect x=\"160\" y=\"244\" width=\"92\" height=\"62\" rx=\"3\"/> </g> <g fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"21\" font-weight=\"600\" text-anchor=\"middle\"> <text x=\"94\" y=\"123\">1</text><text x=\"206\" y=\"123\">2</text> <text x=\"150\" y=\"203\">3</text> <text x=\"94\" y=\"283\">4</text><text x=\"206\" y=\"283\">5</text> </g> <g fill=\"var(--muted)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"10.5\" font-weight=\"600\" letter-spacing=\"0.9\" text-anchor=\"middle\"> <text x=\"150\" y=\"76\">HIGH</text><text x=\"150\" y=\"156\">MIDDLE</text><text x=\"150\" y=\"236\">LOW</text> </g> <circle cx=\"150\" cy=\"406\" r=\"20\" fill=\"var(--surface-2)\" stroke=\"var(--line-strong)\" stroke-width=\"1.6\"/> </svg>", steps:[
     "Same club, same target, five balls.",
     "Windows 1 and 2 are the two high ones, left and right of the flag. Window 3 is straight through the middle. Windows 4 and 5 are the two low ones, left and right.",
     "A point for the window you called, a point for finishing inside the target."
   ]},
-  heights:{ title:"Three pitch heights", svg:"<svg viewBox=\"0 0 300 292\" class=\"dg\" role=\"img\" aria-label=\"Three pitch heights from one club: higher, normal and lower flights to the same target\"> <line x1=\"24\" y1=\"262\" x2=\"288\" y2=\"262\" stroke=\"var(--line-strong)\" stroke-width=\"1.5\"/> <g fill=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\"> <path d=\"M58 248 Q 150 -129 250 258\" stroke=\"var(--accent-fill)\"/> <path d=\"M58 248 Q 150 -9 250 258\" stroke=\"var(--ink)\"/> <path d=\"M58 248 Q 150 111 250 258\" stroke=\"var(--muted)\"/> </g> <line x1=\"266\" y1=\"262\" x2=\"266\" y2=\"204\" stroke=\"var(--line-strong)\" stroke-width=\"2\"/> <path d=\"M266 204 L290 213 L266 222 Z\" fill=\"var(--accent-fill)\"/> <circle cx=\"46\" cy=\"250\" r=\"12\" fill=\"var(--surface-2)\" stroke=\"var(--line-strong)\" stroke-width=\"1.6\"/> <g fill=\"var(--ink)\" font-family=\"Archivo, sans-serif\" font-size=\"13\" font-weight=\"600\" text-anchor=\"middle\"> <text x=\"150\" y=\"46\">3 + 5 &#183; higher</text> <text x=\"150\" y=\"106\">1 &#183; normal</text> <text x=\"150\" y=\"166\">2 + 4 &#183; lower</text> </g> <text x=\"24\" y=\"284\" fill=\"var(--muted)\" font-family=\"Archivo, sans-serif\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.9\">SAME CLUB &#183; SAME TARGET</text> </svg>", steps:[
+  heights:{ title:"Three pitch heights", svg:"<svg viewBox=\"0 0 300 292\" class=\"dg\" role=\"img\" aria-label=\"Three pitch heights from one club: higher, normal and lower flights to the same target\"> <line x1=\"24\" y1=\"262\" x2=\"288\" y2=\"262\" stroke=\"var(--line-strong)\" stroke-width=\"1.5\"/> <g fill=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\"> <path d=\"M58 248 Q 150 -129 250 258\" stroke=\"var(--accent-fill)\"/> <path d=\"M58 248 Q 150 -9 250 258\" stroke=\"var(--ink)\"/> <path d=\"M58 248 Q 150 111 250 258\" stroke=\"var(--muted)\"/> </g> <line x1=\"266\" y1=\"262\" x2=\"266\" y2=\"204\" stroke=\"var(--line-strong)\" stroke-width=\"2\"/> <path d=\"M266 204 L290 213 L266 222 Z\" fill=\"var(--accent-fill)\"/> <circle cx=\"46\" cy=\"250\" r=\"12\" fill=\"var(--surface-2)\" stroke=\"var(--line-strong)\" stroke-width=\"1.6\"/> <g fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"13\" font-weight=\"600\" text-anchor=\"middle\"> <text x=\"150\" y=\"46\">3 + 5 &#183; higher</text> <text x=\"150\" y=\"106\">1 &#183; normal</text> <text x=\"150\" y=\"166\">2 + 4 &#183; lower</text> </g> <text x=\"24\" y=\"284\" fill=\"var(--muted)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.9\">SAME CLUB &#183; SAME TARGET</text> </svg>", steps:[
     "Same club, five balls, three heights.",
     "Ball 1 at the normal height. Balls 3 and 5 higher. Balls 2 and 4 lower.",
     "A point for the height you called, a point for finishing inside the target."
   ]},
-  ladder:{ title:"Lag ladder", svg:"<svg viewBox=\"0 0 300 446\" class=\"dg\" role=\"img\" aria-label=\"Lag ladder: five targets at each end, one step apart, fifteen steps between the ends\"> <g stroke=\"var(--line-strong)\" stroke-width=\"1.5\" stroke-dasharray=\"6 5\"> <line x1=\"104\" y1=\"24\" x2=\"196\" y2=\"24\"/> <line x1=\"104\" y1=\"192\" x2=\"196\" y2=\"192\"/> <line x1=\"104\" y1=\"254\" x2=\"196\" y2=\"254\"/> <line x1=\"104\" y1=\"422\" x2=\"196\" y2=\"422\"/> </g> <g fill=\"var(--accent-fill)\"> <circle cx=\"150\" cy=\"44\" r=\"7\"/><circle cx=\"150\" cy=\"76\" r=\"7\"/><circle cx=\"150\" cy=\"108\" r=\"7\"/> <circle cx=\"150\" cy=\"172\" r=\"7\"/> <circle cx=\"150\" cy=\"274\" r=\"7\"/><circle cx=\"150\" cy=\"306\" r=\"7\"/><circle cx=\"150\" cy=\"338\" r=\"7\"/> <circle cx=\"150\" cy=\"370\" r=\"7\"/><circle cx=\"150\" cy=\"402\" r=\"7\"/> </g> <circle cx=\"150\" cy=\"140\" r=\"8\" fill=\"var(--ink)\"/> <g fill=\"var(--ink-2)\" font-family=\"IBM Plex Mono, ui-monospace, monospace\" font-size=\"12.5\" text-anchor=\"end\"> <text x=\"130\" y=\"48\">a5</text><text x=\"130\" y=\"80\">a4</text><text x=\"130\" y=\"112\">a3</text> <text x=\"130\" y=\"144\">a2</text><text x=\"130\" y=\"176\">a1</text> <text x=\"130\" y=\"278\">b1</text><text x=\"130\" y=\"310\">b2</text><text x=\"130\" y=\"342\">b3</text> <text x=\"130\" y=\"374\">b4</text><text x=\"130\" y=\"406\">b5</text> </g> <g stroke=\"var(--ink-2)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 108 L188 108 M170 172 L188 172 M188 108 L188 172\"/> </g> <text x=\"196\" y=\"144\" fill=\"var(--ink)\" font-family=\"Archivo, sans-serif\" font-size=\"12.5\" font-weight=\"600\">1 point</text> <g stroke=\"var(--muted)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 274 L184 274 M170 306 L184 306 M184 274 L184 306\"/> </g> <text x=\"192\" y=\"294\" fill=\"var(--muted)\" font-family=\"Archivo, sans-serif\" font-size=\"11.5\">1 step, a club apart</text> <g stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <line x1=\"88\" y1=\"204\" x2=\"88\" y2=\"242\"/> </g> <path d=\"M88 198 L83 208 L93 208 Z\" fill=\"var(--ink-2)\"/> <path d=\"M88 248 L83 238 L93 238 Z\" fill=\"var(--ink-2)\"/> <text x=\"100\" y=\"227\" fill=\"var(--ink)\" font-family=\"Archivo, sans-serif\" font-size=\"12.5\" font-weight=\"600\">15 steps</text> </svg>", steps:[
+  ladder:{ title:"Lag ladder", svg:"<svg viewBox=\"0 0 300 446\" class=\"dg\" role=\"img\" aria-label=\"Lag ladder: five targets at each end, one step apart, fifteen steps between the ends\"> <g stroke=\"var(--line-strong)\" stroke-width=\"1.5\" stroke-dasharray=\"6 5\"> <line x1=\"104\" y1=\"24\" x2=\"196\" y2=\"24\"/> <line x1=\"104\" y1=\"192\" x2=\"196\" y2=\"192\"/> <line x1=\"104\" y1=\"254\" x2=\"196\" y2=\"254\"/> <line x1=\"104\" y1=\"422\" x2=\"196\" y2=\"422\"/> </g> <g fill=\"var(--accent-fill)\"> <circle cx=\"150\" cy=\"44\" r=\"7\"/><circle cx=\"150\" cy=\"76\" r=\"7\"/><circle cx=\"150\" cy=\"108\" r=\"7\"/> <circle cx=\"150\" cy=\"172\" r=\"7\"/> <circle cx=\"150\" cy=\"274\" r=\"7\"/><circle cx=\"150\" cy=\"306\" r=\"7\"/><circle cx=\"150\" cy=\"338\" r=\"7\"/> <circle cx=\"150\" cy=\"370\" r=\"7\"/><circle cx=\"150\" cy=\"402\" r=\"7\"/> </g> <circle cx=\"150\" cy=\"140\" r=\"8\" fill=\"var(--ink)\"/> <g fill=\"var(--ink-2)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" text-anchor=\"end\"> <text x=\"130\" y=\"48\">a5</text><text x=\"130\" y=\"80\">a4</text><text x=\"130\" y=\"112\">a3</text> <text x=\"130\" y=\"144\">a2</text><text x=\"130\" y=\"176\">a1</text> <text x=\"130\" y=\"278\">b1</text><text x=\"130\" y=\"310\">b2</text><text x=\"130\" y=\"342\">b3</text> <text x=\"130\" y=\"374\">b4</text><text x=\"130\" y=\"406\">b5</text> </g> <g stroke=\"var(--ink-2)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 108 L188 108 M170 172 L188 172 M188 108 L188 172\"/> </g> <text x=\"196\" y=\"144\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">1 point</text> <g stroke=\"var(--muted)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 274 L184 274 M170 306 L184 306 M184 274 L184 306\"/> </g> <text x=\"192\" y=\"294\" fill=\"var(--muted)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"11.5\">1 step, a club apart</text> <g stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <line x1=\"88\" y1=\"204\" x2=\"88\" y2=\"242\"/> </g> <path d=\"M88 198 L83 208 L93 208 Z\" fill=\"var(--ink-2)\"/> <path d=\"M88 248 L83 238 L93 238 Z\" fill=\"var(--ink-2)\"/> <text x=\"100\" y=\"227\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">15 steps</text> </svg>", steps:[
     "Five targets at each end, A1 to A5 and B1 to B5, one step apart, about 15 steps between the ends, on a slope.",
     "Each round, putt five balls from one launch target to the five at the far end, then rotate the launch target and swap ends: R1 A1 to B1-5, R2 B1 to A1-5, R3 A2 to B1-5 and so on.",
     "Ten rounds is 50 putts.",
@@ -2388,14 +2371,14 @@ function dgPlan(o){
       '<rect x="'+(wx-0.5)+'" y="'+(CY-5)+'" width="9" height="10" rx="2" fill="var(--ink-2)"/>' +
       dgBand(wx, CY, cx, CY, p) + dgFig(cx, CY, p) +
       (p.turn ? dgArc(cx, CY, 34, p.turn[0], p.turn[1]) : "") +
-      '<text x="'+cx+'" y="168" fill="var(--muted)" font-family="Archivo, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+cap+'</text>';
+      '<text x="'+cx+'" y="168" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+cap+'</text>';
   }
   return '<svg viewBox="0 0 300 190" class="dg" role="img" aria-label="'+o.alt+'">'+
-    '<text x="8" y="14" fill="var(--muted)" font-family="Archivo, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">LOOKING DOWN FROM ABOVE</text>'+
+    '<text x="8" y="14" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">LOOKING DOWN FROM ABOVE</text>'+
     panel(WA, CA, o.a, o.capA || "START") +
     '<line x1="150" y1="30" x2="150" y2="146" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>' +
     panel(WB, CB, o.b, o.capB || "FINISH") +
-    '<text x="150" y="186" fill="var(--ink-2)" font-family="Archivo, sans-serif" font-size="11" font-weight="600" text-anchor="middle">'+o.note+'</text>'+
+    '<text x="150" y="186" fill="var(--ink-2)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle">'+o.note+'</text>'+
     '</svg>';
 }
 var BANDDG = {
@@ -2434,18 +2417,18 @@ BANDDG.hips =
   '<ellipse cx="176" cy="96" rx="76" ry="52" fill="none" stroke="var(--line-strong)" stroke-width="1.4" stroke-dasharray="6 6"/>'+
   '<g stroke="var(--muted)" stroke-width="4.5" stroke-linecap="round">'+
   '<line x1="62" y1="78" x2="76" y2="78"/><line x1="62" y1="114" x2="76" y2="114"/></g>'+
-  '<text x="50" y="100" fill="var(--muted)" font-family="Archivo, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="end">HANDS</text>'+
+  '<text x="50" y="100" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="end">HANDS</text>'+
   '<g stroke="var(--ink)" stroke-width="3" stroke-linecap="round">'+
   '<line x1="78" y1="96" x2="188" y2="60"/><line x1="78" y1="96" x2="196" y2="132"/></g>'+
   '<circle cx="84" cy="96" r="7.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>'+
   '<g stroke="var(--accent-fill)" stroke-width="5" stroke-linecap="round">'+
   '<line x1="188" y1="60" x2="200" y2="56"/><line x1="196" y1="132" x2="208" y2="136"/></g>'+
   dgArc(176, 96, 62, 190, 20)+
-  '<text x="150" y="178" fill="var(--ink-2)" font-family="Archivo, sans-serif" font-size="11" font-weight="600" text-anchor="middle">Hands stay put · feet sweep the full circle</text>'+
+  '<text x="150" y="178" fill="var(--ink-2)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle">Hands stay put · feet sweep the full circle</text>'+
   '</svg>';
 BANDDG.goblet =
   '<svg viewBox="0 0 300 190" class="dg" role="img" aria-label="Side view. Standing tall with the weight at the chest, then the bottom of the squat with the elbows inside the knees.">'+
-  '<text x="8" y="14" fill="var(--muted)" font-family="Archivo, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">FROM THE SIDE</text>'+
+  '<text x="8" y="14" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">FROM THE SIDE</text>'+
   '<line x1="16" y1="152" x2="284" y2="152" stroke="var(--line-strong)" stroke-width="1.5"/>'+
   '<line x1="150" y1="34" x2="150" y2="146" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>'+
   '<g stroke="var(--line-strong)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none">'+
@@ -2459,12 +2442,12 @@ BANDDG.goblet =
   '<circle cx="230" cy="66" r="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>'+
   '<circle cx="60" cy="84" r="8.5" fill="var(--accent-fill)"/><circle cx="202" cy="104" r="8.5" fill="var(--accent-fill)"/>'+
   dgArc(150, 96, 46, 236, 304)+
-  '<g fill="var(--muted)" font-family="Archivo, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+
+  '<g fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+
   '<text x="76" y="174">STAND TALL</text><text x="222" y="174">ELBOWS INSIDE KNEES</text></g>'+
   '</svg>';
 BANDDG.jump =
   '<svg viewBox="0 0 300 190" class="dg" role="img" aria-label="Side view. Dip beside the box and jump on, then step down rather than jumping down.">'+
-  '<text x="8" y="14" fill="var(--muted)" font-family="Archivo, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">FROM THE SIDE</text>'+
+  '<text x="8" y="14" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="600" letter-spacing="1.1">FROM THE SIDE</text>'+
   '<line x1="16" y1="152" x2="284" y2="152" stroke="var(--line-strong)" stroke-width="1.5"/>'+
   '<line x1="150" y1="34" x2="150" y2="146" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>'+
   '<rect x="100" y="118" width="42" height="34" rx="2" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.6"/>'+
@@ -2482,7 +2465,7 @@ BANDDG.jump =
   '<path d="M116 114 L108 101 L122 102 Z" fill="var(--accent-fill)"/>'+
   '<path d="M238 128 L214 145" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="4 4"/>'+
   '<path d="M210 148 L219 138 L221 148 Z" fill="var(--muted)"/>'+
-  '<g fill="var(--muted)" font-family="Archivo, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+
+  '<g fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="0.9" text-anchor="middle">'+
   '<text x="72" y="174">DIP, THEN JUMP ON</text><text x="224" y="174">STEP DOWN, NEVER JUMP</text></g>'+
   '</svg>';
 
@@ -5796,6 +5779,11 @@ function deckShow(i){
     '<span class="progtxt">'+(d.idx+1)+' of '+d.cards.length+'</span>';
   updateNav();
   window.scrollTo(0,0);
+  /* A card is a page as far as the phone's back button is concerned. Without
+     this, back from the middle of a session threw the whole session away and
+     dropped her on the areas, which reads as the button being broken rather
+     than as a design decision. */
+  pushCard(d.idx);
 }
 function updateNav(){
   var d = state.deck, last = d ? (d.idx === d.cards.length-1) : true;
@@ -9821,7 +9809,7 @@ function lineChart(sessions, max, label, sg){
   var grid="", ticks = sg ? [lo, 0, hi] : [0, Math.round(hi/2), hi];
   ticks.forEach(function(t){
     grid += '<line x1="'+l+'" x2="'+(w-r)+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>'+
-            '<text x="'+(l-7)+'" y="'+(Y(t)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">'+fmt(t)+'</text>';
+            '<text x="'+(l-7)+'" y="'+(Y(t)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif">'+fmt(t)+'</text>';
   });
   var pts = sessions.map(function(s,i){ return X(i).toFixed(1)+","+Y(s.total).toFixed(1); });
   var dots = sessions.map(function(s,i){
@@ -9835,7 +9823,7 @@ function lineChart(sessions, max, label, sg){
     grid + target +
     (n>1 ? '<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--accent-fill)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' : '') +
     dots +
-    '<text x="'+(lastX+8)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">'+fmt(sessions[n-1].total)+'</text>'+
+    '<text x="'+(lastX+8)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="Figtree, Helvetica Neue, Arial, sans-serif">'+fmt(sessions[n-1].total)+'</text>'+
     '<text x="'+l+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)">'+fmtDate(sessions[0].date)+'</text>'+
     (n>1 ? '<text x="'+(w-r)+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)" text-anchor="end">'+fmtDate(sessions[n-1].date)+'</text>' : '')+
     '</svg>';
@@ -9854,7 +9842,7 @@ function speedChart(rows){
   [lo, (lo+hi)/2, hi].forEach(function(t){
     var tv = Math.round(t);
     grid += '<line x1="'+l+'" x2="'+(w-r)+'" y1="'+Y(tv).toFixed(1)+'" y2="'+Y(tv).toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>'+
-            '<text x="'+(l-7)+'" y="'+(Y(tv)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">'+tv+'</text>';
+            '<text x="'+(l-7)+'" y="'+(Y(tv)+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="Figtree, Helvetica Neue, Arial, sans-serif">'+tv+'</text>';
   });
   var bars = rows.map(function(x,i){
     var xx = X(i).toFixed(1);
@@ -9867,7 +9855,7 @@ function speedChart(rows){
   var lastX = X(n-1), lastY = Y(rows[n-1].f);
   return '<svg class="line" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Club head speed, fastest and slowest of ten balls, by session">'+
     grid + bars +
-    '<text x="'+(lastX+9)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">'+rows[n-1].f+'</text>'+
+    '<text x="'+(lastX+9)+'" y="'+(lastY+4).toFixed(1)+'" font-size="13" font-weight="600" fill="var(--ink)" font-family="Figtree, Helvetica Neue, Arial, sans-serif">'+rows[n-1].f+'</text>'+
     '<text x="'+l+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)">'+rows[0].d+'</text>'+
     (n>1 ? '<text x="'+(w-r)+'" y="'+(h-6)+'" font-size="11" fill="var(--muted)" text-anchor="end">'+rows[n-1].d+'</text>' : '')+
     '</svg>';
@@ -11296,7 +11284,7 @@ function aimPaint(){
 
   function tag(txt, x, y, col){
     g.save();
-    g.font = "600 " + (12 * D) + "px 'IBM Plex Mono', ui-monospace, monospace";
+    g.font = "600 " + (12 * D) + "px Figtree, Helvetica Neue, Arial, sans-serif";
     g.textAlign = "center"; g.textBaseline = "middle";
     var pad = 6 * D, tw = g.measureText(txt).width;
     g.fillStyle = "rgba(0,0,0,.6)";
@@ -11936,16 +11924,41 @@ window.addEventListener("lcl-who", function(){
 var HIST_ON = false, histPopping = false;
 function pushView(view){
   if(!HIST_ON || histPopping || !view) return;
+  /* The deck is built before show() runs, so a session's first card has already
+     been and gone by the time we get here. Carry it, or the first back press
+     inside a session is a press that does nothing. */
+  var card = ((view === "session" || view === "gym") && state.deck) ? state.deck.idx : null;
   try{
-    var cur = history.state && history.state.lcl;
-    if(cur === view) return;
-    history.pushState({lcl:view}, "");
+    var st = history.state;
+    if(st && st.lcl === view && st.card === card) return;
+    history.pushState(card == null ? {lcl:view} : {lcl:view, card:card}, "");
   }catch(e){}   /* a browser that refuses history is no reason to break the app */
 }
+/* The card she is on inside a session or a gym workout. */
+function pushCard(idx){
+  if(!HIST_ON || histPopping || idx == null) return;
+  var view = state.view;
+  if(view !== "session" && view !== "gym") return;
+  try{
+    var st = history.state;
+    if(st && st.lcl === view && st.card === idx) return;
+    /* the first card replaces the session's own entry rather than adding one,
+       so a single back from the first card leaves the session instead of
+       bouncing her off the front of the deck */
+    if(idx === 0 && st && st.lcl === view && st.card == null)
+      history.replaceState({lcl:view, card:0}, "");
+    else history.pushState({lcl:view, card:idx}, "");
+  }catch(e){}
+}
 window.addEventListener("popstate", function(e){
-  var v = (e.state && e.state.lcl) || "home";
+  var st = e.state || {}, v = st.lcl || "home";
   histPopping = true;
-  try{ show(v); } finally { histPopping = false; }
+  try{
+    /* Stepping between cards of the session she is already in must not rebuild
+       it: show() throws the deck away and starts the whole thing again. */
+    if(st.card != null && state.view === v && state.deck) deckShow(st.card);
+    else show(v);
+  } finally { histPopping = false; }
 });
 
 renderPlayer();
