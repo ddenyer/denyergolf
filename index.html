@@ -9371,9 +9371,57 @@ function playerObj(){
   var m = state.players.filter(function(x){ return x.id===state.activePlayer; });
   return m[0] || state.players[0];
 }
+/* The LPGA driver average the help card already quotes, kept once so the target
+   and the card cannot say different things. */
+var LPGA_CHS = 94;
+/* Where the balls have to finish, in the words the set itself uses. */
+function tgtWhere(a){
+  if(areaShape(a) === "clock") return "Holed on the clock";
+  var s = (a.sets || []).filter(function(x){ return x.tc; })[0];
+  var tc = s ? s.tc : null;
+  if(!tc) return "Inside the circle";
+  if(areaShape(a) === "corridor") return "In the " + tc + " corridor";
+  if(/club/.test(tc)) return "Inside two clubs";
+  return "Inside " + tc;
+}
+/* ---- the targets card --------------------------------------------------
+   These used to be written by hand beside the tool rather than out of it, and
+   they had drifted: the wedge ladder asked for less than the tour from 50 yards
+   and for exactly the tour from 90, and two of the three putting bullets quoted
+   the tour average and called it a target. Worse, the card has only ever shown
+   THREE bullets, and some areas had six written, so half of them were invisible.
+
+   They are built from the area's own constants now. The rate in the first line
+   is the rate the placing is drawn against; the counts in it are the counts the
+   session is scored in. If a number moves in the tool, the target moves with it,
+   because there is only one number. She can still edit any of them, and reset
+   puts this back. */
+function areaTargets(a){
+  if(!a || !a.placing) return null;
+  var P = a.placing, out = [];
+  var n = P.n, inN = Math.round(n * P.p);
+  out.push(tgtWhere(a) + ", " + inN + " of " + n + " is the LPGA rate");
+  /* the second line is whatever that area's next real question is */
+  if(P.bullP){
+    out.push("Inside one club, " + Math.round(n * P.bullP) + " of " + n);
+  } else if(areaShape(a) === "clock"){
+    var ft = (a.sets || []).filter(function(x){ return x.pd && !x.lag && x.r2; })
+      .map(function(x){ return x.pd + " ft " + Math.round(x.r2*100) + "%"; });
+    out.push(ft.length ? ft.join(", ") : "Every station at the LPGA rate");
+  } else if(a.ott){
+    out.push("Club head speed, the LPGA average is " + LPGA_CHS + " mph");
+  } else {
+    out.push("Every station at the LPGA rate");
+  }
+  out.push(isSG(a)
+    ? "Strokes gained above 0.0, which is the LPGA field"
+    : "A placing inside the top fifty of the hundred");
+  return out;
+}
 function defaultTarget(areaId){
   if(areaId===5) return ROUND_TARGETS;
-  var a = area(areaId); return a ? a.targets : "";
+  var a = area(areaId); if(!a) return "";
+  return areaTargets(a) || a.targets;
 }
 
 function targetsFor(areaId){
