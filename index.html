@@ -1326,7 +1326,7 @@
   .clock .rz.cin:hover, .clock .rz.cin.on{fill:rgba(255,255,255,.6); stroke:var(--turf-line); stroke-width:1.4}
   /* a white halo so the label stays readable wherever the slope arrow lands */
   .czl{fill:#2b3a27; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11px; font-weight:700;
-    letter-spacing:1.1; text-anchor:middle; pointer-events:none;
+    letter-spacing:1.1px; text-anchor:middle; pointer-events:none;
     stroke:#eef5e9; stroke-width:3.2; paint-order:stroke fill}
   .chole{fill:var(--hole); pointer-events:none}
   .cline{stroke:#33482c; stroke-width:1.8; stroke-dasharray:6 4; pointer-events:none}
@@ -1494,15 +1494,8 @@
   #goalsProject{color:var(--accent); margin-top:2px}
 
   /* ---- the season mix ---- */
-  .seasonhd{margin-bottom:3px}
-  .seasonn{margin:0 0 9px; font-size:12.5px; color:var(--muted)}
-  .sbars{display:flex; flex-direction:column; gap:7px}
-  .srow{display:grid; grid-template-columns:96px 1fr 44px 40px; gap:9px; align-items:center; font-size:13px}
-  .srow > span:first-child{color:var(--ink-2)}
-  .strack{position:relative; height:10px; background:var(--surface-2); border:1px solid var(--line);
-    border-radius:99px; overflow:visible}
-  .sfill{position:absolute; left:0; top:0; bottom:0; background:var(--accent-fill); border-radius:99px}
-  .starget{position:absolute; top:-4px; width:2px; height:18px; background:var(--ink-2); border-radius:1px}
+  /* the season-mix block that used to live here is gone; its .srow rule was
+     still turning the gym set rows into a four-column grid */
   .srow .n{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; text-align:right; color:var(--ink)}
   .srow .n.off{color:var(--accent)}
   .srow .w{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; text-align:right; color:var(--muted); font-size:12px}
@@ -2193,8 +2186,15 @@ var AREAS = [
   sg:true, hitLabel:"in the fairway",
   /* The distance she is chasing and the speed she is chasing it at. The two
      together give her own yards per mile an hour, which is what turns a
-     session's club head speed into the carry a ball is priced from. */
-  ott:{ dist:272, speedUp:5 },
+     session's club head speed into the carry a ball is priced from.
+
+     TOTAL, not carry. It used to be called dist and was read as a carry, which
+     put 35 yards of roll on top of a number that already had them: her drives
+     were priced at 307 yards against a field on 253, and every one of them was
+     worth about a fifth of a stroke more than it should have been. 272 as a
+     carry is 2.9 yards per mile an hour, which neither tour produces; as a
+     total it is 2.9 against the LPGA's 2.7, which is a strong player. */
+  ott:{ total:272, speedUp:5 },
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
   /* The corridor is the LPGA 66% corridor for that club: at a lateral spread of about
      6% of distance, 26 yards passes two in three with a driver. A typical tour fairway
@@ -4090,6 +4090,43 @@ function saveLocal(){
     return false;
   }
 }
+/* ---- the one migration this app has ever needed -------------------------
+   Five areas used to score in points and now score in strokes gained, and a
+   session carries no note of which it was scored under. The unit is read off
+   the AREA, so an old total of 62 points was being printed as "+62.0 strokes":
+   on the home tile as a Best she could never beat, at the top of the progress
+   chart where it flattened a season of real strokes into a dozen pixels, in
+   the sessions list, in the past-session card, in Copy summary, and in the CSV.
+   It also silently switched off "best yet", because nothing beats 62.
+
+   Nothing has to be guessed. Every ball she ever tapped is still in sess.shots,
+   and sgSession prices them with today's engine, legacy zone ids included. So
+   the totals are recomputed once, on the way in, and stamped so it never runs
+   again. A session with no shots to price is left exactly as it was and marked
+   so it is not asked twice. */
+var SGV = 1;
+function migrateToStrokes(){
+  var moved = 0;
+  (state.sessions || []).forEach(function(x){
+    if(!x || x.kind === "gym" || x.sgv === SGV) return;
+    var a = area(x.areaId);
+    if(!isSG(a)){ x.sgv = SGV; return; }
+    var r = sgSession(a, x);
+    /* No taps left to price, so the stored total cannot be converted and cannot
+       be trusted either: it is a points total wearing a strokes label. Rather
+       than guess it or delete it, it is marked unknown, and the three places
+       that would otherwise read it as strokes skip it. */
+    if(!r){ if(x.total != null) x.sgUnknown = true; x.sgv = SGV; return; }
+    delete x.sgUnknown;
+    var was = x.total;
+    x.total = Math.round(r.sg*100)/100;
+    x.max = sgAreaCeil(a);
+    x.balls = r.balls;
+    x.sgv = SGV;
+    if(was !== x.total) moved++;
+  });
+  return moved;
+}
 function loadLocal(){
   try{
     var raw = localStorage.getItem(LS);
@@ -4097,7 +4134,13 @@ function loadLocal(){
     if(!raw){ STORE.read = true; return false; }
     var o = JSON.parse(raw);
     if(o && o.players && o.players.length){ state.players=o.players; state.activePlayer=o.activePlayer||o.players[0].id; }
-    if(o && o.sessions) state.sessions = o.sessions;
+    /* A stored history that is not an array took the whole app down and left no
+       way back: nothing in this try touches it, so the damaged-copy rescue below
+       never fired, and the first thing outside the try to read it threw before a
+       single screen was drawn. saveLocal has always checked this on the way in
+       from another tab; the way in from disk did not. */
+    if(o && Array.isArray(o.sessions)) state.sessions = o.sessions;
+    else if(o && o.sessions) throw new Error("the stored history is not a list");
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
     if(o && o.lib) state.lib = { practice:(o.lib.practice||[]), tests:(o.lib.tests||[]) };
     if(o && o.gone) state.gone = tombPrune(o.gone);
@@ -4110,7 +4153,7 @@ function loadLocal(){
     }
     STORE.lastWrote = raw;
     STORE.read = true;
-    STORE.wrote = (o && o.sessions) ? o.sessions.length : 0;
+    STORE.wrote = state.sessions.length;
     return true;
   }catch(e){
     STORE.ok = false;
@@ -4892,6 +4935,7 @@ function cloudPull(){
     if(merged.length){
       state.sessions = merged;
       state.sampleOn = false;
+      migrateToStrokes();   /* the other device may not have run it yet */
       saveLocal();
     }
     CLOUD.on = true; CLOUD.at = Date.now(); CLOUD.why = "";
@@ -4953,6 +4997,7 @@ function connect(){
       if(remote.length || merged.length){
         state.sessions = merged;
         if(merged.length) state.sampleOn=false;
+        migrateToStrokes();
       }
       // push anything the cloud does not have yet
       var remoteIds={}; remote.forEach(function(r){ remoteIds[r.id]=true; });
@@ -5782,14 +5827,31 @@ function tileMeta(r){
    the ball is priced, a count out of what was on offer where it is not. Only
    full sessions count, because a best set by a session she abandoned after five
    balls is not a best, it is a short session. */
+/* How many balls a full session of this area is, which is what a part-session
+   has to be measured against. */
+function sgAreaBalls(a){
+  var n = 0;
+  liveSets(a).forEach(function(s){ n += ballsIn(s) || 0; });
+  return n;
+}
 function tileBest(r){
   var a = r.a, sg = isSG(a), best = null, i, x, v;
   for(i = 0; i < r.hist.length; i++){
     x = r.hist[i];
-    if(!x || x.total == null) continue;
+    if(!x || x.total == null || x.sgUnknown) continue;
     if(!sg && !x.max) continue;
-    /* a part-session cannot hold a best: too few balls to be one */
-    if(!sg && x.max && x.total != null && x.n != null && x.n < x.max * 0.6) continue;
+    /* A part-session cannot hold a best. This used to read x.n, which sessions
+       have never carried, so it never fired once, and on the four strokes areas
+       it was switched off anyway. Five holed four-footers is +0.57 and a whole
+       tour-average putting session is about zero, so a session she walked away
+       from was setting a Best she could not beat. sgBallsLogged counts the
+       taps that are actually there. */
+    var ballsWanted = sg ? sgAreaBalls(a) : x.max;
+    /* Only when the balls can actually be counted. A session that carries a
+       total but no taps, which is what an import or a hand-edited store looks
+       like, is taken at its word rather than thrown out as a short one. */
+    var ballsGot = sg ? (x.balls != null ? x.balls : sgBallsLogged(x)) : x.total;
+    if(ballsWanted && ballsGot && ballsGot < ballsWanted * 0.6) continue;
     v = sg ? x.total : x.total / x.max;
     if(best === null || v > best.v) best = { v:v, s:x };
   }
@@ -7067,9 +7129,18 @@ function sgLagBands(d){
   SG_LAG_CACHE[key] = out;
   return out;
 }
-function sgPuttOfShot(set, z){
+function sgPuttOfShot(set, z, call){
   if(!set || set.pd == null) return null;
-  if(set.lag){ var B = sgLagBands(set.pd); return z === "c" ? B.inV : B.outV; }
+  /* The ladder does not have a centre. It has six gaps, tapped as g0 to g5, and
+     whether a ball is "inside" depends on which target it was played to, which
+     is what lagHit answers and what the count score has always used. Asking
+     z === "c" here never matched, so every lag putt was priced as a miss and
+     the ladder was a flat penalty however well she lagged. */
+  if(set.lag){
+    var B = sgLagBands(set.pd);
+    var got = call && call.t != null ? lagHit(call.t, z) : (z === "c" || z === "b");
+    return got ? B.inV : B.outV;
+  }
   return z === "c" ? sgPutts(set.pd) - 1 : sgPutts(set.pd) - 2;
 }
 
@@ -7087,14 +7158,22 @@ function ottBaseSpeed(pid, skipId){
   if(!v.length) return null;
   return v.reduce(function(t,x){ return t + x; }, 0) / v.length;
 }
+/* Her carry at the speed she swung today. The target is a total, so the ratio
+   is worked out in totals and the roll comes off at the end: what the engine
+   prices is carry against carry, and sgOttRemain puts the roll back on by lie.
+   Subtracting the fairway figure here and adding the lie figure there means a
+   drive up the middle is exactly whole, and one in the rough runs less, which
+   is the point of having the table at all. */
 function ottCarry(a, sess){
   var C = a && a.ott; if(!C) return null;
+  var total = C.total != null ? C.total : C.dist;   /* dist: what it was called */
+  if(total == null) return null;
   var pid = sess && sess.areaId;
   var base = ottBaseSpeed(pid, sess && sess.id);
   var now = sess && sess.metrics && +sess.metrics.chsAvg;
   var speed = (now > 0) ? now : base;
-  if(!speed) return C.dist;
-  return speed * (C.dist / ((base || speed) + C.speedUp));
+  var hers = speed ? speed * (total / ((base || speed) + C.speedUp)) : total;
+  return Math.max(40, hers - SG_OTT_ROLL.fair);
 }
 
 /* A rotation ball was asked to do something different from the ball before it,
@@ -7112,7 +7191,7 @@ function sgOfShot(set, z, v, ctx, i){
     var c = ctx && ctx.carry;
     return c ? sgOttOfShot(c * (S.ottClub || 1), z) : null;
   }
-  if(S && S.sgKind === "putt") return sgPuttOfShot(S, z);
+  if(S && S.sgKind === "putt") return sgPuttOfShot(S, z, ctx && ctx.calls ? ctx.calls[i] : null);
   if(S && S.sgKind) return sgFsOfShot(S.sgKind, S.dist, z, v);
   var B = sgBands(set); if(!B || z == null) return null;
   if(z === "h") return B.base;                       /* holed: no putt left at all */
@@ -7153,7 +7232,11 @@ function sgHitRate(a, sess){
    session was hit at, and, for a rotation, the draw it was hit against. */
 function sgCtx(a, sess, s){
   if(!a || !s) return null;
-  var calls = s.rot && isSG(a) ? callsFor(a, s, null, sess) : null;
+  /* The draw needs its calls because each ball was asked for something
+     different. The ladder needs them for a different reason: a lag ball cannot
+     be judged without knowing which target it was played to. */
+  var calls = isSG(a) && (s.rot || trackKind(a, s) === "lag")
+    ? callsFor(a, s, null, sess) : null;
   var c = a.ott ? ottCarry(a, sess) : null;
   if(!calls && !c) return null;
   return { carry:c, calls:calls };
@@ -9436,6 +9519,26 @@ function projectFor(){
 }
 
 
+/* The seeded targets that are already on her phone. They cannot be told apart
+   from an edit by inspection, so they are told apart by comparison: a target
+   that still matches the seed word for word was written by the app and goes,
+   and anything she has changed stays exactly as she left it. */
+function dropSeededTargets(p){
+  if(!p || !p.targets) return 0;
+  var n = (p.name||"").trim().toLowerCase();
+  var key = n.indexOf("charlotte")===0 ? "charlotte" : n.indexOf("annabel")===0 ? "annabel" : null;
+  var seed = key && DECK_TARGETS[key]; if(!seed) return 0;
+  var gone = 0;
+  Object.keys(p.targets).forEach(function(id){
+    var mine = p.targets[id], was = seed[id];
+    if(!was) return;
+    var a = Array.isArray(mine) ? mine : String(mine||"").split(/\s*\u00b7\s*/);
+    if(a.length !== was.length) return;
+    for(var i=0;i<a.length;i++) if(String(a[i]).trim() !== String(was[i]).trim()) return;
+    delete p.targets[id]; gone++;
+  });
+  return gone;
+}
 function seedByName(p){
   if(!p) return false;
   if(p.targets && Object.keys(p.targets).length) return false;
@@ -9443,7 +9546,13 @@ function seedByName(p){
   if(n.indexOf("charlotte")===0) key = "charlotte";
   else if(n.indexOf("annabel")===0) key = "annabel";
   if(!key) return false;
-  p.targets = JSON.parse(JSON.stringify(DECK_TARGETS[key]));
+  /* Targets are no longer seeded. They are generated out of each area's own
+     scoring numbers now, and a stored copy beats a generated one, so seeding
+     meant the two girls would have gone on reading a hand-written set that had
+     drifted from the tool. One of them told Charlotte to get 90% of her lags
+     inside three feet, which was the broken figure the old lag scoring needed,
+     not one a golfer hits. Anything she types herself is still hers and still
+     wins; this only stops the app writing one for her. */
   if(!p.checksByArea){ p.checksByArea = {}; SWING_AREAS.forEach(function(id){ p.checksByArea[id] = DECK_CHECKS[key].slice(); }); }
   if(!p.project) p.project = DECK_PROJECT[key];
   if(!p.outcomes) p.outcomes = DECK_OUTCOMES[key].slice();
@@ -10972,7 +11081,8 @@ function renderProgress(){
     var hist = sessionsFor(a.id);
     if(!hist.length) return;
     any=true;
-    var best=-1e9; hist.forEach(function(s){ if(s.total>best) best=s.total; });
+    var best=-1e9; hist.forEach(function(s){ if(!s.sgUnknown && s.total>best) best=s.total; });
+  if(best === -1e9) best = null;   /* nothing readable, rather than minus a billion */
     var card = document.createElement("div"); card.className="chartcard";
     var played = hist.filter(function(s){ return s.won!=null; });
     var wonN = played.filter(function(s){ return s.won; }).length;
@@ -11071,6 +11181,7 @@ function renderSessions(){
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
       '<span class="s">'+(x.kind==="gym" ? x.total+"/"+x.max+" sets"
+                          : x.sgUnknown ? "\u2013"
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
                           : x.total+"/"+x.max)+'</span>'+
       '<button class="x" title="Delete" aria-label="Delete session">\u00d7</button>'+
@@ -11323,7 +11434,8 @@ function summary(){
   AREAS.forEach(function(a){
     var h = sessionsFor(a.id);
     if(!h.length){ if(!a.retired) out.push(areaTitle(a)+": no sessions"); return; }
-    var best=-1e9; h.forEach(function(s){ if(s.total>best) best=s.total; });
+    var best=-1e9; h.forEach(function(s){ if(!s.sgUnknown && s.total>best) best=s.total; });
+    if(best === -1e9) best = null;
     out.push(areaTitle(a)+": "+(isSG(a)
       ? "last "+fmtSG(h[h.length-1].total)+" strokes, best "+fmtSG(best)
       : "last "+h[h.length-1].total+"/"+areaMax(a)+", best "+best)+", "+h.length+" sessions");
@@ -12005,6 +12117,10 @@ renderSC         = guard(renderSC,         "S&C");
 renderTests      = guard(renderTests,      "tests");
 renderBench      = guard(renderBench,      "benchmarks");
 renderHome       = guard(renderHome,       "the home screen");
+/* renderHello and show were the two the first paint goes through that were
+   not wrapped. A throw in either killed init before the back button was
+   wired and before the device ever tried to sync. */
+renderHello      = guard(renderHello,      "the greeting");
 renderPlayer     = guard(renderPlayer,     "the player");
 renderReview     = guard(renderReview,     "the review");
 renderGym        = guard(renderGym,        "the gym session");
@@ -12244,6 +12360,15 @@ function coachImport(text){
 
 /* ---------- boot ---------- */
 var had = loadLocal();
+/* Before anything reads a total. It writes only when a total actually moves, so
+   a store that has already been through it is untouched and costs one pass. */
+try{
+  /* not "moved": there is already a function of that name in here, and a var at
+     this scope hoists over it and takes the goals page down with it */
+  var fixedUp = migrateToStrokes();
+  (state.players || []).forEach(function(p){ fixedUp += dropSeededTargets(p); });
+  if(fixedUp) saveLocal();
+}catch(e){}
 applyCouponIdentity();
 window.addEventListener("lcl-who", function(){
   if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
