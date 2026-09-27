@@ -231,10 +231,10 @@
       rgba(255,255,255,0) 82%)}
   .tl:active{transform:translateY(1px)}
   .tl .ic{position:absolute; top:11px; left:12px; z-index:2; line-height:0; color:var(--tile-ink)}
-  .tl .fig{position:absolute; top:12px; right:13px; z-index:2;
-    font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:14.5px; font-weight:600;
-    font-variant-numeric:tabular-nums}
-  .tl .fig.up{color:var(--up)} .tl .fig.dn{color:var(--down)} .tl .fig.flat{color:var(--tile-ink-2)}
+  /* When she last played it and how often, set apart from the description so
+     the two lines are not read as one sentence. */
+  .tl .meta{position:relative; z-index:2; font-size:10.5px; line-height:1.3; margin-top:5px;
+    font-weight:600; color:var(--tile-ink); font-variant-numeric:tabular-nums}
   .tl .nm{position:relative; z-index:2; font-size:13.5px; font-weight:700; letter-spacing:-.012em;
     line-height:1.18}
   .tl .sub{position:relative; z-index:2; font-size:10.5px; line-height:1.3; margin-top:3px;
@@ -247,9 +247,9 @@
   .tl.wide .txt{position:relative; z-index:2; flex:1 1 auto; min-width:0}
   .tl.wide .rt{position:relative; z-index:2; flex:0 0 auto; padding-left:12px;
     display:flex; flex-direction:column; align-items:flex-end; gap:7px}
-  .tl.wide .fig{position:static; font-size:17px}
   .tl.wide .nm{font-size:15px}
   .tl.wide .sub{font-size:11px; margin-top:4px}
+  .tl.wide .meta{font-size:11.5px; margin-top:5px}
   /* The tile she is being sent to is marked by its badge and its size. The
      seam under it was the old system's flourish and has nothing to say here. */
   .tl .tag{position:relative; z-index:2; align-self:flex-start; margin-top:7px; font-size:9.5px;
@@ -1450,8 +1450,10 @@
   .shotask .calldo{display:block; margin-top:7px; font-size:13.5px; color:var(--ink-2)}
   .complead{min-height:0}
 
+  /* The season's name is the biggest thing on the page and does not act, so it
+     is set in the text colour. The coral is kept for the things that do. */
   .homeproj{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em;
-    color:var(--accent); margin:0 0 12px; font-size:27px; line-height:1.12}
+    color:var(--ink); margin:0 0 12px; font-size:27px; line-height:1.12}
   /* under the tiles, not in front of them */
   .homeseason{margin-top:20px}
   .homeseason .targets{margin:0}
@@ -5565,9 +5567,8 @@ function tileGap(t){
   var d = daysBetween(last);
   return { hist:hist, last:last, days:d, key:(d === null ? 1e6 : d) };
 }
-/* The figure in the corner: the last session as a share of what was on offer,
-   coloured by whether it beat the one before it. One measure for all five, so
-   the five numbers on the screen can be read against each other. */
+/* Still used by the past-session card and the review, which do compare a
+   session against what was on offer. The tile no longer shows it. */
 function tilePc(sess, a){
   /* Against the max the session itself was played to, not today\'s. Sets get
      added and dropped, and scoring an old session out of a newer total is how
@@ -5576,16 +5577,24 @@ function tilePc(sess, a){
   if(!sess || !max) return null;
   return Math.max(0, Math.min(100, Math.round(sess.total / max * 100)));
 }
-function tileFig(hist, a){
-  if(!hist.length) return {txt:"\u2013", cls:"flat"};
-  var pc = tilePc(hist[hist.length-1], a);
-  if(pc === null) return {txt:"\u2013", cls:"flat"};
-  var cls = "flat";
-  if(hist.length > 1){
-    var prev = tilePc(hist[hist.length-2], a);
-    if(prev !== null) cls = pc > prev ? "up" : pc < prev ? "dn" : "flat";
-  }
-  return {txt:pc+"%", cls:cls};
+var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso){
+  if(!iso) return null;
+  var d = new Date(iso+"T12:00:00");
+  if(isNaN(d)) return null;
+  var s = d.getDate()+" "+MON[d.getMonth()];
+  /* the year only once it is not this one, so the line stays short all season */
+  return d.getFullYear() === new Date(today()+"T12:00:00").getFullYear()
+    ? s : s+" "+String(d.getFullYear()).slice(2);
+}
+/* What the tile says underneath: when she last played this area and how many
+   times she has played it in all. A percentage told her how one session went;
+   these two tell her what her practice actually looks like, which is what a
+   screen sorted by neglect is for. */
+function tileMeta(r){
+  var n = r.hist.length;
+  if(!n) return "Not played yet";
+  return shortDate(r.last) + " \u00b7 " + n + (n === 1 ? " session" : " sessions");
 }
 function renderHome(){
   renderStoreWarn();
@@ -5606,26 +5615,26 @@ function renderHome(){
     var dueNow = testDue(t.id);
     var nm = sk.nm || t.name;
     var sub = isDefaultPractice(r.pid) ? sk.sub : a.name;
-    var fig = tileFig(r.hist, a);
+    var meta = tileMeta(r);
     var b = document.createElement("button");
     b.className = "tl" + (wide ? " wide" : "");
     b.type = "button";
     b.style.setProperty("--tint", sk.tint);
-    b.setAttribute("aria-label", nm + ", " + sinceWords(r.days));
+    b.setAttribute("aria-label", nm + ", " + sinceWords(r.days) + ", " + meta);
     var icon = '<span class="ic">'+TICON[sk.ic](wide ? 46 : 34)+'</span>';
-    var figh = '<span class="fig '+fig.cls+'">'+fig.txt+'</span>';
     /* A test waiting is said once, on the bar, where Tests is a thumb away.
        Saying it here as well cost the tile the line that tells her how long it
        has been, which is the thing this screen exists to say. */
     var tags = wide ? '<span class="tag">Start here</span>' : "";
     var line = '<div class="nm">'+nm+'</div>'+
-               '<div class="sub">'+sub+' \u00b7 '+sinceWords(r.days)+'</div>';
+               '<div class="sub">'+sub+'</div>'+
+               '<div class="meta">'+meta+'</div>';
     if(wide){
       b.innerHTML = icon +
         '<div class="txt">'+line+'</div>'+
-        '<div class="rt">'+figh+tags+'</div>';
+        '<div class="rt">'+tags+'</div>';
     } else {
-      b.innerHTML = icon + figh + line + tags;
+      b.innerHTML = icon + line + tags;
     }
     b.addEventListener("click", function(){
       var due = testDue(t.id);
