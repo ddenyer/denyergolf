@@ -96,8 +96,13 @@
   }
 
   *{box-sizing:border-box}
+  /* A short page on iOS rubber-bands when you flick it, and the flick that was
+     meant to reach the last row springs straight back. Contained overscroll
+     stops the page passing the gesture on. */
+  html{overscroll-behavior-y:contain}
   body{
     background:var(--bg); color:var(--ink);
+    overscroll-behavior-y:contain;
     font-variant-numeric:tabular-nums;
     font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
     font-size:15px; line-height:1.45;
@@ -109,7 +114,16 @@
      colour and nothing else does. setTint still runs and costs nothing. */
   body:before{content:none}
   header.top, main, nav.tabs, .totalbar, #gate{position:relative; z-index:1}
-  .wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:0 0}
+  /* .wrap sits on <main>, and a class beats an element, so this rule's
+     padding-block:0 was quietly cancelling the 18px/108px below it. The page
+     then ended flush against a bar fixed over the bottom of it: on a phone the
+     last thing on the screen sat underneath the tabs, and reaching for it meant
+     over-scrolling into the rubber band and being thrown back up. The clearance
+     lives here now, where nothing outranks it. */
+  .wrap{max-width:760px; margin:0 auto; padding-inline:16px}
+  /* One figure for both bars: the tabs are 62px and a session's total bar is
+     66px, and the inset is added on top rather than hoped for. */
+  main.wrap{padding-block:18px calc(112px + env(safe-area-inset-bottom, 0px))}
   button{font:inherit; color:inherit; cursor:pointer}
   [hidden]{display:none !important}
   :focus-visible{outline:2px solid var(--accent-fill); outline-offset:2px}
@@ -201,7 +215,7 @@
   nav.tabs button[aria-selected="true"] svg{color:var(--accent)}
   @media (max-width:340px){ nav.tabs button{font-size:9.5px} }
 
-  main{padding-block:18px 108px}
+
   h1{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:25px; font-weight:800; letter-spacing:-.022em;
      letter-spacing:0; margin:0 0 3px; text-wrap:balance; line-height:1.14}
   h2{font-size:14px; font-weight:700; margin:0 0 8px; letter-spacing:.01em}
@@ -1826,7 +1840,7 @@
     <p class="note">Club speed and carry are the two that move everything else. Attack angle is negative for every club but the driver, which is hit on the way up.</p>
 
     <h2 style="margin-top:22px">Proximity by distance</h2>
-    <p class="note" style="margin:0 0 10px">What tour players actually leave themselves from each distance. Average proximity is the middle of the field, not the target.</p>
+    <p class="note" style="margin:0 0 10px">What LPGA Tour players actually leave themselves from each distance. Average proximity is the middle of the field, not the target.</p>
     <div class="cardscroll"><table class="btable" id="proxTable"></table></div>
     <p class="note" style="margin-top:12px"><button type="button" id="aimFromBench" class="vid aimc" style="font-size:12.5px">⊙ open the scope</button>
       Hold the camera up and see how wide the approach circles actually are. They barely
@@ -2163,7 +2177,7 @@ var AREAS = [
       tgt:"Club and window drawn at random every ball. A point for the window, a point for the corridor",
       parts:[{id:"w", label:"Window", max:10},{id:"t", label:"Target", max:10}]}
   ],
-  placing:{n:45, p:0.66, sd:0.065, field:"tour players"} },
+  placing:{n:45, p:0.66, sd:0.065, field:"LPGA Tour players"} },
 
 { id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true, sg:true, sgKind:"app",
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
@@ -2211,14 +2225,14 @@ var AREAS = [
     {id:"r", rot:true, balls:20, label:"Rotation \u00b7 twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. Same routine, no rehearsal", max:20}
   ],
-  placing:{n:60, p:0.737, sd:0.05, bullP:0.100, field:"tour players"},
+  placing:{n:60, p:0.737, sd:0.05, bullP:0.100, field:"LPGA Tour players"},
   /* Sessions hit before 26 Sep 2026 counted their balls against a circle that
      grew with the shot, 26 ft at 125 out to 43 at 185. Judging that count
      against the 13 pace ring would move a session that placed 48th to 100th
      overnight, and nothing she did would have changed. Every ball logged on
      the new rings carries a stamp, so a session is placed against the field
      whose target it was actually hitting at. */
-  placingWas:{n:60, p:0.519, sd:0.05, field:"tour players"} },
+  placingWas:{n:60, p:0.519, sd:0.05, field:"LPGA Tour players"} },
 
 /* Retired when tee shots and approach play were split apart. Kept so sessions
    already scored under it still open and still chart. Not offered on the home page. */
@@ -2261,8 +2275,8 @@ var AREAS = [
     {id:"h", rot:true, balls:20, label:"Rotation · twenty balls, the app calls the number",
       tgt:"The number is drawn at random every ball. A point inside each target", max:20}
   ],
-  placing:{n:60, p:0.685, sd:0.05, bullP:0.257, field:"tour players"},
-  placingWas:{n:60, p:0.628, sd:0.05, field:"tour players"} },
+  placing:{n:60, p:0.685, sd:0.05, bullP:0.257, field:"LPGA Tour players"},
+  placingWas:{n:60, p:0.628, sd:0.05, field:"LPGA Tour players"} },
 
 { id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces", sg:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · every ball scored in strokes gained on the LPGA field",
@@ -2300,7 +2314,7 @@ var AREAS = [
     {id:"f4", blk:"Around the green", label:"Tight lie \u00b7 bare \u00b7 15 paces", tc:"2 clubs", bull:"1 club", sgLie:"tight", dist:15, lie:"tight", r1:0.073, r2:0.416, word:"a bare lie", tgt:"Set 3 of 4 \u00b7 no grass under it \u00b7 tap the ring it finished in", balls:5, max:10},
     {id:"f3", blk:"Around the green", label:"Into an upslope \u00b7 20 paces", tc:"2 clubs", bull:"1 club", sgLie:"up", dist:20, lie:"good", r1:0.046, r2:0.328, word:"an upslope", tgt:"Set 4 of 4 \u00b7 use the bank \u00b7 tap the ring it finished in", balls:5, max:10}
   ],
-  placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"tour players"} },
+  placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"LPGA Tour players"} },
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
   sg:true, hitLabel:"holed",
@@ -2312,7 +2326,7 @@ var AREAS = [
      so both are reported as their own percentages instead. runTable is the clock's own
      run placing, because the rates fall away through the sequence. */
   placing:{n:55, p:0.653, sd:0.045, sets:["a","b","c","e"], runTable:"CLOCKRUN",
-           mixed:true, word:"on the clock", field:"tour players"},
+           mixed:true, word:"on the clock", field:"LPGA Tour players"},
   sets:[
     {id:"a", sgKind:"putt", pd:4, group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
     {id:"b", sgKind:"putt", pd:6, label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
@@ -2857,7 +2871,7 @@ var PRACTICE = [
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  placing:{n:40, p:0.570, sd:0.05, field:"tour players"} }
+  placing:{n:40, p:0.570, sd:0.05, field:"LPGA Tour players"} }
 ];
 function customLib(kind){
   var o = (state.lib && state.lib[kind]) || [];
@@ -3089,7 +3103,7 @@ var TESTS = [
     {id:"s12", name:"Pitch and run",           set:"10 to 15 yards, flat fairway lie",
      bands:[{pts:2, lab:"Inside one club"},{pts:1, lab:"Inside two clubs"}]}
   ],
-  /* Score to placing in a hundred tour players. Read as: this score or better
+  /* Score to placing in a hundred LPGA Tour players. Read as: this score or better
      finishes here. Between two rows the lower placing applies, so the table is
      never kinder than the evidence. */
   placing:[[28,91],[30,82],[32,70],[34,57],[36,44],[38,31],[40,20],[42,13],[44,7],[46,4],[48,3],[52,1]],
@@ -3695,7 +3709,7 @@ function cdResult(a, hits, s){
        '<u style="left:'+tc+'%"></u></div>'+
        '<div class="mxends"><span>'+lo+'</span><span>tour '+tour+'</span><span>'+hi+'+</span></div>';
   h += enough
-    ? '<p class="mxplace">'+cdOrdinal(place)+' of a hundred tour players.</p>'
+    ? '<p class="mxplace">'+cdOrdinal(place)+' of a hundred LPGA Tour players.</p>'
     : '<p class="note">'+runs+' '+(runs===1?"run":"runs")+' logged. One session of this is close to a coin toss, '+
       'so the placing is held back until there are '+(a.needRuns||3)+' to average.</p>';
   h += '<p class="mxread">'+cdReading(a, pts)+'</p>';
@@ -6600,7 +6614,7 @@ function slopeRows(stats){
   return out;
 }
 
-/* Where sixty balls at a 66% circle would finish among a hundred tour players.
+/* Where sixty balls at a 66% circle would finish among a hundred LPGA Tour players.
    Beta-binomial, mean .66, sd .05 for the spread between players, which is the
    correction that matters here: it widens the spread from 3.7 to 4.7. Partial
    sessions get no placing at all rather than a scaled one. */
@@ -6843,8 +6857,20 @@ var SG_OTT_HOLE = 400;              /* a fixed representative par 4 */
    the middle of the table, and a cliff is never true. */
 var SG_OTT_LIE = { fair:[1.00, 0.00], semi:[1.22, 0.30], deep:[1.80, 1.20], sand:[1.45, 1.25] };
 var SG_OTT_SHORT = 30;              /* the bunker sits about this far short */
-/* The field she is measured against: the LPGA off this tee. */
-var SG_OTT_FIELD = { carry:250, mix:[["fair",0.74],["semi",0.20],["deep",0.04],["sand",0.02]] };
+/* The field she is measured against: the LPGA off this tee.
+   The carry figure was 250, which was wrong, and wrong in the direction that
+   costs her. The drill measures CARRY off a launch monitor, so the field has
+   to be a measured carry too, and Trackman's LPGA average is 218 yards, not
+   250. The 253 yards the tour reports is carry plus roll, and reading it as
+   carry handed the field 32 yards it does not have. Both numbers are used
+   here now: the carry for the comparison, the roll so the hole is the right
+   length when the second shot is priced. */
+var SG_OTT_FIELD = { carry:218, mix:[["fair",0.74],["semi",0.20],["deep",0.04],["sand",0.02]] };
+/* How far a drive runs once it lands. Judgement, like the lie multipliers
+   above, but the ordering is not arguable: a ball in deep rough does not run
+   thirty-five yards, and a ball in a bunker does not run at all. The fairway
+   figure is the one that is pinned, at 253 measured minus 218 carried. */
+var SG_OTT_ROLL = { fair:35, semi:18, deep:5, sand:0 };
 /* the six things she can tap, and what each one is */
 var SG_OTT_ZONE = { c:"fair", left:"semi", right:"semi",
                     wayLeft:"deep", wayRight:"deep", short:"sand" };
@@ -6860,8 +6886,14 @@ function sgOttFrom(dist, lie){
   var L = SG_OTT_LIE[lie] || SG_OTT_LIE.fair;
   return sgApproachAt(dist, L[0] + L[1] * Math.max(0, dist - 90)/100);
 }
+/* What is left after a drive: the hole, less what she carried and what it then
+   ran, plus the walk back out of a fairway bunker. Roll applies to her ball and
+   to the field's on the same terms, so the comparison is still carry against
+   carry; it is here so that the second shot is priced from where a ball
+   actually finishes rather than from where it landed. */
 function sgOttRemain(carry, lie){
-  return SG_OTT_HOLE - carry + (lie === "sand" ? SG_OTT_SHORT : 0);
+  var run = SG_OTT_ROLL[lie]; if(run == null) run = SG_OTT_ROLL.fair;
+  return SG_OTT_HOLE - (carry + run) + (lie === "sand" ? SG_OTT_SHORT : 0);
 }
 var SG_OTT_TEE = null;
 function sgOttTee(){
@@ -6885,9 +6917,57 @@ function sgOttOfShot(carry, z){
    A missed putt from inside twelve feet is a two-putt. Pricing the tap-in as
    anything less than certain breaks the identity that makes the field sum to
    nothing, and buys a hundredth of a stroke of realism for it. */
+/* ---- the lag ------------------------------------------------------------
+   Every other distribution on this page is spread and then cut into bands. The
+   lag was not: it was priced off two hard-coded representative distances, three
+   feet if she finished inside the circle and seven if she did not, and those two
+   numbers did not balance. The station only broke even if the field got inside
+   the circle 91% of the time, which is a baseline player leaving herself a foot
+   and a half from forty feet. Nobody does that, so a tour-average lag session
+   scored about minus three strokes however well she lagged.
+
+   The proximity needs no new source, because the putting curve already implies
+   it. Expected putts from d is this putt plus whatever the leave is worth, so
+   the leave distribution that makes sgPutts(d) true IS the field's leave from d,
+   and it can be solved for. From forty feet it comes out at three feet, which is
+   a tour lag, and sixty per cent of the field inside the circle. The two bands
+   are then the two halves of that distribution, so they balance by construction
+   rather than by luck: E[SG] over the field is exactly zero at every distance.
+
+   Below about thirty feet the solve has nothing to find, because sgPutts is
+   built as two minus the make rate and cannot imply a leave better than a
+   tap-in. The ladder is played from forty, and the distance is clamped so a
+   shorter one cannot walk off the end of the curve. */
+var SG_LAG_R = 3;        /* the circle: one step either side of the target */
+var SG_LAG_MIN = 32;     /* below this the putting curve implies nothing useful */
+var SG_LAG_CACHE = {};
+function sgLagBands(d){
+  d = Math.max(SG_LAG_MIN, d || SG_LAG_MIN);
+  var key = d.toFixed(1);
+  if(SG_LAG_CACHE[key]) return SG_LAG_CACHE[key];
+  var base = sgPutts(d) - 1, i, m, lo = 0.4, hi = 30, mu;
+  /* the mean leave whose whole distribution averages out to what is left */
+  function avg(mean){
+    var u = Math.log(mean) - SG_SIG*SG_SIG/2, t = 0, j;
+    for(j=0;j<SG_Q.length;j++) t += sgPutts(Math.exp(u + SG_SIG*SG_Q[j]));
+    return t/SG_Q.length;
+  }
+  for(i=0;i<80;i++){ m=(lo+hi)/2; if(avg(m) < base) lo=m; else hi=m; }
+  mu = Math.log(m) - SG_SIG*SG_SIG/2;
+  var tIn=0, nIn=0, tOut=0, nOut=0, x;
+  for(i=0;i<SG_Q.length;i++){
+    x = Math.exp(mu + SG_SIG*SG_Q[i]);
+    if(x < SG_LAG_R){ tIn += sgPutts(x); nIn++; } else { tOut += sgPutts(x); nOut++; }
+  }
+  var out = { prox:m,
+    inV:  nIn  ? base - tIn/nIn   : 0, inF:  nIn/SG_Q.length,
+    outV: nOut ? base - tOut/nOut : 0, outF: nOut/SG_Q.length };
+  SG_LAG_CACHE[key] = out;
+  return out;
+}
 function sgPuttOfShot(set, z){
   if(!set || set.pd == null) return null;
-  if(set.lag) return sgPutts(set.pd) - (1 + sgPutts(z === "c" ? 3 : 7));
+  if(set.lag){ var B = sgLagBands(set.pd); return z === "c" ? B.inV : B.outV; }
   return z === "c" ? sgPutts(set.pd) - 1 : sgPutts(set.pd) - 2;
 }
 
@@ -7315,7 +7395,9 @@ function placingBlock(a, sess){
     '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' '+
       (spec.bullP ? 'inside two clubs' : (areaShape(a) === 'clock' ? 'holed on the clock' : 'inside the circle'))+'</span></div>'+
     (full
-      ? '<p class="plread">On this test, <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
+      /* It said "On this test" on every session, which is left over from when
+         placing only ran on tests. It runs on all five areas now. */
+      ? '<p class="plread">That places you <b>'+ordinalPlace(tab.count[Math.min(spec.n, t.in_)])+'</b> of 100 '+spec.field+'.</p>'+
         leagueTable(tab.count, spec.n, t.in_)+
         fieldNote(a, spec)+
         (spec.bullP ? '<p class="plread">Inside one club, <b>'+
@@ -7353,7 +7435,7 @@ var FIELD_MARK = {
 };
 function fieldNote(a, spec){
   var mark = a && FIELD_MARK[a.id];
-  return '<p class="plnote">The hundred are the LPGA top hundred'+
+  return '<p class="plnote">The hundred are LPGA Tour players'+
     (mark ? '. '+mark : '')+'.</p>';
 }
 function runLine(a, sess){
@@ -10392,7 +10474,7 @@ var HEADLINE = {
 /* ---- placing ----
    The score out of 80 only means something against the same session; the placing
    means something full stop, because it is where that count would finish in a
-   hundred tour players. It is also the one number that survives the session being
+   hundred LPGA Tour players. It is also the one number that survives the session being
    rebuilt: the old short game scored out of 75 and the new one out of 150, and a
    placing from either is still a placing.
 
@@ -10624,7 +10706,7 @@ function renderGoalProgress(){
 
   rows.forEach(function(r){
     if(r.placing){
-      html += '<div class="grow"><div class="gnm">Against a tour field' +
+      html += '<div class="grow"><div class="gnm">Against the LPGA field' +
         ' <span class="gsub">' + r.a.name + '</span></div>' +
         '<div class="gval">' + ordinalPlace(r.now) + ' <span class="gunit">of 100</span></div>' +
         '<div class="gmove ' + (r.ready ? r.mv.verdict : "early") + '">' +
@@ -10637,7 +10719,7 @@ function renderGoalProgress(){
             ((r.a.placing && r.a.placing.n) || 'test') + '. No trend yet: ' +
             MIN_SESSIONS + ' is where one starts to mean something.') +
         '</div>' +
-        '<p class="note">Where that count would finish in a hundred tour players. ' +
+        '<p class="note">Where that count would finish in a hundred LPGA Tour players. ' +
         'The only figure here that survives the session being rebuilt, so it is the one ' +
         'to watch across a season.</p></div>';
       return;
@@ -10795,7 +10877,7 @@ function sessionMeta(sess){
   var pspec = placingFor(a, sess);
   if(pspec){
     var t = testSplit(a, sess);
-    if(t.n >= pspec.n) bits.push(ordinalPlace(tablesFor(pspec).count[Math.min(pspec.n, t.in_)]) + " of 100");
+    if(t.n >= pspec.n) bits.push(ordinalPlace(tablesFor(pspec).count[Math.min(pspec.n, t.in_)]) + " of 100 LPGA");
   }
   if(sess.compete) bits.push("compete " + sess.compete);
   return bits.join(" \u00b7 ");
@@ -11128,7 +11210,7 @@ function openInfo(title, lines){
 }
 /* The tour data used to sit in a tab of its own, which meant she read it nowhere near
    the number it explains. It belongs next to the placing: what the target is, where the
-   figure came from, and how a hundred tour players get turned into a position. */
+   figure came from, and how a hundred LPGA Tour players get turned into a position. */
 var TOURINFO = {
   10:{ title:"The tour numbers behind this",
        rows:[["Driving accuracy, LPGA average","71%"],
@@ -11138,7 +11220,7 @@ var TOURINFO = {
              ["Club head speed, LPGA average","94 mph"]],
        lines:["The corridor is the width a tour player finds two times in three. It is tighter than a fairway on purpose: a typical tour fairway is about 30 yards and gets found 72% of the time.",
               "So the target itself is the tour standard. Hitting 30 of 45 is exactly average out here.",
-              "The placing takes 45 balls at a 66% chance, allows for the fact that some tour players are better than others, and works out how many of a hundred of them would have beaten your score. 1st means almost nobody would.",
+              "The placing takes 45 balls at a 66% chance, allows for the fact that some LPGA Tour players are better than others, and works out how many of a hundred of them would have beaten your score. 1st means almost nobody would.",
               "Club head speed is measured, not placed. The average of the fifteen is the one that tracks progress: the fastest of fifteen reads about 4 mph high and moves twice as much between sessions."] },
   11:{ title:"The tour numbers behind this",
        rows:[["Inside 3 paces, 125 yd","+0.51"],
