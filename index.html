@@ -252,6 +252,7 @@
      the two lines are not read as one sentence. */
   .tl .meta{position:relative; z-index:2; font-size:10.5px; line-height:1.3; margin-top:5px;
     font-weight:600; color:var(--tile-ink); font-variant-numeric:tabular-nums}
+  .tl .meta .bst{display:block; margin-top:2px; font-weight:600; color:var(--tile-ink-2)}
   .tl .nm{position:relative; z-index:2; font-size:13.5px; font-weight:700; letter-spacing:-.012em;
     line-height:1.18}
   .tl .sub{position:relative; z-index:2; font-size:10.5px; line-height:1.3; margin-top:3px;
@@ -267,6 +268,9 @@
   .tl.wide .nm{font-size:15px}
   .tl.wide .sub{font-size:11px; margin-top:4px}
   .tl.wide .meta{font-size:11.5px; margin-top:5px}
+  /* on its own line on the wide tile too: run in beside the date it wrapped
+     mid-phrase, which reads worse than two short lines */
+  .tl.wide .meta .bst{margin-top:3px}
   /* The tile she is being sent to is marked by its badge and its size. The
      seam under it was the old system's flourish and has nothing to say here. */
   .tl .tag{position:relative; z-index:2; align-self:flex-start; margin-top:7px; font-size:9.5px;
@@ -1031,6 +1035,13 @@
     font-size:14.5px; font-weight:600; cursor:pointer;
     background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink)}
   .dueacts button.pri{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
+  #delWrap input{width:100%; box-sizing:border-box; padding:13px 14px; border-radius:12px;
+    border:0; box-shadow:inset 0 0 0 1px var(--line-strong); background:var(--surface-2);
+    color:var(--ink); font-family:Figtree, "Helvetica Neue", Arial, sans-serif;
+    font-size:16px; letter-spacing:.04em}
+  #delWrap input:focus{outline:0; box-shadow:inset 0 0 0 2px var(--accent-fill)}
+  #delWrap .dueacts button.pri[disabled]{opacity:.4; cursor:default}
+  #delWrap .dueacts button.pri:not([disabled]){background:var(--flag); border-color:var(--flag)}
   .openacts{grid-column:1/-1; display:flex; gap:8px; margin-top:8px}
   .openacts button{background:var(--surface); border:1px solid var(--line-strong); border-radius:11px;
     padding:8px 14px; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:13px; font-weight:600;
@@ -2029,6 +2040,29 @@
       <p class="note" id="nameMsg"></p>
       <div class="dueacts">
         <button type="submit" class="pri" id="nameGo">That's me</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Deleting a session cannot be undone, and a tap-through "are you sure" is
+     one careless thumb away from losing a night's work. This one asks her to
+     write the word, which no accident produces. -->
+<div class="duewrap" id="delWrap" hidden>
+  <div class="duecard" role="dialog" aria-modal="true" aria-labelledby="delTitle">
+    <span class="eyebrow">This cannot be undone</span>
+    <h2 id="delTitle">Delete this session?</h2>
+    <p id="delLead"></p>
+    <form id="delForm" autocomplete="off">
+      <label for="delInput" class="note" style="display:block; margin:12px 0 5px">
+        Type <b>delete</b> to confirm</label>
+      <input type="text" id="delInput" maxlength="10" placeholder="delete"
+             aria-label="Type delete to confirm" autocapitalize="none"
+             autocorrect="off" spellcheck="false">
+      <p class="note" id="delMsg"></p>
+      <div class="dueacts">
+        <button type="submit" class="pri" id="delGo" disabled>Delete it</button>
+        <button type="button" id="delNo">Keep it</button>
       </div>
     </form>
   </div>
@@ -4431,6 +4465,45 @@ function hideInstallTip(){
   document.documentElement.classList.remove("lockscroll");
 }
 
+/* A confirm() is dismissed by the same thumb movement that opened it, and what
+   it takes away cannot be got back. This asks her to write the word instead, so
+   the gesture that deletes a session is one nothing else in the app uses. */
+var delGo = null;
+function askDelete(what, then){
+  var wrap = $("delWrap"), form = $("delForm"), inp = $("delInput"),
+      go = $("delGo"), lead = $("delLead"), msg = $("delMsg");
+  if(!wrap || !inp){ if(confirm("Delete " + what + "?")) then(); return; }
+  delGo = then;
+  lead.textContent = what;
+  inp.value = ""; msg.textContent = ""; go.disabled = true;
+  wrap.hidden = false;
+  document.documentElement.classList.add("lockscroll");
+  /* not focused on opening: a keyboard springing up over the dialog on a phone
+     hides the thing she is being asked to read */
+  if(!form.__wired){
+    form.__wired = true;
+    inp.addEventListener("input", function(){
+      go.disabled = inp.value.trim().toLowerCase() !== "delete";
+      msg.textContent = "";
+    });
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(inp.value.trim().toLowerCase() !== "delete"){
+        msg.textContent = "Write the word delete to confirm.";
+        return;
+      }
+      var fn = delGo; closeDelete();
+      if(fn) fn();
+    });
+    $("delNo").addEventListener("click", closeDelete);
+    wrap.addEventListener("click", function(e){ if(e.target === wrap) closeDelete(); });
+  }
+}
+function closeDelete(){
+  var wrap = $("delWrap"); if(wrap) wrap.hidden = true;
+  delGo = null;
+  document.documentElement.classList.remove("lockscroll");
+}
 function wireInstallTip(){
   var go = $("installGo"), ok = $("installOk"), no = $("installNo");
   if(!ok || ok.__wired) return;
@@ -5705,6 +5778,25 @@ function tileMeta(r){
   if(!n) return "Not played yet";
   return shortDate(r.last) + " \u00b7 " + n + (n === 1 ? " session" : " sessions");
 }
+/* Her best on this area, in whatever the area counts in: strokes gained where
+   the ball is priced, a count out of what was on offer where it is not. Only
+   full sessions count, because a best set by a session she abandoned after five
+   balls is not a best, it is a short session. */
+function tileBest(r){
+  var a = r.a, sg = isSG(a), best = null, i, x, v;
+  for(i = 0; i < r.hist.length; i++){
+    x = r.hist[i];
+    if(!x || x.total == null) continue;
+    if(!sg && !x.max) continue;
+    /* a part-session cannot hold a best: too few balls to be one */
+    if(!sg && x.max && x.total != null && x.n != null && x.n < x.max * 0.6) continue;
+    v = sg ? x.total : x.total / x.max;
+    if(best === null || v > best.v) best = { v:v, s:x };
+  }
+  if(!best) return null;
+  return sg ? fmtSG(best.s.total) + " strokes"
+            : best.s.total + " of " + best.s.max;
+}
 function renderHome(){
   renderStoreWarn();
   renderHello();
@@ -5729,15 +5821,18 @@ function renderHome(){
     b.className = "tl" + (wide ? " wide" : "");
     b.type = "button";
     b.style.setProperty("--tint", sk.tint);
-    b.setAttribute("aria-label", nm + ", " + sinceWords(r.days) + ", " + meta);
+    b.setAttribute("aria-label", nm + ", " + sinceWords(r.days) + ", " + meta +
+      (tileBest(r) ? ", best " + tileBest(r) : ""));
     var icon = '<span class="ic">'+TICON[sk.ic](wide ? 46 : 34)+'</span>';
     /* A test waiting is said once, on the bar, where Tests is a thumb away.
        Saying it here as well cost the tile the line that tells her how long it
        has been, which is the thing this screen exists to say. */
     var tags = wide ? '<span class="tag">Start here</span>' : "";
+    var best = tileBest(r);
     var line = '<div class="nm">'+nm+'</div>'+
                '<div class="sub">'+sub+'</div>'+
-               '<div class="meta">'+meta+'</div>';
+               '<div class="meta">'+meta+
+                 (best ? '<span class="bst">Best '+best+'</span>' : '')+'</div>';
     if(wide){
       b.innerHTML = icon +
         '<div class="txt">'+line+'</div>'+
@@ -5772,12 +5867,13 @@ function renderSC(){
      them ended up with a bare plus sign where the other two had the letters
      S&C. One table, one builder, and a row that is missing here is missing
      everywhere rather than quietly unreachable. */
+  /* One programme is the current one. Strength 1 & 2 is the one before it, kept
+     because the history against it is hers, and moved to the foot of the page so
+     it is not offered alongside the thing that replaced it. */
   var PROG = [
     {nm:"Strength &amp; conditioning", sub:"Power, compound, support, trunk",
      ic:"gym", ss:coreGymSessions(),
-     go:function(){ openGym(); }},
-    {nm:"Strength 1 &amp; 2", sub:"Paired supersets",
-     ic:"gym", ss:mine().filter(isNov), go:function(){ openGym(novDue()); }}
+     go:function(){ openGym(); }}
   ];
   var ALSO = [
     {nm:"Speed sticks", opt:1, ic:"bolt", ss:mine().filter(isSpeed),
@@ -5788,7 +5884,10 @@ function renderSC(){
      go:function(){ openGym(5); }},
     {nm:"Movement prep", ic:"move", ss:mine().filter(isPrep),
      sub:"Every session \u00b7 8\u201310 min \u00b7 or on its own",
-     go:function(){ openGym(6); }}
+     go:function(){ openGym(6); }},
+    {nm:"Strength 1 &amp; 2", old:1, ic:"gym", ss:mine().filter(isNov),
+     sub:"Paired supersets \u00b7 Old BMS programme",
+     go:function(){ openGym(novDue()); }}
   ];
   /* The same line the practice tiles carry: when she last did it, and how many
      times in all. A count on its own said nothing about whether she had been
@@ -5805,13 +5904,15 @@ function renderSC(){
      programme rather than a page borrowed from somewhere else. */
   PROG.forEach(function(o){
     var b = document.createElement("button");
-    b.className = "tl"; b.type = "button";
+    b.className = "tl" + (PROG.length === 1 ? " wide" : "");
+    b.type = "button";
     b.style.setProperty("--tint", "var(--t-sc)");
     b.setAttribute("aria-label", stripTags(o.nm) + ", " + metaOf(o.ss));
-    b.innerHTML = '<span class="ic">'+TICON[o.ic](34)+'</span>'+
-      '<div class="nm">'+o.nm+'</div>'+
-      '<div class="sub">'+o.sub+'</div>'+
-      '<div class="meta">'+metaOf(o.ss)+'</div>';
+    var body = '<div class="nm">'+o.nm+'</div>'+
+               '<div class="sub">'+o.sub+'</div>'+
+               '<div class="meta">'+metaOf(o.ss)+'</div>';
+    b.innerHTML = '<span class="ic">'+TICON[o.ic](PROG.length === 1 ? 40 : 34)+'</span>'+
+      (PROG.length === 1 ? '<div class="txt">'+body+'</div>' : body);
     b.addEventListener("click", o.go);
     tiles.appendChild(b);
   });
@@ -5825,7 +5926,8 @@ function renderSC(){
       : '<div class="cap none">not done yet</div>';
     b.innerHTML = '<span class="puck">'+TICON[o.ic](21)+'</span>'+
       '<div><div class="nm">'+o.nm+
-        (o.opt ? ' <span class="optchip">optional</span>' : '')+'</div>'+
+        (o.opt ? ' <span class="optchip">optional</span>' : '')+
+        (o.old ? ' <span class="optchip">previous</span>' : '')+'</div>'+
         '<div class="sub">'+o.sub+'</div></div>'+
       '<div class="right"><div class="lastscore">'+rt+'</div></div>';
     b.addEventListener("click", o.go);
@@ -10932,14 +11034,17 @@ function renderSessions(){
     if(on) on.addEventListener("click", function(ev){ ev.stopPropagation(); resumeDraft(x); });
     row.querySelector(".x").addEventListener("click", function(ev){
       ev.stopPropagation();
-      var q = open
-        ? "Delete the unfinished " + label + " session from " + fmtDate(x.date) + "?\n\nWhat is scored in it is lost."
-        : "Delete the " + label + " session from " + fmtDate(x.date) + "?\n\nThis cannot be undone.";
-      if(!confirm(q)) return;
-      dropSession(x);
-      render();
-      if(state.view !== "sessions") show("sessions");
-      else renderSessions();
+      askDelete(
+        open
+          ? "The unfinished " + label + " session from " + fmtDate(x.date) +
+            ". What is scored in it is lost."
+          : "The " + label + " session from " + fmtDate(x.date) + ", and everything scored in it.",
+        function(){
+          dropSession(x);
+          render();
+          if(state.view !== "sessions") show("sessions");
+          else renderSessions();
+        });
     });
     wrapEl.appendChild(row);
   });
@@ -11823,8 +11928,8 @@ $("resumeGo").addEventListener("click", function(){ resumeDraft(); });
 $("resumeDrop").addEventListener("click", function(){
   var d = liveSessions()[0];
   if(!d) { renderResume(); return; }
-  if(!confirm("Delete the unfinished " + draftLabel(d) + " session?\n\nWhat is scored in it is lost.")) return;
-  dropSession(d); render(); renderResume();
+  askDelete("The unfinished " + draftLabel(d) + " session. What is scored in it is lost.",
+    function(){ dropSession(d); render(); renderResume(); });
 });
 window.addEventListener("pagehide", saveDraft);
 window.addEventListener("beforeunload", saveDraft);
