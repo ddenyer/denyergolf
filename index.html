@@ -2075,9 +2075,14 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-26", note:"one home page of five tiles that rotate on how long since each area was last played, each area's pastel following her into its session and through every panel on the screen, and one typeface for the voice, one for the interface and one for the figures" };
+var BUILD = { on:"2026-09-27", note:"all five areas score in strokes gained, the tee priced off her own speed and the lie she taps, and every ball she logs is counted, rotations included" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
+  sg:true, hitLabel:"in the fairway",
+  /* The distance she is chasing and the speed she is chasing it at. The two
+     together give her own yards per mile an hour, which is what turns a
+     session's club head speed into the carry a ball is priced from. */
+  ott:{ dist:272, speedUp:5 },
   targets:"Driving accuracy 71 \u2192 82% \u00b7 driving distance 272+ \u00b7 club-head speed + 5 mph \u00b7 a fade on demand",
   /* The corridor is the LPGA 66% corridor for that club: at a lateral spread of about
      6% of distance, 26 yards passes two in three with a driver. A typical tour fairway
@@ -2086,10 +2091,10 @@ var AREAS = [
      more yards at the same angle. */
   plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
   sets:[
-    {id:"a", label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", r2:0.66, word:"the driver", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
+    {id:"a", sgKind:"ott", ottClub:1.00, label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", r2:0.66, word:"the driver", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
       max:15, metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"The average of the fifteen, and the fastest and slowest"},
-    {id:"c", label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", r2:0.66, word:"the 3-wood", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
-    {id:"e", label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", r2:0.66, word:"the 5-wood", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
+    {id:"c", sgKind:"ott", ottClub:0.93, label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", r2:0.66, word:"the 3-wood", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
+    {id:"e", sgKind:"ott", ottClub:0.87, label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", r2:0.66, word:"the 5-wood", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
     {id:"r", rot:true, allWin:true, balls:10, guide:"windows", label:"Rotation \u00b7 ten balls, the app calls the club and the window",
       tgt:"Club and window drawn at random every ball. A point for the window, a point for the corridor",
       parts:[{id:"w", label:"Window", max:10},{id:"t", label:"Target", max:10}]}
@@ -2234,6 +2239,7 @@ var AREAS = [
   placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"tour players"} },
 
 { id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
+  sg:true, hitLabel:"holed",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
   plan:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
   /* The test is the 55 clock putts and nothing else. A tour player holes 35.9 of them,
@@ -2244,11 +2250,11 @@ var AREAS = [
   placing:{n:55, p:0.653, sd:0.045, sets:["a","b","c","e"], runTable:"CLOCKRUN",
            mixed:true, word:"on the clock", field:"tour players"},
   sets:[
-    {id:"a", group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
-    {id:"b", label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
-    {id:"c", label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", r2:0.46, word:"9 feet", max:10},
-    {id:"e", label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", r2:0.32, word:"12 feet", max:10},
-    {id:"d", guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
+    {id:"a", sgKind:"putt", pd:4, group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
+    {id:"b", sgKind:"putt", pd:6, label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
+    {id:"c", sgKind:"putt", pd:9, label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", r2:0.46, word:"9 feet", max:10},
+    {id:"e", sgKind:"putt", pd:12, label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", r2:0.32, word:"12 feet", max:10},
+    {id:"d", sgKind:"putt", pd:40, lag:1, guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
     {id:"r", rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", xg:"Rotation", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
   ],
   setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Six rounds is 30 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
@@ -4848,6 +4854,7 @@ function show(view){
      invitation to walk out of a drill halfway through. */
   var barEl = document.querySelector("nav.tabs");
   if(barEl) barEl.hidden = (view==="session" || view==="gym");
+  pushView(view);
   if(view!=="session" && view!=="gym"){
     state.deck = null; clearRest();
     var fl = $("runFlash");
@@ -6668,8 +6675,113 @@ function sgFsOfShot(kind, d, z, v){
 var SG_FS_V = 2;
 function fsKind(a){ return (a && a.sgKind) || null; }
 
-function sgOfShot(set, z, v){
-  if(set && set.sgKind) return sgFsOfShot(set.sgKind, set.dist, z, v);
+
+/* ---- off the tee -------------------------------------------------------
+   The one area where the ball's value cannot be read off its proximity to a
+   flag, because there is no flag. What the drill does have is the lie, tapped
+   every ball, and a speed, measured every session, so the shot is priced the
+   way it is priced on a course: what the tee was worth, minus what is left.
+
+   Nothing below invents a baseline. "What is left" is an approach from a known
+   distance out of a known lie, which is the model the tool already runs, and
+   that hands its own remainder to the greenside curve and the putting curve.
+   The whole chain existed; only the first link is new. */
+var SG_OTT_HOLE = 400;              /* a fixed representative par 4 */
+/* What a lie costs, as a multiplier on the mean proximity of the next shot,
+   growing with how far she still has: a bad lie at 90 yards costs a little and
+   a bad lie at 200 costs a lot. A hard "can she reach it" switch put a cliff in
+   the middle of the table, and a cliff is never true. */
+var SG_OTT_LIE = { fair:[1.00, 0.00], semi:[1.22, 0.30], deep:[1.80, 1.20], sand:[1.45, 1.25] };
+var SG_OTT_SHORT = 30;              /* the bunker sits about this far short */
+/* The field she is measured against: the LPGA off this tee. */
+var SG_OTT_FIELD = { carry:250, mix:[["fair",0.74],["semi",0.20],["deep",0.04],["sand",0.02]] };
+/* the six things she can tap, and what each one is */
+var SG_OTT_ZONE = { c:"fair", left:"semi", right:"semi",
+                    wayLeft:"deep", wayRight:"deep", short:"sand" };
+
+/* An approach from d yards, with the lie folded into the proximity. */
+function sgApproachAt(d, mult){
+  var m = sgFsProx("app", Math.max(60, d)) * (mult || 1);
+  var sig = SG_FS.app.sig, mu = Math.log(m) - sig*sig/2, t = 0, i;
+  for(i=0;i<SG_Q.length;i++) t += sgLeft(Math.exp(mu + sig*SG_Q[i]));
+  return 1 + t/SG_Q.length;
+}
+function sgOttFrom(dist, lie){
+  var L = SG_OTT_LIE[lie] || SG_OTT_LIE.fair;
+  return sgApproachAt(dist, L[0] + L[1] * Math.max(0, dist - 90)/100);
+}
+function sgOttRemain(carry, lie){
+  return SG_OTT_HOLE - carry + (lie === "sand" ? SG_OTT_SHORT : 0);
+}
+var SG_OTT_TEE = null;
+function sgOttTee(){
+  if(SG_OTT_TEE != null) return SG_OTT_TEE;
+  var t = 0;
+  SG_OTT_FIELD.mix.forEach(function(p){
+    t += p[1] * sgOttFrom(sgOttRemain(SG_OTT_FIELD.carry, p[0]), p[0]);
+  });
+  SG_OTT_TEE = 1 + t;
+  return SG_OTT_TEE;
+}
+function sgOttOfShot(carry, z){
+  var lie = SG_OTT_ZONE[z];
+  if(!lie || !carry) return null;
+  return sgOttTee() - sgOttFrom(sgOttRemain(carry, lie), lie) - 1;
+}
+
+/* ---- holing out --------------------------------------------------------
+   The easy one, and the parts were already here: the greenside model has been
+   using this curve for months to price whatever a chip leaves behind.
+   A missed putt from inside twelve feet is a two-putt. Pricing the tap-in as
+   anything less than certain breaks the identity that makes the field sum to
+   nothing, and buys a hundredth of a stroke of realism for it. */
+function sgPuttOfShot(set, z){
+  if(!set || set.pd == null) return null;
+  if(set.lag) return sgPutts(set.pd) - (1 + sgPutts(z === "c" ? 3 : 7));
+  return z === "c" ? sgPutts(set.pd) - 1 : sgPutts(set.pd) - 2;
+}
+
+/* Her own yards per mile an hour, from her own targets: the distance she is
+   chasing at the speed she is chasing it. Not a tour table, and not a constant:
+   as she gets faster the ratio holds and the carry moves with her.
+
+   When the monitor is flat there is no speed for the session, so it falls back
+   to what she has actually been swinging lately rather than to the target she
+   has not hit yet. With no history at all, the target is all there is. */
+function ottBaseSpeed(pid, skipId){
+  var v = sessionsFor(pid).filter(function(x){ return x.id !== skipId; })
+    .map(function(x){ return x.metrics && +x.metrics.chsAvg; })
+    .filter(function(x){ return x > 0; }).slice(-5);
+  if(!v.length) return null;
+  return v.reduce(function(t,x){ return t + x; }, 0) / v.length;
+}
+function ottCarry(a, sess){
+  var C = a && a.ott; if(!C) return null;
+  var pid = sess && sess.areaId;
+  var base = ottBaseSpeed(pid, sess && sess.id);
+  var now = sess && sess.metrics && +sess.metrics.chsAvg;
+  var speed = (now > 0) ? now : base;
+  if(!speed) return C.dist;
+  return speed * (C.dist / ((base || speed) + C.speedUp));
+}
+
+/* A rotation ball was asked to do something different from the ball before it,
+   so it is priced on what it was asked to do rather than on the set it sits in.
+   The draw is kept with the session, which is the only reason this is possible:
+   what the app called is part of the result, not part of the screen. */
+function sgSetFor(set, call){
+  if(!set || !set.rot || !call) return set;
+  if(call.kind === "lag") return { sgKind:"putt", pd:40, lag:1 };
+  return { sgKind:call.sgKind, dist:call.dist, pd:call.pd, ottClub:call.ottClub };
+}
+function sgOfShot(set, z, v, ctx, i){
+  var S = (ctx && ctx.calls) ? sgSetFor(set, ctx.calls[i]) : set;
+  if(S && S.sgKind === "ott"){
+    var c = ctx && ctx.carry;
+    return c ? sgOttOfShot(c * (S.ottClub || 1), z) : null;
+  }
+  if(S && S.sgKind === "putt") return sgPuttOfShot(S, z);
+  if(S && S.sgKind) return sgFsOfShot(S.sgKind, S.dist, z, v);
   var B = sgBands(set); if(!B || z == null) return null;
   if(z === "h") return B.base;                       /* holed: no putt left at all */
   var i = SG_ZONE[z];
@@ -6686,12 +6798,40 @@ function sgOfShot(set, z, v){
    own terms, because sgOfShot reads the zone that was stored rather than the
    rings on the screen today. */
 function isSG(a){ return !!(a && a.sg); }
-function sgSetSum(s, list){
+/* Every place that prices a tee set needs the carry that session was hit at,
+   and there are five of them. One helper, so a set can never be priced one way
+   on the card and another way in the review. */
+/* The percentage she is chasing, kept beside the strokes rather than replaced
+   by them. Her target off the tee is driving accuracy 71 to 82%, and a target
+   you cannot count is not a target. The lag is left out: it is not a thing you
+   hole, so counting it as a miss would drag the number down for no reason. */
+function sgHitRate(a, sess){
+  if(!a || !a.hitLabel || !sess || !sess.shots) return null;
+  var inN = 0, n = 0;
+  (a.sets || []).forEach(function(s){
+    if(s.lag || !s.sgKind) return;
+    (sess.shots[s.id] || []).forEach(function(x){
+      if(!x || x.z == null) return;
+      n++; if(isIn(x.z)) inN++;
+    });
+  });
+  return n ? { pc: Math.round(inN/n*100), inN:inN, n:n } : null;
+}
+/* Every place that prices a set needs the same two things: the carry that
+   session was hit at, and, for a rotation, the draw it was hit against. */
+function sgCtx(a, sess, s){
+  if(!a || !s) return null;
+  var calls = s.rot && isSG(a) ? callsFor(a, s, null, sess) : null;
+  var c = a.ott ? ottCarry(a, sess) : null;
+  if(!calls && !c) return null;
+  return { carry:c, calls:calls };
+}
+function sgSetSum(s, list, ctx){
   if(!list) return null;
   var sum = 0, n = 0;
-  list.forEach(function(sh){
+  list.forEach(function(sh, i){
     if(!sh || sh.z == null) return;
-    var v = sgOfShot(s, sh.z, sh.v);
+    var v = sgOfShot(s, sh.z, sh.v, ctx, i);
     if(v == null) return;
     sum += v; n++;
   });
@@ -6701,7 +6841,7 @@ function sgSession(a, sess){
   if(!isSG(a) || !sess || !sess.shots) return null;
   var sg = 0, n = 0;
   (a.sets || []).forEach(function(s){
-    var r = sgSetSum(s, sess.shots[s.id]);
+    var r = sgSetSum(s, sess.shots[s.id], sgCtx(a, sess, s));
     if(r){ sg += r.sg; n += r.balls; }
   });
   return n ? {sg:sg, balls:n} : null;
@@ -7103,7 +7243,7 @@ function modeStats(a, sess){
   a.sets.forEach(function(s){
     var k = modeOf(a, s);
     if(sg){
-      var r = sgSetSum(s, (sess.shots||{})[s.id]);
+      var r = sgSetSum(s, (sess.shots||{})[s.id], sgCtx(a, sess, s));
       if(r){ out[k].v += r.sg; out[k].n += r.balls; out[k].m += r.balls; }
       return;
     }
@@ -7239,7 +7379,7 @@ function renderReview(host, a){
     /* On strokes a set is one line, because the strokes do not split into parts,
        and the number beside it is what those five balls were worth. */
     if(sg){
-      var r = sgSetSum(s, (d.shots||{})[s.id]);
+      var r = sgSetSum(s, (d.shots||{})[s.id], sgCtx(a, d, s));
       if(!r) return;
       rows += '<div class="rvrow'+(r.sg < 0 ? ' miss' : '')+'" data-go="'+(i+1)+'">'+
               '<span>'+s.label+'</span><b>'+fmtSG2(r.sg)+'</b></div>';
@@ -8277,7 +8417,10 @@ function rotPool(a){
     if(x.rot || x.guide === "ladder") return;
     if(x.parts && (x.guide === "windows" || x.guide === "heights")){ windowed = true; gk = x.guide; }
     else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist,
-                                         r1:x.r1, r2:x.r2, word:x.word});
+                                         r1:x.r1, r2:x.r2, word:x.word,
+                                         /* what the ball is worth depends on what it was asked
+                                            to do, so the draw has to carry that too */
+                                         sgKind:x.sgKind, ottClub:x.ottClub, pd:x.pd});
   });
   return {pool:pool, windowed:windowed, grid:gk};
 }
@@ -8305,7 +8448,8 @@ function makeClockRot(a, s){
     } else {
       var p = kinds[slot];
       calls.push({ kind:"t", st:1 + Math.floor(Math.random()*5), tc:p.tc,
-                   label:p.label, r2:p.r2, word:p.word });
+                   label:p.label, r2:p.r2, word:p.word,
+                   sgKind:p.sgKind, pd:p.pd });
     }
   }
   return shuffle(calls);
@@ -8318,7 +8462,8 @@ function makeRotCalls(a, s){
     var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
     calls.push({ kind:"t", grid:spec.grid, win:null, lat:areaShape(a) === "corridor",
                  label:p.label, tc:p.tc, bull:p.bull, dist:p.dist,
-                 r1:p.r1, r2:p.r2, word:p.word, two:!!a.twoTier });
+                 r1:p.r1, r2:p.r2, word:p.word, two:!!a.twoTier,
+                 sgKind:p.sgKind, ottClub:p.ottClub, pd:p.pd });
   }
   shuffle(calls);
   if(wantWin){
@@ -8641,7 +8786,7 @@ function shotRow(a, s, last, cfg){
     if(!cfg && isSG(a)){
       var nIn = 0, nLog = 0;
       shots.forEach(function(x){ if(x && x.z != null){ nLog++; if(isIn(x.z)) nIn++; } });
-      var r = sgSetSum(s, shots);
+      var r = sgSetSum(s, shots, sgCtx(a, state.draft, s));
       /* On a windows set the count she wants beside the strokes is the window,
          not the ring: the ring is already priced in the strokes figure, and two
          counts of the same balls beside each other read as a contradiction. */
@@ -8671,7 +8816,7 @@ function shotRow(a, s, last, cfg){
        against the old circle, which grew with the shot, would be re-priced years
        later as though it had been hit at today's fixed rings, and her history
        would quietly change under her. */
-    if(patch.z != null && fsKind(a)) sh.v = SG_FS_V;
+    if(patch.z != null && (fsKind(a) || isSG(a))) sh.v = SG_FS_V;
     shots[cur] = sh;
     phase = null;
     var fresh = patch.z != null && !wasDone;
@@ -10667,6 +10812,8 @@ function openPast(s){
        (sgA
          ? '<div><b>'+fmtSG(s.total)+'</b><span>strokes on the field</span></div>'+
            '<div><b>'+(s.balls || sgBallsLogged(s))+'</b><span>balls</span></div>'+
+           (function(){ var r = sgHitRate(pa, s);
+             return r ? '<div><b>'+r.pc+'%</b><span>'+pa.hitLabel+'</span></div>' : ''; })()+
            '<div><b>'+fmtSG2((s.total||0)/Math.max(1, s.balls || sgBallsLogged(s)))+'</b><span>a ball</span></div>'
          : '<div><b>'+(s.total||0)+'</b><span>'+(isGym ? "sets done" : "scored")+'</span></div>'+
            '<div><b>'+(s.max||0)+'</b><span>out of</span></div>'+
@@ -10708,7 +10855,7 @@ function openPast(s){
              strokes existed they say zero, which is worse than nothing. The set
              line carries what those balls were worth instead, and a set with no
              balls logged carries nothing at all. */
-          var sgr = sgSetSum(set, (s.shots||{})[set.id]);
+          var sgr = sgSetSum(set, (s.shots||{})[set.id], sgCtx(a, s, set));
           if(sgr) bits.push(fmtSG2(sgr.sg) + " over " + sgr.balls);
         } else {
           parts.forEach(function(pt){
@@ -11717,9 +11864,32 @@ window.addEventListener("lcl-who", function(){
   if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
   cloudPull();            // the gate answered after boot, so the code is only known now
 });
+/* The phone's own back button used to walk straight out of the app. Nothing
+   here ever told the browser where she was, so one press from the middle of a
+   session closed the whole thing and the only way back in was the home screen.
+   Every screen now leaves a mark, and back steps through those marks instead.
+   Views only, not the thirteen pages inside a session: a session has its own
+   Back beside its Next, and the thing back is wanted for is getting out. */
+var HIST_ON = false, histPopping = false;
+function pushView(view){
+  if(!HIST_ON || histPopping || !view) return;
+  try{
+    var cur = history.state && history.state.lcl;
+    if(cur === view) return;
+    history.pushState({lcl:view}, "");
+  }catch(e){}   /* a browser that refuses history is no reason to break the app */
+}
+window.addEventListener("popstate", function(e){
+  var v = (e.state && e.state.lcl) || "home";
+  histPopping = true;
+  try{ show(v); } finally { histPopping = false; }
+});
+
 renderPlayer();
 render();
 show("home");
+try{ history.replaceState({lcl:"home"}, ""); }catch(e){}
+HIST_ON = true;
 wireInstallTip();
 connect();
 cloudPull();
