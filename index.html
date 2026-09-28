@@ -6207,10 +6207,16 @@ function renderResume(){
 function resumeDraft(d){
   if(!d || !d.id) d = liveSessions()[0];
   if(!d) return;
+  /* Read where she was BEFORE opening it. Opening builds the deck at card one
+     and saves on the way through, and saving writes the current card back over
+     d.pos, so by the time this line used to run the answer was always nought
+     and she was always put back at the start. Twenty balls in, on a thirteen
+     card deck, that is a lot of swiping to get back to where she stopped. */
+  var wasAt = d.pos || 0;
   if(typeof d.cardMode === "boolean") state.cardMode = d.cardMode;
   if(d.kind === "gym") openGym(d.gymId, d);
   else openSession(d.areaId, d);
-  if(d.pos && state.deck) deckShow(d.pos);
+  if(wasAt && state.deck) deckShow(wasAt);
 }
 
 /* ---------- practice session ---------- */
