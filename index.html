@@ -6043,6 +6043,39 @@ function deckInit(cards, progId){
   state.deck = { cards:cards, idx:0, progId:progId };
   deckShow(0);
 }
+/* How much of the session is actually done: balls logged against balls asked
+   for, which is what 0 to 100 per cent means to somebody standing on a range
+   deciding whether she has time to finish. The card position is still there
+   underneath it, because it is how she navigates. */
+function deckDone(){
+  var d = state.draft || state.gymDraft;
+  var deck = state.deck;
+  var cards = deck ? deck.cards.length : 0, at = deck ? deck.idx + 1 : 0;
+  if(!d || d.kind === "gym"){
+    /* a gym session counts exercises, not balls */
+    return { pc: cards ? Math.round(at/cards*100) : 0,
+             words: at + " of " + cards, done:at, total:cards };
+  }
+  var a = area(d.areaId);
+  var total = a ? sgAreaBalls(a) : 0;
+  var done = sgBallsLogged(d);
+  if(!total) return { pc: cards ? Math.round(at/cards*100) : 0,
+                      words: at + " of " + cards, done:at, total:cards };
+  var pc = Math.max(0, Math.min(100, Math.round(done/total*100)));
+  return { pc: pc, done:done, total:total,
+           words: done + " of " + total + " balls \u00b7 " + pc + "%" };
+}
+/* Repainted on every ball as well as on every card, because a bar that only
+   moves when she turns a page tells her where she is standing rather than how
+   much she has done. */
+function paintProg(){
+  var d = state.deck; if(!d) return;
+  var host = $(d.progId); if(!host) return;
+  var P = deckDone();
+  host.innerHTML =
+    '<span class="progbar"><span class="progfill" style="width:'+P.pc+'%"></span></span>'+
+    '<span class="progtxt">'+P.words+'</span>';
+}
 function deckShow(i){
   var d = state.deck; if(!d) return;
   d.idx = Math.max(0, Math.min(d.cards.length-1, i));
@@ -6051,9 +6084,11 @@ function deckShow(i){
   var c = d.cards[d.idx];
   if(c._refresh) c._refresh();
   var host = $(d.progId);
-  if(host) host.innerHTML =
-    '<span class="progbar"><span class="progfill" style="width:'+((d.idx+1)/d.cards.length*100)+'%"></span></span>'+
-    '<span class="progtxt">'+(d.idx+1)+' of '+d.cards.length+'</span>';
+  /* The bar used to fill with the card she was looking at, so walking to the
+     back of the deck without hitting anything read as nearly finished. It fills
+     with balls logged now, which is the thing that is actually complete, and it
+     is the number the resume bar will have to agree with. */
+  paintProg();
   updateNav();
   window.scrollTo(0,0);
   /* A card is a page as far as the phone's back button is concerned. Without
@@ -6191,8 +6226,15 @@ function draftProgress(d){
     return ((d.mx && d.mx.hits ? d.mx.hits.length : 0)) + " of " + cdShots(ma) + " shots";
   }
   var da = area(d.areaId);
-  if(isSG(da)) return fmtSG(d.total) + " strokes over " + (d.balls || 0) + " balls";
-  return (d.total||0) + " of " + (d.max||0) + " points scored";
+  /* How much is left, not only how much is done: she is deciding whether she
+     has time to finish it, and "4 balls in" does not answer that. */
+  var want = da ? sgAreaBalls(da) : 0;
+  var got = sgBallsLogged(d);
+  var left = want ? Math.max(0, want - got) : 0;
+  var rest = left ? ", " + left + " to go" : "";
+  if(isSG(da)) return fmtSG(d.total) + " strokes over " + got + " of " + (want || got) +
+                      " balls" + rest;
+  return (d.total||0) + " of " + (d.max||0) + " points scored" + rest;
 }
 function renderResume(){
   var bar = $("resumeBar"); if(!bar) return;
@@ -9142,9 +9184,15 @@ function shotRow(a, s, last, cfg){
     var wantSide = c.kind === "w" && (st === "t" || sh.z != null);
     // only redraw the frame when the picture itself changes; repeated taps on the
     // same diagram just move markers, which keeps focus and avoids churn
+    /* The called yardage belongs in this key. Without it, a rotation that moved
+       from 165 to 125 changed every word on the card and none of the picture:
+       the ring labels still counted 152 to 178 off a 165 yard centre, and the
+       dashed LPGA ring was still drawn at the proximity for 165. She was asked
+       for one shot and shown the target for another. */
     var key = st + "|" + (c.tc||"") + "|" + (wantSide ? 1 : 0) + "|" + (c.grid||"") +
               "|" + (c.st||"") + "|" + (c.t||"") + "|" + (c.from||"") + "|" + (slopeNow()||"") +
-              "|" + (c.bull||"");
+              "|" + (c.bull||"") + "|" + (c.dist==null ? "" : c.dist) +
+              "|" + (c.pd==null ? "" : c.pd) + "|" + (c.ottClub==null ? "" : c.ottClub);
     if(key !== diag.__key){
       var low = slopeNow();
       var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist}, true);
@@ -9671,6 +9719,7 @@ function renderCond(hostId, draft, kind){
 
 function updateTotal(){
   var d = state.draft; if(!d) return;
+  paintProg();   /* every ball moves the bar, not only every card */
   var a = area(d.areaId); if(!a || !a.sets) return;
   if(isMatrix(a)){
     mxSeed(a, d);
