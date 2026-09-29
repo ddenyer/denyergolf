@@ -1613,6 +1613,26 @@
   /* the chip that opens it, alongside the existing diagram chip */
   .vid.aimc{color:var(--accent)}
 
+/* ---- quick drills ---- */
+.wherebar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 18px}
+.wherelab{font-size:12px; font-weight:700; color:var(--muted)}
+.wherechips{display:flex; gap:6px; flex-wrap:wrap}
+.wchip{border:0; border-radius:999px; padding:7px 13px; font-size:12.5px; font-weight:600;
+  background:var(--surface-2); color:var(--ink); box-shadow:0 0 0 1px var(--line);
+  font-family:inherit; cursor:pointer}
+.wchip[aria-pressed="true"]{background:var(--surface); color:var(--accent);
+  box-shadow:0 0 0 1.6px var(--accent)}
+.zonehd{display:flex; align-items:center; gap:9px; margin:22px 0 2px}
+.zonehd b{font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted)}
+.zonehd i{flex:1 1 auto; height:1px; background:var(--line); font-style:normal}
+.zonehd.now b{color:var(--accent)}
+.drillcard.away{opacity:.62}
+.drillcard.off{opacity:.42}
+.dtag{display:inline-block; margin-left:6px; font-size:9px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+  border:1px solid var(--line-strong); border-radius:4px; padding:0 4px; vertical-align:1.5px}
+
   /* ---- access gate ----
      The first screen anyone sees, so it is built out of the same parts as the
      rest: the crest, the name, a hairline card on white, and one coral action,
@@ -1747,6 +1767,7 @@
   <button id="tabPractice" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
   <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Tests</span></button>
+  <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Quick Drills</span></button>
 </nav>
 
 
@@ -1818,6 +1839,18 @@
     <h1>Tests</h1>
     <p class="lede">Fixed tests, run every so often, under the same conditions every time. That is what makes them comparable. A test never changes once it has results against it.</p>
     <div id="testList"></div>
+  </section>
+
+  <!-- QUICK DRILLS -->
+  <!-- Grouped by place, because place is the constraint that actually decides
+       what she can do today. Whichever zone she is in comes first; the rest
+       stays on the page, dimmed but readable, because some evenings the
+       question is where to go rather than what to do. -->
+  <section id="viewDrills" hidden>
+    <h1>Quick Drills</h1>
+    <p class="lede">Short sessions that supplement the main practice. Do these when time is short, or for a top up.</p>
+    <div id="drillWhere"></div>
+    <div id="drillList"></div>
   </section>
 
   <section id="viewSC" hidden>
@@ -2180,7 +2213,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-27", note:"the app split two ways, Practice, S&C and Tests under the thumb and Goals, Sessions and Progress across the top, and back now steps a card at a time inside a session instead of throwing it away" };
+var BUILD = { on:"2026-09-29", note:"Quick Drills: fourteen short sessions grouped by where you are, two of them on the mat and two in the garden, and Holing out is a green session again so the deck can no longer offer a forty foot ladder indoors" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -2832,8 +2865,7 @@ var COND = {
     {id:"rain", label:"Rain", opts:[["dry","Dry"],["showers","Showers"],["wet","Wet"]], hide:{venue:["indoor"]}}
   ],
   putt:[
-    {id:"venue", label:"Where", opts:[["green","Practice green"],["indoor","Indoor mat"]]},
-    {id:"speed", label:"Green speed", opts:[["fast","Fast"],["med","Medium"],["slow","Slow"]], hide:{venue:["indoor"]}}
+    {id:"speed", label:"Green speed", opts:[["fast","Fast"],["med","Medium"],["slow","Slow"]]}
   ]
 };
 /* Venue is recorded on every session, and it stays a record rather than a split.
@@ -2860,6 +2892,8 @@ function area(id){
   for(var j=0;j<PRACTICE.length;j++){ if(PRACTICE[j].id===id) return PRACTICE[j]; }
   var cp = customLib("practice");
   for(var k=0;k<cp.length;k++){ if(cp[k].id===id) return cp[k]; }
+  var d = (typeof DRILLS !== "undefined") ? drillById(id) : null;
+  if(d) return d;               // and so is a drill
   return testById(id);          // a test is an area as far as the session machinery cares
 }
 /* ============ tasks and the practice library ============
@@ -2923,7 +2957,7 @@ function allTests(){ return TESTS.concat(customLib("tests")); }
 function typeOf(id){
   var a = area(id);
   if(!a) return id;
-  if(a.isTest) return a.area;
+  if(a.isTest || a.isDrill) return a.area;
   return a.type != null ? a.type : a.id;
 }
 /* Which practice session this player does for that task. Nothing assigned means the
@@ -3154,6 +3188,237 @@ function testById(id){
   return null;
 }
 function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId; }); }
+
+/* ============ quick drills ============
+   A drill is a short session that supplements the main practice: fifteen to
+   thirty minutes, its own place, its own history. It is its own kind, like a
+   test, which is the point of it. It never stands in for a full session and it
+   never counts towards one, because a quarter of a session's balls cannot say
+   where she stands and pretending otherwise would spoil the only number that
+   can.
+
+   Five places in two zones. The zone is the scarcity tier. Tee shots, short
+   game and lag exist nowhere but the club, so a dry day there is spent on
+   those; everything else has somewhere else to go. That rule is the whole
+   reason the page is grouped the way it is.
+
+   The ten club drills are slices of the five areas: the same sets, the same
+   rings, the same scoring, fewer of them. They are cloned at load rather than
+   copied out, so a set has exactly one definition and a change to an area's
+   distance or ring reaches its drills with it.
+
+   The four home drills are not slices of anything, and they are scored in
+   their own counts rather than in strokes. A mat is flat, fast and straight, so
+   a make rate on one is flattered against a field measured on grass. What a mat
+   does measure honestly is error: the gate measures face angle, the trainer
+   measures delivered speed, and neither is made easier by the surface being
+   quick. Those two carry real numbers. The green sessions compare her two
+   diagonals against each other, which cancels the surface entirely. */
+
+var DRILL_PLACES = [
+  {id:0, nm:"Range or sim",    zone:0},
+  {id:1, nm:"Short game area", zone:0},
+  {id:2, nm:"Practice green",  zone:0},
+  {id:3, nm:"Garden green",    zone:1},
+  {id:4, nm:"The mat",         zone:1}
+];
+var DRILL_ZONES = ["At the club", "At home"];
+
+/* A slice of an area: clone the sets named in `use`, capping each at the
+   drill's own ball count. Cloning matters. A copied set literal is a second
+   definition that drifts from the first the moment either is edited. */
+function drillSets(spec){
+  var a = spec.from != null ? area(spec.from) : null;
+  if(!a) return spec.sets || [];
+  var caps = spec.caps || {};
+  return (spec.use || []).map(function(sid){
+    var s = (a.sets || []).filter(function(x){ return x.id === sid; })[0];
+    if(!s) return null;
+    var c = {}, k;
+    for(k in s) if(Object.prototype.hasOwnProperty.call(s, k)) c[k] = s[k];
+    /* group and blk are the parent area's headings. A drill is one heading. */
+    delete c.group; delete c.blk; delete c.gone;
+    if(caps[sid] != null){
+      c.max = caps[sid];
+      if(c.balls != null) c.balls = caps[sid];
+    }
+    if(c.parts) c.parts = c.parts.map(function(p){
+      var q = {}, j;
+      for(j in p) if(Object.prototype.hasOwnProperty.call(p, j)) q[j] = p[j];
+      if(caps[sid] != null) q.max = caps[sid];
+      return q;
+    });
+    return c;
+  }).filter(Boolean);
+}
+
+var DRILLS = [
+/* ---- range or sim ---- */
+{ id:"d-tee-driver", area:10, place:0, needs:"height", mins:20,
+  name:"The driver", sub:"Fifteen to the corridor, speed across all fifteen",
+  why:"The shortest way to keep a driver alive over a winter. Fifteen balls at full speed with the corridor still counting, which is the only pairing that matters: speed you cannot keep in play is not speed.",
+  where:"Range, outdoors", shape:"corridor", sg:true, hitLabel:"in the fairway",
+  /* The speed history lives on the area, not on the drill, or every drill
+     would start again from nothing and price her carries off one session. */
+  ott:{ total:272, speedUp:5, from:10 },
+  ruleText:"Inside the 26-yard corridor scores. Straight but short still counts, because the corridor measures line. Strokes gained is priced off the speed logged with it.",
+  from:10, use:["a"] },
+
+{ id:"d-tee-woods", area:10, place:0, needs:"height", mins:20,
+  name:"The woods", sub:"3-wood and 5-wood, ten each",
+  why:"The two clubs that get skipped. They are what turns an awkward tee shot into a playable one, and neither survives a winter of nothing but driver.",
+  where:"Range, outdoors", shape:"corridor", sg:true, hitLabel:"in the fairway",
+  ott:{ total:272, speedUp:5, from:10 },
+  ruleText:"Inside the corridor for that club scores: 23 yards with the 3-wood, 22 with the 5-wood.",
+  from:10, use:["c","e"] },
+
+{ id:"d-app-windows", area:11, place:0, mins:25,
+  name:"Windows", sub:"Start it through your window, finish at the flag",
+  why:"Flight control on demand, which is the difference between a shape she owns and one that turns up. The window makes her start it where she meant to; the circle makes it come back.",
+  where:"Range or sim", sg:true, sgKind:"app", quads:true,
+  ruleText:"A point for the window she called and a point for finishing inside the circle. Both on the same ball, or it counts once.",
+  from:11, use:["b","d","f","h"] },
+
+{ id:"d-wedge-ladder", area:2, place:0, mins:20,
+  name:"The wedge ladder", sub:"30, 50, 70 and 90 yards",
+  why:"Four numbers, five balls each, no warm-up shots in between. The ladder is the fastest way to find which of the four has drifted.",
+  where:"Range or sim", sg:true, sgKind:"pitch", quads:true,
+  ruleText:"Inside the circle scores, and the circle is the LPGA rate from that number.",
+  from:2, use:["a","c","e","f"] },
+
+/* ---- short game area ---- */
+{ id:"d-short-bunkers", area:3, place:1, mins:25,
+  name:"Bunkers", sub:"Good lie at 10, 20 and 30, downhill and plugged",
+  why:"Sand is the shot that decays fastest when it is not practised, and the only place to practise it is here. Three good lies to set the technique, then the two that actually cost shots.",
+  where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
+  ruleText:"Inside two clubs scores, inside one club scores as the bullseye, and strokes gained prices the lie as well as the distance.",
+  from:3, use:["d1","d2","d3","e1","e2"] },
+
+{ id:"d-short-awkward", area:3, place:1, mins:30,
+  name:"Awkward lies", sub:"Downhill, rough, collar, short-sided, bare, upslope",
+  why:"Six lies she does not get to choose, which is the only realistic version of short game practice. Nobody on a course gets a good lie on demand.",
+  where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
+  ruleText:"Inside two clubs scores, inside one club scores as the bullseye. The lie is priced in, so a good result off a bare lie is worth more than the same result off grass.",
+  from:3, use:["c1","c2","f1","f2","f4","f3"] },
+
+{ id:"d-short-updown", area:3, place:1, mins:20,
+  name:"Up and down", sub:"The release sets, 50 and 54 degrees",
+  why:"The bread and butter shot, from the distances it actually comes from. Less dramatic than the awkward lies and more of what a round is made of.",
+  where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
+  ruleText:"Inside two clubs scores, inside one club scores as the bullseye.",
+  from:3, use:["a1","b1","b2","b3"] },
+
+/* ---- practice green ---- */
+{ id:"d-putt-six", area:4, place:2, mins:25,
+  name:"Inside six feet", sub:"Four and six feet, around the clock",
+  why:"The two lengths that decide a card. Thirty five putts is enough to mean something and short enough to do after a round.",
+  where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
+  ruleText:"A holed putt scores and nothing else does. A tour player holes 90% from four feet and 68% from six.",
+  from:4, use:["a","b"] },
+
+{ id:"d-putt-nine", area:4, place:2, mins:20,
+  name:"Nine and twelve", sub:"The two lengths that decide a card",
+  why:"Longer than a tap in, short enough that a tour player expects to hole a fair share. The band where a good putter separates from an average one.",
+  where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
+  ruleText:"A holed putt scores. A tour player holes 46% from nine feet and 32% from twelve.",
+  from:4, use:["c","e"] },
+
+{ id:"d-putt-lag", area:4, place:2, mins:20,
+  name:"The lag", sub:"The ladder, six rounds",
+  why:"Lag is the one putting skill that cannot be trained anywhere but here. A mat stops at nine feet and the garden green at twelve, so a winter without this is a winter of three-putts waiting to happen.",
+  where:"Practice green", shape:"clock", sg:true,
+  ruleText:"A point when the ball finishes between the targets in front and behind, about three feet. Strokes gained prices the leave rather than the make.",
+  from:4, use:["d"] },
+
+/* ---- garden green ----
+   Twelve feet corner to corner and the slope runs on the diagonals, so there
+   is no straight putt on it. That is a virtue: a putt with slope and break
+   together is what a course actually asks for, and a straight one barely
+   exists out there. Both diagonals are played both ways, which halves the
+   walking, and the number worth reading is the gap between the four. */
+{ id:"d-gdn-corners", area:4, place:3, needs:"dry", mins:15,
+  name:"Four corners", sub:"Both diagonals, uphill and down, each way",
+  why:"Four reads inside twelve feet, and almost nobody is equally good at all four. Which of them leaks strokes is the thing no mat can ever tell her, and five balls a session is enough to see it build over a winter.",
+  where:"Garden green", shape:"clock", home:true,
+  ruleText:"A holed putt scores. Five balls in each direction is too few to read a rate from one session: what it is for is the pattern across the four, gathered over a winter.",
+  sets:[
+    {id:"a", pd:12, label:"Downhill, left to right", tc:"Holed", word:"the downhill left to right", max:5,
+     tgt:"Five balls. The fast one that breaks away from you"},
+    {id:"b", pd:12, label:"Uphill, right to left", tc:"Holed", word:"the uphill right to left", max:5,
+     tgt:"Five balls. Same line, played back up it"},
+    {id:"c", pd:12, label:"Downhill, right to left", tc:"Holed", word:"the downhill right to left", max:5,
+     tgt:"Five balls. The other diagonal, running away"},
+    {id:"d", pd:12, label:"Uphill, left to right", tc:"Holed", word:"the uphill left to right", max:5,
+     tgt:"Five balls. Same line, played back up it"}
+  ] },
+
+{ id:"d-gdn-circle", area:4, place:3, needs:"dry", mins:15, shape:"gauntlet",
+  name:"The circle", sub:"Eight reads round the middle hole, miss and restart",
+  why:"A circle drill on a green with no fall line, so there is no symmetry in it and every station is genuinely different. Harder than the same lap on a mat, and the closest thing at home to holing out with something at stake.",
+  where:"Garden green", home:true, limit:15*60, balls:0, target:10,
+  ruleText:"Go round the eight in order. One miss and the lap starts again. What is recorded is the best lap, the number of attempts and the time.",
+  stations:[
+    {id:"s1", name:"Station 1", detail:"Straightest of the eight. Hole it."},
+    {id:"s2", name:"Station 2", detail:"A quarter turn on. Read it fresh."},
+    {id:"s3", name:"Station 3", detail:"Across the slope."},
+    {id:"s4", name:"Station 4", detail:"The downhill side is starting."},
+    {id:"s5", name:"Station 5", detail:"Straight down the fall of it."},
+    {id:"s6", name:"Station 6", detail:"Downhill and breaking."},
+    {id:"s7", name:"Station 7", detail:"Back across the slope the other way."},
+    {id:"s8", name:"Station 8", detail:"Uphill to finish. Do not leave it short."}
+  ],
+  sets:[] },
+
+/* ---- the mat ----
+   The two that measure error rather than success, which is why they survive
+   being done indoors. A fast flat mat does not make her face squarer and it
+   does not make her pace more repeatable. */
+{ id:"d-mat-startline", area:4, place:4, mins:15,
+  name:"Start line", sub:"Six feet through the gate, then without it",
+  why:"Face angle is about 92% of where a putt starts, and a gate is the only way to see it without a launch monitor. Two coins 19 inches in front of the ball, 55 mm apart, is 0.73 degrees of tolerance. A dead-weight putt from eight feet allows 0.77, so every ball through that gate was on a line good enough to hole from eight feet.",
+  where:"The mat", home:true,
+  ruleText:"Through the gate scores, clean, without touching either coin. The last ten are the same putt with the gate taken away, scored on whether they went in.",
+  sets:[
+    {id:"a", label:"Six feet · through the gate", tc:"Through the gate", word:"the gate", max:20,
+     tgt:"Twenty balls. Gate 19 inches out, 55 mm wide. Clean through or nothing"},
+    {id:"b", label:"Six feet · gate away", tc:"Holed", word:"6 feet", max:10,
+     tgt:"Ten balls, same putt, no gate. Did anything hold?"}
+  ] },
+
+{ id:"d-mat-pace", area:4, place:4, mins:12,
+  name:"Pace", sub:"The micro target, and the length of the return",
+  why:"The trainer's micro target only holds a ball delivered at eighteen inches past the hole, and Pelz's research put the optimum at seventeen. It is the right pace made into a gate. The ramp also returns the ball the distance it would have run past, so every putt gives a measured speed error, which is the rarest feedback there is at home.",
+  where:"The mat", home:true,
+  ruleText:"Stuck in the micro target is the bullseye. A ball returning less than a foot counts, anything further does not. The floor has to be level or the return means nothing.",
+  sets:[
+    {id:"a", label:"Twenty at the micro target", tc:"Back inside a foot", bull:"Stuck in the target",
+     word:"the micro target", max:20,
+     tgt:"Twenty balls. Tap the bullseye if it stuck, the ring if it came back inside a foot"}
+  ] }
+];
+
+/* Slices are resolved once, at load. After this a drill is an ordinary area
+   with sets, and every render path that already walks sets walks these too. */
+DRILLS.forEach(function(d){
+  if(d.from != null) d.sets = drillSets(d);
+  d.isDrill = true;
+  d.track = true;
+  if(!d.sgKind) return;
+  (d.sets || []).forEach(function(s){ if(s.dist != null && !s.sgKind) s.sgKind = d.sgKind; });
+});
+
+function allDrills(){ return DRILLS; }
+function drillById(id){
+  for(var i=0;i<DRILLS.length;i++){ if(DRILLS[i].id === id) return DRILLS[i]; }
+  return null;
+}
+function isDrill(a){ return !!(a && a.isDrill); }
+function drillSessions(drillId, playerId){
+  return state.sessions.filter(function(x){
+    return x.kind === "drill" && x.drillId === drillId &&
+           x.playerId === (playerId || state.activePlayer);
+  }).sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
+}
 
 /* ============ the two matrices ============
    Every other test counts points out of n balls, so one set of machinery
@@ -4076,7 +4341,8 @@ function saveLocal(){
   try{
     var blob = JSON.stringify({
       players:state.players, activePlayer:state.activePlayer, cardMode:state.cardMode,
-      lib:state.lib, gone:state.gone, savedAt:Date.now(), sessions:live
+      lib:state.lib, gone:state.gone, drillPlace:state.drillPlace,
+      savedAt:Date.now(), sessions:live
     });
     localStorage.setItem(LS, blob);
     STORE.lastWrote = blob;
@@ -4142,6 +4408,7 @@ function loadLocal(){
     if(o && Array.isArray(o.sessions)) state.sessions = o.sessions;
     else if(o && o.sessions) throw new Error("the stored history is not a list");
     if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
+    if(o && o.drillPlace != null) state.drillPlace = +o.drillPlace;
     if(o && o.lib) state.lib = { practice:(o.lib.practice||[]), tests:(o.lib.tests||[]) };
     if(o && o.gone) state.gone = tombPrune(o.gone);
     if(o && o.savedAt) STORE.at = o.savedAt;
@@ -5025,6 +5292,7 @@ function show(view){
   $("viewBench").hidden = view!=="bench";
   $("viewSC").hidden = view!=="sc";
   $("viewTests").hidden = view!=="tests";
+  $("viewDrills").hidden = view!=="drills";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
   $("viewSessions").hidden = view!=="sessions";
@@ -5035,6 +5303,7 @@ function show(view){
     $("buildStamp").textContent = "Version " + BUILD.on + " \u00b7 " + BUILD.note + ".";
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
   $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
+  $("tabDrills").setAttribute("aria-selected", view==="drills"?"true":"false");
   $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
   $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
@@ -5053,7 +5322,7 @@ function show(view){
   if(barEl) barEl.hidden = (view==="session" || view==="gym");
   /* Exactly one of the two rows holds the screen she is on, and the other steps
      back to half strength so a glance says which way she moved last. */
-  var inDo = ["tabPractice","tabSC","tabTests"].some(function(id){
+  var inDo = ["tabPractice","tabSC","tabTests","tabDrills"].some(function(id){
     return $(id) && $(id).getAttribute("aria-selected") === "true"; });
   if(barEl) barEl.classList.toggle("dim", !inDo);
   if(lookEl) lookEl.classList.toggle("dim", inDo);
@@ -5459,6 +5728,136 @@ function renderTests(){
   host.appendChild(note);
   $("addTest").addEventListener("click", function(){ importLib("tests"); });
   $("addPractice").addEventListener("click", function(){ importLib("practice"); });
+}
+
+
+/* ---------- quick drills ---------- */
+/* Where she is decides what is worth doing, so the page asks once and then
+   orders itself round the answer. The zone she is in comes first; the other
+   stays on the page at half strength, because "should I go to the club" is a
+   question this page can answer too. Nothing is ranked inside a place: an
+   order implies one of them is due, and none of them ever is. */
+function drillPlace(d){
+  return DRILL_PLACES[(d && d.place) || 0] || DRILL_PLACES[0];
+}
+function drillWhere(){
+  var v = state.drillPlace;
+  return (v != null && DRILL_PLACES[v]) ? v : 4;   /* the mat: the one that is always there */
+}
+/* Her best on it. A club drill is priced in strokes against the same field the
+   area is; a home drill is a count, because a mat is fast and flat and a make
+   rate on one is flattered against a field measured on grass. */
+function drillBest(d){
+  var runs = drillSessions(d.id), best = null, i, x, v;
+  for(i=0;i<runs.length;i++){
+    x = runs[i];
+    if(!x || x.total == null || x.sgUnknown) continue;
+    v = x.total;
+    if(best === null || v > best.v) best = {v:v, s:x};
+  }
+  if(best === null) return null;
+  if(isMatrix(d)) return { big:String(best.v), small:"best lap" };
+  if(isSG(d)) return { big:fmtSG(best.v), small:"strokes, your best" };
+  return { big:best.v + " of " + (best.s.max || areaMax(d)), small:"your best" };
+}
+function drillBalls(d){
+  if(isMatrix(d)) return (d.stations || []).length + " stations";
+  var n = 0;
+  liveSets(d).forEach(function(s){ n += ballsIn(s) || 0; });
+  return n + " ball" + (n === 1 ? "" : "s");
+}
+function renderDrills(){
+  var host = $("drillList"); if(!host) return;
+  var here = drillWhere(), zoneHere = DRILL_PLACES[here].zone;
+
+  var picker = $("drillWhere");
+  if(picker){
+    picker.className = "wherebar";
+    picker.innerHTML = '<span class="wherelab">Where are you?</span>' +
+      '<span class="wherechips">' + DRILL_PLACES.map(function(pl, i){
+        return '<button type="button" class="wchip" data-pl="' + i + '" aria-pressed="' +
+          (i === here) + '">' + pl.nm + '</button>';
+      }).join("") + '</span>';
+    picker.onclick = function(e){
+      var b = e.target.closest ? e.target.closest("[data-pl]") : null;
+      if(!b) return;
+      state.drillPlace = +b.dataset.pl;
+      saveLocal();
+      renderDrills();
+    };
+  }
+
+  host.innerHTML = "";
+  var order = zoneHere === 1 ? [1, 0] : [0, 1];
+  order.forEach(function(z, zi){
+    var live = zi === 0;
+    var zh = document.createElement("div");
+    zh.className = "zonehd" + (live ? " now" : "");
+    zh.innerHTML = '<b>' + DRILL_ZONES[z] + '</b><i></i>';
+    host.appendChild(zh);
+
+    DRILL_PLACES.forEach(function(pl, pi){
+      if(pl.zone !== z) return;
+      var mine = allDrills().filter(function(x){ return x.place === pi; });
+      if(!mine.length) return;
+      var hd = document.createElement("div");
+      hd.className = "grouphd";
+      hd.innerHTML = '<b>' + pl.nm + '</b><span>' +
+        (pi === here ? "where you are" : live ? "a walk away" : "not today") + '</span>';
+      host.appendChild(hd);
+
+      mine.forEach(function(d){
+        var sk = TILE[d.area] || TILE[10];
+        var best = drillBest(d), runs = drillSessions(d.id);
+        var off = pl.zone !== zoneHere;
+        var card = document.createElement("div");
+        card.className = "testcard drillcard" +
+          (off ? " off" : pi === here ? "" : " away");
+        var did = "ddet-" + d.id;
+        card.innerHTML =
+          '<button type="button" class="trow" aria-expanded="false" aria-controls="' + did + '" ' +
+            'style="--tint:' + sk.tint + '">' +
+            '<span class="puck">' + TICON[sk.ic](21) + '</span>' +
+            '<span class="tx"><span class="nm">' + d.name +
+              (d.needs === "height" ? '<span class="dtag">outdoors</span>' : '') +
+              (d.needs === "dry" ? '<span class="dtag">dry</span>' : '') + '</span>' +
+              '<span class="sub">' + drillBalls(d) + ' · about ' + (d.mins || 20) + ' min</span></span>' +
+            '<span class="rt">' + (best ? '<b>' + best.big + '</b><span>' + best.small + '</span>'
+                                        : '<span>not tried yet</span>') + '</span>' +
+            '<span class="chev">' +
+              '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+              'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg></span>' +
+          '</button>' +
+          '<div class="tdet" id="' + did + '" hidden>' +
+            '<p class="note">' + d.sub + '.</p>' +
+            '<p class="note">' + d.why + '</p>' +
+            '<p class="note"><b>Scoring.</b> ' + d.ruleText + '</p>' +
+            '<p class="tstat">' + (runs.length
+                ? runs.length + (runs.length === 1 ? " run" : " runs") + ' logged'
+                : 'Nothing logged yet') + '</p>' +
+            '<div class="tacts"><button type="button" class="pri" data-run="' + d.id + '">Start</button>' +
+              '<span class="twhere">' + drillBalls(d) + ' · ' + d.where + '</span></div>' +
+          '</div>';
+        var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
+        row.addEventListener("click", function(){
+          var open = row.getAttribute("aria-expanded") === "true";
+          row.setAttribute("aria-expanded", open ? "false" : "true");
+          det.hidden = open;
+        });
+        card.querySelector("[data-run]").addEventListener("click", function(){ openDrill(d.id); });
+        host.appendChild(card);
+      });
+    });
+  });
+
+  var note = document.createElement("p");
+  note.className = "note";
+  note.textContent = "A drill is its own thing. It shows up in your history and it keeps its own " +
+    "best, but it never stands in for a full session and it is never placed against a tour field. " +
+    "The two on the mat and the two in the garden are scored in their own counts, because a mat is " +
+    "flat and fast and a make rate on one flatters you.";
+  host.appendChild(note);
 }
 
 /* ---------- goals ---------- */
@@ -6003,7 +6402,7 @@ function renderBalance(){
   var recent = mine().filter(function(s){ return s.date >= cutStr; });
   var counts = {1:0,2:0,3:0,4:0,6:0,7:0,8:0,9:0,10:0,11:0};
   recent.forEach(function(s){
-    if(s.kind==="round") return;
+    if(s.kind==="round" || s.kind==="drill") return;
     if(isSpeed(s)) counts[7]++;
     else if(isPrep(s)) counts[9]++;
     else if(isBand(s)) counts[8]++;
@@ -6257,6 +6656,7 @@ function resumeDraft(d){
   var wasAt = d.pos || 0;
   if(typeof d.cardMode === "boolean") state.cardMode = d.cardMode;
   if(d.kind === "gym") openGym(d.gymId, d);
+  else if(d.kind === "drill") openDrill(d.drillId || d.areaId, d);
   else openSession(d.areaId, d);
   if(wasAt && state.deck) deckShow(wasAt);
 }
@@ -6281,6 +6681,22 @@ function openTest(testId, resume){
     state.draft.kind = "test";
     state.draft.testId = testId;
     $("sessArea").textContent = "Test \u00b7 " + (area(t.area) ? area(t.area).name : "");
+    saveDraft();
+  }
+  return ok;
+}
+function openDrill(drillId, resume){
+  var d = drillById(drillId); if(!d) return false;
+  /* An unfinished run of THIS drill is picked up rather than started beside
+     itself, for the same reason a test is: openSession's own resume lookup
+     only matches kind "practice". */
+  if(!resume) resume = liveSessions().filter(function(x){
+    return x.kind === "drill" && x.drillId === drillId; })[0] || null;
+  var ok = openSession(drillId, resume);
+  if(ok && state.draft){
+    state.draft.kind = "drill";
+    state.draft.drillId = drillId;
+    $("sessArea").textContent = "Quick drill \u00b7 " + drillPlace(d).nm;
     saveDraft();
   }
   return ok;
@@ -6338,7 +6754,9 @@ function openSession(areaId, resume){
   }
   watchDraft();
   paintTick();
-  $("sessArea").textContent = a.isTest ? "Test" : (a.retired ? "Earlier format" : "Area "+areaNo(a));
+  $("sessArea").textContent = a.isDrill ? "Quick drill"
+                            : a.isTest ? "Test"
+                            : (a.retired ? "Earlier format" : "Area "+areaNo(a));
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
   renderSession();
@@ -7216,7 +7634,7 @@ function ottCarry(a, sess){
   var C = a && a.ott; if(!C) return null;
   var total = C.total != null ? C.total : C.dist;   /* dist: what it was called */
   if(total == null) return null;
-  var pid = sess && sess.areaId;
+  var pid = (C.from != null) ? C.from : (sess && sess.areaId);
   var base = ottBaseSpeed(pid, sess && sess.id);
   var now = sess && sess.metrics && +sess.metrics.chsAvg;
   var speed = (now > 0) ? now : base;
@@ -12080,6 +12498,7 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
 $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
 $("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("tabTests").addEventListener("click", function(){ renderTests(); show("tests"); });
+$("tabDrills").addEventListener("click", function(){ renderDrills(); show("drills"); });
 $("dueGo").addEventListener("click", function(){ var id = state.dueTest; closeDue(); if(id) openTest(id); });
 $("dueLater").addEventListener("click", function(){
   var id = state.dueArea; closeDue(); if(id != null) openSession(id);
