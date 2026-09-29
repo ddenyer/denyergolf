@@ -1633,6 +1633,71 @@
   letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
   border:1px solid var(--line-strong); border-radius:4px; padding:0 4px; vertical-align:1.5px}
 
+  /* ---- the home drills: a mat, a trainer, a garden green ----
+     A mat is not turf. Darker, flatter, white lines on it, so the eye knows at
+     a glance that this is a bedroom floor and not a golf course. */
+  :root{ --mat:#2f6b40; --mat-2:#265734; --mat-line:#f4f8f4; --mat-edge:#1d4227;
+         --kit:#e9ecef; --kit-2:#cfd4da; --kit-line:#8b939c; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --mat:#26563a; --mat-2:#1d4730; --mat-line:#dbe6dd; --mat-edge:#15301f;
+    --kit:#2a2d31; --kit-2:#3a3f45; --kit-line:#8b939c; } }
+  :root[data-theme="dark"]{
+    --mat:#26563a; --mat-2:#1d4730; --mat-line:#dbe6dd; --mat-edge:#15301f;
+    --kit:#2a2d31; --kit-2:#3a3f45; --kit-line:#8b939c; }
+
+  .matd, .trainerd, .qputt{display:block; width:100%; max-width:340px; height:auto; margin:0 auto}
+  .trainerd{max-width:400px}
+  .matbed{fill:var(--mat); stroke:var(--mat-edge); stroke-width:2; stroke-linejoin:round}
+  .matline{stroke:var(--mat-line); stroke-width:1.6; stroke-opacity:.5; stroke-dasharray:9 8}
+  .gthole{fill:var(--hole); stroke:var(--mat-line); stroke-width:1.2; stroke-opacity:.45}
+  .gtspan{stroke:var(--mat-line); stroke-width:1.3; stroke-opacity:.45}
+  .gtpill{fill:var(--mat)}
+  .gtball{fill:#fff; stroke:var(--kit-line); stroke-width:1.5}
+  .gtball.sm{stroke-width:1.3}
+  .gtdim line{stroke:var(--mat-line); stroke-width:1; stroke-opacity:.4}
+  .gtl{font-size:10.5px; font-weight:700; letter-spacing:.06em; fill:var(--mat-line);
+       fill-opacity:.85; text-anchor:middle; pointer-events:none}
+  .gtl.dim{fill-opacity:.7}
+  .gtcap{font-size:14px; font-weight:800; fill:var(--mat-line); text-anchor:middle; pointer-events:none}
+  .gtcap.sm{font-size:10.5px; font-weight:700; letter-spacing:.06em; fill:var(--accent-fill)}
+  .gtfoot{font-size:10px; font-weight:700; letter-spacing:.07em; fill:var(--muted);
+          text-anchor:middle; pointer-events:none}
+  .matd .rz, .trainerd .rz, .qputt .rz{fill:#000; fill-opacity:0}
+  .matd .rz.gm{fill:var(--kit); fill-opacity:1; stroke:var(--kit-line); stroke-width:2}
+  .matd .rz:hover, .matd .rz.on{fill:var(--pick); fill-opacity:.8; stroke:var(--pick-line); stroke-width:2}
+  .ttick line{stroke:var(--kit-line); stroke-width:1.2; stroke-opacity:.8}
+  .trramp{fill:var(--kit); stroke:var(--kit-line); stroke-width:1.5; stroke-linejoin:round}
+  .trface{fill:none; stroke:var(--kit-2); stroke-width:3}
+  .trbase{fill:var(--kit-2); stroke:var(--kit-line); stroke-width:1.2}
+  .trhole{fill:var(--hole); pointer-events:none}
+  .trainerd .rz.tbull{fill:none; stroke:var(--pick-line); stroke-width:2.4}
+  .trainerd .rz:hover, .trainerd .rz.on{fill:var(--pick); fill-opacity:.75;
+    stroke:var(--pick-line); stroke-width:2.4}
+  .qbed{fill:var(--turf-wash); stroke:var(--turf-line); stroke-width:2}
+  .qcross line{stroke:var(--turf-line); stroke-width:1.3; stroke-opacity:.8}
+  .qputt .rz.qin{fill:var(--turf-wash); fill-opacity:1; stroke:var(--turf-line-2); stroke-width:1.4}
+  .qputt .rz:hover, .qputt .rz.on{fill:var(--pick); fill-opacity:.85;
+    stroke:var(--pick-line); stroke-width:2.2}
+  .qhole{fill:var(--hole); pointer-events:none}
+  .qbreak{fill:none; stroke:var(--pick-line); stroke-width:2.4; stroke-dasharray:6 6;
+          stroke-linecap:round; pointer-events:none}
+  .qlab text{font-size:13px; font-weight:800; letter-spacing:.05em; fill:var(--turf-ink);
+             text-anchor:middle; pointer-events:none}
+  .qmid{font-size:10px; font-weight:700; letter-spacing:.07em; fill:var(--turf-ink);
+        text-anchor:middle; pointer-events:none}
+  .qipanel{fill:var(--surface); stroke:var(--line); stroke-width:1}
+  .qigreen{fill:var(--turf-wash); stroke:var(--turf-line); stroke-width:1.4}
+  .qidot{fill:var(--hole)} .qidot.mid{fill:var(--hole); opacity:.45}
+  .qiline{stroke:var(--pick-line); stroke-width:2; stroke-dasharray:4 4}
+  .qitarget{fill:none; stroke:var(--pick-line); stroke-width:2}
+  .qinset .gtl{fill:var(--muted); fill-opacity:1}
+  .gtpic{margin:0 0 14px}
+
+  .tbands rect{fill:var(--surface-2); stroke:var(--line-strong); stroke-width:1.3}
+  .tbl text{font-size:11.5px; font-weight:700; fill:var(--ink-2); text-anchor:middle; pointer-events:none}
+  .tft text{font-size:10px; font-weight:700; letter-spacing:.06em; fill:var(--muted);
+            text-anchor:middle; pointer-events:none}
+
   /* ---- access gate ----
      The first screen anyone sees, so it is built out of the same parts as the
      rest: the crest, the name, a hairline card on white, and one coral action,
@@ -2213,7 +2278,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-29", note:"Quick Drills: fifteen short sessions grouped by where you are, three on the mat including the run, two in the garden, and Holing out is a green session again so the deck can no longer offer a forty foot ladder indoors" };
+var BUILD = { on:"2026-09-29", note:"Quick Drills, and the home drills now draw their own kit: a mat with a gate on it, the trainer in section with its return scale, and the garden green with the four ways of missing from six paces. A point for the one thing each drill is about, a record of everything else" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3325,7 +3390,7 @@ var DRILLS = [
 
 { id:"d-putt-lag", area:4, place:2, mins:20,
   name:"The lag", sub:"The ladder, six rounds",
-  why:"Lag is the one putting skill that cannot be trained anywhere but here. A mat stops at nine feet and the garden green at twelve, so a winter without this is a winter of three-putts waiting to happen.",
+  why:"Lag is the one putting skill that cannot be trained anywhere but here. A mat stops at nine feet and the garden green at about eighteen, so a winter without this is a winter of three-putts waiting to happen.",
   where:"Practice green", shape:"clock", sg:true,
   ruleText:"A point when the ball finishes between the targets in front and behind, about three feet. Strokes gained prices the leave rather than the make.",
   from:4, use:["d"] },
@@ -3337,18 +3402,28 @@ var DRILLS = [
    exists out there. Both diagonals are played both ways, which halves the
    walking, and the number worth reading is the gap between the four. */
 { id:"d-gdn-corners", area:4, place:3, needs:"dry", mins:15,
-  name:"Four corners", sub:"Both diagonals, uphill and down, each way",
-  why:"Four reads inside twelve feet, and almost nobody is equally good at all four. Which of them leaks strokes is the thing no mat can ever tell her, and five balls a session is enough to see it build over a winter.",
-  where:"Garden green", shape:"clock", home:true,
-  ruleText:"A holed putt scores. Five balls in each direction is too few to read a rate from one session: what it is for is the pattern across the four, gathered over a winter.",
+  name:"Four corners", sub:"Six paces corner to corner, both diagonals, each way",
+  why:"Six paces corner to corner, about eighteen feet. That is past the range she expects to hole from, which is the point of scoring it on where the ball finished rather than on whether it went in: at this length a make rate would be two or three out of twenty and would say nothing. Four reads at that length, and almost nobody is equally good at all four.",
+  where:"Garden green", shape:"qputt", home:true,
+  ruleText:"A point for a holed putt, and nothing else scores. Every miss is still recorded, in one of four quadrants: high or low for the read, long or short for the pace. From eighteen feet a make rate is thin, so the score stays small and the pattern underneath it is the thing worth reading.",
   sets:[
-    {id:"a", pd:12, label:"Downhill, left to right", tc:"Holed", word:"the downhill left to right", max:5,
+    /* A and B are the high edge, so the green falls from one long side to the
+       other. Work the perpendicular out on each diagonal and the four names
+       fall out of it, and so does which side is high. That is why hiSide sits
+       on the set rather than being assumed by the drawing: it swaps between
+       the two diagonals, and a label on the wrong side would teach her the
+       opposite of what happened. */
+    {id:"a", pd:18, label:"A to D · downhill, left to right", tc:"Holed",
+     from:"A", to:"D", hiSide:"l", word:"the downhill left to right", max:5,
      tgt:"Five balls. The fast one that breaks away from you"},
-    {id:"b", pd:12, label:"Uphill, right to left", tc:"Holed", word:"the uphill right to left", max:5,
+    {id:"b", pd:18, label:"D to A · uphill, right to left", tc:"Holed",
+     from:"D", to:"A", hiSide:"r", word:"the uphill right to left", max:5,
      tgt:"Five balls. Same line, played back up it"},
-    {id:"c", pd:12, label:"Downhill, right to left", tc:"Holed", word:"the downhill right to left", max:5,
+    {id:"c", pd:18, label:"B to C · downhill, right to left", tc:"Holed",
+     from:"B", to:"C", hiSide:"r", word:"the downhill right to left", max:5,
      tgt:"Five balls. The other diagonal, running away"},
-    {id:"d", pd:12, label:"Uphill, left to right", tc:"Holed", word:"the uphill left to right", max:5,
+    {id:"d", pd:18, label:"C to B · uphill, left to right", tc:"Holed",
+     from:"C", to:"B", hiSide:"l", word:"the uphill left to right", max:5,
      tgt:"Five balls. Same line, played back up it"}
   ] },
 
@@ -3373,19 +3448,21 @@ var DRILLS = [
    The two that measure error rather than success, which is why they survive
    being done indoors. A fast flat mat does not make her face squarer and it
    does not make her pace more repeatable. */
-{ id:"d-mat-startline", area:4, place:4, mins:15,
-  name:"Start line", sub:"Six feet through the gate, then without it",
+{ id:"d-mat-startline", area:4, place:4, mins:12, shape:"gate",
+  name:"Start line", sub:"Twenty through the gate, at six feet",
   why:"Face angle is about 92% of where a putt starts, and a gate is the only way to see it without a launch monitor. Two coins 19 inches in front of the ball, 55 mm apart, is 0.73 degrees of tolerance. A dead-weight putt from eight feet allows 0.77, so every ball through that gate was on a line good enough to hole from eight feet.",
   where:"The mat", home:true,
-  ruleText:"Through the gate scores, clean, without touching either coin. The last ten are the same putt with the gate taken away, scored on whether they went in.",
+  /* The ten without the gate have gone. They were scored on whether they went
+     in and added to the same total as the twenty scored on the gate, so twenty
+     out of thirty could have been any mixture of two different things. One
+     drill, one question. */
+  ruleText:"Clean through the gate scores, without touching either coin. A miss is a ball that struck a marker, so tap the one it hit: which side it was says which way the face was. Neither marker scores.",
   sets:[
     {id:"a", label:"Six feet · through the gate", tc:"Through the gate", word:"the gate", max:20,
-     tgt:"Twenty balls. Gate 19 inches out, 55 mm wide. Clean through or nothing"},
-    {id:"b", label:"Six feet · gate away", tc:"Holed", word:"6 feet", max:10,
-     tgt:"Ten balls, same putt, no gate. Did anything hold?"}
+     tgt:"Twenty balls. Gate 19 inches out, 55 mm wide. Clean through, or tap the marker you hit"}
   ] },
 
-{ id:"d-mat-pace", area:4, place:4, mins:12,
+{ id:"d-mat-pace", area:4, place:4, mins:12, shape:"trainer",
   name:"Pace", sub:"The micro target, and the length of the return",
   why:"The trainer's micro target only holds a ball delivered at eighteen inches past the hole, and Pelz's research put the optimum at seventeen. It is the right pace made into a gate. The ramp also returns the ball the distance it would have run past, so every putt gives a measured speed error, which is the rarest feedback there is at home.",
   where:"The mat", home:true,
@@ -3393,7 +3470,7 @@ var DRILLS = [
   sets:[
     {id:"a", label:"Twenty at the micro target", tc:"Back inside a foot", bull:"Stuck in the target",
      word:"the micro target", max:20,
-     tgt:"Twenty balls. Tap the bullseye if it stuck, the ring if it came back inside a foot"}
+     tgt:"Twenty balls. Tap where it stopped coming back, or the target if it stuck"}
   ] },
 
 /* The game they invented themselves last winter, which is the most valuable
@@ -3406,7 +3483,7 @@ var DRILLS = [
    Ten is a ceiling nobody should reach often. The micro target only holds a
    ball delivered at eighteen inches past, so this is not the trainer's own
    twenty five in a row, which only asks the ramp to accept the ball. */
-{ id:"d-mat-run", area:4, place:4, mins:15, shape:"gauntlet",
+{ id:"d-mat-run", area:4, place:4, mins:15, shape:"gauntlet", pic:"trainer",
   name:"The run", sub:"Stuck in the micro target, one after another",
   why:"One miss and it starts again, which makes it the only thing on this list with a consequence attached to a single putt. What it measures is not really pace, it is whether she can deliver the same pace when the last four have gone in and she knows it.",
   where:"The mat", home:true, limit:15*60, balls:0, target:10,
@@ -3761,6 +3838,14 @@ function buildGauntlet(a){
   var d = state.draft;
   mxSeed(a, d);
   var host = $("sessCards"); host.innerHTML = "";
+  /* A gauntlet is a station list with a clock, which is the right shape when
+     the stations are instructions. When the station is a piece of kit set up a
+     particular way, one picture at the top says it once instead of ten times. */
+  if(a.pic === "trainer"){
+    var pic = document.createElement("div"); pic.className = "gtpic";
+    pic.innerHTML = trainerSvg(false, false);
+    host.appendChild(pic);
+  }
   var n = gtN(a), done = gtDone(d), won = gtComplete(a, d);
   var ms = gtElapsed(a, d), lim = gtLimit(a);
 
@@ -8473,7 +8558,12 @@ function trackKind(a, s){
 function ballsIn(s){ return s.balls || (s.parts ? 5 : s.max); }
 function hitWord(a, s){
   if(trackKind(a, s) === "lag") return "Inside one step";
-  return areaShape(a) === "clock" ? "Holed" : "In the target";
+  var sh = areaShape(a);
+  /* "In the target" is the rose's word and it fits nothing on a mat. */
+  if(sh === "gate") return "Through";
+  if(sh === "trainer") return "Inside a foot";
+  if(sh === "qputt" || sh === "clock") return "Holed";
+  return "In the target";
 }
 
 /* ---- geometry ---- */
@@ -9063,10 +9153,174 @@ function corridorSvg(gate, tappable){
 /* one place that knows which picture an area uses */
 var CLOCK_ZONES = [{id:"l", lab:"Missed left"}, {id:"r", lab:"Missed right"}];
 var LAG_ZONES = [{id:"g0"},{id:"g1"},{id:"g2"},{id:"g3"},{id:"g4"},{id:"g5"}];
+
+/* ---- the three home-drill diagrams ----
+   Every other shape in here draws a piece of golf course, because every other
+   session happens on one. These three draw kit: a mat, a trainer, and a garden
+   green with holes in its corners. Borrowing the rose for a gate drill asked
+   her whether a putt on a bedroom floor had finished Long Left, which is the
+   approach diagram doing its job perfectly in the wrong place.
+
+   The tap ids decide the score, and only "c" and "b" count (see isIn). So the
+   gate's markers, the trainer's outer bands and the garden's four quadrants are
+   all recorded and none of them score, which is what was asked for: a point for
+   the one thing the drill is about, a record of everything else. */
+
+/* THE GATE. Drawn in perspective, because the gate is nineteen inches away and
+   the hole is six feet away and a plan view pretends they are the same size.
+   The perspective is not decoration: it makes the near things big, which is the
+   only way two coins 55 mm apart become targets a thumb can hit.
+
+   A missed gate is a ball that STRUCK a marker, not one that sailed wide: with
+   six millimetres of clearance either side there is nowhere else for it to go.
+   So the markers are the miss targets, and which one she hit says which way the
+   face was. */
+function gateSvg(tappable){
+  var att = tappable ? ' tabindex="0" role="button"' : ' aria-hidden="true"';
+  var o = '';
+  o += '<path class="matbed" d="M30 400 L112 26 L188 26 L270 400 Z"></path>';
+  o += '<line class="matline" x1="150" y1="392" x2="150" y2="36"></line>';
+  o += '<path class="rz gz" data-z="c"'+att+' aria-label="Through the gate" '+
+       'd="M63 248 L112 28 L188 28 L237 248 Z"></path>';
+  o += '<ellipse class="gthole" cx="150" cy="48" rx="17" ry="7.5"></ellipse>';
+  o += '<line class="gtspan" x1="114" y1="284" x2="186" y2="284"></line>';
+  o += '<rect class="gtpill" x="123" y="256" width="54" height="15" rx="3"></rect>';
+  o += '<text class="gtl" x="150" y="268">55 MM</text>';
+  o += '<circle class="rz gm" data-z="gl"'+att+' aria-label="Hit the left marker" '+
+       'cx="112" cy="284" r="20"></circle>';
+  o += '<circle class="rz gm" data-z="gr"'+att+' aria-label="Hit the right marker" '+
+       'cx="188" cy="284" r="20"></circle>';
+  o += '<circle class="gtball" cx="150" cy="372" r="14"></circle>';
+  o += '<g class="gtdim"><line x1="228" y1="284" x2="252" y2="284"></line>'+
+       '<line x1="240" y1="284" x2="240" y2="372"></line>'+
+       '<line x1="228" y1="372" x2="252" y2="372"></line></g>';
+  o += '<text class="gtl dim" x="224" y="332" text-anchor="end">19 IN</text>';
+  o += '<text class="gtcap" x="150" y="152">THROUGH</text>';
+  o += '<text class="gtfoot" x="150" y="420">OR TAP THE MARKER YOU HIT</text>';
+  return '<svg viewBox="0 0 300 430" class="matd" role="group" '+
+         'aria-label="A putting mat in perspective with a gate nineteen inches in front of the ball">'+
+         o+'<g class="marks"></g></svg>';
+}
+
+/* THE TRAINER, from the side, because the ramp is the mechanism and a ramp is
+   invisible from above. The mat below it is a ruler: the ball comes back the
+   distance it would have run past, which is the only quantified pace feedback
+   anywhere in this programme.
+
+   bands=false strips the ruler and leaves the micro target alone. That is the
+   run, where nothing except sticking it counts and the bands would be four
+   ways of saying the same zero. */
+function trainerSvg(tappable, bands){
+  var att = tappable ? ' tabindex="0" role="button"' : ' aria-hidden="true"';
+  var o = '';
+  if(bands){
+    /* Drawn as three panels rather than three invisible rectangles. A tap
+       target you cannot see is not a target, and the first version of this had
+       her guessing where the thirds were. */
+    o += '<g class="tbands">'+
+         '<rect class="rz tb" data-z="p3"'+att+' aria-label="More than two feet back" '+
+           'x="16" y="96" width="104" height="54" rx="5"></rect>'+
+         '<rect class="rz tb" data-z="p2"'+att+' aria-label="One to two feet back" '+
+           'x="122" y="96" width="66" height="54" rx="5"></rect>'+
+         '<rect class="rz tb" data-z="c"'+att+' aria-label="Back inside a foot" '+
+           'x="190" y="96" width="62" height="54" rx="5"></rect>'+
+         '</g>';
+    o += '<g class="tbl"><text x="68" y="128">Further</text>'+
+         '<text x="155" y="128">1 to 2 ft</text>'+
+         '<text x="221" y="128">Inside 1 ft</text></g>';
+  }
+  o += '<rect class="matbed" x="14" y="152" width="332" height="12" rx="4"></rect>';
+  if(bands){
+    o += '<g class="ttick"><line x1="190" y1="146" x2="190" y2="170"></line>'+
+         '<line x1="120" y1="146" x2="120" y2="170"></line>'+
+         '<line x1="50" y1="146" x2="50" y2="170"></line></g>';
+    o += '<g class="tft"><text x="221" y="184">1 FT</text>'+
+         '<text x="155" y="184">2 FT</text><text x="85" y="184">3 FT</text></g>';
+  }
+  o += '<path class="trramp" d="M252 152 Q 296 150 314 96 Q 326 58 332 22 L 348 22 '+
+       'Q 344 72 340 110 Q 336 152 348 152 Z"></path>';
+  o += '<path class="trface" d="M252 152 Q 296 150 314 96 Q 326 58 332 22"></path>';
+  o += '<ellipse class="trbase" cx="288" cy="156" rx="40" ry="8"></ellipse>';
+  o += '<circle class="rz tbull" data-z="b"'+att+' aria-label="Stuck in the micro target" '+
+       'cx="324" cy="80" r="21"></circle>';
+  o += '<circle class="trhole" cx="324" cy="80" r="9"></circle>';
+  o += '<text class="gtcap sm" x="322" y="42">STUCK</text>';
+  o += bands
+     ? '<text class="gtfoot" x="170" y="204">TAP WHERE IT STOPPED COMING BACK</text>'
+     : '<circle class="gtball sm" cx="52" cy="144" r="9"></circle>'+
+       '<text class="gtfoot" x="170" y="204">STUCK, OR THE RUN STARTS AGAIN</text>';
+  return '<svg viewBox="0 0 360 214" class="trainerd" role="group" '+
+         'aria-label="The pressure trainer from the side, its ramp rising off the mat">'+
+         o+'<g class="marks"></g></svg>';
+}
+
+/* THE GARDEN GREEN. Six paces corner to corner, a hole in each corner and one
+   in the middle, and the slope running on the diagonals so there is no straight
+   putt on it. At that length a make rate is two or three out of twenty and says
+   nothing, so the ball is recorded in a quadrant instead: high or low for the
+   read, long or short for the pace. Those are two independent faults and a
+   proximity ring would mash them back into one number, which is the very thing
+   the wedge distance test exists to avoid.
+
+   High and low change sides between the two diagonals, so the set says which
+   side is which rather than the drawing assuming it. */
+function qputtSvg(tappable, set){
+  var att = tappable ? ' tabindex="0" role="button"' : ' aria-hidden="true"';
+  var hiLeft = !(set && set.hiSide === "r");
+  var CX = 170, CY = 222, R = 112;
+  function quad(id, lab, d){
+    return '<path class="rz qz" data-z="'+id+'"'+att+' aria-label="'+lab+'" d="'+d+'"></path>';
+  }
+  var o = '';
+  o += '<circle class="qbed" cx="'+CX+'" cy="'+CY+'" r="'+R+'"></circle>';
+  o += '<g class="qcross"><line x1="91" y1="143" x2="249" y2="301"></line>'+
+       '<line x1="249" y1="143" x2="91" y2="301"></line></g>';
+  /* north is long, south is short, and the two sides take their names from the
+     slope, which is why hiSide is on the set and not baked in here */
+  o += quad("ql", "Long", "M170 222 L91 143 A112 112 0 0 1 249 143 Z");
+  o += quad(hiLeft ? "qlo" : "qhi", hiLeft ? "Low" : "High",
+            "M170 222 L249 143 A112 112 0 0 1 249 301 Z");
+  o += quad("qs", "Short", "M170 222 L249 301 A112 112 0 0 1 91 301 Z");
+  o += quad(hiLeft ? "qhi" : "qlo", hiLeft ? "High" : "Low",
+            "M170 222 L91 301 A112 112 0 0 1 91 143 Z");
+  o += '<circle class="rz qin" data-z="c"'+att+' aria-label="Holed" '+
+       'cx="'+CX+'" cy="'+CY+'" r="34"></circle>';
+  o += '<circle class="qhole" cx="'+CX+'" cy="'+CY+'" r="13"></circle>';
+  o += '<path class="qbreak" d="M112 356 C 118 318 132 272 156 250"></path>';
+  o += '<circle class="gtball sm" cx="110" cy="360" r="7"></circle>';
+  o += '<g class="qlab"><text x="170" y="158">LONG</text>'+
+       '<text x="170" y="300">SHORT</text>'+
+       '<text x="240" y="228">'+(hiLeft ? "LOW" : "HIGH")+'</text>'+
+       '<text x="100" y="228">'+(hiLeft ? "HIGH" : "LOW")+'</text></g>';
+  o += '<text class="qmid" x="170" y="178">HOLED</text>';
+  /* the inset: which of the four she is on, drawn as the green itself */
+  var from = (set && set.from) || "A", to = (set && set.to) || "D";
+  var P = {A:[18,17], B:[116,17], C:[18,57], D:[116,57]};
+  var f = P[from] || P.A, t = P[to] || P.D;
+  o += '<g class="qinset" transform="translate(214,10)">'+
+       '<rect class="qipanel" x="-6" y="-6" width="146" height="98" rx="10"></rect>'+
+       '<rect class="qigreen" x="4" y="4" width="126" height="66" rx="12"></rect>'+
+       '<circle class="qidot" cx="18" cy="17" r="4"></circle>'+
+       '<circle class="qidot" cx="116" cy="17" r="4"></circle>'+
+       '<circle class="qidot" cx="18" cy="57" r="4"></circle>'+
+       '<circle class="qidot" cx="116" cy="57" r="4"></circle>'+
+       '<circle class="qidot mid" cx="67" cy="37" r="3.2"></circle>'+
+       '<line class="qiline" x1="'+f[0]+'" y1="'+f[1]+'" x2="'+t[0]+'" y2="'+t[1]+'"></line>'+
+       '<circle class="qitarget" cx="'+t[0]+'" cy="'+t[1]+'" r="8"></circle>'+
+       '<text class="gtl" x="67" y="88">'+from+' → '+to+' · 6 PACES</text>'+
+       '</g>';
+  return '<svg viewBox="0 0 360 380" class="qputt" role="group" '+
+         'aria-label="The hole close up with four miss quadrants, and an inset of the garden green">'+
+         o+'<g class="marks"></g></svg>';
+}
+
 function areaShape(a){ return (a && a.shape) || "rose"; }
 function shapeSvg(a, set, tappable){
   var sh = areaShape(a);
   if(sh === "corridor") return corridorSvg(set.tc || "", tappable);
+  if(sh === "gate") return gateSvg(tappable);
+  if(sh === "trainer") return trainerSvg(tappable, true);
+  if(sh === "qputt") return qputtSvg(tappable, set);
   if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
   var fs = fsKind(a);
   return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist,
