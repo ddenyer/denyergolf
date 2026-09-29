@@ -2213,7 +2213,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-29", note:"Quick Drills: fourteen short sessions grouped by where you are, two of them on the mat and two in the garden, and Holing out is a green session again so the deck can no longer offer a forty foot ladder indoors" };
+var BUILD = { on:"2026-09-29", note:"Quick Drills: fifteen short sessions grouped by where you are, three on the mat including the run, two in the garden, and Holing out is a green session again so the deck can no longer offer a forty foot ladder indoors" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3394,7 +3394,36 @@ var DRILLS = [
     {id:"a", label:"Twenty at the micro target", tc:"Back inside a foot", bull:"Stuck in the target",
      word:"the micro target", max:20,
      tgt:"Twenty balls. Tap the bullseye if it stuck, the ring if it came back inside a foot"}
-  ] }
+  ] },
+
+/* The game they invented themselves last winter, which is the most valuable
+   thing on this list. It was left off on the argument that a streak is blocked
+   practice and the competition should attach to the measured numbers instead.
+   True on paper, and beside the point in a cold lounge in January: the thing
+   that gets two teenagers to a mat is worth more than the tidiness of the
+   practice schedule. So it is a gauntlet, on the same machinery as the circle.
+
+   Ten is a ceiling nobody should reach often. The micro target only holds a
+   ball delivered at eighteen inches past, so this is not the trainer's own
+   twenty five in a row, which only asks the ramp to accept the ball. */
+{ id:"d-mat-run", area:4, place:4, mins:15, shape:"gauntlet",
+  name:"The run", sub:"Stuck in the micro target, one after another",
+  why:"One miss and it starts again, which makes it the only thing on this list with a consequence attached to a single putt. What it measures is not really pace, it is whether she can deliver the same pace when the last four have gone in and she knows it.",
+  where:"The mat", home:true, limit:15*60, balls:0, target:10,
+  ruleText:"Stuck in the micro target counts. Returned, rejected, or holed without sticking does not. One miss and the run starts again. What is recorded is the best run, the number of attempts and the time.",
+  stations:[
+    {id:"r1",  name:"1",  detail:"Stuck in the micro target. Nothing else counts."},
+    {id:"r2",  name:"2",  detail:"Same putt, same pace."},
+    {id:"r3",  name:"3",  detail:"Same putt, same pace."},
+    {id:"r4",  name:"4",  detail:"Same putt, same pace."},
+    {id:"r5",  name:"5",  detail:"Halfway. Same putt, same pace."},
+    {id:"r6",  name:"6",  detail:"Same putt, same pace."},
+    {id:"r7",  name:"7",  detail:"Same putt, same pace."},
+    {id:"r8",  name:"8",  detail:"Same putt, same pace."},
+    {id:"r9",  name:"9",  detail:"Same putt, same pace."},
+    {id:"r10", name:"10", detail:"The last one. Same putt, same pace."}
+  ],
+  sets:[] }
 ];
 
 /* Slices are resolved once, at load. After this a drill is an ordinary area
@@ -3781,8 +3810,12 @@ function buildGauntlet(a){
       acts.innerHTML = '<button type="button" class="mxgo wide" id="mxBegin">Start the clock</button>';
       host.appendChild(acts);
       var hint = document.createElement("p"); hint.className = "note mxpace";
-      hint.textContent = "Forty five minutes from the moment you tap it, so stand over the "
-        + "first putt before you do. It keeps running if you lock the phone.";
+      /* The wording used to say forty five whatever the limit was, which was true
+         of the only matrix there was and a lie on the two that came after it. */
+      var mins = Math.round(gtLimit(a) / 60000);
+      hint.textContent = mins + " minutes from the moment you tap it, so stand over the "
+        + "first " + (a.shape === "gauntlet" && a.home ? "putt" : "shot") + " before you do. "
+        + "It keeps running if you lock the phone.";
       host.appendChild(hint);
       $("mxBegin").addEventListener("click", gtStart);
     } else if(gtPaused(d)){
