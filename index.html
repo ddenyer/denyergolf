@@ -1698,6 +1698,22 @@
   .tft text{font-size:10px; font-weight:700; letter-spacing:.06em; fill:var(--muted);
             text-anchor:middle; pointer-events:none}
 
+  .stn.sm text{font-size:11px}
+
+  /* the lap: the gauntlet's counter, over the clock's picture */
+  .lapbox{margin:10px 0 2px; padding:11px 13px; border-radius:var(--radius);
+    box-shadow:var(--card); background:var(--surface-2)}
+  .laprow{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:6px}
+  .lappips{display:flex; gap:4px; flex-wrap:wrap}
+  .lappip{width:22px; height:22px; border-radius:999px; display:flex; align-items:center;
+    justify-content:center; font-size:10.5px; font-weight:700; color:var(--muted);
+    background:var(--surface); box-shadow:0 0 0 1px var(--line)}
+  .lappip.on{background:var(--accent-fill); color:var(--on-accent); box-shadow:none}
+  .lapnum{font-size:10.5px; color:var(--muted); display:flex; align-items:baseline; gap:4px}
+  .lapnum b{font-size:17px; font-weight:800; color:var(--ink)}
+  .lapnum.best b{color:var(--accent-fill)}
+  .lapnote{margin:8px 0 0; font-size:11.5px}
+
   /* ---- access gate ----
      The first screen anyone sees, so it is built out of the same parts as the
      rest: the crest, the name, a hairline card on white, and one coral action,
@@ -2278,7 +2294,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-29", note:"Quick Drills, and the home drills now draw their own kit: a mat with a gate on it, the trainer in section with its return scale, and the garden green with the four ways of missing from six paces. A point for the one thing each drill is about, a record of everything else" };
+var BUILD = { on:"2026-09-29", note:"Quick Drills, and the home drills draw their own kit: a mat with a gate, the trainer in section, the garden corners, and the circle as an eight-station clock with a lap counter on it, one miss and it starts again. A point for the one thing each drill is about, a record of everything else" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3427,22 +3443,20 @@ var DRILLS = [
      tgt:"Five balls. Same line, played back up it"}
   ] },
 
-{ id:"d-gdn-circle", area:4, place:3, needs:"dry", mins:15, shape:"gauntlet",
-  name:"The circle", sub:"Eight reads round the middle hole, miss and restart",
-  why:"A circle drill on a green with no fall line, so there is no symmetry in it and every station is genuinely different. Harder than the same lap on a mat, and the closest thing at home to holing out with something at stake.",
-  where:"Garden green", home:true, limit:15*60, balls:0, target:10,
-  ruleText:"Go round the eight in order. One miss and the lap starts again. What is recorded is the best lap, the number of attempts and the time.",
-  stations:[
-    {id:"s1", name:"Station 1", detail:"Straightest of the eight. Hole it."},
-    {id:"s2", name:"Station 2", detail:"A quarter turn on. Read it fresh."},
-    {id:"s3", name:"Station 3", detail:"Across the slope."},
-    {id:"s4", name:"Station 4", detail:"The downhill side is starting."},
-    {id:"s5", name:"Station 5", detail:"Straight down the fall of it."},
-    {id:"s6", name:"Station 6", detail:"Downhill and breaking."},
-    {id:"s7", name:"Station 7", detail:"Back across the slope the other way."},
-    {id:"s8", name:"Station 8", detail:"Uphill to finish. Do not leave it short."}
-  ],
-  sets:[] },
+{ id:"d-gdn-circle", area:4, place:3, needs:"dry", mins:15, shape:"clock",
+  name:"The circle", sub:"Eight round the middle hole, one miss and it starts again",
+  why:"A circle drill on a green with no fall line, so every station reads differently and there is no symmetry to lean on. The closest thing at home to holing out with something at stake, and the only one of the four that uses the middle hole.",
+  where:"Garden green", home:true,
+  ruleText:"Work round the eight in order. One miss and the lap starts again at station one. A point for every holed putt whatever the run does, and the best run is the number worth beating. A miss is recorded as left or right so the pattern round the ring is readable afterwards, and neither side scores.",
+  sets:[
+    /* Eight stations rather than the five every other clock in here uses, and
+       the slope is not worth asking about: it is the same hole on the same
+       green every time, falling due south, which on an eight-station ring is
+       station 6. So the question is answered on the set and she never sees it. */
+    {id:"a", stn:8, low:"6", lap:true, pd:5, label:"Eight round the hole", tc:"Holed",
+     word:"the circle", max:16,
+     tgt:"Four or five feet. Work round the eight in order, and tap the hole as you hole one. A miss starts the lap again"}
+  ] },
 
 /* ---- the mat ----
    The two that measure error rather than success, which is why they survive
@@ -5865,8 +5879,24 @@ function drillWhere(){
 /* Her best on it. A club drill is priced in strokes against the same field the
    area is; a home drill is a count, because a mat is fast and flat and a make
    rate on one is flattered against a field measured on grass. */
+/* A lap drill is scored in points like any other, but the number anybody
+   actually cares about is the longest run, so that is what the tab carries. It
+   is derived from the taps rather than stored, so an old session gives the same
+   answer as a live one. */
+function drillLapBest(d){
+  var st = liveSets(d).filter(function(x){ return x.lap; })[0];
+  if(!st) return null;
+  var best = null;
+  drillSessions(d.id).forEach(function(sess){
+    var L = lapRun(st, sess);
+    if(best === null || L.best > best) best = L.best;
+  });
+  return best;
+}
 function drillBest(d){
   var runs = drillSessions(d.id), best = null, i, x, v;
+  var lapB = drillLapBest(d);
+  if(lapB !== null) return runs.length ? { big:String(lapB), small:"in a row, your best" } : null;
   for(i=0;i<runs.length;i++){
     x = runs[i];
     if(!x || x.total == null || x.sgUnknown) continue;
@@ -9321,7 +9351,8 @@ function shapeSvg(a, set, tappable){
   if(sh === "gate") return gateSvg(tappable);
   if(sh === "trainer") return trainerSvg(tappable, true);
   if(sh === "qputt") return qputtSvg(tappable, set);
-  if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed", set.low || null);
+  if(sh === "clock") return clockSvg(set.st || null, tappable, set.tc || "Holed",
+                                     set.low || null, set.stn);
   var fs = fsKind(a);
   return roseSvg(set.tc || "In", tappable, set.bull, !!(a && a.quads), set.dist,
                  (isSG(a) && !fs) ? set : null, fs);
@@ -9415,15 +9446,30 @@ function gridMark(kind, wid, n){
    turn with the station the app has called and the putt line is drawn in. */
 var CLOCK = { cx:150, cy:170, R:112, bed:134, hole:12, r0:42, r1:100, stn:15 };
 var ST_ANG = {1:288, 2:0, 3:72, 4:144, 5:216};
-function clockB(st){ return (ST_ANG[st] != null ? ST_ANG[st] + 180 : 0); }
-function clockSvg(st, tappable, label, low){
+/* Five stations was the only number this had ever needed, so the angles were a
+   lookup. The garden circle wants eight, so they are computed now, with the
+   five-station case landing on exactly the numbers the lookup held: station 2
+   is due north and the rest follow clockwise. 0 degrees is up and 180 is down,
+   which is how polar reads, so on an eight the low station due south is 6. */
+function stCount(n){ n = +n; return (n >= 3 && n <= 12) ? n : 5; }
+function stAng(i, n){
+  n = stCount(n);
+  if(n === 5 && ST_ANG[i] != null) return ST_ANG[i];
+  return (((i - 2) * (360 / n)) % 360 + 360) % 360;
+}
+function clockB(st, n){ return (st ? stAng(st, n) + 180 : 0); }
+function clockSvg(st, tappable, label, low, n){
   var K = CLOCK, att = tappable ? ' role="button" tabindex="0"' : '', out = "";
-  var B = clockB(st), pts = [];
-  [1,2,3,4,5].forEach(function(i){ pts.push(polar(K.cx, K.cy, K.R, ST_ANG[i])); });
+  n = stCount(n);
+  var B = clockB(st, n), pts = [], STN = [], q;
+  for(q = 1; q <= n; q++) STN.push(q);
+  /* the marker shrinks as the ring fills up, or eight of them touch */
+  var sr = n > 6 ? K.stn - 2.5 : K.stn;
+  STN.forEach(function(i){ pts.push(polar(K.cx, K.cy, K.R, stAng(i, n))); });
   out += '<circle class="cbed" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.bed+'"></circle>';
   if(low && low !== "flat"){
     // the head stops short of the low station, which would otherwise sit on top of it
-    var F = ST_ANG[+low], hi = polar(K.cx, K.cy, K.bed-8, F+180), lo = polar(K.cx, K.cy, 92, F);
+    var F = stAng(+low, n), hi = polar(K.cx, K.cy, K.bed-8, F+180), lo = polar(K.cx, K.cy, 92, F);
     var hd1 = polar(lo[0], lo[1], 17, F+145), hd2 = polar(lo[0], lo[1], 17, F-145);
     out += '<g class="fall"><line x1="'+f1(hi[0])+'" y1="'+f1(hi[1])+'" x2="'+f1(lo[0])+'" y2="'+f1(lo[1])+'"></line>'+
            '<path d="M'+f1(lo[0])+' '+f1(lo[1])+' L'+f1(hd1[0])+' '+f1(hd1[1])+' M'+f1(lo[0])+' '+f1(lo[1])+
@@ -9437,16 +9483,18 @@ function clockSvg(st, tappable, label, low){
   // the line of the putt, carried through the hole so the two halves read at a glance
   var a0 = polar(K.cx, K.cy, st ? K.R : K.r1, B+180), a1 = polar(K.cx, K.cy, K.r1, B);
   out += '<line class="cline" x1="'+f1(a0[0])+'" y1="'+f1(a0[1])+'" x2="'+f1(a1[0])+'" y2="'+f1(a1[1])+'"></line>';
-  var pl = polar(K.cx, K.cy, 96, B-90), pr = polar(K.cx, K.cy, 96, B+90);
+  var lr = n > 6 ? 74 : 96;
+  var pl = polar(K.cx, K.cy, lr, B-90), pr = polar(K.cx, K.cy, lr, B+90);
   out += '<text class="czl" x="'+f1(pl[0])+'" y="'+f1(pl[1]+4)+'">LEFT</text>';
   out += '<text class="czl" x="'+f1(pr[0])+'" y="'+f1(pr[1]+4)+'">RIGHT</text>';
   out += '<circle class="rz rc cin" data-z="c" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.r0+'"'+
          (tappable ? ' role="button" tabindex="0" aria-label="Holed"' : '')+'></circle>';
   out += '<circle class="chole" cx="'+K.cx+'" cy="'+K.cy+'" r="'+K.hole+'"></circle>';
-  [1,2,3,4,5].forEach(function(i){
-    var p = polar(K.cx, K.cy, K.R, ST_ANG[i]);
-    out += '<g class="stn'+(i===st ? " on" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+K.stn+'"></circle>'+
-           '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+i+'</text></g>';
+  STN.forEach(function(i){
+    var p = polar(K.cx, K.cy, K.R, stAng(i, n));
+    out += '<g class="stn'+(i===st ? " on" : "")+(n > 6 ? " sm" : "")+'">'+
+           '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+f1(sr)+'"></circle>'+
+           '<text x="'+f1(p[0])+'" y="'+f1(p[1]+(n > 6 ? 4 : 5))+'">'+i+'</text></g>';
   });
   out += '<g class="caption"><rect class="cappill" x="86" y="3" width="128" height="26" rx="13"></rect>'+
          '<text class="rcl" x="150" y="21">'+(label || "Holed")+'</text></g>';
@@ -9466,10 +9514,10 @@ var BREAK_LAB = {up:"Uphill", down:"Downhill", lr:"Left to right", rl:"Right to 
                  flat:"Flat", across:"Across the slope"};
 var BREAK_ORDER = ["lr","rl","up","down","across","flat"];
 function norm180(d){ d = ((d % 360) + 360) % 360; return d > 180 ? d - 360 : d; }
-function clockBreak(low, st){
+function clockBreak(low, st, n){
   if(!low || !st) return null;
   if(low === "flat") return "flat";
-  var th = norm180(clockB(st) - ST_ANG[+low]);   // the putt against the fall line
+  var th = norm180(clockB(st, n) - stAng(+low, n));   // the putt against the fall line
   if(Math.abs(th) <= 45) return "down";
   if(Math.abs(th) >= 135) return "up";
   return th > 0 ? "rl" : "lr";
@@ -9483,7 +9531,7 @@ function lagBreak(sl, from){
 function slopeOpts(kind){ return kind === "lag" ? SLOPE_LAG : SLOPE_CLOCK; }
 function breakOf(kind, sl, call){
   if(!call) return null;
-  return kind === "lag" ? lagBreak(sl, call.from) : clockBreak(sl, call.st);
+  return kind === "lag" ? lagBreak(sl, call.from) : clockBreak(sl, call.st, call.stn);
 }
 function slopeAsk(kind){
   return kind === "lag" ? "Which way does the ladder run?" : "Which station is the low side?";
@@ -9677,6 +9725,32 @@ function rotCalls(a, s, store){
   if(!ROT_SPARE[key]) ROT_SPARE[key] = makeRotCalls(a, s);
   return ROT_SPARE[key];
 }
+/* A lap set walks its stations in order and starts again on a miss, so the
+   station a ball is played from is not a function of its number but of how the
+   ones before it went. The run is derived from the taps rather than stored,
+   which means undo, resume and a reload all give the same answer without a
+   second copy of the truth to keep in step. */
+function lapRun(s, store){
+  var list = (store && store.shots && store.shots[s.id]) || [];
+  var run = 0, best = 0, i, z;
+  for(i = 0; i < list.length; i++){
+    z = list[i] && list[i].z;
+    if(z == null) continue;              /* not played yet: the run is intact */
+    if(z === "c"){ run++; if(run > best) best = run; }
+    else run = 0;
+  }
+  return { run:run, best:best, n:stCount(s.stn) };
+}
+function lapStation(s, store, i){
+  var list = (store && store.shots && store.shots[s.id]) || [];
+  var run = 0, j, z;
+  for(j = 0; j < i; j++){
+    z = list[j] && list[j].z;
+    if(z == null) continue;
+    if(z === "c") run++; else run = 0;
+  }
+  return (run % stCount(s.stn)) + 1;
+}
 function callsFor(a, s, cfg, store){
   if(cfg && cfg.calls) return cfg.calls;
   if(s.rot) return rotCalls(a, s, store);
@@ -9690,7 +9764,8 @@ function callsFor(a, s, cfg, store){
       out.push({kind:"w", grid:s.guide, win:ord[i % ord.length], tc:s.tc, bull:s.bull,
                 lat:lat, two:!!a.twoTier, rule:a.rule, dist:s.dist});
     } else if(areaShape(a) === "clock"){
-      out.push({kind:"t", st:(i%5)+1, tc:s.tc});
+      out.push({kind:"t", stn:s.stn, tc:s.tc,
+                st:s.lap ? lapStation(s, store, i) : (i % stCount(s.stn)) + 1});
     } else {
       out.push({kind:"t", tc:s.tc, bull:s.bull, lat:lat, two:!!a.twoTier,
                 r1:s.r1, r2:s.r2, lie:s.lie, dist:s.dist, rule:a.rule});
@@ -9774,19 +9849,42 @@ function slopeBox(kind, s, onPick){
   return box;
 }
 
+/* The lap, drawn as the ring of stations with the ones already holed filled
+   in. It is the gauntlet's counter over the clock's picture, which is what was
+   wanted: the diagram says which putt, the strip says how far she has got. */
+function lapStrip(s, store){
+  var L = lapRun(s, store), box = document.createElement("div");
+  box.className = "lapbox";
+  var pips = "", i;
+  for(i = 1; i <= L.n; i++){
+    pips += '<span class="lappip'+(i <= (L.run % L.n) || (L.run >= L.n && L.run % L.n === 0 && L.run > 0)
+              ? " on" : "")+'">'+i+'</span>';
+  }
+  box.innerHTML = '<span class="eyebrow">The lap</span>'+
+    '<div class="laprow"><span class="lappips">'+pips+'</span>'+
+    '<span class="lapnum"><b>'+L.run+'</b>in a row</span>'+
+    '<span class="lapnum'+(L.best ? " best" : "")+'"><b>'+L.best+'</b>best</span></div>'+
+    '<p class="note lapnote">One miss and it starts again at station one. '+
+    'Every holed putt still scores, whatever the run does.</p>';
+  return box;
+}
 function shotRow(a, s, last, cfg){
-  var calls = callsFor(a, s, cfg);
+  var calls = callsFor(a, s, cfg, cfg ? null : state.draft);
   var nb = calls.length;
   var anyWindow = calls.some(function(c){ return c.kind === "w"; });
   var shots = cfg ? cfg.shots : draftShots(s);
   var parts = cfg ? null : setParts(s);
 
   var kind = trackKind(a, s);
-  var wantsSlope = !cfg && (kind === "lag" || areaShape(a) === "clock");
+  /* The garden circle is always the same hole on the same slope, so the answer
+     is on the set and the question is not worth a tap. */
+  var wantsSlope = !cfg && !s.low && (kind === "lag" || areaShape(a) === "clock");
 
   var row = document.createElement("div"); row.className = "set shotset";
   if(!cfg) row.innerHTML = '<div><div class="lbl">'+s.label+guideChip(s.guide)+'</div><div class="tgt">'+tgtText(s, a)+aimChip(a, s)+'</div></div>';
   if(wantsSlope) row.appendChild(slopeBox(kind, s, function(){ diag.__key = null; paint(); }));
+  var lapHost = null;
+  if(!cfg && s.lap){ lapHost = lapStrip(s, state.draft); row.appendChild(lapHost); }
 
   var ask = document.createElement("p"); ask.className = "shotask";
   var diag = document.createElement("div"); diag.className = "shotdiag";
@@ -9798,6 +9896,10 @@ function shotRow(a, s, last, cfg){
 
   var cur = 0, phase = null;
   function call(){ return calls[cur] || {}; }
+  /* A lap re-reads its stations after every tap: holing one moves her on, and a
+     miss puts her back at station one, so the call for the ball she is about to
+     play changes under her. */
+  function recalls(){ if(!cfg && s.lap) calls = callsFor(a, s, null, state.draft); }
   function firstOpen(){
     for(var i=0;i<nb;i++){ if(!shotDone(s, shots[i], calls[i])) return i; }
     return nb-1;
@@ -9856,7 +9958,7 @@ function shotRow(a, s, last, cfg){
     return out;
   }
 
-  function slopeNow(){ return wantsSlope ? (state.draft.slope || {})[s.id] : null; }
+  function slopeNow(){ return s.low ? s.low : (wantsSlope ? (state.draft.slope || {})[s.id] : null); }
   function brk(c){
     var b = breakOf(kind, slopeNow(), c);
     return (b && b !== "flat") ? ', <b>' + BREAK_LAB[b].toLowerCase() + '</b>' : '';
@@ -9900,9 +10002,14 @@ function shotRow(a, s, last, cfg){
               "|" + (c.pd==null ? "" : c.pd) + "|" + (c.ottClub==null ? "" : c.ottClub);
     if(key !== diag.__key){
       var low = slopeNow();
-      var pic = c.kind === "lag" ? lagSvg(c, true) : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist}, true);
+      var pic = c.kind === "lag" ? lagSvg(c, true)
+        : shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist, stn:s.stn,
+                       hiSide:s.hiSide, from:s.from, to:s.to}, true);
       var main = st === "w" ? gridSvg(gridOf(c), true) : pic;
-      var side = !wantSide ? "" : (st === "w" ? shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist}, false) : gridSvg(gridOf(c), false));
+      var side = !wantSide ? "" : (st === "w"
+        ? shapeSvg(a, {tc:c.tc, st:c.st, low:low, bull:c.bull, dist:c.dist, stn:s.stn,
+                       hiSide:s.hiSide, from:s.from, to:s.to}, false)
+        : gridSvg(gridOf(c), false));
       diag.innerHTML = '<div class="diagmain">'+main+'</div>'+
         (side ? '<button type="button" class="inset" aria-label="Go back to the '+(st==="w"?"target":word||"grid")+'">'+side+'</button>' : '');
       diag.__key = key;
@@ -9998,8 +10105,12 @@ function shotRow(a, s, last, cfg){
     var fresh = patch.z != null && !wasDone;
     rescore();
     if(fresh && !cfg) praiseShot(a, s, calls[cur], shots[cur]);
+    /* the lap moves before advance() picks the next ball, or she would be told
+       to play from the station the miss just took her away from */
+    recalls();
     advance();
     paint();
+    if(lapHost) lapHost.replaceWith(lapHost = lapStrip(s, state.draft));
     saveDraft();
   }
 
@@ -10021,7 +10132,9 @@ function shotRow(a, s, last, cfg){
   undo.addEventListener("click", function(){
     if(shots[cur]) shots[cur] = null;
     else if(cur > 0){ cur--; shots[cur] = null; }
-    phase = null; rescore(); paint(); saveDraft();
+    phase = null; rescore(); recalls(); paint();
+    if(lapHost) lapHost.replaceWith(lapHost = lapStrip(s, state.draft));
+    saveDraft();
   });
 
   row.appendChild(ask);
