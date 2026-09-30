@@ -1889,6 +1889,7 @@
       </div>
       <input type="date" id="sessDate" aria-label="Session date">
     </div>
+    <div class="seg" id="sessSeg" hidden></div>
     <div class="modebar"><button class="modetoggle" id="sessMode">Show all sets</button></div>
     <div class="prog" id="sessProg"></div>
     <p class="savetick" id="saveTick" hidden></p>
@@ -2299,7 +2300,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-30", note:"New S&C: two sessions, A and B, twice a week in forty minutes, built from the evidence review. Three short warm-ups of their own: gym (seven minutes, warm first, then landing and stopping, and at the top of A and B), golf (the teenage back-pain trial warm-up, with its drawings, then the club, then three jumps on the first tee) and squash (eight minutes). Sessions 1 to 3 move to the foot of the list as Extended S&C" };
+var BUILD = { on:"2026-09-30", note:"Putting is two days now, about thirty minutes each, and the app says which is due: a holing-out day (the ladder twice for pace, then the 55 around the clock, which still places you against the LPGA) and a lag day (the full ladder, all ten rounds and every marker, then ten four-footers). The rotation is a Quick Drill of its own. Also new: S&C sessions A and B, and gym, golf and squash warm-ups" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -2469,10 +2470,10 @@ var AREAS = [
   ],
   placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"LPGA Tour players"} },
 
-{ id:4, no:5, name:"World-class holing out", sub:"Putting · pace and line under pressure", block:"in100", track:true, shape:"clock",
+{ id:4, no:5, name:"World-class holing out", sub:"Putting · holing-out day, alternating with a lag day", block:"in100", track:true, shape:"clock",
   sg:true, hitLabel:"holed",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
-  plan:"10 min warm-up → 50 min: 105 putts, five-ball sets, full routine every one",
+  plan:"Golf warm-up → about 30 min: the ladder twice for pace, then 55 around the clock, five-ball sets, full routine every one",
   /* The test is the 55 clock putts and nothing else. A tour player holes 35.9 of them,
      which is 65.3%, so the clock calibrates to two in three on its own. The ladder has no
      tour equivalent to be placed against and the rotation mixes lags in with holing out,
@@ -2481,14 +2482,21 @@ var AREAS = [
   placing:{n:55, p:0.653, sd:0.045, sets:["a","b","c","e"], runTable:"CLOCKRUN",
            mixed:true, word:"on the clock", field:"LPGA Tour players"},
   sets:[
+    /* Split in two in Sep 2026: the girls found 105 putts too long. This is now
+       the holing-out day, and the lag day is p-putt-lag in the practice library.
+       The full ladder and the rotation are gone from here, not deleted, so every
+       session already played against them still renders and still counts. Two
+       rounds of the ladder stay at the front, because holing out cold is not how
+       a round starts. */
+    {id:"w", sgKind:"putt", pd:40, lag:1, guide:"ladder", group:"Pace first · the ladder, two rounds", label:"Lag ladder · rounds 1 and 2", xg:"Ladder warm-up", tgt:"10 putts · A1 to the five at B, then B1 to the five at A", max:10},
     {id:"a", sgKind:"putt", pd:4, group:"Holing out · a point is holed", label:"4 ft · around the clock", tc:"4 ft", tgt:"4 sets of 5 (one club plus grip)", r2:0.90, word:"4 feet", max:20},
     {id:"b", sgKind:"putt", pd:6, label:"6 ft", tc:"6 ft", tgt:"3 sets of 5 (two clubs)", r2:0.68, word:"6 feet", max:15},
     {id:"c", sgKind:"putt", pd:9, label:"9 ft", tc:"9 ft", tgt:"2 sets of 5 (three clubs)", r2:0.46, word:"9 feet", max:10},
     {id:"e", sgKind:"putt", pd:12, label:"12 ft", tc:"12 ft", tgt:"2 sets of 5 (four clubs)", r2:0.32, word:"12 feet", max:10},
-    {id:"d", sgKind:"putt", pd:40, lag:1, guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
-    {id:"r", rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", xg:"Rotation", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
+    {id:"d", gone:true, sgKind:"putt", pd:40, lag:1, guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
+    {id:"r", gone:true, rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", xg:"Rotation", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
   ],
-  setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. Six rounds is 30 putts. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
+  setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. On a holing-out day it is the first two rounds only, ten putts, for pace. The full ladder is ten rounds, 50 putts, and that is the lag day. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
   }
 ];
 
@@ -3186,8 +3194,49 @@ var PRACTICE = [
      tgt:"Same club, same target. A point for the window, a point for the circle",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ],
-  placing:{n:40, p:0.570, sd:0.05, field:"LPGA Tour players"} }
+  placing:{n:40, p:0.570, sd:0.05, field:"LPGA Tour players"} },
+/* The lag day. Paired with area 4 rather than assigned instead of it: the two
+   alternate, and the app says which is due. Its sets are cloned from area 4
+   below, so the ladder and the clock have one definition each. */
+{ id:"p-putt-lag", type:4, no:5, paired:4, track:true, shape:"clock", sg:true, hitLabel:"holed", block:"in100",
+  name:"World-class holing out \u00b7 lag day", sub:"Putting \u00b7 the full lag ladder, then short ones",
+  targets:"No more than two three-putts in three rounds \u00b7 Every lag inside one step, about 3 ft, from all ten markers \u00b7 Every four-footer holed",
+  plan:"Golf warm-up \u2192 about 30 min: the full ladder, ten rounds, then ten four-footers around the clock",
+  setup:"Five targets at each end (A1\u20135 and B1\u20135), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1\u2192B1-5, R2 B1\u2192A1-5, R3 A2\u2192B1-5 and so on to B5. Ten rounds is 50 putts, every marker used. A point when the ball finishes between the targets in front and behind, about 3 ft. Then ten four-footers around the clock, because a good lag leaves one.",
+  sets:[] }
 ];
+(function(){
+  var p = PRACTICE.filter(function(x){ return x.id === "p-putt-lag"; })[0];
+  p.sets = drillSets({from:4, use:["d","a"], caps:{d:50, a:10}});
+  p.sets[0].group = "Lag ladder \u00b7 a point is inside one step";
+  p.sets[0].label = "Lag ladder \u00b7 all ten rounds";
+  p.sets[0].tgt = "50 putts \u00b7 A1 to B5, change ends after every five";
+  p.sets[1].group = "Finish short \u00b7 a point is holed";
+  p.sets[1].tgt = "2 sets of 5 (one club plus grip)";
+})();
+/* Tasks that run as two alternating days rather than one session. The tile
+   opens whichever was done longer ago, and the session page offers the other. */
+var PAIRS = { 4:{ ids:[4, "p-putt-lag"], names:["Holing-out day", "Lag day"] } };
+function pairOf(id){
+  var t = typeOf(id), p = PAIRS[t];
+  return (p && p.ids.indexOf(id) > -1) ? p : null;
+}
+function pairDue(typeId){
+  var p = PAIRS[typeId];
+  if(!p) return practiceFor(typeId);
+  /* a player given a practice of her own keeps it */
+  if(practiceFor(typeId) !== typeId) return practiceFor(typeId);
+  var best = p.ids[0], bestDate = "9999";
+  p.ids.forEach(function(id){
+    var h = sessionsFor(id), d = h.length ? h[h.length-1].date : "0000";
+    if(d < bestDate){ bestDate = d; best = id; }
+  });
+  return best;
+}
+function pairName(id){
+  var p = pairOf(id); if(!p) return "";
+  return p.names[p.ids.indexOf(id)] || "";
+}
 function customLib(kind){
   var o = (state.lib && state.lib[kind]) || [];
   return o.slice();
@@ -3196,7 +3245,7 @@ function allPractice(typeId){
   var out = [];
   liveAreas().forEach(function(a){ if(a.id === typeId) out.push(a); });
   PRACTICE.concat(customLib("practice")).forEach(function(p){
-    if(p && p.type === typeId) out.push(p);
+    if(p && p.type === typeId && !p.paired) out.push(p);
   });
   return out;
 }
@@ -3569,6 +3618,13 @@ var DRILLS = [
   where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
   ruleText:"A holed putt scores. A tour player holes 46% from nine feet and 32% from twelve.",
   from:4, use:["c","e"] },
+
+{ id:"d-putt-rotation", area:4, place:2, mins:10,
+  name:"The rotation", sub:"Twenty putts, the app calls the length",
+  why:"The only putting practice where she does not know what is coming: a four-footer, then a lag, then a nine-footer. That is how putts arrive on a course. It did not fit in either putting day without breaking the thirty minutes, so it lives here.",
+  where:"Practice green", shape:"clock", sg:true, hitLabel:"holed", rotFrom:4,
+  ruleText:"Holed scores on the short ones. Inside one step, about three feet, scores on a lag. Strokes gained prices each putt at the length it was called.",
+  from:4, use:["r"] },
 
 { id:"d-putt-lag", area:4, place:2, mins:20,
   name:"The lag", sub:"The ladder, six rounds",
@@ -6502,10 +6558,19 @@ function sinceWords(d){
    at all. It is the most neglected thing on the screen, so it sorts as if the
    gap were longer than any real one rather than falling off the bottom. */
 function tileGap(t){
-  var hist = sessionsFor(practiceFor(t.id));
+  var own = sessionsFor(practiceFor(t.id)), hist = own;
+  /* A paired task was practised whenever either day was, so the gap and the
+     count take both. The best stays with the programme's own day: the two days
+     are different sessions and a best across them compares nothing. */
+  var pr = PAIRS[t.id];
+  if(pr && practiceFor(t.id) === t.id){
+    hist = [];
+    pr.ids.forEach(function(id){ hist = hist.concat(sessionsFor(id)); });
+    hist.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  }
   var last = hist.length ? hist[hist.length-1].date : null;
   var d = daysBetween(last);
-  return { hist:hist, last:last, days:d, key:(d === null ? 1e6 : d) };
+  return { hist:hist, own:own, last:last, days:d, key:(d === null ? 1e6 : d) };
 }
 /* Still used by the past-session card and the review, which do compare a
    session against what was on offer. The tile no longer shows it. */
@@ -6548,9 +6613,9 @@ function sgAreaBalls(a){
   return n;
 }
 function tileBest(r){
-  var a = r.a, sg = isSG(a), best = null, i, x, v;
-  for(i = 0; i < r.hist.length; i++){
-    x = r.hist[i];
+  var a = r.a, sg = isSG(a), best = null, i, x, v, hs = r.own || r.hist;
+  for(i = 0; i < hs.length; i++){
+    x = hs[i];
     if(!x || x.total == null || x.sgUnknown) continue;
     if(!sg && !x.max) continue;
     /* A part-session cannot hold a best. This used to read x.n, which sessions
@@ -6591,6 +6656,7 @@ function renderHome(){
     var dueNow = testDue(t.id);
     var nm = sk.nm || t.name;
     var sub = isDefaultPractice(r.pid) ? sk.sub : a.name;
+    if(PAIRS[t.id] && isDefaultPractice(r.pid)) sub = sk.sub + " \u00b7 " + pairName(pairDue(t.id)).toLowerCase() + " next";
     var meta = tileMeta(r);
     var b = document.createElement("button");
     b.className = "tl" + (wide ? " wide" : "");
@@ -6618,7 +6684,7 @@ function renderHome(){
     b.addEventListener("click", function(){
       var due = testDue(t.id);
       if(due && showDue(due, t.id)) return;
-      openSession(practiceFor(t.id));
+      openSession(pairDue(t.id));
     });
     host.appendChild(b);
   });
@@ -7087,9 +7153,30 @@ function openSession(areaId, resume){
                             : (a.retired ? "Earlier format" : "Area "+areaNo(a));
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
+  renderSessSeg(areaId);
   renderSession();
   show("session");
   return true;
+}
+/* The two days of a paired task, side by side at the top of the session, the
+   way the gym shows A and B. The one done longer ago is marked due. */
+function renderSessSeg(areaId){
+  var host = $("sessSeg"); if(!host) return;
+  var p = pairOf(areaId);
+  host.innerHTML = "";
+  if(!p){ host.hidden = true; return; }
+  host.hidden = false;
+  var due = pairDue(typeOf(areaId));
+  p.ids.forEach(function(id, i){
+    var h = sessionsFor(id), a = area(id);
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("role","tab");
+    b.setAttribute("aria-selected", id === areaId ? "true" : "false");
+    b.innerHTML = '<b>' + p.names[i] + (id === due ? ' <span class="due">\u00b7 due</span>' : '') + '</b>' +
+      (a ? (sgAreaBalls(a) + ' putts') : '') +
+      (h.length ? ' <span style="color:var(--muted);font-weight:400">\u00b7 ' + fmtDate(h[h.length-1].date) + '</span>' : '');
+    b.addEventListener("click", function(){ if(id !== state.draft.areaId) openSession(id); });
+    host.appendChild(b);
+  });
 }
 function renderSession(){
   var a = area(state.draft.areaId);
@@ -8621,7 +8708,11 @@ function buildSessionList(a, last){
   host.appendChild(sessionIntro());
   host.appendChild(condPage());
   var current=null, wrap=null;
-  a.sets.forEach(function(s){
+  /* The live sets, as the card view already does. This iterated a.sets, so
+     "Show all sets" put every retired set back on the page of a new session:
+     harmless while none of the retired ones were long, but once putting was
+     split it offered the full ladder and the rotation on the holing-out day. */
+  liveSets(a).forEach(function(s){
     if(s.group || !wrap){
       current = document.createElement("div"); current.className="setgroup";
       if(s.group) current.innerHTML = '<span class="eyebrow">'+s.group+'</span>';
@@ -9811,7 +9902,9 @@ function lagFrom(round){
    already logged. */
 function rotPool(a){
   var pool = [], windowed = false, gk = "windows";
-  a.sets.forEach(function(x){
+  /* A drill that is only the rotation draws its lengths from the area it came from */
+  var src = (a.rotFrom != null && area(a.rotFrom)) || a;
+  src.sets.forEach(function(x){
     if(x.rot || x.guide === "ladder") return;
     if(x.parts && (x.guide === "windows" || x.guide === "heights")){ windowed = true; gk = x.guide; }
     else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist,
@@ -10470,9 +10563,16 @@ var DEFAULT_CHECKS = ["Always be checking alignment", "", ""];
 var SWING_AREAS = [1, 2, 10, 11];
 var CHECK_TITLE = {10:"Tee shot checks", 11:"Approach checks", 2:"Wedge checks",
                    3:"Short game checks", 4:"Putting checks", 5:"Course checks"};
-function checkTitle(areaId){ return CHECK_TITLE[areaId] || "Swing checks"; }
+/* The lag day is putting: it shares the holing-out day's checks rather than
+   starting a second list of its own. */
+function checkKey(areaId){
+  var a = (typeof PRACTICE !== "undefined") ? area(areaId) : null;
+  return (a && a.paired != null) ? a.paired : areaId;
+}
+function checkTitle(areaId){ return CHECK_TITLE[checkKey(areaId)] || "Swing checks"; }
 
 function checksFor(areaId){
+  areaId = checkKey(areaId);
   var p = playerObj();
   var by = p && p.checksByArea;
   if(by && by[areaId] != null && by[areaId] !== "") return toBullets(by[areaId]);
@@ -10489,7 +10589,7 @@ function renderChecks(hostId, areaId, opts){
     lines: function(){ return checksFor(areaId); },
     onSave: function(v){
       var pl = playerObj();
-      if(pl){ pl.checksByArea = pl.checksByArea || {}; pl.checksByArea[areaId] = v; saveEdit(); }
+      if(pl){ pl.checksByArea = pl.checksByArea || {}; pl.checksByArea[checkKey(areaId)] = v; saveEdit(); }
       if(state.draft) state.draft.checks = checksFor(areaId);
       if(opts.after) opts.after();
     }
@@ -12161,7 +12261,7 @@ function renderProgress(){
   renderConditions();
   var host = $("charts"); host.innerHTML="";
   var any=false;
-  AREAS.forEach(function(a){
+  AREAS.concat(PRACTICE.filter(function(p){ return p.paired; })).forEach(function(a){
     var hist = sessionsFor(a.id);
     if(!hist.length) return;
     any=true;
