@@ -1936,8 +1936,8 @@
 
   <section id="viewSC" hidden>
     <h1>Strength &amp; conditioning</h1>
-    <p class="lede">The gym and everything that goes with it. Movement prep before every session, speed work alongside.</p>
-    <div class="grouphd"><b>The programme</b><span>two to three a week</span></div>
+    <p class="lede">The gym and everything that goes with it. Two sessions a week, a warm up before every one, and the same warm up before squash.</p>
+    <div class="grouphd"><b>The programme</b><span>twice a week</span></div>
     <div class="tilegrid" id="scTiles"></div>
     <div class="grouphd"><b>Alongside it</b><span>as and when</span></div>
     <div class="arealist" id="scList"></div>
@@ -2294,7 +2294,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-29", note:"Quick Drills, and the home drills draw their own kit: a mat with a gate, the trainer in section, the garden corners, and the circle as an eight-station clock with a lap counter on it, one miss and it starts again. A point for the one thing each drill is about, a record of everything else" };
+var BUILD = { on:"2026-09-30", note:"New S&C: two sessions, A and B, twice a week in forty minutes, built from the evidence review. A six-minute warm up of landing and stopping work before each, and the same before squash. Sessions 1 to 3 move to the foot of the list as Extended S&C" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -2700,7 +2700,109 @@ function vidChip(id, name, label){
     '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M2 1 L9 5 L2 9 Z" fill="currentColor"/></svg>'+(label||"watch")+'</a>';
 }
 
+/* ---- New S&C, Sep 2026 ----
+   Two sessions, A and B, twice a week, forty minutes with the warm up. Built
+   from the evidence review rather than cut down from sessions 1 to 3, which
+   stay as Extended S&C for a day with an hour to spare.
+
+   What the review supported, and so what is here: jumps and throws (lower-body
+   impulse and upper-body explosive strength are the two best predictors of club
+   head speed), heavy free-weight compound lifts (what the youth golf trials that
+   worked were built on), and landing and deceleration work (the ACL prevention
+   programmes, which matter because they play squash). What it did not support,
+   and so what is gone: a separate trunk block, a ramp before every lift, and a
+   fourth working set on everything.
+
+   The strength block is a circuit, lower then push then pull, so each lift gets
+   about three minutes before its own next set while the clock keeps moving. The
+   lower-body lift gets a fourth set, because lower-body force is the strongest
+   predictor of the three. Reps are 6 to 8: the best youth dose evidence points
+   there, and it is the safer start for players still finding the 20 kg bar
+   heavy.
+
+   Videos: every lift reuses an id the app already had. Three are new, found by
+   search and not yet watched through: the chest pass, the single-leg RDL and
+   the warm-up drills. Tap through before trusting them. */
+var NEWPREP = [
+  ["90/90 hip switch","5/side","kvyYhCbOUaQ"],
+  ["Half-kneeling t-spine rotation","5/side","VkGwj9ps4EA"],
+  ["Single-leg reach, front, side, back","3 each way, each leg","T1Mss4A193s"],
+  ["Jump and stick, hold 2 s","5","jmJkUKUY3pg"],
+  ["Hop and stick, hold 2 s","5 each leg","iULSY4NdKXM"],
+  ["Split-step into a lunge, hold 1 s","3 each way","iCAmGtNFxRc"],
+  ["Side-step and stop dead","3 each way","JaZd29lMBro"]
+];
+/* The same warm up for squash, with the strength and the court moves put back:
+   squash has no strength block after it, and it is where the knees are at risk.
+   The ACL studies delivered this before sport, every time, which is why it is
+   its own session rather than a note on the gym. */
+var SQUASHPREP = [
+  ["Easy jog round the court, side shuffles, crossover steps","2 min",null],
+  ["Single-leg reach, front, side, back","3 each way, each leg","T1Mss4A193s"],
+  ["Bodyweight squat","10",null],
+  ["Slow walking lunge","5 each leg",null],
+  ["Jump and stick, hold 2 s","5","jmJkUKUY3pg"],
+  ["Hop and stick, hold 2 s","5 each leg","iULSY4NdKXM"],
+  ["Split-step into a lunge to each corner, hold 1 s","2 rounds of all six","iCAmGtNFxRc"],
+  ["Side-step and stop dead","5 each way","JaZd29lMBro"],
+  ["Ghosting, rising pace","2 or 3 runs","2XS4RMCW4pM"]
+];
+var NEW_INTRO = "Two sessions a week, A and B, the same two every week: only the weights change. "+
+  "Warm up 6 min, power 7, strength 19, finisher 7. Every set stops one or two reps short of failure. "+
+  "When every set of a lift reaches 8 reps, add weight next time and work back up from 6.";
+var NEW_TIP = "Short on time: drop the fourth lower-body set first, then the finisher. The warm up, the power pairs "+
+  "and three rounds of the circuit always stay. Tournament or exam week: two rounds of the circuit, or one session "+
+  "if only one fits. Not the evening after a hard squash match.";
+
 var GYM = [
+{ id:9, name:"Session A", lift:"Trap bar · bench · row", grp:"new",
+  intro:NEW_INTRO, tip:NEW_TIP, prep:NEWPREP, blocks:[
+  {name:"Power", note:"7 min. Jump, then throw, then 60 s. Three rounds. Stick every landing for 2 s", ex:[
+    {id:"p1", name:"Countermovement jump", vid:"3u1uz8ghdk0", pre:"3 × 3", tgt:3, sets:3,
+     cue:"Maximum height, land and hold 2 s, knees over toes", rest:"straight into the throw"},
+    {id:"p2", name:"MB rotational scoop throw", vid:"mxf1D3NtxMo", pre:"3 × 3 / side", tgt:3, sets:3,
+     load:true, unit:"kg", kit:"ball", cue:"3 kg, maximum intent", rest:"60 s",
+     alt:"Band rotational chop, fast", altVid:"0AHBdvW5iaM"}]},
+  {name:"Strength", note:"19 min. A circuit: trap bar, bench, row, 45–60 s between each. Three rounds, then the fourth trap bar set on its own", ex:[
+    {id:"c", name:"Trap-bar deadlift", vid:"ZnIMOgVCOKI", pre:"4 × 6–8", tgt:8, top:8, sets:4,
+     load:true, unit:"kg", kit:"bar", ramp:[[0.6,5],[0.8,3]], cue:"Stop one or two reps short of failure", rest:"45–60 s, then the bench",
+     prog:true, key:true, alt:"DB Romanian deadlift, until the empty bar is manageable for 8", altVid:"IJdUtnxAmNo"},
+    {id:"s1", name:"DB bench press", vid:"WLTU1j7Ur8M", pre:"3 × 6–8", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", cue:"Stop one or two reps short of failure", rest:"45–60 s, then the row", prog:true},
+    {id:"s2", name:"Chest-supported row", vid:"LuWGKt8B_7o", pre:"3 × 6–8", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", cue:"Pause at the chest", rest:"45–60 s, then back to the trap bar", prog:true}]},
+  {name:"Finisher", note:"7 min. Split squat, then Nordics, then 60 s. Two rounds", ex:[
+    {id:"f1", name:"Rear-foot elevated split squat", vid:"tcEAeBjSkHI", pre:"2 × 6–8 / side", tgt:8, top:8, sets:2,
+     load:true, unit:"kg", kit:"db", cue:"Dumbbells, front knee over the toes", rest:"straight into the Nordics", prog:true},
+    {id:"f2", name:"Nordic curl (eccentric only)", vid:"F-AaE8mw_pY", pre:"2 × 3–5", tgt:5, top:5, sets:2,
+     cue:"Slowest lower possible", rest:"60 s", prog:true,
+     alt:"Towel or slider hamstring curl", altVid:"p-V7uBUHeLc"}]}
+] },
+
+{ id:10, name:"Session B", lift:"Goblet squat · press · chin-up", grp:"new",
+  intro:NEW_INTRO, tip:NEW_TIP+" When goblet squats with the heaviest dumbbell reach 8 comfortably, move to the bar or make the split squat the main lift.",
+  prep:NEWPREP, blocks:[
+  {name:"Power", note:"7 min. Bound, then throw, then 60 s. Three rounds. Stick every landing for 2 s", ex:[
+    {id:"p1", name:"Lateral bound, stick the landing", vid:"ofNjMK1Qf90", pre:"3 × 3 / side", tgt:3, sets:3,
+     cue:"Maximum distance, hold 2 s, knee over the toes", rest:"straight into the throw"},
+    {id:"p2", name:"MB chest pass", vid:"pJ8amgzbZMM", pre:"3 × 3", tgt:3, sets:3,
+     load:true, unit:"kg", kit:"ball", cue:"3–4 kg, as hard as you can from the chest", rest:"60 s"}]},
+  {name:"Strength", note:"19 min. A circuit: squat, press, chin-up, 45–60 s between each. Three rounds, then the fourth squat set on its own", ex:[
+    {id:"c", name:"Goblet squat", vid:"lRYBbchqxtI", pre:"4 × 6–8", tgt:8, top:8, sets:4,
+     load:true, unit:"kg", kit:"db", ramp:[[0.6,5]], cue:"Chest up, elbows inside the knees. Stop one or two short of failure", rest:"45–60 s, then the press",
+     prog:true, key:true},
+    {id:"s1", name:"Half-kneeling 1-arm DB press", vid:"7oeFpnRCJkY", pre:"3 × 6–8 / side", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", cue:"Do not let the body twist", rest:"45–60 s, then the chin-up", prog:true},
+    {id:"s2", name:"Chin-up (banded assist)", vid:"6NoWVtcSUyI", pre:"3 × 6–8", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"plate", cue:"Less band as you get stronger", rest:"45–60 s, then back to the squat", prog:true,
+     alt:"Single-arm DB row", altVid:"wi1k4tFbNUU"}]},
+  {name:"Finisher", note:"7 min. RDL, then Pallof, then 60 s. Two rounds", ex:[
+    {id:"f1", name:"Single-leg RDL", vid:"iS7atZhcRnw", pre:"2 × 6–8 / side", tgt:8, top:8, sets:2,
+     load:true, unit:"kg", kit:"db", cue:"One dumbbell, hips square", rest:"straight into the Pallof", prog:true},
+    {id:"f2", name:"Pallof press hold", vid:"HXrLaqNIkTs", pre:"2 × 30 s / side", tgt:30, sets:2, rep:"sec",
+     cue:"Hardest band, held still", rest:"60 s", alt:"Bring a band"}]}
+] },
+
 { id:1, name:"Session 1", lift:"Squat", blocks:[
   {name:"Power", note:"Build up: 3 easy, 3 medium, then the 4 working sets. Stop if it slows down", ex:[
     {id:"p", name:"MB rotational scoop throw", vid:"mxf1D3NtxMo", pre:"4 × 3 / side", tgt:3, sets:4,
@@ -2727,7 +2829,7 @@ var GYM = [
 
 { id:2, name:"Session 2", lift:"Bench", blocks:[
   {name:"Power", note:"Build up: 3 easy, 3 medium, then the 4 working sets", ex:[
-    {id:"p", name:"Countermovement jump", vid:"3u1uz8ghdk0", pre:"4 × 3", tgt:3, sets:4, rep:"cm", repLabel:"height",
+    {id:"p", name:"Countermovement jump", vid:"3u1uz8ghdk0", pre:"4 × 3", tgt:3, sets:4,
      cue:"Bodyweight, maximum height", rest:"60 s"}]},
   {name:"Compound", note:"Ramp 40 / 60 / 80%, then 4 working sets", ex:[
     {id:"c", name:"DB bench press", vid:"WLTU1j7Ur8M", pre:"4 × 4–6", tgt:6, top:6, sets:4,
@@ -2774,7 +2876,7 @@ var GYM = [
 
 { id:4, name:"Speed sticks", lift:"Overspeed", extra:true,
   intro:"Four sticks: yellow superlight, green light, blue medium, red heavy. Ascending order, light to heavy, then finish light again to re-express the speed after the heavy work. Twenty-four maximal swings. No ball. The rests are the programme, not padding, and they are the first thing anyone skips.",
-  tip:"Test the driver, never the stick. Best of five on the sim in weeks 1, 5 and 9, on a day with no stick work, and log it on the ball flight sheet. Stick speed rising while driver speed sits still means she has learned to swing a light object fast.",
+  tip:"Test the driver, never the stick. Best of five on the sim in weeks 1, 5 and 9, on a day with no stick work, and log it on the ball flight sheet. Stick speed rising while driver speed sits still means she has learned to swing a light object fast. It is a trial: six to eight weeks at the start of golf practice, never straight after a heavy leg day, and if the driver has not moved by more than 2 to 3 mph at week 9, stop. Only for a player chasing speed.",
   blocks:[
   {name:"Build up", note:"Be properly warm before the maximal sets", ex:[
     {id:"w", name:"Build up, standing", pre:"Yellow \u00b7 3 easy, 3 medium", tgt:6, sets:1, rest:"1 min", timer:60,
@@ -2846,6 +2948,15 @@ var GYM = [
   {name:"Movement prep", ex:[
     {id:"pp", name:"Movement prep", prepList:true, pre:"Eleven movements \u00b7 8\u201310 min", tgt:11, sets:1}]}
 ] },
+
+{ id:11, name:"Squash warm-up", lift:"Before every game", extra:true,
+  intro:"Ten minutes on court before every game or practice. It is the same landing and stopping work as the gym warm up with the squats, lunges and court moves put back. The injury studies behind it ran it before sport, every time, so it only counts if it is every time.",
+  tip:"Knee over the second toe, never caving in, and land quietly. Watch each other's knees: the feedback is part of what made it work.",
+  blocks:[
+  {name:"Squash warm-up", ex:[
+    {id:"pp", name:"Squash warm-up", prepList:true, items:SQUASHPREP, doneLabel:"Warm-up done", pre:"Nine movements · 10 min", tgt:9, sets:1}]}
+] },
+
 
 /* ---- Nov 2025 programme, added Sep 2026 ----
    A different shape from sessions 1 to 3, and deliberately kept as its own pair
@@ -6479,24 +6590,32 @@ function renderSC(){
   /* One programme is the current one. Strength 1 & 2 is the one before it, kept
      because the history against it is hers, and moved to the foot of the page so
      it is not offered alongside the thing that replaced it. */
+  /* New S&C is the programme; the three ramped sessions it replaced sit at the
+     foot of the list as Extended S&C, for a day with an hour to spare. */
   var PROG = [
-    {nm:"Strength &amp; conditioning", sub:"Power, compound, support, trunk",
-     ic:"gym", ss:coreGymSessions(),
-     go:function(){ openGym(); }}
+    {nm:"New S&amp;C", sub:"Sessions A and B \u00b7 twice a week \u00b7 40 min with the warm up",
+     ic:"gym", ss:mine().filter(isNewSC),
+     go:function(){ openGym(newDue()); }}
   ];
   var ALSO = [
     {nm:"Speed sticks", opt:1, ic:"bolt", ss:mine().filter(isSpeed),
-     sub:"Overspeed \u00b7 12 min \u00b7 twice a week alongside the gym",
+     sub:"A 6 to 8 week trial \u00b7 12 min \u00b7 at the start of golf practice, not in the gym",
      go:function(){ openGym(4); }},
     {nm:"Band session", opt:1, ic:"band", ss:mine().filter(isBand),
      sub:"Away from the gym \u00b7 15 min \u00b7 instead of a missed session",
      go:function(){ openGym(5); }},
     {nm:"Movement prep", ic:"move", ss:mine().filter(isPrep),
-     sub:"Every session \u00b7 8\u201310 min \u00b7 or on its own",
+     sub:"The long version \u00b7 8\u201310 min \u00b7 before Extended S&amp;C, or on its own",
      go:function(){ openGym(6); }},
+    {nm:"Squash warm-up", ic:"move", ss:mine().filter(isSquash),
+     sub:"Before every game \u00b7 10 min \u00b7 landing and stopping",
+     go:function(){ openGym(11); }},
     {nm:"Strength 1 &amp; 2", old:1, ic:"gym", ss:mine().filter(isNov),
      sub:"Paired supersets \u00b7 Old BMS programme",
-     go:function(){ openGym(novDue()); }}
+     go:function(){ openGym(novDue()); }},
+    {nm:"Extended S&amp;C", ic:"gym", ss:coreGymSessions(),
+     sub:"Sessions 1 to 3 \u00b7 power, compound, support, trunk \u00b7 about an hour",
+     go:function(){ openGym(); }}
   ];
   /* The same line the practice tiles carry: when she last did it, and how many
      times in all. A count on its own said nothing about whether she had been
@@ -6552,7 +6671,7 @@ function renderBalance(){
   recent.forEach(function(s){
     if(s.kind==="round" || s.kind==="drill") return;
     if(isSpeed(s)) counts[7]++;
-    else if(isPrep(s)) counts[9]++;
+    else if(isPrep(s) || isSquash(s)) counts[9]++;
     else if(isBand(s)) counts[8]++;
     else if(s.kind==="gym") counts[6]++;
     else { var tid = typeOf(s.areaId); counts[tid]=(counts[tid]||0)+1; }
@@ -6561,7 +6680,7 @@ function renderBalance(){
   if(counts[1]) BKEYS.push(1);   // only if there are sessions in the earlier format
   var maxN = 1; BKEYS.forEach(function(k){ if(counts[k]>maxN) maxN = counts[k]; });
   var names = {10:"Tee shots",11:"Approach",2:"Wedge play",3:"Short game",4:"Holing out",
-               6:"S&C · gym",7:"Speed sticks",8:"Band session",9:"Movement prep",1:"Ball flight · earlier"};
+               6:"S&C · gym",7:"Speed sticks",8:"Band session",9:"Warm-ups",1:"Ball flight · earlier"};
   var host = $("balance"); host.innerHTML="";
   BKEYS.forEach(function(k){
     var row = document.createElement("div"); row.className="brow";
@@ -10599,8 +10718,22 @@ function isPrep(s){ return s.kind==="gym" && s.gymId===6; }
 /* The Nov 2025 pair. Its own programme, so it has its own card and its own
    rotation rather than being mixed into the ramped percentage work. */
 function isNov(s){ return s.kind==="gym" && (s.gymId===7 || s.gymId===8); }
+/* New S&C, Sep 2026: A and B. The programme now, so it has the big tile and its
+   own rotation; sessions 1 to 3 carry on underneath it as Extended S&C. */
+function isNewSC(s){ return s.kind==="gym" && (s.gymId===9 || s.gymId===10); }
+function isSquash(s){ return s.kind==="gym" && s.gymId===11; }
+function newDue(){
+  var a = gymSessions(9), b = gymSessions(10);
+  var da = a.length ? a[a.length-1].date : "0000";
+  var db = b.length ? b[b.length-1].date : "0000";
+  return da <= db ? 9 : 10;
+}
+/* The three ramped sessions, now Extended S&C. Everything else is filtered out
+   by name, so a new kind of gym session has to be added here or it is counted
+   as one of these three. */
 function coreGymSessions(){
-  return mine().filter(function(s){ return s.kind==="gym" && !isSpeed(s) && !isBand(s) && !isPrep(s) && !isNov(s); })
+  return mine().filter(function(s){ return s.kind==="gym" && !isSpeed(s) && !isBand(s) && !isPrep(s) && !isNov(s) &&
+                                           !isNewSC(s) && !isSquash(s); })
                .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
 }
 /* Alternates between Strength 1 and Strength 2, whichever was done longer ago,
@@ -10680,6 +10813,15 @@ function gymIntro(){
   /* A second programme, so it gets its own rules rather than the four that
      govern the ramped percentage work, and its own warm up in the same
      collapsible box: one list, read once, not a card per movement. */
+  if(g.grp === "new"){
+    d.innerHTML =
+      '<div class="targets" style="margin-top:0"><span class="eyebrow">How it runs</span><span>'+g.intro+'</span></div>'+
+      '<details class="prepbox" id="prepBox" open><summary>Warm up <span>every session \u00b7 6 min</span></summary>'+
+      '<p class="note" style="margin:8px 0 0">Knee over the second toe on every landing and every stop. Move through the range, do not hold a stretch.</p>'+
+      '<div id="prepList"></div></details>'+
+      (g.tip ? '<p class="note" style="margin-top:12px"><b>'+g.tip+'</b></p>' : '');
+    return d;
+  }
   if(g.grp === "nov"){
     d.innerHTML =
       '<div class="targets" style="margin-top:0"><span class="eyebrow">How it runs</span><span>'+g.intro+'</span></div>'+
@@ -10779,7 +10921,7 @@ function renderGymSeg(){
   host.hidden = false;
   /* Each programme marks its own due session, so the Nov pair says which of
      the two is next rather than borrowing the core rotation's answer. */
-  var due = (grp === "nov") ? novDue() : gymDue();
+  var due = (grp === "nov") ? novDue() : (grp === "new") ? newDue() : gymDue();
   GYM.forEach(function(g){
     if(gymGrp(g) !== grp) return;
     var h = gymSessions(g.id);
@@ -10804,7 +10946,7 @@ function renderPrep(){
   }).join("");
   host.innerHTML = '<div class="prep">'+rows+'</div>'+
     '<label class="prepdone"><input type="checkbox" id="prepDone"> '+
-      (gym(state.gymDraft.gymId).grp === "nov" ? "Warm up done" : "Movement prep done")+'</label>';
+      (gym(state.gymDraft.gymId).grp ? "Warm up done" : "Movement prep done")+'</label>';
   $("prepDone").checked = !!state.gymDraft.prep;
   $("prepDone").addEventListener("change", function(){ state.gymDraft.prep = this.checked; });
 }
@@ -10893,7 +11035,7 @@ function exRow(e, last){
 
   if(e.prepList){
     var pl = document.createElement("div");
-    pl.innerHTML = '<div class="prep">' + PREP.map(function(x,i){
+    pl.innerHTML = '<div class="prep">' + (e.items || PREP).map(function(x,i){
       return '<div><span>'+(i+1)+'</span><span>'+x[0]+vidChip(x[2], x[0])+'</span><em>'+x[1]+'</em></div>';
     }).join("") + '</div>';
     body.appendChild(pl);
@@ -10902,7 +11044,8 @@ function exRow(e, last){
     pdone.type="button"; pdone.className="donebtn";
     function paintPrep(){
       pdone.setAttribute("data-done", d.done ? "1" : "0");
-      pdone.textContent = d.done ? "\u2713 Movement prep done" : "Movement prep done";
+      var dl = e.doneLabel || "Movement prep done";
+      pdone.textContent = d.done ? "\u2713 " + dl : dl;
     }
     pdone.addEventListener("click", function(){
       d.done = !d.done; paintPrep(); updateGym();
@@ -11991,7 +12134,7 @@ function renderProgress(){
     var pts = h.map(function(s){ return { date:s.date, total:s.ex[k.id].load, max:0 }; });
     var pb=0; pts.forEach(function(p){ if(p.total>pb) pb=p.total; });
     var card = document.createElement("div"); card.className="chartcard";
-    card.innerHTML = '<div class="hd"><span class="nm">S&amp;C · '+k.name+'</span><span class="pb num">best '+pb+' kg</span></div>'+
+    card.innerHTML = '<div class="hd"><span class="nm">S&amp;C · '+k.name+(g.grp ? '' : ' · extended')+'</span><span class="pb num">best '+pb+' kg</span></div>'+
                      lineChart(pts, pb, k.name+" load");
     host.appendChild(card);
   });
@@ -12026,6 +12169,7 @@ function sessLabel(x){
   return isSpeed(x) ? "Speed sticks"
        : isBand(x) ? "Band session"
        : isPrep(x) ? "Movement prep"
+       : isSquash(x) ? "Squash warm-up"
        : x.kind==="gym" ? "S&C \u00b7 "+gym(x.gymId).name+" \u00b7 "+gym(x.gymId).lift
        : areaTitle(area(x.areaId));
 }
