@@ -196,6 +196,8 @@
   .bellitem{display:flex; flex-direction:column; gap:2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px}
   .bellitem span{color:var(--ink-2); font-size:13.5px}
   .bellitem.new{border-color:var(--accent)}
+  .bellitem.kudos b::before{content:"\2713  "; color:var(--accent)}
+  .bellitem.news{background:var(--surface-2)}
   .bellitem.new b::after{content:" \00b7  new"; color:var(--accent); font-weight:600; font-size:12px}
   /* ---------- this week ---------- */
   .wkhead{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:2px 0 6px}
@@ -2490,7 +2492,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-01", note:"Goals is now yours to read and write: outcome, targets, where you are and the week. Which session, which test, which S&C programme and which quick drills are set by your coach. An unfinished session can be kept with Save as it is. This week, the first tab, is where you set how many main sessions, S&C and quick drills" };
+var BUILD = { on:"2026-10-01", note:"The bell is now a feed: kudos for every session, records (a new best, a run record, best ever on a set, a move up the LPGA placing, a drill or test best, weeks in a row) and anything new in the app. None of it comes to your phone; only the reminder does. Also new today: This week, Save as it is, and the coach sets your programme" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -13075,6 +13077,160 @@ function daysSinceType(typeId){
 }
 /* The messages. Each has a key, so a phone shows the dot for what it has not
    seen and not for the same thing every time. */
+/* ---------- the bell: kudos, records and what is new ----------
+   None of this is a phone notification. It is the Strava feed: every session
+   gets its kudos, anything significant gets said once, and a new session, test
+   or drill in the app is announced. A week of it, newest first. */
+var BELL_DAYS = 7;
+var KUDOS = ["Another session in the books.", "Kudos! That one counts.", "Logged. Nice work.",
+             "In the bank. Keep it going.", "Another one done. Well played."];
+function hashPick(list, id){
+  var h = 0; id = String(id || ""); for(var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return list[h % list.length];
+}
+function sessTitle(s){
+  if(s.kind === "drill"){ var d = drillById(s.drillId); return d ? d.name : "Quick drill"; }
+  if(s.kind === "test"){ var t = testById(s.testId); return t ? t.name : "Test"; }
+  if(s.kind === "gym") return stripTags(sessLabel(s));
+  var sk = TILE[typeOf(s.areaId)]; return sk ? sk.nm : areaTitle(area(s.areaId));
+}
+function sessResult(s){
+  if(s.kind === "gym") return (s.total || 0) + " of " + (s.max || 0) + " sets";
+  var a = area(s.drillId || s.testId || s.areaId);
+  if(s.total == null || s.sgUnknown) return "";
+  if(a && isSG(a)) return fmtSG(s.total) + " strokes";
+  return s.max ? s.total + " of " + s.max : String(s.total);
+}
+/* The sessions that came before this one, in the order they were saved, of
+   the same thing. A record is only a record against what came before it. */
+function priorOf(sess, same){
+  var out = [], i, x;
+  for(i = 0; i < state.sessions.length; i++){
+    x = state.sessions[i];
+    if(x.id === sess.id) break;
+    if(x.playerId !== state.activePlayer || x.status === "live" || x.sample || thinSession(x)) continue;
+    if(same(x)) out.push(x);
+  }
+  return out;
+}
+function recordsFor(sess){
+  var out = [];
+  if(!sess || sess.sample || thinSession(sess) || sess.status === "live") return out;
+  var name = sessTitle(sess);
+  var push = function(tag, title, body){ out.push({ key:"rec:"+tag+":"+sess.id, kind:"good", title:title, body:body, date:sess.date }); };
+
+  if(sess.kind === "practice"){
+    var a = area(sess.areaId); if(!a) return out;
+    var prior = priorOf(sess, function(x){ return x.kind === "practice" && x.areaId === sess.areaId; });
+    var sg = isSG(a);
+    var val = function(x){ return x.total == null || x.sgUnknown ? null : sg ? x.total : (x.max ? x.total / x.max : null); };
+    var pv = prior.map(val).filter(function(v){ return v != null; });
+    if(pv.length >= 2 && val(sess) != null && val(sess) > Math.max.apply(null, pv))
+      push("best", "New best: " + name, sessResult(sess) + ", better than all " + pv.length + " before it.");
+    /* the leaderboard: her LPGA placing, where lower is better */
+    var pl = sessionPlacing(a, sess);
+    if(pl != null){
+      var pp = prior.map(function(x){ return sessionPlacing(a, x); }).filter(function(v){ return v != null; });
+      if(pp.length && pl < Math.min.apply(null, pp))
+        push("place", "Up the leaderboard: " + name,
+             ordinalPlace(pl) + " of 100 LPGA Tour players, your highest yet. It was " + ordinalPlace(Math.min.apply(null, pp)) + ".");
+    }
+    var br = sess.bestRun || 0;
+    if(br >= 4){
+      var pr = 0; prior.forEach(function(x){ if((x.bestRun || 0) > pr) pr = x.bestRun; });
+      if(pr && br > pr) push("run", "Run record: " + name, br + " in a row, your longest yet. The old one was " + pr + ".");
+    }
+    /* best ever on one set: the windows, a distance, a station */
+    var sets = [];
+    liveSets(a).forEach(function(set){
+      var list = sess.shots && sess.shots[set.id]; if(!list || !list.length) return;
+      var k = list.filter(function(x){ return x && isIn(x.z); }).length; if(!k) return;
+      var was = null, n = 0;
+      prior.forEach(function(x){
+        var l2 = x.shots && x.shots[set.id]; if(!l2 || !l2.length) return;
+        n++; var k2 = l2.filter(function(y){ return y && isIn(y.z); }).length;
+        if(was == null || k2 > was) was = k2;
+      });
+      if(n >= 2 && k > was) sets.push({ set:set, k:k, of:list.length, gain:k - was });
+    });
+    sets.sort(function(x, y){ return y.gain - x.gain; }).slice(0, 2).forEach(function(x){
+      push("set-" + x.set.id, "Best ever on " + (x.set.label || "a set"),
+           name + ": " + x.k + " of " + x.of + " in the target, your best on it yet.");
+    });
+    if(sess.metrics && sess.metrics.chsFast){
+      var fp = 0; prior.forEach(function(x){ if(x.metrics && x.metrics.chsFast > fp) fp = x.metrics.chsFast; });
+      if(fp && sess.metrics.chsFast > fp) push("speed", "Fastest yet", sess.metrics.chsFast + " mph club head speed. The old best was " + fp + ".");
+    }
+  } else if(sess.kind === "drill" || sess.kind === "test"){
+    var key = sess.kind === "drill" ? "drillId" : "testId";
+    var pr2 = priorOf(sess, function(x){ return x.kind === sess.kind && x[key] === sess[key]; })
+      .filter(function(x){ return x.total != null && !x.sgUnknown; });
+    if(pr2.length >= (sess.kind === "test" ? 1 : 2) && sess.total != null &&
+       sess.total > Math.max.apply(null, pr2.map(function(x){ return x.total; })))
+      push("best", (sess.kind === "test" ? "Test best: " : "Drill record: ") + name,
+           sessResult(sess) + ", better than all " + pr2.length + " before it.");
+    var br2 = sess.bestRun || 0, pr3 = 0;
+    pr2.forEach(function(x){ if((x.bestRun || 0) > pr3) pr3 = x.bestRun; });
+    if(br2 >= 4 && pr3 && br2 > pr3) push("run", "Run record: " + name, br2 + " in a row, your longest yet.");
+  }
+  return out;
+}
+
+/* What is new in the app. Written by hand for a feature; a new session, test
+   or drill is found on its own by comparing the catalogue with what this
+   device has seen before. The first time it looks, it only takes note. */
+var NEWS = [
+  { id:"2026-10-01-week", date:"2026-10-01", title:"New: This week",
+    body:"The first tab. Set how many main sessions, S&C and quick drills in Settings; the app picks which. Change or remove any of them." },
+  { id:"2026-10-01-bank", date:"2026-10-01", title:"New: Save as it is",
+    body:"An unfinished session you are not going back to can be kept with what you scored, instead of deleted." },
+  { id:"2026-10-01-bell", date:"2026-10-01", title:"New: kudos and records",
+    body:"Every session you log, every record and every move up the leaderboard now shows here." }
+];
+var KNOWN_KEY = "lcl.known";
+function catalogue(){
+  var out = [];
+  PRACTICE.forEach(function(p){ if(!p.paired) out.push({ id:"p:"+p.id, what:"session", nm:p.name }); });
+  TESTS.forEach(function(t){ if(!t.retired) out.push({ id:"t:"+t.id, what:"test", nm:t.name }); });
+  allDrills().forEach(function(d){ if(/^d-/.test(d.id)) out.push({ id:"d:"+d.id, what:"quick drill", nm:d.name }); });
+  GYM.forEach(function(g){ out.push({ id:"g:"+g.id, what:"S&C session", nm:stripTags(g.name) }); });
+  return out;
+}
+function catalogueNews(){
+  var k = null;
+  try{ k = JSON.parse(localStorage.getItem(KNOWN_KEY) || "null"); }catch(e){}
+  var cat = catalogue(), changed = false, first = !k;
+  k = k || { seen:{} };
+  cat.forEach(function(c){
+    if(k.seen[c.id] == null){ k.seen[c.id] = first ? "0" : today(); changed = true; }
+  });
+  if(changed){ try{ localStorage.setItem(KNOWN_KEY, JSON.stringify(k)); }catch(e){} }
+  return cat.filter(function(c){ var d = k.seen[c.id]; return d && d !== "0" && daysBetween(d) <= 30; })
+    .map(function(c){ return { key:"cat:"+c.id, kind:"news", title:"New " + c.what + ": " + c.nm,
+      body:"Added to the app. " + (c.what === "test" ? "It is on the Tests tab." : c.what === "quick drill" ? "It is on Quick Drills." :
+           c.what === "S&C session" ? "It is on the S&C tab." : "Your coach can put it in your programme."), date:k.seen[c.id] }; });
+}
+function feedItems(){
+  var out = [], cut = addDays(today(), -BELL_DAYS);
+  var recent = mine().filter(function(s){ return !s.sample && s.date >= cut && countsForWeek(s); })
+    .sort(function(a, b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+  var wk = weekOf(), thisWeek = mine().filter(function(s){ return s.date >= wk && countsForWeek(s); }).length;
+  recent.forEach(function(s, i){
+    if(i < 6){
+      var res = sessResult(s);
+      out.push({ key:"kudos:"+s.id, kind:"kudos", date:s.date, title:"Kudos! " + sessTitle(s),
+        body:hashPick(KUDOS, s.id) + (res ? " " + res + "." : "") + (i === 0 && s.date >= wk ? " That is " + thisWeek + " this week." : "") });
+    }
+    recordsFor(s).forEach(function(r){ out.push(r); });
+  });
+  /* weeks in a row, the ones worth saying */
+  var sn = weekStreakNow();
+  if(sn.st.met && [2, 4, 8, 12, 26, 52].indexOf(sn.n) > -1)
+    out.push({ key:"streak:"+sn.n+":"+wk, kind:"good", title:sn.n+" weeks in a row", body:"Every week you set yourself, done. Keep it going." });
+  NEWS.forEach(function(n){ if(daysBetween(n.date) <= 30) out.push({ key:"news:"+n.id, kind:"news", title:n.title, body:n.body, date:n.date }); });
+  return out.concat(catalogueNews());
+}
+
 function bellItems(){
   var out = [], wk = weekOf();
   var dow = (new Date().getDay() + 6) % 7;
@@ -13099,6 +13255,8 @@ function bellItems(){
       out.push({ key:"plan:"+nextWeek(), kind:"nudge", title:"Set next week", go:"plan",
                  body:"How many main sessions, S&C and quick drills. Your numbers; the app picks the sessions." });
   }
+  /* kudos, records, weeks in a row and what is new */
+  feedItems().forEach(function(x){ out.push(x); });
   /* tests that are due, where Tests is a thumb away */
   liveAreas().forEach(function(a){
     var d = testDue(a.id);
@@ -13111,20 +13269,6 @@ function bellItems(){
     if(g && g.days >= 10) out.push({ key:"gap:"+x[0]+":"+g.last, kind:"gap",
       title:"No "+x[1]+" for "+g.days+" days",
       body:"It only exists at the club. Next time you are there, start at "+x[2]+"." });
-  });
-  /* a best in the last week, said once */
-  liveAreas().forEach(function(t){
-    var hist = sessionsFor(practiceFor(t.id)).filter(function(s){ return s.total != null && !s.sgUnknown && !thinSession(s); });
-    if(hist.length < 3) return;
-    var a = area(practiceFor(t.id)) || t, sg = isSG(a);
-    var val = function(s){ return sg ? s.total : (s.max ? s.total / s.max : -1); };
-    var last = hist[hist.length-1], prev = hist.slice(0, -1);
-    if(daysBetween(last.date) > 7) return;
-    if(prev.every(function(s){ return val(last) > val(s); })){
-      var sk = TILE[t.id] || {};
-      out.push({ key:"best:"+last.id, kind:"good", title:"New best: "+(sk.nm || a.name),
-        body:(sg ? fmtSG(last.total)+" strokes" : last.total+" of "+last.max)+", better than all "+prev.length+" before it." });
-    }
   });
   /* milestones, the Strava "10th activity" */
   var all = mine().filter(countsForWeek).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
