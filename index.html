@@ -2300,7 +2300,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-09-30", note:"Putting is two days now, about thirty minutes each, and the app says which is due: a holing-out day (the ladder twice for pace, then the 55 around the clock, which still places you against the LPGA) and a lag day (the full ladder, all ten rounds and every marker, then ten four-footers). The rotation is a Quick Drill of its own. Also new: S&C sessions A and B, and gym, golf and squash warm-ups" };
+var BUILD = { on:"2026-10-01", note:"New tests. Right number on approach and on wedges: the app calls a new number every ball, a point for level with the flag, every miss counted short or long. Lag and hole out replaces twenty from six feet, because the holing-out day already tests holing every time. Inside one club is retired. Every test now shows your last run against the average of your last three, and how big a change has to be to be real" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3324,7 +3324,7 @@ function areaMax(a){ var m=0; liveSets(a).forEach(function(s){ m+=setMax(s); });
    Anything added to this list appears in the Goals dropdown on its own, for the area
    it names. Nothing else has to be touched. */
 var TESTS = [
-{ id:"t-approach-pinhigh", area:11, isTest:true, track:true, name:"Pin high or past",
+{ id:"t-approach-pinhigh", retired:true, area:11, isTest:true, track:true, name:"Pin high or past",
   sub:"Never short from 125 to 185",
   why:"Short is the miss that costs most: it brings the front bunker and the false front into play and leaves the longest putt. This test scores the one thing, whether the ball got there.",
   where:"Range or sim", balls:20, target:120,
@@ -3371,7 +3371,7 @@ var TESTS = [
      metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}],
      metricLabel:"Club head speed \u00b7 mph", metricNote:"The average of the fifteen, and the fastest and slowest"}
   ]},
-{ id:"t-wedge-distance", area:2, isTest:true, track:true, rule:"distance",
+{ id:"t-wedge-distance", retired:true, area:2, isTest:true, track:true, rule:"distance",
   name:"Distance control", sub:"Right number, whatever the line does",
   why:"Proximity mixes two faults together. This one asks about distance alone: a ball that is level with the flag but off to one side has the number right, and a ball that is straight but long or short does not.",
   where:"Range or sim", balls:20, target:120,
@@ -3382,7 +3382,7 @@ var TESTS = [
     {id:"c", label:"70y \u00b7 five balls", short:"70 yards", tc:"Level with the flag", dist:70, balls:5, max:5, tgt:"Five balls. The number, not the line"},
     {id:"d", label:"90y \u00b7 five balls", short:"90 yards", tc:"Level with the flag", dist:90, balls:5, max:5, tgt:"Five balls. The number, not the line"}
   ]},
-{ id:"t-short-oneclub", area:3, isTest:true, track:true, rule:"bull",
+{ id:"t-short-oneclub", retired:true, area:3, isTest:true, track:true, rule:"bull",
   name:"Inside one club", sub:"Twenty shots, every lie, three feet or nothing",
   why:"The two-club circle is the working target. This is the other end of it: how often she puts one close enough that the putt is a formality, from lies she does not choose.",
   where:"Short game area", balls:20, target:120,
@@ -3393,7 +3393,7 @@ var TESTS = [
     {id:"c", label:"Bunker \u00b7 20 paces", tc:"2 clubs", bull:"1 club", dist:20, lie:"good", r1:0.084, r2:0.221, word:"the bunker", balls:5, max:5, tgt:"Five balls. Inside a club or nothing"},
     {id:"d", label:"Awkward lie \u00b7 your pick", tc:"2 clubs", bull:"1 club", dist:30, lie:"awk", r1:0.066, r2:0.169, word:"an awkward lie", balls:5, max:5, tgt:"Five balls, a different lie each one"}
   ]},
-{ id:"t-putt-six", area:4, isTest:true, track:true, shape:"clock", rule:"holed",
+{ id:"t-putt-six", retired:true, area:4, isTest:true, track:true, shape:"clock", rule:"holed",
   name:"Twenty from six feet", sub:"The length that decides a card",
   why:"Six feet is where rounds are saved and thrown away, and it is the shortest putt a tour player misses often enough to matter. Twenty of them, around the clock, no second balls.",
   where:"Practice green", balls:20, target:120,
@@ -3401,6 +3401,53 @@ var TESTS = [
   sets:[
     {id:"a", label:"6 ft \u00b7 around the clock", tc:"6 ft", r2:0.68, word:"6 feet", balls:20, max:20,
      tgt:"Four sets of five, moving round the hole. Holed scores"}
+  ]},
+
+/* ---- Oct 2026: three replacements ----
+   The four above marked retired were reviewed and found too small or scored the
+   wrong way to show change. Twenty balls scored hit or miss need about six balls
+   of movement between two runs before the change is real, and two of them asked
+   the wrong question besides: pin high or past paid for flying the green, and
+   five balls in a row at one number let her correct after the first. Retired,
+   not edited, so the runs against them stay comparable with each other.
+
+   The two full-swing replacements draw the number at random every ball, the way
+   the Approach-Iron Skill Test does (Robertson, Burnett and Newton), and score
+   depth only: level with the flag, inside the circle's depth, whatever the line.
+   Every miss is filed as short or long, which is the number the test is for. */
+{ id:"t-approach-depth", area:11, isTest:true, track:true, rule:"distance", rotFrom:11, depth:true,
+  name:"Right number, approach", sub:"125 to 185, the app calls the number",
+  why:"Short is the miss that costs most: it brings the front bunker and the false front into play and leaves the longest putt. This asks whether the ball got to the number without paying for one that flew the green, and it files every miss as short or long, so a habit of coming up short shows as a count.",
+  where:"Range or sim", balls:20, target:120,
+  ruleText:"The app calls 125, 145, 165 or 185 for each ball, in no order you can predict. A point for a ball level with the flag, inside the depth of the 40 ft circle (about 13 yards either side), wherever it is left or right. Every miss is recorded as short or long.",
+  sets:[
+    {id:"r", rot:true, balls:20, max:20, label:"Twenty balls \u00b7 the app calls the number",
+     tgt:"A new number every ball. Level with the flag scores"}
+  ]},
+{ id:"t-wedge-number", area:2, isTest:true, track:true, rule:"distance", rotFrom:2, depth:true,
+  name:"Right number, wedges", sub:"30, 50, 70 and 90, the app calls the number",
+  why:"Wedges are a distance problem before they are a direction problem. Five balls at one number lets her find it with the first and repeat it; a round never gives her that. Here the number changes every ball, and every miss is filed as short or long.",
+  where:"Range or sim", balls:20, target:120,
+  ruleText:"The app calls 30, 50, 70 or 90 for each ball. A point for a ball level with the flag, inside the depth of the 20 ft circle (about 7 yards either side), wherever it is left or right. Every miss is recorded as short or long.",
+  sets:[
+    {id:"r", rot:true, balls:20, max:20, label:"Twenty balls \u00b7 the app calls the number",
+     tgt:"A new number every ball. Level with the flag scores"}
+  ]},
+/* Holing out is measured every holing-out day, 55 putts against the LPGA, which
+   is a bigger and better test than twenty six-footers. What had no test at all
+   was lag, so this is it: three lengths, holed out, counted twice. */
+{ id:"t-putt-lag", area:4, isTest:true, track:true,
+  name:"Lag and hole out", sub:"Eighteen putts from 20, 30 and 40 feet",
+  why:"Three-putts are the putting stat that moves a score, and they start with the first putt. This counts both halves: how often the lag finishes inside three feet, and how often she is down in two. It is the test for the target of no more than two three-putts in three rounds.",
+  where:"Practice green", balls:18, target:108,
+  ruleText:"Play them in turn, 20, 30, 40 feet, then round again, six times, and hole out every one. A point for a lag that finishes inside 3 ft, and a point for down in two or fewer.",
+  sets:[
+    {id:"a", label:"20 ft \u00b7 six putts", short:"20 feet", balls:6, tgt:"Hole out every one",
+     parts:[{id:"l", label:"Inside 3 ft", max:6},{id:"t", label:"Down in two", max:6}]},
+    {id:"b", label:"30 ft \u00b7 six putts", short:"30 feet", balls:6, tgt:"Hole out every one",
+     parts:[{id:"l", label:"Inside 3 ft", max:6},{id:"t", label:"Down in two", max:6}]},
+    {id:"c", label:"40 ft \u00b7 six putts", short:"40 feet", balls:6, tgt:"Hole out every one",
+     parts:[{id:"l", label:"Inside 3 ft", max:6},{id:"t", label:"Down in two", max:6}]}
   ]},
 
 /* ---- the two short game matrices ----
@@ -3483,7 +3530,9 @@ function testById(id){
   for(var j=0;j<ct.length;j++){ if(ct[j].id===id) return ct[j]; }
   return null;
 }
-function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId; }); }
+function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId && !t.retired; }); }
+var TEST_NEXT = {"t-approach-pinhigh":"t-approach-depth", "t-wedge-distance":"t-wedge-number",
+                 "t-putt-six":"t-putt-lag", "t-short-oneclub":"t-hundred"};
 
 /* ============ quick drills ============
    A drill is a short session that supplements the main practice: fifteen to
@@ -5917,7 +5966,12 @@ function testSessions(testId, playerId){
 function testPlan(areaId){
   var p = playerObj();
   var t = p && p.tests ? p.tests[areaId] : null;
-  return t && t.id ? t : null;
+  if(!(t && t.id)) return null;
+  /* a plan on a retired test moves to the one that replaced it, keeping her
+     "every so many sessions" exactly as she set it */
+  var old = testById(t.id);
+  if(old && old.retired && TEST_NEXT[t.id]) return { id:TEST_NEXT[t.id], every:t.every };
+  return t;
 }
 function testsDoneFor(areaId){
   return state.sessions.filter(function(x){
@@ -5941,8 +5995,19 @@ function testDue(areaId){
   return { test:testById(plan.id), n:n, every:every, over:n - every };
 }
 function testTally(t, sess){
-  var got = 0, n = 0;
+  var got = 0, n = 0, short = 0, long = 0;
   (t.sets || []).forEach(function(st){
+    /* a counted set (the lag test) is two steppers, not taps */
+    if(st.parts && !trackKind(t, st)){
+      var any = false, g = 0, m = 0;
+      setParts(st).forEach(function(pt){
+        var v = (sess.scores || {})[pt.key];
+        if(v != null) any = true;
+        g += v || 0; m += pt.max;
+      });
+      if(any){ got += g; n += m; }
+      return;
+    }
     var list = (sess.shots || {})[st.id] || [];
     var calls = callsFor(t, st, null, sess);
     list.forEach(function(x, i){
@@ -5952,9 +6017,22 @@ function testTally(t, sess){
       var ring = inFor(c, x.z);
       if(c.kind === "w"){ if(x.w === c.win && ring) got++; }
       else if(ring) got++;
+      else if(t.depth){
+        var dz = depthOf(x.z);
+        if(dz === "short") short++; else if(dz === "long") long++;
+      }
     });
   });
-  return {n:n, got:got};
+  return {n:n, got:got, short:short, long:long};
+}
+/* How far apart two results have to be before the difference is real rather than
+   a good day or a bad one: about two standard errors of the difference, for a
+   single run and for the average of three. Binomial, from her own rate. */
+function testNoise(n, p){
+  if(!n) return null;
+  p = Math.min(0.95, Math.max(0.05, p == null ? 0.5 : p));
+  var one = 1.96 * Math.sqrt(2 * n * p * (1 - p));
+  return { one:Math.max(1, Math.round(one)), three:Math.max(1, Math.round(one / Math.sqrt(3))) };
 }
 /* ---- adding to the libraries ----
    A pasted definition is data, not code. It can compose new sessions out of pieces the
@@ -6011,6 +6089,26 @@ function importLib(kind){
   render(); renderGoals();
   alert(added + " added to the library.");
 }
+/* Her last run against the average of her last three, and how big a change has
+   to be before it means anything. A rate over twenty balls moves several balls
+   on its own from one run to the next, and without this every one of those
+   movements reads as progress or as a slump. */
+function testRecent(t, runs, pct){
+  var rs = runs.map(function(r){ return { r:r, x:testTally(t, r) }; })
+               .filter(function(o){ return o.x.n; });
+  if(!rs.length) return '';
+  var last = rs[rs.length-1], three = rs.slice(-3);
+  var avg = three.reduce(function(s, o){ return s + o.x.got; }, 0) / three.length;
+  var nz = testNoise(last.x.n, pct != null ? pct/100 : last.x.got/last.x.n);
+  var out = '<p class="tstat">Last run <b>'+last.x.got+' of '+last.x.n+'</b>';
+  if(three.length > 1) out += ' \u00b7 average of the last '+three.length+' <b>'+(Math.round(avg*10)/10)+'</b>';
+  out += '</p>';
+  if(t.depth && (last.x.short || last.x.long))
+    out += '<p class="tstat">Misses last run: <b>'+last.x.short+' short</b>, '+last.x.long+' long</p>';
+  if(nz) out += '<p class="note">A single run has to move by about '+nz.one+' to be a real change; '+
+    'the average of three, by about '+nz.three+'. Anything smaller is the day, not the player.</p>';
+  return out;
+}
 function renderTests(){
   var host = $("testList"); if(!host) return;
   host.innerHTML = "";
@@ -6025,6 +6123,7 @@ function renderTests(){
   }
   allTests().forEach(function(t){
     var a = area(t.area), runs = testSessions(t.id);
+    if(t.retired && !runs.length) return;
     var tot = {n:0, got:0};
     if(!isMatrix(t)) runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
     var pct = tot.n ? Math.round(100*tot.got/tot.n) : null;
@@ -6052,13 +6151,15 @@ function renderTests(){
         '<p class="note">'+t.why+'</p>'+
         '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
         '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
+        (mxs ? '' : testRecent(t, runs, pct))+
         '<p class="tstat">'+
           (mxs ? mxs.text
                : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
                         : 'Nothing logged yet')+
                  ' \u00b7 aiming for '+(t.target||100))+'</p>'+
+        (t.retired ? '<p class="note">Retired. Kept for the runs against it; its replacement is in the list.</p>' :
         '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
-          '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>'+
+          '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>')+
       '</div>';
     var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
     row.addEventListener("click", function(){
@@ -6069,7 +6170,8 @@ function renderTests(){
     /* The one that is due opens on arrival, so the page has an opinion about
        what she came for without five red buttons shouting at once. */
     if(due && !isMatrix(t)){ row.setAttribute("aria-expanded","true"); det.hidden = false; }
-    card.querySelector("[data-run]").addEventListener("click", function(){ openTest(t.id); });
+    var rb = card.querySelector("[data-run]");
+    if(rb) rb.addEventListener("click", function(){ openTest(t.id); });
     host.appendChild(card);
   });
   if(!allTests().length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
@@ -9953,7 +10055,7 @@ function makeRotCalls(a, s){
     var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
     calls.push({ kind:"t", grid:spec.grid, win:null, lat:areaShape(a) === "corridor",
                  label:p.label, tc:p.tc, bull:p.bull, dist:p.dist,
-                 r1:p.r1, r2:p.r2, word:p.word, two:!!a.twoTier,
+                 r1:p.r1, r2:p.r2, word:p.word, two:!!a.twoTier, rule:a.rule,
                  sgKind:p.sgKind, ottClub:p.ottClub, pd:p.pd });
   }
   shuffle(calls);
