@@ -143,12 +143,12 @@
   .topin{max-width:760px; margin:0 auto; padding:11px 16px 10px}
   /* The other axis. Pills rather than a second bar, because these are places she
      goes on purpose now and then, not places she lives. */
-  nav.lookrow{display:flex; gap:7px; margin-top:9px; overflow-x:auto; scrollbar-width:none}
+  nav.lookrow{display:flex; gap:5px; margin-top:9px; overflow-x:auto; scrollbar-width:none}
   nav.lookrow::-webkit-scrollbar{display:none}
   nav.lookrow button{
-    flex:none; display:flex; align-items:center; gap:6px;
+    flex:1 1 auto; min-width:0; justify-content:center; display:flex; align-items:center; gap:5px;
     background:var(--surface); border:0; box-shadow:var(--card); border-radius:999px;
-    padding:7px 13px 7px 10px; font-size:12.5px; font-weight:600; color:var(--ink-2);
+    padding:7px 9px; font-size:12px; font-weight:600; color:var(--ink-2);
     white-space:nowrap;
   }
   nav.lookrow button svg{width:16px; height:16px; color:var(--ink)}
@@ -197,6 +197,79 @@
   .bellitem span{color:var(--ink-2); font-size:13.5px}
   .bellitem.new{border-color:var(--accent)}
   .bellitem.new b::after{content:" \00b7  new"; color:var(--accent); font-weight:600; font-size:12px}
+  /* ---------- this week ---------- */
+  .wkhead{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:2px 0 6px}
+  .wkhead h1{margin:2px 0 0}
+  .wkstreak{text-align:right; line-height:1.15; flex:none}
+  .wkstreak b{display:block; font-size:22px; font-weight:800; color:var(--accent); letter-spacing:-.02em}
+  .wkstreak span{font-size:11.5px; color:var(--muted)}
+  .wkgrp{margin-top:20px}
+  .wkgh{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .wkgh h2{margin:0; font-size:17px; font-weight:700; letter-spacing:-.012em}
+  .wkgh span{font-size:12.5px; color:var(--muted); font-weight:600}
+  .wkpips{display:flex; gap:4px; margin:8px 0 10px}
+  .wkpips i{flex:1; height:5px; border-radius:999px; background:var(--line-strong); max-width:64px}
+  .wkpips i.on{background:var(--accent)}
+  .wkrow{display:flex; align-items:center; border:1px solid var(--line); border-radius:12px; background:var(--surface);
+    margin-top:8px; overflow:hidden}
+  .wkrow.done{background:var(--surface-2)}
+  .wkgo, .wkopt{flex:1; display:flex; align-items:center; gap:11px; padding:10px 12px; background:none; border:0;
+    text-align:left; color:var(--ink); font:inherit; min-width:0; cursor:pointer}
+  .wkgo:disabled{cursor:default; color:var(--ink)}
+  .wkic{width:38px; height:38px; border-radius:10px; background:var(--tint); color:var(--tile-ink);
+    display:grid; place-items:center; flex:none}
+  .wktx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+  .wktx b{font-size:14.5px; font-weight:700; letter-spacing:-.01em}
+  .wktx b em{font-style:normal; font-weight:600; font-size:11.5px; color:var(--muted)}
+  .wktx > span{font-size:12.5px; color:var(--muted); line-height:1.3}
+  .wkrow.done .wktx > span{color:var(--ink-2)}
+  .wkstart{flex:none; font-size:12.5px; font-weight:700; color:var(--accent); background:var(--accent-wash);
+    border-radius:999px; padding:6px 11px}
+  .wktick{flex:none; width:26px; height:26px; border-radius:999px; background:var(--accent-fill); color:var(--on-accent);
+    display:grid; place-items:center; font-size:14px; font-weight:800}
+  .wkacts{display:flex; align-items:center; flex:none; padding-right:4px; border-left:1px solid var(--line); align-self:stretch}
+  .wkacts button{background:none; border:0; color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600;
+    padding:0 8px; height:100%; min-height:44px; cursor:pointer}
+  .wkacts .wkx{font-size:20px; font-weight:400; color:var(--muted); padding:0 8px 2px}
+  .wkextra, .wknote{font-size:13px; color:var(--ink-2); margin:10px 0 0; line-height:1.4}
+  .wkdone{background:var(--accent-wash); color:var(--ink); border-radius:10px; padding:10px 12px; font-weight:600;
+    font-size:14px; margin:12px 0 0}
+  .wkundo{font-size:13px; color:var(--ink-2); margin:14px 0 0}
+  .wkundo button{background:none; border:0; padding:0; color:var(--accent); font:inherit; font-weight:700; text-decoration:underline; cursor:pointer}
+  .wkfoot{margin-top:24px; padding-top:14px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px 12px;
+    align-items:center; justify-content:space-between; font-size:12.5px; color:var(--muted)}
+  .wkfoot button, .bellacts button{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    border-radius:999px; padding:7px 13px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer}
+  .wkopts{display:flex; flex-direction:column; gap:6px; margin-top:8px}
+  .wkopt{border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+  .wkopt.cur{opacity:.55}
+  .wkoh{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:10px 0 0}
+  .wkrmall{width:100%; margin-top:14px; border:1px solid var(--line-strong); background:var(--surface); color:var(--accent);
+    border-radius:10px; padding:11px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
+  /* ---------- settings ---------- */
+  .setgrp{margin-top:16px; background:var(--surface-2); border-radius:12px; padding:14px}
+  .setgrp .note{margin:8px 0 0}
+  .setseg{display:flex; gap:6px; margin:10px 0 2px}
+  .setseg button{flex:1; min-width:0; font:inherit; font-size:12.5px; padding:8px 6px; border:1px solid var(--line-strong);
+    border-radius:9px; background:var(--surface); color:var(--ink-2); cursor:pointer}
+  .setseg button b, .setseg button small{display:block}
+  .setseg button small{font-size:11.5px; color:var(--muted); margin-top:1px; font-weight:500}
+  .setseg button[aria-pressed="true"]{border-color:var(--accent-fill); background:var(--accent-wash); color:var(--ink); font-weight:700}
+  .setrow{align-items:center; padding-top:10px; border-top:1px solid var(--line)}
+  .setrow > span:first-child{display:flex; flex-direction:column; gap:2px; min-width:0}
+  .setrow b{font-size:14.5px}
+  .setrow small{font-size:11.5px; color:var(--muted); line-height:1.3}
+  .setrow .bwstep{flex:none}
+  .setrow .bwstep b{min-width:22px; text-align:center; font-size:17px}
+  .bwstep button:disabled{opacity:.35}
+  .setlist{font-size:12.5px}
+  .setgo{margin-top:12px; width:100%; background:var(--accent-fill); color:var(--on-accent); border:0; border-radius:10px;
+    padding:11px; font:inherit; font-size:14px; font-weight:700; cursor:pointer}
+  .setfocus{list-style:none; margin:8px 0 0; padding:0}
+  .setfocus li{display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:14px}
+  .setfocus li span{color:var(--muted); font-size:12.5px; text-align:right}
+  .bellacts{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+  .bellitem.go{text-align:left; background:var(--surface); font:inherit; color:var(--ink); cursor:pointer; width:100%}
   #bellClose{border:0; background:var(--surface-2); color:var(--ink-2); border-radius:8px; width:32px; height:32px; font-size:20px; line-height:1; flex:none}
   .player{
     display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line-strong);
@@ -1817,6 +1890,20 @@
   .cstat.cold b{color:var(--muted)}
   .cnote{font-size:13px; color:var(--ink-2); line-height:1.5; margin:0 0 10px;
     padding-left:10px; border-left:2px solid var(--line-strong)}
+  .cfocus{margin:4px 0 12px}
+  .cflist{list-style:none; margin:0 0 8px; padding:0}
+  .cflist li{display:flex; align-items:center; gap:6px; padding:6px 0; border-top:1px solid var(--line); font-size:13.5px}
+  .cflist li b{flex:1 1 auto; min-width:0}
+  .cflist input{width:9.5em; min-width:0; font:inherit; font-size:12.5px; padding:5px 7px; border:1px solid var(--line-strong);
+    border-radius:7px; background:var(--surface); color:var(--ink)}
+  .cflist button{width:28px; height:28px; flex:none; border:1px solid var(--line-strong); border-radius:7px;
+    background:var(--surface); color:var(--ink-2)}
+  .cfgap{width:28px; flex:none}
+  .cfadd{display:flex; gap:8px}
+  .cfadd select{flex:1; min-width:0; font:inherit; font-size:13px; padding:6px 8px; border:1px solid var(--line-strong);
+    border-radius:7px; background:var(--surface); color:var(--ink)}
+  .cfadd button{border:1px solid var(--line-strong); background:var(--surface); border-radius:7px; padding:6px 12px;
+    font:inherit; font-size:13px; font-weight:600; color:var(--ink)}
   .cnote em{display:block; font-style:normal; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:9.5px;
     font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
   .pcardc .acts{display:flex; gap:8px; flex-wrap:wrap}
@@ -1870,9 +1957,10 @@
     </div>
     <!-- Across the top: the three she goes to on purpose, now and then. -->
     <nav class="lookrow" role="tablist" aria-label="Look back">
-      <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path></svg><span>Sessions</span></button>
+      <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.6 12a8.4 8.4 0 1 0 2.5-6"></path><path d="M3.4 3.6v4.6H8"></path><path d="M12 7.6v4.6l3 1.9"></path></svg><span>Sessions</span></button>
       <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
       <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
+      <button id="tabSettings" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.7 6.3a5.6 5.6 0 0 1-7.4 6.9l-7 7a2.1 2.1 0 0 1-3-3l7-7a5.6 5.6 0 0 1 6.9-7.4l-3.4 3.4.6 2.9 2.9.6z"></path></svg><span>Settings</span></button>
     </nav></div>
 </header>
 
@@ -1880,7 +1968,8 @@
      is the only part one hand reaches without shifting grip, and Practice,
      S&C and Tests are what she came to do several times a week. -->
 <nav class="tabs" role="tablist" aria-label="Practise">
-  <button id="tabPractice" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
+  <button id="tabWeek" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path><path d="m8.4 15.6 2.4 2.3 4.8-4.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>This week</span></button>
+  <button id="tabPractice" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
   <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Tests</span></button>
   <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Quick Drills</span></button>
@@ -1893,7 +1982,23 @@
   <!-- One page. The welcome screen charged a tap and gave back a greeting she
        had already read, so the greeting moved up here and the season moved
        under the tiles, where it sits beneath the thing it is the reason for. -->
-  <section id="viewHome">
+  <!-- THIS WEEK: the page the app opens on -->
+  <section id="viewWeek" hidden>
+    <p class="banner hello" id="weekHello" hidden></p>
+    <div class="banner resume" id="weekResume" hidden>
+      <span id="weekResumeText"></span>
+      <span class="resacts">
+        <button id="weekResumeGo">Carry on</button>
+      </span>
+    </div>
+    <div class="wkhead">
+      <div><div class="eyebrow">This week</div><h1 id="wkDates"></h1></div>
+      <div class="wkstreak" id="wkStreak"></div>
+    </div>
+    <div id="wkBody"></div>
+  </section>
+
+  <section id="viewHome" hidden>
     <p class="banner warn" id="storeWarn" hidden></p>
     <div id="homeProj"></div>
     <p class="banner hello" id="helloBar" hidden></p>
@@ -2077,6 +2182,13 @@
     <p class="note" id="buildStamp"></p>
   </section>
 
+  <!-- SETTINGS -->
+  <section id="viewSettings" hidden>
+    <div class="eyebrow" id="setWho"></div>
+    <h1>Settings</h1>
+    <div id="setBody"></div>
+  </section>
+
   <!-- COACH -->
   <section id="viewCoach" hidden>
     <div class="coachbar">
@@ -2102,6 +2214,15 @@
       <button id="bellClose" class="lbx" aria-label="Close notifications">×</button>
     </div>
     <div id="bellBody"></div>
+  </div>
+</div>
+<div class="lb" id="wkSheet" hidden>
+  <div class="lbcard bellcard" role="dialog" aria-modal="true" aria-labelledby="wkSheetTitle">
+    <div class="lbhd">
+      <h3 id="wkSheetTitle">Change</h3>
+      <button id="wkSheetClose" class="lbx" aria-label="Close">×</button>
+    </div>
+    <div id="wkSheetBody"></div>
   </div>
 </div>
 <div class="lb" id="lightbox" hidden>
@@ -2339,7 +2460,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-01", note:"The bell, top right. Set your own number of sessions a week; a week counts when you reach it, rest days never break it, and you can pause a week for exams, illness or a tournament. It also tells you when a test is due, when you have not been near the short game or the tee for a while, and when you set a best. In the installed app you can turn on one reminder, at a time you choose, only on a day you have not trained" };
+var BUILD = { on:"2026-10-01", note:"This week, the new first tab. You set how many main sessions, S&C and quick drills in Settings; the app picks which: the areas you have left longest, S&C A and B in turn, and quick drills from your coach\u2019s focus and where you are placing lowest. Change or remove any of them. On Sunday evening the reminder asks you to set next week" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -5349,7 +5470,7 @@ function askName(){
         wrap.hidden = true;
         CLOUD.pulled = false; CLOUD.pulledFor = "";
         cloudPull();
-        render(); show("home");
+        render(); show("week");
         setStatus("That code is already set up, so there was nothing to name.");
         return null;      // stop here: nothing to claim
       }
@@ -5369,7 +5490,7 @@ function askName(){
       // now that she exists, do the real pull, on the same code
       CLOUD.pulled = false; CLOUD.pulledFor = "";
       cloudPull();
-      render(); show("home");
+      render(); show("week");
       showInstallTip();          // naming is done, so this is the next setup step
     }).catch(function(){
       go.disabled = false;
@@ -5467,6 +5588,7 @@ function applyMeta(meta){
           }
         });
         if(newer && them.mv) mine.mv = them.mv;
+        if(mergeWeekMeta(mine, them)) touched = true;
       }
     }
 
@@ -5496,7 +5618,7 @@ function applyMeta(meta){
      in storage while the panel went on saying "not set". */
   if(touched){
     try{ saveLocal(); }catch(e){}
-    try{ renderPlayer(); render(); }catch(e){}
+    try{ renderPlayer(); render(); if(state.view === "week") renderWeek(); if(state.view === "settings") renderSettings(); }catch(e){}
   }
 }
 
@@ -5723,11 +5845,18 @@ var $ = function(id){ return document.getElementById(id); };
 
 function show(view){
   state.view = view;
+  /* started from This week: Back goes back there, until she leaves the session */
+  if(view !== "session" && view !== "gym") state.fromWeek = false;
+  if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All areas";
+  if($("gymBack")) $("gymBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All areas";
   /* Leaving the session screen stops the matrix clock. It is rebuilt from the
      stored start time on the way back in, so nothing is lost by stopping it,
      and an interval left running on a screen nobody is looking at is how a
      phone's battery disappears. */
   if(view !== "session") mxStop();
+  $("viewWeek").hidden = view!=="week";
+  $("viewSettings").hidden = view!=="settings";
+  if(view==="week") renderWeek();
   $("viewHome").hidden = view!=="home";
   $("viewSession").hidden = view!=="session";
   $("viewGym").hidden = view!=="gym";
@@ -5743,6 +5872,8 @@ function show(view){
   $("viewGoals").hidden = view!=="goals";
   if(view === "goals" && $("buildStamp"))
     $("buildStamp").textContent = "Version " + BUILD.on + " \u00b7 " + BUILD.note + ".";
+  $("tabWeek").setAttribute("aria-selected", view==="week"?"true":"false");
+  $("tabSettings").setAttribute("aria-selected", view==="settings"?"true":"false");
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
   $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
   $("tabDrills").setAttribute("aria-selected", view==="drills"?"true":"false");
@@ -5764,7 +5895,7 @@ function show(view){
   if(barEl) barEl.hidden = (view==="session" || view==="gym");
   /* Exactly one of the two rows holds the screen she is on, and the other steps
      back to half strength so a glance says which way she moved last. */
-  var inDo = ["tabPractice","tabSC","tabTests","tabDrills"].some(function(id){
+  var inDo = ["tabWeek","tabPractice","tabSC","tabTests","tabDrills"].some(function(id){
     return $(id) && $(id).getAttribute("aria-selected") === "true"; });
   if(barEl) barEl.classList.toggle("dim", !inDo);
   if(lookEl) lookEl.classList.toggle("dim", inDo);
@@ -11543,8 +11674,9 @@ function saveCurrent(){
   if(fl && !fl.hidden){ clearTimeout(fl.__t); fl.hidden = true; }
   state.praise = (s.kind === "practice") ? sessionPraise(saved) : null;
   state.homePage = 0;
+  state.fromWeek = false;
   render();
-  show("home");
+  show("week");
   state.praise = null;
 }
 
@@ -12860,17 +12992,28 @@ function daysSinceType(typeId){
 /* The messages. Each has a key, so a phone shows the dot for what it has not
    seen and not for the same thing every time. */
 function bellItems(){
-  var out = [], wk = weekOf(), st = weekStreak();
+  var out = [], wk = weekOf();
   var dow = (new Date().getDay() + 6) % 7;
-
-  if(st.target && !pausedWeek(wk)){
-    if(st.thisWeek >= st.target){
-      out.push({ key:"wk-done:"+wk, kind:"good", title:"Week done",
-                 body:st.thisWeek+" of "+st.target+" this week."+(st.n > 1 ? " That is "+st.n+" weeks in a row." : "") });
-    } else if(dow >= 4 && st.thisWeek === st.target - 1){
-      out.push({ key:"wk-one:"+wk+":"+st.thisWeek, kind:"nudge", title:"One more keeps your week",
-                 body:st.thisWeek+" of "+st.target+" so far. Ten minutes on the mat counts." });
+  var wst = weekState(wk);
+  if(!wst.paused && wst.planned){
+    if(wst.met){
+      var sn = weekStreakNow().n;
+      out.push({ key:"wk-done:"+wk, kind:"good", title:"Week done", go:"week",
+                 body:"Everything you set yourself this week."+(sn > 1 ? " That is "+sn+" weeks in a row." : "") });
+    } else if(dow >= 4){
+      var left = [];
+      WEEK_KINDS.forEach(function(k){ var x = wst.per[k]; for(var i = x.got; i < x.want; i++) left.push(k); });
+      if(left.length === 1)
+        out.push({ key:"wk-one:"+wk+":"+left[0], kind:"nudge", title:"One more keeps your week", go:"week",
+                   body:"One "+WEEK_ONE[left[0]]+" to go. It is on This week." });
     }
+  }
+  /* the weekend: set the next one */
+  if(dow >= 5){
+    var nr = weekRec(nextWeek(), false);
+    if(!nr || !nr.set)
+      out.push({ key:"plan:"+nextWeek(), kind:"nudge", title:"Set next week", go:"plan",
+                 body:"How many main sessions, S&C and quick drills. Your numbers; the app picks the sessions." });
   }
   /* tests that are due, where Tests is a thumb away */
   liveAreas().forEach(function(a){
@@ -12910,7 +13053,7 @@ function bellItems(){
     return false;
   });
   if(pushCan() && !remindPrefs().on)
-    out.push({ key:"remind-offer", kind:"nudge", title:"A reminder, if you want one",
+    out.push({ key:"remind-offer", kind:"nudge", title:"A reminder, if you want one", go:"settings",
       body:"One nudge on a day you have not trained, at a time you choose. Never more than one a day." });
   return out;
 }
@@ -12927,38 +13070,24 @@ function paintBell(){
 }
 function openBell(){
   var host = $("bellBody"); if(!host) return;
-  var items = bellItems(), seen = bellSeen(), st = weekStreak(), wk = weekOf();
-  var pips = "";
-  for(var i = 0; i < Math.max(st.target, st.thisWeek); i++)
-    pips += '<i class="'+(i < st.thisWeek ? "on" : "")+'"></i>';
-  var week =
-    '<div class="bellweek">'+
-      '<div class="bwhd"><b>Your week</b><span>'+
-        (pausedWeek(wk) ? "paused" : st.target ? (st.n ? st.n+(st.n === 1 ? " week" : " weeks")+" in a row" : "a fresh start") : "")+
-      '</span></div>'+
-      (st.target
-        ? '<div class="bwpips">'+pips+'</div><p class="note">'+st.thisWeek+' of '+st.target+' this week. A week counts when you reach your own target. Rest days never break it.</p>'
-        : '<p class="note">Set a target for the week: how many sessions you mean to do. Your own number, not anybody else’s.</p>')+
-      '<div class="bwrow"><span>Sessions a week</span>'+
-        '<span class="bwstep"><button type="button" id="bwMinus" aria-label="One fewer a week">−</button>'+
-        '<b id="bwTarget">'+(st.target || "–")+'</b>'+
-        '<button type="button" id="bwPlus" aria-label="One more a week">+</button></span></div>'+
-      '<label class="bwpause"><input type="checkbox" id="bwPause"'+(pausedWeek(wk) ? " checked" : "")+'> '+
-        'Pause this week: exams, illness, a tournament. The streak waits.</label>'+
-    '</div>';
+  var items = bellItems(), seen = bellSeen(), wst = weekState(weekOf());
+  var sum = WEEK_KINDS.filter(function(k){ return wst.per[k].want; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&amp;C" : k === "main" ? "main" : "drills"); }).join(" \u00b7 ");
+  var week = '<div class="bellweek"><div class="bwhd"><b>Your week</b><span>'+(wst.paused ? "paused" : (sum || "nothing planned"))+'</span></div>'+
+    '<div class="bellacts"><button type="button" data-bgo="week">This week</button><button type="button" data-bgo="settings">Settings</button></div></div>';
   var list = items.length ? items.map(function(x){
-    return '<div class="bellitem '+x.kind+(seen[x.key] ? "" : " new")+'"><b>'+x.title+'</b><span>'+x.body+'</span></div>';
+    var tag = x.go ? "button" : "div";
+    return '<'+tag+(x.go ? ' type="button" data-bgo="'+x.go+'"' : '')+' class="bellitem '+x.kind+(seen[x.key] ? "" : " new")+(x.go ? " go" : "")+'"><b>'+x.title+'</b><span>'+x.body.replace(/&(?!amp;)/g, "&amp;")+'</span></'+tag+'>';
   }).join("") : '<p class="note">Nothing new. Go and make something.</p>';
-  host.innerHTML = week + '<div class="belllist">'+list+'</div>' + remindBlock();
-  $("bwMinus").onclick = function(){ setWeekTarget(Math.max(0, weekTarget() - 1)); };
-  $("bwPlus").onclick = function(){ setWeekTarget(Math.min(14, weekTarget() + 1)); };
-  $("bwPause").onchange = function(){
-    var p = playerObj(); if(!p) return;
-    p.pauseWeeks = (p.pauseWeeks || []).filter(function(w){ return w !== wk; });
-    if(this.checked) p.pauseWeeks.push(wk);
-    saveEdit(); openBell(); paintBell();
+  host.innerHTML = week + '<div class="belllist">'+list+'</div>';
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("[data-bgo]") : null; if(!b) return;
+    var g = b.getAttribute("data-bgo");
+    closeBell();
+    if(g === "week") show("week");
+    else if(g === "plan") openSettings("next");
+    else openSettings();
   };
-  wireRemind();
   $("bellWrap").hidden = false;
   document.body.style.overflow = "hidden";
   bellMark(items.map(function(x){ return x.key; }));
@@ -12966,7 +13095,7 @@ function openBell(){
 }
 function setWeekTarget(n){
   var p = playerObj(); if(!p) return;
-  p.weekTarget = n; saveEdit(); openBell(); paintBell();
+  p.weekTarget = n; saveEdit(); paintBell();
 }
 function closeBell(){ $("bellWrap").hidden = true; document.body.style.overflow = ""; }
 
@@ -13002,7 +13131,8 @@ function remindBlock(){
       times.map(function(x){ return '<option'+(x === t ? " selected" : "")+'>'+x+'</option>'; }).join("")+'</select></div>'+
     '<div class="bwrow"><span>When I</span><input id="rmCue" maxlength="40" placeholder="finish dinner" value="'+String(r.cue||"").replace(/"/g,"&quot;")+'" aria-label="Your cue"></div>'+
     '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>';
-  return '<div class="bellweek"><div class="bwhd"><b>Reminder</b><span>this phone</span></div>'+body+'</div>';
+  return '<div class="wkgh"><h2>Reminders</h2><span>this phone</span></div>'+body+
+    '<p class="note">On a Sunday the reminder is the one that asks you to set next week.</p>';
 }
 function urlB64(s){
   var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
@@ -13067,6 +13197,607 @@ function wireRemind(){
   $("rmTime").onchange = changed;
   $("rmCue").onchange = changed;
 }
+/* ============ this week ============
+   She picks the numbers, the app picks the sessions. Three kinds, each with
+   its own count: main sessions (the five golf areas), S&C (the two new
+   sessions, A and B) and quick drills. A week's plan is drawn once, the first
+   time it is looked at or when she sets it, and then stays put, so ticking one
+   off never reshuffles the rest. She can change any item or remove it; a
+   removed one is not replaced, it lowers that week's number.
+
+   What fills a slot: anything of that kind done in the week. The planned item
+   is ticked when she does exactly that; doing something else of the same kind
+   still counts towards the number, and the planned one stays on the list.
+   A week counts towards the streak when every kind reaches its number.
+
+   Stored on the player, and merged across devices by its own stamps rather
+   than the goals' mv, so a coach editing focus areas can never wipe a week a
+   girl set on her phone, and an auto-drawn week never beats one she chose. */
+var WEEK_KINDS = ["main", "sc", "drill"];
+var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills" };
+var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill" };
+var WEEK_DEF   = { main:3, sc:2, drill:3 };
+var WEEK_MAX   = { main:10, sc:2, drill:10 };
+/* the first week planned this way; before it, a week counted on the old
+   "so many sessions" target */
+var WEEK_FROM  = "2026-09-28";
+var SC_IDS     = [9, 10];
+/* The coach's starting focus for each girl. A coach edit (stamped now) always
+   beats these (stamped 1). */
+var FOCUS_SEED = {
+  charlotte:[{id:"gym:4", why:"Speed"}, {id:"d-short-bunkers", why:"Bunkers"}, {id:"d-tee-driver", why:"Distance"}],
+  annabel:  [{id:"d-wedge-ladder", why:"Distance control"}, {id:"d-app-windows", why:"Flight control"}, {id:"d-tee-driver", why:"Accuracy"}]
+};
+
+function gymOf(id){ for(var i = 0; i < GYM.length; i++) if(GYM[i].id === id) return GYM[i]; return null; }
+function weekClone(x){ return x == null ? x : JSON.parse(JSON.stringify(x)); }
+function nextWeek(){ return addDays(weekOf(), 7); }
+function weekSave(){ try{ saveLocal(); }catch(e){} try{ cloudMeta(); }catch(e){} }
+
+/* Every quick drill, plus the two optional gym sessions that work like one. */
+function drillRef(id){
+  if(/^gym:\d+$/.test(String(id))){
+    var g = gymOf(+String(id).slice(4)); if(!g) return null;
+    return { id:id, name:stripTags(g.name), gym:g.id, area:10 };
+  }
+  var d = drillById(id); if(!d) return null;
+  return { id:id, name:d.name, drill:d, area:d.area };
+}
+function drillChoices(){
+  return allDrills().filter(function(d){ return /^d-/.test(d.id); }).map(function(d){ return d.id; })
+    .concat(["gym:4", "gym:5"]);
+}
+function drillLast(id){
+  var r = drillRef(id); if(!r) return null;
+  var ss = r.gym ? mine().filter(function(s){ return s.kind === "gym" && s.gymId === r.gym; })
+                 : mine().filter(function(s){ return s.kind === "drill" && s.drillId === id; });
+  var d = planHist(ss).map(function(s){ return s.date; }).sort().pop();
+  return d || null;
+}
+
+function focusFor(p){
+  p = p || playerObj(); if(!p) return [];
+  if(p.focus == null){
+    var n = (p.name || "").trim().toLowerCase();
+    var key = n.indexOf("charlotte") === 0 ? "charlotte" : n.indexOf("annabel") === 0 ? "annabel" : null;
+    if(key){ p.focus = weekClone(FOCUS_SEED[key]); p.focusAt = 1; }
+  }
+  return (p.focus || []).filter(function(f){ return f && drillRef(f.id); });
+}
+
+function defaultNums(){
+  var p = playerObj();
+  if(p && p.weekPlan) return weekClone(p.weekPlan);
+  var t = p ? +p.weekTarget || 0 : 0;
+  if(t) return { main:Math.max(1, t - 2), sc:Math.min(2, t > 1 ? 2 : 1), drill:3 };
+  return weekClone(WEEK_DEF);
+}
+
+function weekRec(wk, make){
+  var p = playerObj(); if(!p) return null;
+  var r = p.weeks && p.weeks[wk];
+  if(r && r.redraw){ delete r.redraw; redrawDrills(wk, r); }
+  if(r || !make) return r || null;
+  p.weeks = p.weeks || {};
+  r = p.weeks[wk] = { n:defaultNums(), items:[], at:1 };
+  fillWeek(r, wk);
+  /* keep twenty weeks; older ones only ever fed the streak, which is
+     already decided for them */
+  var ks = Object.keys(p.weeks).sort();
+  while(ks.length > 20){ delete p.weeks[ks.shift()]; }
+  try{ saveLocal(); }catch(e){}
+  return r;
+}
+/* The coach changed the focus areas: the quick drills still to do this week
+   and later are drawn again, except any she chose herself. */
+function redrawDrills(wk, r){
+  var st = weekState(wk, false);
+  r.items = r.items.filter(function(it, i){ return it.k !== "drill" || it.own || (st.rows[i] && st.rows[i].done); });
+  fillWeek(r, null);
+  try{ saveLocal(); }catch(e){}
+}
+function markRedraw(p){
+  var now = weekOf();
+  Object.keys(p.weeks || {}).forEach(function(wk){ if(wk >= now && p.weeks[wk]) p.weeks[wk].redraw = true; });
+}
+function itemsOf(r, k){ return r.items.filter(function(x){ return x.k === k; }); }
+/* A week is drawn from what had happened before it began, so a session she
+   did on Monday before first opening the page is the one it ticks, not a
+   reason to plan something else. */
+var PLAN_BEFORE = null;
+function planHist(list){ return PLAN_BEFORE ? list.filter(function(s){ return s.date < PLAN_BEFORE; }) : list; }
+function fillWeek(r, wk){
+  PLAN_BEFORE = wk || null;
+  try{ fillKinds(r); } finally { PLAN_BEFORE = null; }
+}
+function fillKinds(r){
+  WEEK_KINDS.forEach(function(k){
+    var guard = 0;
+    while(itemsOf(r, k).length < (r.n[k] || 0) && guard++ < 20){
+      var it = pickFor(k, r); if(!it) break;
+      r.items.push(it);
+    }
+    r.n[k] = itemsOf(r, k).length;
+  });
+}
+function pickFor(k, r){
+  if(k === "main") return pickMain(r);
+  if(k === "sc") return pickSC(r);
+  return pickDrill(r);
+}
+
+/* Main: longest since she last did it, and least done lately. Eight weeks
+   of history; each session fewer than the average is worth a week of gap. */
+function mainScores(r){
+  var cut = addDays(today(), -56);
+  var rows = liveAreas().map(function(t){
+    var g = tileGap(t), hist = planHist(g.hist);
+    var n = hist.filter(function(s){ return s.date >= cut; }).length;
+    var lastD = hist.length ? hist[hist.length-1].date : null;
+    var days = lastD ? daysBetween(lastD) : null;
+    return { id:t.id, days:(days == null ? 999 : days), n:n,
+             planned: r ? itemsOf(r, "main").filter(function(x){ return x.id === t.id; }).length : 0 };
+  });
+  var avg = rows.reduce(function(a, x){ return a + x.n; }, 0) / Math.max(1, rows.length);
+  rows.forEach(function(x){ x.score = Math.min(x.days, 120) + 7 * (avg - x.n) - 1000 * x.planned; });
+  return rows.sort(function(a, b){ return b.score - a.score || areaNo(area(a.id)) - areaNo(area(b.id)); });
+}
+function pickMain(r){
+  var top = mainScores(r)[0];
+  return top ? { k:"main", id:top.id } : null;
+}
+
+/* S&C: A and B, never the same one twice running. One a week alternates on
+   what she last did, so a missed week does not skip one. */
+function lastSC(){
+  var s = planHist(mine()).filter(function(x){ return x.kind === "gym" && SC_IDS.indexOf(x.gymId) > -1; })
+    .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }).pop();
+  return s ? s.gymId : null;
+}
+function pickSC(r){
+  var have = itemsOf(r, "sc").map(function(x){ return x.id; });
+  var last = lastSC();
+  var first = last === 9 ? 10 : 9;
+  var order = [first, first === 9 ? 10 : 9];
+  for(var i = 0; i < order.length; i++) if(have.indexOf(order[i]) < 0) return { k:"sc", id:order[i] };
+  return null;
+}
+
+/* Where she is furthest behind: the average LPGA placing of her last three
+   sessions in each area, worst first. An area with nothing yet sits mid-table. */
+function weakAreas(){
+  return liveAreas().map(function(t){
+    var ser = placingSeries(t.id).slice(-3);
+    var m = ser.length ? mean(ser.map(function(x){ return x.place; })) : 50;
+    return { id:t.id, place:m, n:ser.length };
+  }).sort(function(a, b){ return b.place - a.place; });
+}
+/* Quick drills: the coach's focus first, least recently done first, then the
+   areas she is placing worst in, then whatever has waited longest. */
+function drillCandidates(){
+  var out = [], seen = {};
+  function add(id, why, src){ if(seen[id] || !drillRef(id)) return; seen[id] = 1; out.push({ id:id, why:why, src:src }); }
+  var foc = focusFor().map(function(f, i){ return { f:f, i:i, last:drillLast(f.id) || "0000" }; })
+    .sort(function(a, b){ return a.last < b.last ? -1 : a.last > b.last ? 1 : a.i - b.i; });
+  foc.forEach(function(x){ add(x.f.id, x.f.why ? "Focus · " + x.f.why : "Focus", "focus"); });
+  weakAreas().filter(function(w){ return w.n; }).forEach(function(w){
+    var sk = TILE[w.id] || {};
+    drillChoices().map(drillRef).filter(function(d){ return d && d.area === w.id && !d.gym; })
+      .sort(function(a, b){ var x = drillLast(a.id) || "0000", y = drillLast(b.id) || "0000"; return x < y ? -1 : x > y ? 1 : 0; })
+      .forEach(function(d){ add(d.id, (sk.nm || "This area") + " · placing " + ordinal(Math.round(w.place)) + " of 100 lately", "weak"); });
+  });
+  drillChoices().slice().sort(function(a, b){ var x = drillLast(a) || "0000", y = drillLast(b) || "0000"; return x < y ? -1 : x > y ? 1 : 0; })
+    .forEach(function(id){ add(id, drillLast(id) ? "Waited longest" : "Not tried yet", "rest"); });
+  return out;
+}
+function pickDrill(r){
+  var have = itemsOf(r, "drill").map(function(x){ return x.id; });
+  var c = drillCandidates().filter(function(x){ return have.indexOf(x.id) < 0; })[0];
+  return c ? { k:"drill", id:c.id, why:c.why } : null;
+}
+
+/* ---- what has been done ---- */
+function sessKind(s){
+  if(!s || s.status === "live") return null;
+  if(s.kind === "practice" || s.kind === "test") return "main";
+  if(s.kind === "drill") return "drill";
+  if(s.kind === "gym"){
+    if(isSpeed(s) || isBand(s)) return "drill";
+    if(isSquash(s) || isPrep(s)) return null;
+    return "sc";
+  }
+  return null;
+}
+function sessRef(s){
+  var k = sessKind(s);
+  if(k === "main") return typeOf(s.testId || s.areaId);
+  if(k === "sc") return s.gymId;
+  if(k === "drill") return s.kind === "gym" ? "gym:" + s.gymId : s.drillId;
+  return null;
+}
+function weekSessions(wk){
+  var end = addDays(wk, 6);
+  return mine().filter(function(s){ return s.date >= wk && s.date <= end && sessKind(s); })
+    .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+}
+function weekPaused(wk){
+  var p = playerObj(); if(!p) return false;
+  var r = p.weeks && p.weeks[wk];
+  return !!((r && r.paused) || (p.pauseWeeks && p.pauseWeeks.indexOf(wk) > -1));
+}
+function weekState(wk, make){
+  var r = weekRec(wk, make !== false);
+  var n = r ? r.n : defaultNums();
+  var ss = weekSessions(wk), used = {};
+  var rows = (r ? r.items : []).map(function(it, i){ return { it:it, i:i, done:null }; });
+  rows.forEach(function(x){
+    for(var j = 0; j < ss.length; j++){
+      var s = ss[j];
+      if(used[s.id] || sessKind(s) !== x.it.k || String(sessRef(s)) !== String(x.it.id)) continue;
+      used[s.id] = 1; x.done = s; return;
+    }
+  });
+  var extra = ss.filter(function(s){ return !used[s.id]; });
+  var per = {}, met = true, planned = 0;
+  WEEK_KINDS.forEach(function(k){
+    var want = r ? itemsOf(r, k).length : (n[k] || 0);
+    var got = rows.filter(function(x){ return x.it.k === k && x.done; }).length +
+              extra.filter(function(s){ return sessKind(s) === k; }).length;
+    per[k] = { want:want, got:got };
+    planned += want;
+    if(got < want) met = false;
+  });
+  return { wk:wk, rec:r, rows:rows, extra:extra, per:per, planned:planned,
+           met:planned > 0 && met, paused:weekPaused(wk) };
+}
+/* Before planning existed a week counted on the old single target. */
+function weekMet(wk){
+  if(wk < WEEK_FROM){
+    var t = weekTarget();
+    return t ? weekCount(wk) >= t : false;
+  }
+  return weekState(wk, false).met;
+}
+
+/* ---- changing the week ---- */
+function weekStamp(r){ r.at = Date.now(); }
+function setWeekNum(wk, k, v){
+  var r = weekRec(wk, true); if(!r) return;
+  v = Math.max(0, Math.min(WEEK_MAX[k], v));
+  var cur = itemsOf(r, k).length;
+  if(v > cur){ r.n[k] = v; fillWeek(r, null); }
+  else if(v < cur){
+    /* drop from the end, and never one already done */
+    var st = weekState(wk), done = {};
+    st.rows.forEach(function(x){ if(x.done) done[x.i] = 1; });
+    var drop = cur - v;
+    for(var i = r.items.length - 1; i >= 0 && drop > 0; i--){
+      if(r.items[i].k === k && !done[i]){ r.items.splice(i, 1); drop--; }
+    }
+    for(i = r.items.length - 1; i >= 0 && drop > 0; i--){
+      if(r.items[i].k === k){ r.items.splice(i, 1); drop--; }
+    }
+    r.n[k] = itemsOf(r, k).length;
+  }
+  r.set = true; weekStamp(r);
+  var p = playerObj();
+  if(p){ p.weekPlan = weekClone(r.n); p.weekPlanAt = Date.now(); }
+  weekSave();
+}
+function setWeekPaused(wk, on){
+  var r = weekRec(wk, true), p = playerObj(); if(!r || !p) return;
+  r.paused = !!on; weekStamp(r);
+  p.pauseWeeks = (p.pauseWeeks || []).filter(function(w){ return w !== wk; });
+  if(on) p.pauseWeeks.push(wk);
+  weekSave();
+}
+function weekChange(wk, idx, id){
+  var r = weekRec(wk, true); if(!r || !r.items[idx]) return;
+  var k = r.items[idx].k, why = null;
+  if(k === "drill"){
+    drillCandidates().forEach(function(c){ if(c.id === id && why == null) why = c.why; });
+  }
+  r.items[idx] = { k:k, id:id, own:true };
+  if(why) r.items[idx].why = why;
+  weekStamp(r); weekSave();
+}
+var WEEK_UNDO = null;
+function weekRemove(wk, idx){
+  var r = weekRec(wk, true); if(!r || !r.items[idx]) return;
+  WEEK_UNDO = { wk:wk, idx:idx, it:r.items[idx] };
+  var k = r.items[idx].k;
+  r.items.splice(idx, 1);
+  r.n[k] = itemsOf(r, k).length;
+  weekStamp(r); weekSave();
+}
+function weekUndo(){
+  var u = WEEK_UNDO; WEEK_UNDO = null; if(!u) return;
+  var r = weekRec(u.wk, true); if(!r) return;
+  r.items.splice(Math.min(u.idx, r.items.length), 0, u.it);
+  r.n[u.it.k] = itemsOf(r, u.it.k).length;
+  weekStamp(r); weekSave();
+}
+
+/* Pulled down from the server: each week by its own stamp, focus and the
+   default numbers by theirs. Never by mv. */
+function mergeWeekMeta(mine, them){
+  var t = false;
+  if(them.weeks && typeof them.weeks === "object"){
+    mine.weeks = mine.weeks || {};
+    Object.keys(them.weeks).forEach(function(wk){
+      var a = mine.weeks[wk], b = them.weeks[wk];
+      if(b && typeof b === "object" && Array.isArray(b.items) && (!a || (+b.at || 0) > (+a.at || 0))){
+        mine.weeks[wk] = weekClone(b); t = true;
+      }
+    });
+  }
+  if(Array.isArray(them.focus) && (+them.focusAt || 0) > (+mine.focusAt || 0)){
+    mine.focus = weekClone(them.focus); mine.focusAt = them.focusAt; t = true;
+    markRedraw(mine);
+  }
+  if(them.weekPlan && typeof them.weekPlan === "object" && (+them.weekPlanAt || 0) > (+mine.weekPlanAt || 0)){
+    mine.weekPlan = weekClone(them.weekPlan); mine.weekPlanAt = them.weekPlanAt; t = true;
+  }
+  return t;
+}
+
+/* ---- the page ---- */
+function weekRange(wk){
+  var a = new Date(wk + "T12:00:00"), b = new Date(addDays(wk, 6) + "T12:00:00");
+  return a.getDate() + (a.getMonth() !== b.getMonth() ? " " + MON[a.getMonth()] : "") +
+         " – " + b.getDate() + " " + MON[b.getMonth()];
+}
+function weekItemView(it){
+  if(it.k === "main"){
+    var sk = TILE[it.id] || TILE[10], g = tileGap(area(it.id) || { id:it.id });
+    var sub = g.days == null ? "Not played yet" : "Last played " + sinceWords(g.days);
+    if(PAIRS[it.id] && isDefaultPractice(practiceFor(it.id))) sub = pairName(pairDue(it.id)) + " · " + sub.charAt(0).toLowerCase() + sub.slice(1);
+    return { nm:sk.nm, sub:sub, tint:sk.tint, ic:TICON[sk.ic] };
+  }
+  if(it.k === "sc"){
+    var gy = gymOf(it.id);
+    return { nm:"S&C · " + (gy ? stripTags(gy.name) : "Session"), sub:"New S&C · about 40 minutes",
+             tint:"var(--surface-2)", ic:TICON.gym };
+  }
+  var r = drillRef(it.id) || { name:"Drill", area:10 };
+  var ts = TILE[r.area] || TILE[10];
+  var why = it.why || "";
+  var foc = focusFor().filter(function(f){ return f.id === it.id; })[0];
+  if(foc) why = foc.why ? "Focus · " + foc.why : "Focus";
+  return { nm:r.name, sub:why || (r.gym ? "Optional S&C" : "Quick drill"), tint:r.gym ? "var(--surface-2)" : ts.tint,
+           ic:r.gym ? (r.gym === 4 ? TICON.bolt : TICON.band) : TICON[ts.ic] };
+}
+function weekOpen(it){
+  state.fromWeek = true;
+  if(it.k === "main"){
+    var due = testDue(it.id);
+    if(due && showDue(due, it.id)) return;
+    openSession(pairDue(it.id));
+  } else if(it.k === "sc") openGym(it.id);
+  else {
+    var r = drillRef(it.id); if(!r) return;
+    if(r.gym) openGym(r.gym); else openDrill(it.id);
+  }
+}
+function doneWords(s){
+  if(!s) return "";
+  if(s.kind === "gym") return "Done " + shortDate(s.date);
+  var a = area(s.areaId);
+  if(s.total != null && a && isSG(a) && !s.sgUnknown) return "Done " + shortDate(s.date) + " · " + fmtSG(s.total);
+  if(s.total != null && s.max) return "Done " + shortDate(s.date) + " · " + s.total + "/" + s.max;
+  return "Done " + shortDate(s.date);
+}
+function sessName(s){
+  var k = sessKind(s), ref = sessRef(s);
+  if(k === "main") return (TILE[ref] || {}).nm || (area(s.areaId) || {}).name || "Session";
+  if(k === "sc"){ var g = gymOf(s.gymId); return g ? stripTags(g.name) : "S&C"; }
+  var r = drillRef(ref); return r ? r.name : "Drill";
+}
+
+function weekStreakNow(){
+  var wk = weekOf(), n = 0, st = weekState(wk);
+  if(st.met) n++;
+  var first = mine().filter(countsForWeek).map(function(s){ return s.date; }).sort()[0];
+  var w = addDays(wk, -7);
+  for(var i = 0; i < 260 && first && w >= weekOf(first); i++, w = addDays(w, -7)){
+    if(weekPaused(w)) continue;
+    if(weekMet(w)) n++; else break;
+  }
+  return { n:n, st:st };
+}
+
+function renderWeek(){
+  var host = $("wkBody"); if(!host) return;
+  var wk = weekOf(), ss = weekStreakNow(), st = ss.st;
+  $("wkDates").textContent = weekRange(wk);
+  var bar = $("weekHello");
+  if(bar){ var tx = state.praise || ""; bar.textContent = tx; bar.hidden = !tx; }
+  renderWeekResume();
+  $("wkStreak").innerHTML = st.paused ? '<b>Paused</b><span>the streak waits</span>'
+    : ss.n ? '<b class="num">' + ss.n + '</b><span>' + (ss.n === 1 ? "week" : "weeks") + ' in a row</span>'
+    : '<b>Week 1</b><span>a fresh start</span>';
+
+  var html = "";
+  if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
+  if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
+  WEEK_KINDS.forEach(function(k){
+    var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
+    if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
+    var pips = "";
+    for(var i = 0; i < Math.max(pk.want, pk.got); i++) pips += '<i class="' + (i < pk.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp"><div class="wkgh"><h2>' + WEEK_WORD[k].replace("&", "&amp;") + '</h2>' +
+            '<span class="num">' + pk.got + ' of ' + pk.want + '</span></div><div class="wkpips">' + pips + '</div>';
+    rows.forEach(function(x){
+      var v = weekItemView(x.it);
+      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= 2);
+      html += '<div class="wkrow' + (x.done ? " done" : "") + '" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-go="' + x.i + '"' + (x.done ? ' disabled' : '') + '>' +
+          '<span class="wkic">' + v.ic(22) + '</span>' +
+          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + (x.done ? doneWords(x.done) : v.sub) + '</span></span>' +
+          (x.done ? '<span class="wktick" aria-label="Done">✓</span>' : '<span class="wkstart">Start</span>') +
+        '</button>' +
+        (x.done ? '' : '<span class="wkacts">' +
+          (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
+          '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(v.nm).replace(/"/g, "") + ' from this week">×</button></span>') +
+      '</div>';
+    });
+    var ex = st.extra.filter(function(s){ return sessKind(s) === k; });
+    if(ex.length) html += '<p class="wkextra">Also done: ' + ex.map(function(s){ return sessName(s) + " (" + shortDate(s.date) + ")"; }).join(", ") +
+      '. ' + (ex.length === 1 ? "It counts" : "They count") + ' towards your ' + WEEK_WORD[k].toLowerCase().replace("s&c", "S&amp;C") + '.</p>';
+    html += '</div>';
+  });
+  if(!st.planned) html += '<p class="wknote">Nothing planned this week. Set your numbers in Settings.</p>';
+  if(WEEK_UNDO && WEEK_UNDO.wk === wk)
+    html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
+  var n = st.rec ? st.rec.n : defaultNums();
+  html += '<div class="wkfoot"><span>' + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
+          '<button type="button" id="wkSet">Change in Settings</button></div>';
+  host.innerHTML = html;
+
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    var r = weekRec(wk, true);
+    if(b.id === "wkUndo"){ weekUndo(); renderWeek(); paintBell(); return; }
+    if(b.id === "wkSet"){ openSettings(); return; }
+    if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
+    if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
+    if(b.hasAttribute("data-chg")){ openWeekChange(wk, +b.getAttribute("data-chg")); return; }
+  };
+}
+function renderWeekResume(){
+  var bar = $("weekResume"); if(!bar) return;
+  var d = liveSessions()[0];
+  if(!d){ bar.hidden = true; return; }
+  var when = d.date === today() ? "today" : "on " + fmtDate(d.date);
+  $("weekResumeText").textContent = "Unfinished " + draftLabel(d) + " session from " + when + ", " + draftProgress(d) + ".";
+  bar.hidden = false;
+}
+
+/* The change sheet: the same kind, what the app would suggest first. */
+function weekOptions(wk, idx){
+  var r = weekRec(wk, true), it = r.items[idx]; if(!it) return [];
+  var inWeek = {}; r.items.forEach(function(x, i){ if(i !== idx && x.k === it.k) inWeek[x.id] = 1; });
+  var out = [];
+  if(it.k === "main"){
+    mainScores(null).forEach(function(x){
+      var v = weekItemView({ k:"main", id:x.id });
+      out.push({ id:x.id, nm:v.nm, sub:v.sub, tint:v.tint, ic:v.ic, cur:x.id === it.id, also:!!inWeek[x.id] });
+    });
+  } else if(it.k === "sc"){
+    SC_IDS.forEach(function(id){
+      var v = weekItemView({ k:"sc", id:id });
+      out.push({ id:id, nm:v.nm, sub:v.sub, tint:v.tint, ic:v.ic, cur:id === it.id, also:!!inWeek[id] });
+    });
+  } else {
+    drillCandidates().forEach(function(c){
+      var v = weekItemView({ k:"drill", id:c.id, why:c.why });
+      var last = drillLast(c.id);
+      out.push({ id:c.id, nm:v.nm, sub:v.sub + (last ? " · last " + sinceWords(daysBetween(last)) : " · not done yet"),
+                 tint:v.tint, ic:v.ic, cur:c.id === it.id, also:!!inWeek[c.id], src:c.src });
+    });
+  }
+  return out;
+}
+function openWeekChange(wk, idx){
+  var r = weekRec(wk, true), it = r.items[idx]; if(!it) return;
+  var cur = weekItemView(it);
+  $("wkSheetTitle").textContent = "Change " + cur.nm;
+  var opts = weekOptions(wk, idx);
+  var html = '<p class="note">Pick what to do instead. Nothing else in your week moves.</p><div class="wkopts">';
+  var lastSrc = null;
+  opts.forEach(function(o){
+    if(it.k === "drill" && o.src !== lastSrc){
+      html += '<div class="wkoh">' + (o.src === "focus" ? "Your coach's focus" : o.src === "weak" ? "Where you are placing lowest" : "Everything else") + '</div>';
+      lastSrc = o.src;
+    }
+    html += '<button type="button" class="wkopt' + (o.cur ? " cur" : "") + '" data-id="' + o.id + '"' + (o.cur ? " disabled" : "") +
+      ' style="--tint:' + o.tint + '"><span class="wkic">' + o.ic(20) + '</span><span class="wktx"><b>' + String(o.nm).replace(/&(?!amp;)/g, "&amp;") +
+      (o.cur ? ' <em>now</em>' : o.also ? ' <em>already this week</em>' : '') + '</b><span>' + o.sub + '</span></span></button>';
+  });
+  html += '</div><button type="button" class="wkrmall" id="wkSheetRm">Remove it instead. One fewer this week.</button>';
+  $("wkSheetBody").innerHTML = html;
+  $("wkSheetBody").onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    if(b.id === "wkSheetRm"){ weekRemove(wk, idx); closeWeekChange(); return; }
+    var id = b.getAttribute("data-id"); if(id == null) return;
+    if(it.k !== "drill") id = +id;
+    weekChange(wk, idx, id); closeWeekChange();
+  };
+  $("wkSheet").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeWeekChange(){
+  $("wkSheet").hidden = true; document.body.style.overflow = "";
+  if(state.view === "week") renderWeek(); else if(state.view === "settings") renderSettings();
+  paintBell();
+}
+
+/* ---- settings ---- */
+function settingsWeek(){ return state.setWeek === "next" ? nextWeek() : weekOf(); }
+function renderSettings(){
+  var host = $("setBody"); if(!host) return;
+  var p = playerObj();
+  $("setWho").textContent = p ? p.name : "";
+  var which = state.setWeek === "next" ? "next" : "this";
+  var wk = settingsWeek(), r = weekRec(wk, true), st = weekState(wk);
+  var html =
+    '<div class="setgrp"><div class="wkgh"><h2>Your week</h2></div>' +
+    '<div class="setseg">' +
+      '<button type="button" data-wk="this" aria-pressed="' + (which === "this") + '"><b>This week</b><small>' + weekRange(weekOf()) + '</small></button>' +
+      '<button type="button" data-wk="next" aria-pressed="' + (which === "next") + '"><b>Next week</b><small>' + weekRange(nextWeek()) + '</small></button>' +
+    '</div>' +
+    '<p class="note">How many of each you mean to do. You pick the numbers; the app picks the sessions, and you can change any of them on This week.</p>';
+  WEEK_KINDS.forEach(function(k){
+    var v = itemsOf(r, k).length;
+    html += '<div class="bwrow setrow"><span><b>' + WEEK_WORD[k].replace("&", "&amp;") + '</b>' +
+      (k === "sc" ? '<small>A and B take turns, never the same one twice running</small>'
+       : k === "main" ? '<small>Longest since you did it, and least done lately</small>'
+       : '<small>Your coach’s focus first, then where you are placing lowest</small>') + '</span>' +
+      '<span class="bwstep"><button type="button" data-k="' + k + '" data-d="-1" aria-label="One fewer ' + WEEK_ONE[k] + '"' + (v <= 0 ? " disabled" : "") + '>−</button>' +
+      '<b class="num" id="setN_' + k + '">' + v + '</b>' +
+      '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= WEEK_MAX[k] ? " disabled" : "") + '>+</button></span></div>';
+  });
+  var list = r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); });
+  html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") + '</p>' +
+    '<label class="bwpause"><input type="checkbox" id="setPause"' + (st.paused ? " checked" : "") + '> ' +
+      'Pause ' + (which === "next" ? "next" : "this") + ' week: exams, illness, a tournament. The streak waits.</label>' +
+    (which === "this" ? '<button type="button" class="setgo" id="setSeeWeek">See this week</button>'
+      : r.set ? '<p class="wkdone">Next week is set. It starts on Monday.</p>'
+      : '<button type="button" class="setgo" id="setConfirm">That’s my week</button>') +
+    '</div>';
+
+  var foc = focusFor();
+  html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
+    (foc.length ? '<ul class="setfocus">' + foc.map(function(f){
+      var d = drillRef(f.id); return '<li><b>' + d.name.replace(/&(?!amp;)/g, "&amp;") + '</b>' + (f.why ? '<span>' + String(f.why).replace(/</g, "&lt;") + '</span>' : '') + '</li>';
+    }).join("") + '</ul>' : '<p class="note">None set. Quick drills come from where you are placing lowest.</p>') +
+    '</div>';
+
+  html += '<div class="setgrp">' + remindBlock() + '</div>';
+  host.innerHTML = html;
+
+  host.querySelectorAll("[data-wk]").forEach(function(b){
+    b.onclick = function(){ state.setWeek = b.getAttribute("data-wk"); renderSettings(); };
+  });
+  host.querySelectorAll("[data-k]").forEach(function(b){
+    b.onclick = function(){
+      var k = b.getAttribute("data-k");
+      setWeekNum(wk, k, itemsOf(weekRec(wk, true), k).length + (+b.getAttribute("data-d")));
+      renderSettings(); paintBell();
+    };
+  });
+  $("setPause").onchange = function(){ setWeekPaused(wk, this.checked); renderSettings(); paintBell(); };
+  if($("setSeeWeek")) $("setSeeWeek").onclick = function(){ renderWeek(); show("week"); };
+  if($("setConfirm")) $("setConfirm").onclick = function(){
+    var rr = weekRec(wk, true); rr.set = true; weekStamp(rr); weekSave(); renderSettings(); paintBell();
+  };
+  wireRemind();
+}
+function openSettings(which){
+  if(which) state.setWeek = which;
+  renderSettings(); show("settings");
+}
+
 /* A tapped reminder opens the app with ?go=drill&id=... (or go=bell). The same
    address arrives as a message when the app is already open. */
 function handleGo(search){
@@ -13074,6 +13805,8 @@ function handleGo(search){
   var go = q.get("go");
   if(go === "drill" && q.get("id") && drillById(q.get("id"))) openDrill(q.get("id"));
   else if(go === "bell") openBell();
+  else if(go === "settings") openSettings(q.get("wk") === "next" ? "next" : null);
+  else if(go === "week") show("week");
 }
 
 /* ---------- diagram lightbox ---------- */
@@ -13646,6 +14379,14 @@ $("lightbox").addEventListener("click", function(e){ if(e.target === this) close
 document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("lightbox").hidden) closeGuide(); });
 
 /* ---------- wiring ---------- */
+$("tabWeek").addEventListener("click", function(){ show("week"); });
+$("tabSettings").addEventListener("click", function(){
+  /* at the weekend the week worth setting is the next one */
+  openSettings(((new Date().getDay() + 6) % 7) >= 5 ? "next" : "this");
+});
+$("weekResumeGo").addEventListener("click", function(){ resumeDraft(); });
+$("wkSheetClose").addEventListener("click", closeWeekChange);
+$("wkSheet").addEventListener("click", function(e){ if(e.target === this) closeWeekChange(); });
 $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
 $("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("tabTests").addEventListener("click", function(){ renderTests(); show("tests"); });
@@ -13658,12 +14399,12 @@ $("benchBack").addEventListener("click", function(){ renderGoals(); show("goals"
 $("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
 $("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
 $("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
-$("sessionBack").addEventListener("click", function(){ show("home"); });
+$("sessionBack").addEventListener("click", function(){ show(state.fromWeek ? "week" : "home"); });
 $("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx-1); });
 $("navNext").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx+1); });
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
-$("gymBack").addEventListener("click", function(){ renderSC(); show("sc"); });
+$("gymBack").addEventListener("click", function(){ if(state.fromWeek){ show("week"); return; } renderSC(); show("sc"); });
 $("saveBtn").addEventListener("click", saveCurrent);
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
@@ -13682,7 +14423,7 @@ $("playerSwitch").addEventListener("click", function(){
   }
   renderPlayer(); saveEdit();
   state.sampleOn = false;
-  render(); show("home");
+  render(); show("week");
 });
 $("exportCsv").addEventListener("click", function(){
   var data = csv();
@@ -13698,7 +14439,7 @@ $("exportJson").addEventListener("click", function(){
   else setStatus("The download did not start in this browser.");
 });
 $("coachLink").addEventListener("click", openCoach);
-$("coachOut").addEventListener("click", function(){ coachSet(false); show("home"); });
+$("coachOut").addEventListener("click", function(){ coachSet(false); show("week"); });
 $("coachFile").addEventListener("change", function(){
   var f = this.files && this.files[0];
   if(!f) return;
@@ -13821,6 +14562,8 @@ function renderCoach(){
         (CLOUD.canDelete ? '<button type="button" class="danger" data-drop="1">Remove player</button>' : '')+
       '</div>';
 
+    card.insertBefore(coachWeekLine(p), card.querySelector(".acts"));
+    card.insertBefore(coachFocusBox(p), card.querySelector(".acts"));
     var drop = card.querySelector("[data-drop]");
     if(drop) drop.addEventListener("click", function(){ removePlayer(p); });
 
@@ -13836,6 +14579,65 @@ function renderCoach(){
     });
     host.appendChild(card);
   });
+}
+
+/* ---- her week and her focus areas ----
+   The week is read as she set it; the focus areas are the coach's to set. They
+   are the quick drills her week starts with, each with a few words of why, and
+   they reach her phone by their own stamp, so nothing she set is touched. */
+function asPlayer(p, fn){
+  var was = state.activePlayer; state.activePlayer = p.id;
+  try{ return fn(); } finally { state.activePlayer = was; }
+}
+function coachWeekLine(p){
+  var el = document.createElement("p"); el.className = "cnote";
+  var wst = asPlayer(p, function(){ return weekState(weekOf(), false); });
+  var bits = WEEK_KINDS.filter(function(k){ return wst.per[k].want || wst.per[k].got; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&C" : k === "main" ? "main" : "drills");
+  });
+  el.innerHTML = '<em>This week</em>';
+  el.appendChild(document.createTextNode(wst.paused ? "Paused." : bits.length ? bits.join(" · ") + (wst.met ? ". Done." : ".") : "Nothing planned."));
+  return el;
+}
+function coachFocusBox(p){
+  var box = document.createElement("div"); box.className = "cfocus";
+  function save(list){
+    p.focus = list; p.focusAt = Date.now();
+    markRedraw(p);
+    try{ saveLocal(); }catch(e){}
+    asPlayer(p, function(){ try{ cloudMeta(); }catch(e){} });
+    draw();
+  }
+  function draw(){
+    var foc = focusFor(p).slice();
+    var have = {}; foc.forEach(function(f){ have[f.id] = 1; });
+    var opts = drillChoices().filter(function(id){ return !have[id]; }).map(function(id){
+      return '<option value="'+id+'">'+drillRef(id).name.replace(/&/g,"&amp;")+'</option>'; }).join("");
+    box.innerHTML = '<p class="cnote"><em>Focus areas</em>The quick drills her week starts with, in this order.</p>' +
+      (foc.length ? '<ul class="cflist">' + foc.map(function(f, i){
+        return '<li><b>'+drillRef(f.id).name.replace(/&/g,"&amp;")+'</b>'+
+          '<input data-why="'+i+'" value="'+String(f.why||"").replace(/"/g,"&quot;")+'" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why">'+
+          (i ? '<button type="button" data-up="'+i+'" aria-label="Move up">↑</button>' : '<span class="cfgap"></span>')+
+          '<button type="button" data-del="'+i+'" aria-label="Remove">×</button></li>';
+      }).join("") + '</ul>' : '<p class="cnote">None. Her drills come from where she is placing lowest.</p>') +
+      '<div class="cfadd"><select aria-label="Add a focus area">'+opts+'</select><button type="button" data-add="1">Add</button></div>';
+    box.querySelectorAll("[data-why]").forEach(function(inp){
+      inp.onchange = function(){ var l = focusFor(p).slice(); var i = +inp.getAttribute("data-why");
+        l[i] = { id:l[i].id, why:inp.value.trim() }; save(l); };
+    });
+    box.querySelectorAll("[data-up]").forEach(function(b){
+      b.onclick = function(){ var l = focusFor(p).slice(), i = +b.getAttribute("data-up");
+        var t = l[i-1]; l[i-1] = l[i]; l[i] = t; save(l); };
+    });
+    box.querySelectorAll("[data-del]").forEach(function(b){
+      b.onclick = function(){ var l = focusFor(p).slice(); l.splice(+b.getAttribute("data-del"), 1); save(l); };
+    });
+    var add = box.querySelector("[data-add]");
+    add.onclick = function(){ var v = box.querySelector("select").value; if(!v) return;
+      var l = focusFor(p).slice(); l.push({ id:v, why:"" }); save(l); };
+  }
+  draw();
+  return box;
 }
 
 /* ---- removing a player ----
@@ -13996,7 +14798,7 @@ try{
 }catch(e){}
 applyCouponIdentity();
 window.addEventListener("lcl-who", function(){
-  if(applyCouponIdentity()){ renderPlayer(); render(); show("home"); }
+  if(applyCouponIdentity()){ renderPlayer(); render(); show("week"); }
   cloudPull();            // the gate answered after boot, so the code is only known now
 });
 /* The phone's own back button used to walk straight out of the app. Nothing
@@ -14035,7 +14837,7 @@ function pushCard(idx){
   }catch(e){}
 }
 window.addEventListener("popstate", function(e){
-  var st = e.state || {}, v = st.lcl || "home";
+  var st = e.state || {}, v = st.lcl || "week";
   histPopping = true;
   try{
     /* Stepping between cards of the session she is already in must not rebuild
@@ -14047,8 +14849,8 @@ window.addEventListener("popstate", function(e){
 
 renderPlayer();
 render();
-show("home");
-try{ history.replaceState({lcl:"home"}, ""); }catch(e){}
+show("week");
+try{ history.replaceState({lcl:"week"}, ""); }catch(e){}
 HIST_ON = true;
 $("bellBtn").addEventListener("click", openBell);
 $("bellClose").addEventListener("click", closeBell);
@@ -14060,7 +14862,7 @@ paintBell();
 (function(){
   var q = location.search;
   if(/[?&]go=/.test(q)){
-    try{ history.replaceState({lcl:"home"}, "", location.pathname); }catch(e){}
+    try{ history.replaceState({lcl:"week"}, "", location.pathname); }catch(e){}
     setTimeout(function(){ handleGo(q); }, 0);
   }
   if(cloudReady() && "serviceWorker" in navigator){
