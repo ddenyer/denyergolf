@@ -174,6 +174,30 @@
   .brand{font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-weight:800; letter-spacing:-.022em; font-size:17px;
     letter-spacing:.01em}
   .brand span{color:var(--accent)}
+  .hdright{display:flex; align-items:center; gap:8px; margin-left:auto}
+  .bellbtn{position:relative; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-2);
+    border-radius:999px; width:34px; height:34px; display:grid; place-items:center; padding:0}
+  .belldot{position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px; box-sizing:border-box;
+    border-radius:999px; background:var(--accent); color:#fff; font-size:10.5px; font-weight:700; line-height:17px; text-align:center}
+  .bellcard{max-height:calc(100vh - 60px); overflow-y:auto}
+  .bellweek{background:var(--surface-2); border-radius:10px; padding:12px 14px; margin-bottom:12px}
+  .bwhd{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+  .bwhd span{color:var(--muted); font-size:12.5px}
+  .bwpips{display:flex; gap:6px; margin:10px 0 2px; flex-wrap:wrap}
+  .bwpips i{width:22px; height:22px; border-radius:999px; border:2px solid var(--line-strong)}
+  .bwpips i.on{background:var(--accent); border-color:var(--accent)}
+  .bwrow{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; font-size:14px}
+  .bwrow input, .bwrow select{font:inherit; font-size:14px; padding:6px 8px; border:1px solid var(--line-strong);
+    border-radius:8px; background:var(--surface); color:var(--ink); min-width:0; max-width:60%}
+  .bwstep{display:flex; align-items:center; gap:10px}
+  .bwstep button{width:30px; height:30px; border-radius:999px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); font-size:16px}
+  .bwpause{display:flex; gap:8px; align-items:flex-start; margin-top:12px; font-size:13.5px; color:var(--ink-2)}
+  .belllist{display:flex; flex-direction:column; gap:8px; margin-bottom:12px}
+  .bellitem{display:flex; flex-direction:column; gap:2px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px}
+  .bellitem span{color:var(--ink-2); font-size:13.5px}
+  .bellitem.new{border-color:var(--accent)}
+  .bellitem.new b::after{content:" \00b7  new"; color:var(--accent); font-weight:600; font-size:12px}
+  #bellClose{border:0; background:var(--surface-2); color:var(--ink-2); border-radius:8px; width:32px; height:32px; font-size:20px; line-height:1; flex:none}
   .player{
     display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line-strong);
     border-radius:999px; padding:3px 4px 3px 11px;
@@ -1832,10 +1856,16 @@
   <div class="topin">
     <div class="brandrow">
       <div class="brand">Longer <span>·</span> Closer <span>·</span> Lower</div>
-      <div class="player">
-        <input id="playerName" aria-label="Player name" value="Player 1" autocomplete="off">
-        <button id="playerSwitch" title="Switch player" aria-label="Switch player">⇄</button>
-        <button class="coachlink" id="coachLink" type="button">Coach</button>
+      <div class="hdright">
+        <button type="button" id="bellBtn" class="bellbtn" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6c-3.6 0-6.2 2.8-6.2 6.4v3.6L4 15.9v1.3h16v-1.3l-1.8-3.3V9c0-3.6-2.6-6.4-6.2-6.4zM9.6 18.6a2.4 2.4 0 0 0 4.8 0z"/></svg>
+          <span class="belldot" id="bellDot" hidden>0</span>
+        </button>
+        <div class="player">
+          <input id="playerName" aria-label="Player name" value="Player 1" autocomplete="off">
+          <button id="playerSwitch" title="Switch player" aria-label="Switch player">⇄</button>
+          <button class="coachlink" id="coachLink" type="button">Coach</button>
+        </div>
       </div>
     </div>
     <!-- Across the top: the three she goes to on purpose, now and then. -->
@@ -2065,6 +2095,15 @@
   </section>
 </main>
 
+<div class="lb" id="bellWrap" hidden>
+  <div class="lbcard bellcard" role="dialog" aria-modal="true" aria-labelledby="bellTitle">
+    <div class="lbhd">
+      <h3 id="bellTitle">Notifications</h3>
+      <button id="bellClose" class="lbx" aria-label="Close notifications">×</button>
+    </div>
+    <div id="bellBody"></div>
+  </div>
+</div>
 <div class="lb" id="lightbox" hidden>
   <div class="lbcard" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
     <div class="lbhd">
@@ -2300,7 +2339,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-01", note:"New tests. Right number on approach and on wedges: the app calls a new number every ball, a point for level with the flag, every miss counted short or long. Lag and hole out replaces twenty from six feet, because the holing-out day already tests holing every time. Inside one club is retired. Every test now shows your last run against the average of your last three, and how big a change has to be to be real" };
+var BUILD = { on:"2026-10-01", note:"The bell, top right. Set your own number of sessions a week; a week counts when you reach it, rest days never break it, and you can pause a week for exams, illness or a tournament. It also tells you when a test is due, when you have not been near the short game or the tee for a while, and when you set a best. In the installed app you can turn on one reminder, at a time you choose, only on a day you have not trained" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -12498,6 +12537,7 @@ function renderSessions(){
 }
 
 function render(){
+  if(typeof paintBell === "function" && $("bellDot")) paintBell();
   renderHome();
   renderSC();
   renderTests();
@@ -12749,6 +12789,291 @@ function summary(){
     out.push("S&C "+g.name+" ("+g.lift+"): "+h.length+" sessions, "+k.name+" "+(lastLoad||"no load logged"));
   });
   return out.join("\n");
+}
+
+
+/* ============ the bell ============
+   Awareness, motivation and ownership, in that order, and nothing that nags.
+   What it is built on (the review of Oct 2026): a WEEKLY streak, as Strava
+   does it, because a daily one punishes rest and teenage athletes need rest; a
+   target she sets herself, because autonomy is what keeps adolescents in sport;
+   a pause for exams, illness and tournaments, as Apple's rings now allow,
+   because a streak that breaks for doing the right thing teaches the wrong
+   lesson; and messages that tell her something about her own practice rather
+   than trophies for their own sake.
+
+   Everything here is worked out from the sessions on the device each time the
+   bell is opened. Nothing is stored except her target, her paused weeks (on
+   the player, so they travel with her) and which messages this phone has seen. */
+var BELL_SEEN_KEY = "lcl.bellSeen";
+function bellSeen(){ try{ return JSON.parse(localStorage.getItem(BELL_SEEN_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function bellMark(keys){
+  var s = bellSeen(); keys.forEach(function(k){ s[k] = 1; });
+  try{ localStorage.setItem(BELL_SEEN_KEY, JSON.stringify(s)); }catch(e){}
+}
+/* Monday of the week a date falls in, as YYYY-MM-DD. */
+function weekOf(iso){
+  var d = new Date((iso || today()) + "T12:00:00");
+  var back = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - back);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function addDays(iso, n){
+  var d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+/* What counts towards the week: anything she trained. A warm-up on its own is
+   preparation for a session, not one. */
+function countsForWeek(s){
+  if(!s || s.status === "live") return false;
+  if(s.kind === "gym" && (isSquash(s) || isPrep(s))) return false;
+  return true;
+}
+function weekTarget(){ var p = playerObj(); return (p && +p.weekTarget) || 0; }
+function pausedWeek(wk){ var p = playerObj(); return !!(p && p.pauseWeeks && p.pauseWeeks.indexOf(wk) > -1); }
+function weekCount(wk){
+  var end = addDays(wk, 6);
+  return mine().filter(function(s){ return s.date >= wk && s.date <= end && countsForWeek(s); }).length;
+}
+/* Whole weeks in a row that met her target, counting back from last week, and
+   this week too once it is met. A paused week is stepped over, neither adding
+   to the streak nor breaking it. */
+function weekStreak(){
+  var t = weekTarget(); if(!t) return { n:0, thisWeek:weekCount(weekOf()), target:0 };
+  var first = mine().filter(countsForWeek).map(function(s){ return s.date; }).sort()[0];
+  var wk = weekOf(), n = 0, now = weekCount(wk);
+  if(now >= t) n++;
+  wk = addDays(wk, -7);
+  for(var i = 0; i < 260 && first && wk >= weekOf(first); i++, wk = addDays(wk, -7)){
+    if(pausedWeek(wk)) continue;
+    if(weekCount(wk) >= t) n++; else break;
+  }
+  return { n:n, thisWeek:now, target:t };
+}
+function daysSinceType(typeId){
+  var last = mine().filter(function(s){
+    if(s.kind === "gym") return false;
+    return typeOf(s.areaId) === typeId;
+  }).map(function(s){ return s.date; }).sort().pop();
+  return last ? { days:daysBetween(last), last:last } : null;
+}
+/* The messages. Each has a key, so a phone shows the dot for what it has not
+   seen and not for the same thing every time. */
+function bellItems(){
+  var out = [], wk = weekOf(), st = weekStreak();
+  var dow = (new Date().getDay() + 6) % 7;
+
+  if(st.target && !pausedWeek(wk)){
+    if(st.thisWeek >= st.target){
+      out.push({ key:"wk-done:"+wk, kind:"good", title:"Week done",
+                 body:st.thisWeek+" of "+st.target+" this week."+(st.n > 1 ? " That is "+st.n+" weeks in a row." : "") });
+    } else if(dow >= 4 && st.thisWeek === st.target - 1){
+      out.push({ key:"wk-one:"+wk+":"+st.thisWeek, kind:"nudge", title:"One more keeps your week",
+                 body:st.thisWeek+" of "+st.target+" so far. Ten minutes on the mat counts." });
+    }
+  }
+  /* tests that are due, where Tests is a thumb away */
+  liveAreas().forEach(function(a){
+    var d = testDue(a.id);
+    if(d && d.test) out.push({ key:"due:"+d.test.id+":"+d.n, kind:"due", title:d.test.name+" is due",
+      body:d.n+" sessions since the last one. It is on the Tests tab." });
+  });
+  /* the scarce places: tee shots, short game and lag only exist at the club */
+  [[10, "tee shots", "the range"], [3, "the short game", "the short game area"]].forEach(function(x){
+    var g = daysSinceType(x[0]);
+    if(g && g.days >= 10) out.push({ key:"gap:"+x[0]+":"+g.last, kind:"gap",
+      title:"No "+x[1]+" for "+g.days+" days",
+      body:"It only exists at the club. Next time you are there, start at "+x[2]+"." });
+  });
+  /* a best in the last week, said once */
+  liveAreas().forEach(function(t){
+    var hist = sessionsFor(practiceFor(t.id)).filter(function(s){ return s.total != null && !s.sgUnknown; });
+    if(hist.length < 3) return;
+    var a = area(practiceFor(t.id)) || t, sg = isSG(a);
+    var val = function(s){ return sg ? s.total : (s.max ? s.total / s.max : -1); };
+    var last = hist[hist.length-1], prev = hist.slice(0, -1);
+    if(daysBetween(last.date) > 7) return;
+    if(prev.every(function(s){ return val(last) > val(s); })){
+      var sk = TILE[t.id] || {};
+      out.push({ key:"best:"+last.id, kind:"good", title:"New best: "+(sk.nm || a.name),
+        body:(sg ? fmtSG(last.total)+" strokes" : last.total+" of "+last.max)+", better than all "+prev.length+" before it." });
+    }
+  });
+  /* milestones, the Strava "10th activity" */
+  var all = mine().filter(countsForWeek).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  [300, 200, 150, 100, 75, 50, 25, 10].some(function(m){
+    if(all.length >= m && daysBetween(all[m-1].date) <= 7){
+      out.push({ key:"ms:"+m, kind:"good", title:"Your "+m+"th session",
+        body:"Logged on "+fmtDate(all[m-1].date)+". That is how it adds up." });
+      return true;
+    }
+    return false;
+  });
+  if(pushCan() && !remindPrefs().on)
+    out.push({ key:"remind-offer", kind:"nudge", title:"A reminder, if you want one",
+      body:"One nudge on a day you have not trained, at a time you choose. Never more than one a day." });
+  return out;
+}
+function bellUnread(){
+  var seen = bellSeen();
+  return bellItems().filter(function(x){ return !seen[x.key]; }).length;
+}
+function paintBell(){
+  var dot = $("bellDot"); if(!dot) return;
+  var n = bellUnread();
+  dot.hidden = !n;
+  dot.textContent = n > 9 ? "9+" : String(n);
+  $("bellBtn").setAttribute("aria-label", n ? "Notifications, " + n + " new" : "Notifications");
+}
+function openBell(){
+  var host = $("bellBody"); if(!host) return;
+  var items = bellItems(), seen = bellSeen(), st = weekStreak(), wk = weekOf();
+  var pips = "";
+  for(var i = 0; i < Math.max(st.target, st.thisWeek); i++)
+    pips += '<i class="'+(i < st.thisWeek ? "on" : "")+'"></i>';
+  var week =
+    '<div class="bellweek">'+
+      '<div class="bwhd"><b>Your week</b><span>'+
+        (pausedWeek(wk) ? "paused" : st.target ? (st.n ? st.n+(st.n === 1 ? " week" : " weeks")+" in a row" : "a fresh start") : "")+
+      '</span></div>'+
+      (st.target
+        ? '<div class="bwpips">'+pips+'</div><p class="note">'+st.thisWeek+' of '+st.target+' this week. A week counts when you reach your own target. Rest days never break it.</p>'
+        : '<p class="note">Set a target for the week: how many sessions you mean to do. Your own number, not anybody else’s.</p>')+
+      '<div class="bwrow"><span>Sessions a week</span>'+
+        '<span class="bwstep"><button type="button" id="bwMinus" aria-label="One fewer a week">−</button>'+
+        '<b id="bwTarget">'+(st.target || "–")+'</b>'+
+        '<button type="button" id="bwPlus" aria-label="One more a week">+</button></span></div>'+
+      '<label class="bwpause"><input type="checkbox" id="bwPause"'+(pausedWeek(wk) ? " checked" : "")+'> '+
+        'Pause this week: exams, illness, a tournament. The streak waits.</label>'+
+    '</div>';
+  var list = items.length ? items.map(function(x){
+    return '<div class="bellitem '+x.kind+(seen[x.key] ? "" : " new")+'"><b>'+x.title+'</b><span>'+x.body+'</span></div>';
+  }).join("") : '<p class="note">Nothing new. Go and make something.</p>';
+  host.innerHTML = week + '<div class="belllist">'+list+'</div>' + remindBlock();
+  $("bwMinus").onclick = function(){ setWeekTarget(Math.max(0, weekTarget() - 1)); };
+  $("bwPlus").onclick = function(){ setWeekTarget(Math.min(14, weekTarget() + 1)); };
+  $("bwPause").onchange = function(){
+    var p = playerObj(); if(!p) return;
+    p.pauseWeeks = (p.pauseWeeks || []).filter(function(w){ return w !== wk; });
+    if(this.checked) p.pauseWeeks.push(wk);
+    saveEdit(); openBell(); paintBell();
+  };
+  wireRemind();
+  $("bellWrap").hidden = false;
+  document.body.style.overflow = "hidden";
+  bellMark(items.map(function(x){ return x.key; }));
+  paintBell();
+}
+function setWeekTarget(n){
+  var p = playerObj(); if(!p) return;
+  p.weekTarget = n; saveEdit(); openBell(); paintBell();
+}
+function closeBell(){ $("bellWrap").hidden = true; document.body.style.overflow = ""; }
+
+/* ---- the reminder: real push, on the installed app ----
+   One phone, one subscription, kept on the server (/api/dg-push) with her time
+   and her own words. The server checks at that time whether anything has been
+   logged today and sends one nudge if not. Works on iPhone only from the Home
+   Screen app (iOS 16.4 on), and on Android in Chrome. */
+var REMIND_KEY = "lcl.remind";
+function remindPrefs(){ try{ return JSON.parse(localStorage.getItem(REMIND_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function remindSave(o){ try{ localStorage.setItem(REMIND_KEY, JSON.stringify(o)); }catch(e){} }
+function pushCan(){
+  return typeof navigator !== "undefined" && "serviceWorker" in navigator &&
+         typeof window.PushManager !== "undefined" && typeof window.Notification !== "undefined" &&
+         cloudReady();
+}
+function iosNotInstalled(){
+  var ua = navigator.userAgent || "";
+  return /iPhone|iPad|iPod/.test(ua) && !window.navigator.standalone;
+}
+function remindBlock(){
+  var r = remindPrefs(), t = r.time || "19:00", times = [];
+  for(var m = 16*60; m <= 21*60; m += 15) times.push(String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"));
+  var body;
+  if(!cloudReady()) body = '<p class="note">Reminders work in the installed app, once you are signed in with your code.</p>';
+  else if(iosNotInstalled()) body = '<p class="note">On iPhone, reminders only work from the Home Screen app. In Safari tap Share, then Add to Home Screen, and open it from there.</p>';
+  else if(!pushCan()) body = '<p class="note">This browser cannot receive reminders.</p>';
+  else if(!playerKey(state.activePlayer)) body = '<p class="note">Put your name in first, top right.</p>';
+  else body =
+    '<label class="bwpause"><input type="checkbox" id="rmOn"'+(r.on ? " checked" : "")+'> '+
+      'Nudge me on a day I have not trained</label>'+
+    '<div class="bwrow"><span>At</span><select id="rmTime" aria-label="Reminder time">'+
+      times.map(function(x){ return '<option'+(x === t ? " selected" : "")+'>'+x+'</option>'; }).join("")+'</select></div>'+
+    '<div class="bwrow"><span>When I</span><input id="rmCue" maxlength="40" placeholder="finish dinner" value="'+String(r.cue||"").replace(/"/g,"&quot;")+'" aria-label="Your cue"></div>'+
+    '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>';
+  return '<div class="bellweek"><div class="bwhd"><b>Reminder</b><span>this phone</span></div>'+body+'</div>';
+}
+function urlB64(s){
+  var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
+  var a = new Uint8Array(b.length); for(var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a;
+}
+function remindSay(t){ var m = $("rmMsg"); if(m) m.textContent = t; }
+function remindSend(sub, test){
+  var r = remindPrefs();
+  return cloudPost("/api/dg-push", { action:"sub", code:cloudCode(), player:playerKey(state.activePlayer),
+    sub:sub.toJSON ? sub.toJSON() : sub, time:r.time || "19:00", cue:r.cue || "",
+    tz:(Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London"), test:!!test });
+}
+function remindOn(){
+  /* the permission prompt has to come straight out of her tap */
+  var ask = Notification.requestPermission();
+  return Promise.resolve(ask).then(function(perm){
+    if(perm !== "granted") throw new Error("Notifications are switched off for this app in the phone's settings.");
+    return Promise.all([navigator.serviceWorker.register("/sw.js").then(function(){ return navigator.serviceWorker.ready; }),
+                        cloudPost("/api/dg-push", { action:"key" })]);
+  }).then(function(x){
+    var reg = x[0], k = x[1];
+    if(!k.ok || !k.d || !k.d.key) throw new Error("The server is not set up for reminders yet.");
+    return reg.pushManager.getSubscription().then(function(old){
+      return old || reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64(k.d.key) });
+    });
+  }).then(function(sub){
+    return remindSend(sub, true).then(function(res){
+      if(!res.ok) throw new Error("The server said no (" + ((res.d && res.d.reason) || res.status) + ").");
+      var r = remindPrefs(); r.on = true; r.endpoint = sub.endpoint; remindSave(r);
+      remindSay("On. A test message is on its way.");
+    });
+  });
+}
+function remindOff(){
+  var r = remindPrefs();
+  return navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
+    .then(function(sub){
+      var ep = (sub && sub.endpoint) || r.endpoint;
+      var p = sub ? sub.unsubscribe() : Promise.resolve();
+      return p.then(function(){
+        if(ep) return cloudPost("/api/dg-push", { action:"off", code:cloudCode(), player:playerKey(state.activePlayer), endpoint:ep });
+      });
+    }).then(function(){ r.on = false; remindSave(r); remindSay("Off."); });
+}
+function wireRemind(){
+  var on = $("rmOn"); if(!on) return;
+  on.onchange = function(){
+    var want = on.checked;
+    remindSay(want ? "Turning on…" : "Turning off…");
+    (want ? remindOn() : remindOff()).then(paintBell).catch(function(e){
+      on.checked = !want; remindSay(e && e.message ? e.message : "That did not work. Try again in a moment.");
+    });
+  };
+  function changed(){
+    var r = remindPrefs(); r.time = $("rmTime").value; r.cue = $("rmCue").value.trim(); remindSave(r);
+    if(!r.on) return;
+    navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
+      .then(function(sub){ if(sub) return remindSend(sub, false); })
+      .then(function(){ remindSay("Saved. " + r.time + (r.cue ? ", " + r.cue : "") + "."); })
+      .catch(function(){ remindSay("Saved on this phone; the server will catch up next time."); });
+  }
+  $("rmTime").onchange = changed;
+  $("rmCue").onchange = changed;
+}
+/* A tapped reminder opens the app with ?go=drill&id=... (or go=bell). The same
+   address arrives as a message when the app is already open. */
+function handleGo(search){
+  var q = new URLSearchParams(search || "");
+  var go = q.get("go");
+  if(go === "drill" && q.get("id") && drillById(q.get("id"))) openDrill(q.get("id"));
+  else if(go === "bell") openBell();
 }
 
 /* ---------- diagram lightbox ---------- */
@@ -13725,6 +14050,30 @@ render();
 show("home");
 try{ history.replaceState({lcl:"home"}, ""); }catch(e){}
 HIST_ON = true;
+$("bellBtn").addEventListener("click", openBell);
+$("bellClose").addEventListener("click", closeBell);
+$("bellWrap").addEventListener("click", function(e){ if(e.target === this) closeBell(); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("bellWrap").hidden) closeBell(); });
+paintBell();
+/* a tapped reminder arrives as ?go=...; the address is cleaned afterwards so a
+   reload does not open the drill again */
+(function(){
+  var q = location.search;
+  if(/[?&]go=/.test(q)){
+    try{ history.replaceState({lcl:"home"}, "", location.pathname); }catch(e){}
+    setTimeout(function(){ handleGo(q); }, 0);
+  }
+  if(cloudReady() && "serviceWorker" in navigator){
+    try{
+      navigator.serviceWorker.register("/sw.js").catch(function(){});
+      navigator.serviceWorker.addEventListener("message", function(e){
+        if(e.data && e.data.lcl === "open" && e.data.url){
+          try{ handleGo(new URL(e.data.url).search); }catch(err){}
+        }
+      });
+    }catch(e){}
+  }
+})();
 wireInstallTip();
 connect();
 cloudPull();
