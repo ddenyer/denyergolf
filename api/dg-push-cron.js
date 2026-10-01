@@ -1,8 +1,10 @@
 // /api/dg-push-cron.js
 //
 // Run by Vercel Cron every fifteen minutes (vercel.json). For every phone whose
-// reminder time has just arrived in its own time zone: if she has logged
-// nothing today, and the week is not paused, send one nudge. Never two in a
+// reminder time has just arrived in its own time zone: on a Sunday, if next
+// week is not set yet, the nudge is the one that asks her to set it. Otherwise,
+// if she has logged nothing today and the week is not paused, send one nudge,
+// naming a quick drill still on her week when there is one. Never two in a
 // day, never after nine at night, and a phone the push service has forgotten is
 // dropped rather than retried for ever.
 //
@@ -53,10 +55,53 @@ function counts(rows) {
   return rows.filter((r) => r.status !== 'live' &&
     !(r.kind === 'gym' && WARMUPS.has(+r.gym))).length;
 }
-export function message(row, L, week, target, today) {
+function addDays(date, n) {
+  const d = new Date(date + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+// Her week as she set it in the app: the stored plan if there is one, else her
+// default numbers, else the old single target.
+export function planOf(pl, monday) {
+  const w = pl.weeks && pl.weeks[monday];
+  const sum = (n) => (n ? (+n.main || 0) + (+n.sc || 0) + (+n.drill || 0) : 0);
+  if (w && w.n) return { total: sum(w.n), items: Array.isArray(w.items) ? w.items : [], paused: !!w.paused };
+  if (pl.weekPlan) return { total: sum(pl.weekPlan), items: [], paused: false };
+  return { total: Math.max(0, Math.min(14, +pl.weekTarget || 0)), items: [], paused: false };
+}
+export function isPaused(pl, monday) {
+  return (pl.pauseWeeks || []).indexOf(monday) > -1 || !!(pl.weeks && pl.weeks[monday] && pl.weeks[monday].paused);
+}
+// Sunday: has she set next week? Only a week she chose (set) counts.
+export function nextSet(pl, monday) {
+  const w = pl.weeks && pl.weeks[addDays(monday, 7)];
+  return !!(w && w.set);
+}
+const DRILL_NAMES = {
+  'd-mat-run': 'The run', 'd-mat-startline': 'Start line', 'd-mat-pace': 'Pace', 'd-gdn-corners': 'Four corners',
+  'd-gdn-circle': 'The circle', 'gym:4': 'Speed sticks', 'gym:5': 'The band session',
+};
+// The first planned quick drill she can do at home and has not done this week.
+export function drillLeft(plan, ss) {
+  const did = new Set(ss.map((x) => (x.kind === 'gym' ? 'gym:' + x.gym : x.drill)).filter(Boolean));
+  const it = plan.items.find((x) => x && x.k === 'drill' && DRILL_NAMES[x.id] && !did.has(x.id));
+  return it ? it.id : null;
+}
+export function message(row, L, week, target, today, extra = {}) {
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  if (extra.plan) {
+    return { title: 'Set next week',
+             body: 'How many main sessions, S&C and quick drills? Your numbers; the app picks the sessions.',
+             url: '/?go=settings&wk=next' };
+  }
   const lead = row.cue ? cap(row.cue) + ': ten minutes on the mat?' : 'Ten minutes on the mat?';
   const d = MAT[Math.floor(Date.parse(L.date) / 864e5) % MAT.length];
+  if (extra.left) {
+    const nm = DRILL_NAMES[extra.left];
+    const head = row.cue ? cap(row.cue) + ': ' : '';
+    return { title: L.dow === 6 && target && week === target - 1 ? 'One more keeps your week' : 'Nothing logged today',
+             body: `${head}${nm} is still on your week.` + (target ? ` ${week} of ${target} done.` : ''),
+             url: /^gym:/.test(extra.left) ? '/?go=week' : `/?go=drill&id=${extra.left}` };
+  }
   if (L.dow === 6 && target && week === target - 1) {
     return { title: 'One more keeps your week',
              body: `${week} of ${target} this week. ${lead} ${d.say}`,
@@ -95,19 +140,26 @@ export default async function handler(req, res) {
       }
       const pl = metaCache[row.player];
       const monday = mondayOf(L.date, L.dow);
-      if ((pl.pauseWeeks || []).indexOf(monday) > -1) { out.skipped++; continue; }
+      // Sunday evening: the reminder is the one that sets next week, trained today or not
+      const planNext = L.dow === 6 && !nextSet(pl, monday);
+      if (!planNext && isPaused(pl, monday)) { out.skipped++; continue; }
 
-      const sr = await timedFetch(
-        `${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${p}&played_on=gte.${monday}&played_on=lte.${L.date}` +
-        `&select=played_on,kind,status,gym:body->>gymId`, { headers: H });
-      const ss = sr.ok ? await sr.json() : [];
-      const today = counts(ss.filter((x) => x.played_on === L.date));
-      if (today > 0) { out.skipped++; continue; }
-      const week = counts(ss);
-      const target = Math.max(0, Math.min(14, +pl.weekTarget || 0));
+      let msg;
+      if (planNext) msg = message(row, L, 0, 0, 0, { plan: true });
+      else {
+        const sr = await timedFetch(
+          `${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${p}&played_on=gte.${monday}&played_on=lte.${L.date}` +
+          `&select=played_on,kind,status,gym:body->>gymId,drill:body->>drillId`, { headers: H });
+        const ss = sr.ok ? await sr.json() : [];
+        const today = counts(ss.filter((x) => x.played_on === L.date));
+        if (today > 0) { out.skipped++; continue; }
+        const week = counts(ss);
+        const plan = planOf(pl, monday);
+        msg = message(row, L, week, plan.total, today, { left: drillLeft(plan, ss.filter((x) => x.status !== 'live')) });
+      }
 
       const status = await sendPush({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
-                                    message(row, L, week, target, today), V);
+                                    msg, V);
       if (status === 404 || status === 410) {
         await timedFetch(`${SUPABASE_URL}/rest/v1/dg_push?endpoint=eq.${encodeURIComponent(row.endpoint)}`,
           { method: 'DELETE', headers: H });
