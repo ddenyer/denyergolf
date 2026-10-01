@@ -223,6 +223,7 @@
   .wktx b em{font-style:normal; font-weight:600; font-size:11.5px; color:var(--muted)}
   .wktx > span{font-size:12.5px; color:var(--muted); line-height:1.3}
   .wkrow.done .wktx > span{color:var(--ink-2)}
+  .wkswap{font-size:12px; color:var(--ink-2); line-height:1.3; font-style:italic}
   .wkstart{flex:none; font-size:12.5px; font-weight:700; color:var(--accent); background:var(--accent-wash);
     border-radius:999px; padding:6px 11px}
   .wktick{flex:none; width:26px; height:26px; border-radius:999px; background:var(--accent-fill); color:var(--on-accent);
@@ -913,6 +914,9 @@
     letter-spacing:.7px; text-transform:uppercase; padding:2px 7px; border-radius:999px;
     margin-right:7px; vertical-align:1px; border:1px solid var(--line-strong); color:var(--muted)}
   .hrow .pill.now{background:var(--accent-fill); border-color:var(--accent-fill); color:#ffffff}
+  .hrow .pill.banked{background:transparent; border-color:var(--line-strong); color:var(--ink-2)}
+  .hrow .openacts button[data-bank]{background:var(--surface); border:1px solid var(--line-strong); color:var(--ink);
+    border-radius:9px; padding:6px 11px; font:inherit; font-size:12.5px; font-weight:600; margin-left:6px}
   .hrow .pill.part{background:var(--up-wash); border-color:var(--gold); color:var(--gold)}
   .hrow .openacts{margin-top:7px}
   .hrow .openacts button{padding:5px 13px; font-size:12.5px}
@@ -1904,6 +1908,10 @@
     border-radius:7px; background:var(--surface); color:var(--ink)}
   .cfadd button{border:1px solid var(--line-strong); background:var(--surface); border-radius:7px; padding:6px 12px;
     font:inherit; font-size:13px; font-weight:600; color:var(--ink)}
+  .proghd{display:flex; align-items:center; gap:9px; margin:16px 0 6px; padding-top:12px; border-top:1px solid var(--line)}
+  .proghd .wkic{width:30px; height:30px; border-radius:8px}
+  .proghd b{font-size:15px}
+  #viewProg .testpick{background:var(--surface); border-radius:10px; padding:10px 12px}
   .cnote em{display:block; font-style:normal; font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:9.5px;
     font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
   .pcardc .acts{display:flex; gap:8px; flex-wrap:wrap}
@@ -1989,6 +1997,8 @@
       <span id="weekResumeText"></span>
       <span class="resacts">
         <button id="weekResumeGo">Carry on</button>
+        <button id="weekResumeBank" class="ghost">Save as it is</button>
+        <button id="weekResumeDrop" class="ghost">Discard</button>
       </span>
     </div>
     <div class="wkhead">
@@ -2006,6 +2016,7 @@
       <span id="resumeText"></span>
       <span class="resacts">
         <button id="resumeGo">Carry on</button>
+        <button id="resumeBank" class="ghost">Save as it is</button>
         <button id="resumeDrop" class="ghost">Discard</button>
       </span>
     </div>
@@ -2204,6 +2215,18 @@
       <input type="file" id="coachFile" accept="application/json,.json">
     </div>
     <p class="status" id="coachStatus"></p>
+  </section>
+
+  <!-- COACH: ONE PLAYER'S PROGRAMME -->
+  <section id="viewProg" hidden>
+    <div class="coachbar">
+      <span>Coach view</span>
+      <button id="progBack" type="button">← All players</button>
+    </div>
+    <div class="eyebrow" id="progWho"></div>
+    <h1>Programme</h1>
+    <p class="lede">What she sees on This week comes from here. She sets how many of each; you set what they are.</p>
+    <div id="progBody"></div>
   </section>
 </main>
 
@@ -2460,7 +2483,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-01", note:"This week, the new first tab. You set how many main sessions, S&C and quick drills in Settings; the app picks which: the areas you have left longest, S&C A and B in turn, and quick drills from your coach\u2019s focus and where you are placing lowest. Change or remove any of them. On Sunday evening the reminder asks you to set next week" };
+var BUILD = { on:"2026-10-01", note:"Goals is now yours to read and write: outcome, targets, where you are and the week. Which session, which test, which S&C programme and which quick drills are set by your coach. An unfinished session can be kept with Save as it is. This week, the first tab, is where you set how many main sessions, S&C and quick drills" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -5866,6 +5889,7 @@ function show(view){
   $("viewDrills").hidden = view!=="drills";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
+  $("viewProg").hidden = view!=="prog";
   $("viewSessions").hidden = view!=="sessions";
   if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
@@ -6393,7 +6417,7 @@ function drillBest(d){
   if(lapB !== null) return runs.length ? { big:String(lapB), small:"in a row, your best" } : null;
   for(i=0;i<runs.length;i++){
     x = runs[i];
-    if(!x || x.total == null || x.sgUnknown) continue;
+    if(!x || x.total == null || x.sgUnknown || thinSession(x)) continue;
     v = x.total;
     if(best === null || v > best.v) best = {v:v, s:x};
   }
@@ -6573,6 +6597,7 @@ function testBox(a){
     pl.practice = pl.practice || {};
     if(psel.value === String(a.id) || psel.value === a.id) delete pl.practice[a.id];
     else pl.practice[a.id] = psel.value;
+    pl.practiceAt = Date.now();
     saveEdit();
     paintWhen(); renderHome(); renderTests();
   });
@@ -6610,6 +6635,7 @@ function testBox(a){
     inp.value = String(every);
     if(!id) delete pl.tests[a.id];
     else pl.tests[a.id] = { id:id, every:every };
+    pl.testsAt = Date.now();
     saveEdit();
     paintWhen();
     renderHome();
@@ -6673,7 +6699,8 @@ function renderGoals(){
     }));
     var live = document.createElement("p"); live.className="galive"; live.textContent = areaLive(a);
     card.appendChild(live);
-    card.appendChild(testBox(a));
+    /* Which session and which test are the coach's call now, in the coach's
+       programme page. Here she sees what she is aiming at and how the week goes. */
     card.appendChild(bulletBox({
       eyebrow:"How · the week",
       cls:"proc",
@@ -6888,7 +6915,7 @@ function tileBest(r){
   var a = r.a, sg = isSG(a), best = null, i, x, v, hs = r.own || r.hist;
   for(i = 0; i < hs.length; i++){
     x = hs[i];
-    if(!x || x.total == null || x.sgUnknown) continue;
+    if(!x || x.total == null || x.sgUnknown || thinSession(x)) continue;
     if(!sg && !x.max) continue;
     /* A part-session cannot hold a best. This used to read x.n, which sessions
        have never carried, so it never fired once, and on the four strokes areas
@@ -7253,6 +7280,51 @@ function paintTick(){
 function clearDraft(){
   if(draftTimer){ clearInterval(draftTimer); draftTimer = null; }
 }
+/* How much of a session was actually done, 0 to 1, or null when it cannot be
+   told (a format with no ball count, or a timed matrix). */
+function doneFrac(x){
+  if(!x) return null;
+  if(x.kind === "gym") return x.max ? Math.min(1, (x.total || 0) / x.max) : null;
+  var a = area(x.areaId); if(!a || isMatrix(a)) return null;
+  var want = sgAreaBalls(a), got = sgBallsLogged(x);
+  if(!want || !got) return null;
+  return Math.min(1, got / want);
+}
+/* A part-done session is kept and counts as training, but it cannot set a
+   best or pull a trend line down: under 60% done it is left out of both. */
+function thinSession(x){ return !!(x && x.partial != null && x.partial < 0.6); }
+function hasScore(x){
+  if(!x) return false;
+  if(x.kind === "gym") return (x.total || 0) > 0;
+  if((x.total || 0) !== 0 || sgBallsLogged(x) > 0) return true;
+  if(x.mx && ((x.mx.hits && x.mx.hits.length) || x.mx.at)) return true;
+  var k; for(k in (x.scores || {})) if(x.scores[k]) return true;
+  return false;
+}
+function markPartial(s){
+  var f = doneFrac(s);
+  if(f != null && f < 1) s.partial = Math.round(f * 100) / 100; else delete s.partial;
+}
+/* Save as it is: an unfinished session she is not coming back to, kept with
+   what was scored in it. Not resumed, not deleted. */
+function bankSession(x){
+  var at = sessAt(x && x.id); if(at < 0) return;
+  var s = state.sessions[at];
+  if(state.draft && state.draft.id === s.id){ mxStop(); state.draft = null; clearDraft(); }
+  if(state.gymDraft && state.gymDraft.id === s.id){ state.gymDraft = null; clearDraft(); }
+  s.status = "done";
+  markPartial(s);
+  delete s.pos; delete s.cardMode; delete s.at;
+  saveLocal();
+  pushDoc(s);
+  setStatus("Saved as it is: " + sessLabel(s) + ", " + fmtDate(s.date) +
+            (s.partial != null ? ", " + Math.round(s.partial * 100) + "% done" : "") + ".");
+  render();
+  if(state.view === "sessions") renderSessions();
+  if(state.view === "week") renderWeek();
+  renderResume();
+  if(typeof paintBell === "function") paintBell();
+}
 function dropSession(x){
   tombstone(x.id);     // so the cross-tab merge in saveLocal cannot bring it back
   state.sessions = state.sessions.filter(function(y){ return y.id !== x.id; });
@@ -7306,9 +7378,10 @@ function renderResume(){
   if(state.view === "session" || state.view === "gym"){ bar.hidden = true; return; }
   var d = liveSessions()[0];
   if(!d){ bar.hidden = true; return; }
-  var when = d.date === today() ? "today" : "on " + fmtDate(d.date);
+  var when = d.date === today() ? "today" : fmtDate(d.date);
   $("resumeText").textContent =
     "Unfinished " + draftLabel(d) + " session from " + when + ", " + draftProgress(d) + ".";
+  if($("resumeBank")) $("resumeBank").hidden = !hasScore(d);
   bar.hidden = false;
 }
 function resumeDraft(d){
@@ -11654,6 +11727,7 @@ function saveCurrent(){
      a second copy */
   var at = sessAt(s.id);
   s.status = "done";
+  markPartial(s);
   delete s.pos; delete s.cardMode; delete s.at;
   var saved = JSON.parse(JSON.stringify(s));
   if(at >= 0) state.sessions[at] = saved; else { state.sessions.push(saved); at = state.sessions.length-1; }
@@ -12535,7 +12609,7 @@ function renderProgress(){
   var host = $("charts"); host.innerHTML="";
   var any=false;
   AREAS.concat(PRACTICE.filter(function(p){ return p.paired; })).forEach(function(a){
-    var hist = sessionsFor(a.id);
+    var hist = sessionsFor(a.id).filter(function(s){ return !thinSession(s); });
     if(!hist.length) return;
     any=true;
     var best=-1e9; hist.forEach(function(s){ if(!s.sgUnknown && s.total>best) best=s.total; });
@@ -12602,7 +12676,7 @@ function sessionMeta(sess){
 /* Every session she has started, finished or not, in one list. The status says
    which is which, and an unfinished one can be picked up where it stopped. */
 function sessStatus(x){
-  if(x.status !== "live") return { key:"done", word:"Complete" };
+  if(x.status !== "live") return { key:"done", word:x.partial != null ? "Part done \u00b7 " + Math.round(x.partial * 100) + "%" : "Complete" };
   if(isOpen(x)) return { key:"now", word:"In progress" };
   return { key:"part", word:"Incomplete" };
 }
@@ -12643,12 +12717,15 @@ function renderSessions(){
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
                           : x.total+"/"+x.max)+'</span>'+
       '<button class="x" title="Delete" aria-label="Delete session">\u00d7</button>'+
-      '<span class="nt"><span class="pill '+st.key+'">'+st.word+'</span>'+
+      '<span class="nt"><span class="pill '+st.key+(x.partial != null && !open ? " banked" : "")+'">'+st.word+'</span>'+
         (meta ? '<b>'+meta+'</b>' : "")+(meta && note ? " \u00b7 " : "")+note+'</span>'+
-      (st.key === "part" ? '<span class="openacts"><button type="button" class="pri" data-go="on">Resume</button></span>' : "");
+      (st.key === "part" ? '<span class="openacts"><button type="button" class="pri" data-go="on">Resume</button>'+
+        (hasScore(x) ? '<button type="button" data-bank="1">Save as it is</button>' : '')+'</span>' : "");
     row.addEventListener("click", function(){ go(); });
     var on = row.querySelector('[data-go="on"]');
     if(on) on.addEventListener("click", function(ev){ ev.stopPropagation(); resumeDraft(x); });
+    var bk = row.querySelector('[data-bank]');
+    if(bk) bk.addEventListener("click", function(ev){ ev.stopPropagation(); bankSession(x); });
     row.querySelector(".x").addEventListener("click", function(ev){
       ev.stopPropagation();
       askDelete(
@@ -13030,7 +13107,7 @@ function bellItems(){
   });
   /* a best in the last week, said once */
   liveAreas().forEach(function(t){
-    var hist = sessionsFor(practiceFor(t.id)).filter(function(s){ return s.total != null && !s.sgUnknown; });
+    var hist = sessionsFor(practiceFor(t.id)).filter(function(s){ return s.total != null && !s.sgUnknown && !thinSession(s); });
     if(hist.length < 3) return;
     var a = area(practiceFor(t.id)) || t, sg = isSG(a);
     var val = function(s){ return sg ? s.total : (s.max ? s.total / s.max : -1); };
@@ -13218,10 +13295,17 @@ var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills" };
 var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill" };
 var WEEK_DEF   = { main:3, sc:2, drill:3 };
 var WEEK_MAX   = { main:10, sc:2, drill:10 };
+function weekMax(k){ return k === "sc" ? scIds().length : WEEK_MAX[k]; }
 /* the first week planned this way; before it, a week counted on the old
    "so many sessions" target */
 var WEEK_FROM  = "2026-09-28";
 var SC_IDS     = [9, 10];
+/* The coach picks the S&C programme: the new two (A and B) or the extended
+   three (Sessions 1, 2 and 3). Either way they take turns. */
+var SC_PROGS = { "new":{ ids:[9, 10], nm:"New S&C", sub:"about 40 minutes", turn:"A and B take turns, never the same one twice running" },
+                 "ext":{ ids:[1, 2, 3], nm:"Extended S&C", sub:"the longer programme", turn:"Sessions 1, 2 and 3 take turns, in order" } };
+function scProg(p){ p = p || playerObj(); return SC_PROGS[(p && p.scProg) || "new"] || SC_PROGS["new"]; }
+function scIds(){ return scProg().ids; }
 /* The coach's starting focus for each girl. A coach edit (stamped now) always
    beats these (stamped 1). */
 var FOCUS_SEED = {
@@ -13277,22 +13361,66 @@ function weekRec(wk, make){
   var p = playerObj(); if(!p) return null;
   var r = p.weeks && p.weeks[wk];
   if(r && r.redraw){ delete r.redraw; redrawDrills(wk, r); }
-  if(r || !make) return r || null;
-  p.weeks = p.weeks || {};
-  r = p.weeks[wk] = { n:defaultNums(), items:[], at:1 };
-  fillWeek(r, wk);
-  /* keep twenty weeks; older ones only ever fed the streak, which is
-     already decided for them */
-  var ks = Object.keys(p.weeks).sort();
-  while(ks.length > 20){ delete p.weeks[ks.shift()]; }
-  try{ saveLocal(); }catch(e){}
-  return r;
+  if(!r && make){
+    p.weeks = p.weeks || {};
+    r = p.weeks[wk] = { n:defaultNums(), items:[], at:1 };
+    fillWeek(r, wk);
+    /* keep twenty weeks; older ones only ever fed the streak, which is
+       already decided for them */
+    var ks = Object.keys(p.weeks).sort();
+    while(ks.length > 20){ delete p.weeks[ks.shift()]; }
+    try{ saveLocal(); }catch(e){}
+  }
+  /* once a week has begun, what last week moved on arrives in it */
+  if(r && !r.carryDone && wk <= weekOf()){
+    r.carryDone = true;
+    applyCarry(wk, r);
+    try{ saveLocal(); }catch(e){}
+  }
+  return r || null;
+}
+/* Last week's moved-on items take the place of the app's own last picks of the
+   same kind, never one she chose and never one already done. */
+function applyCarry(wk, r){
+  var prev = addDays(wk, -7);
+  if(!weekRec(prev, false)) return;
+  var carry = weekState(prev, false).carry;
+  if(!carry.length) return;
+  var st = weekState(wk, false), done = {};
+  st.rows.forEach(function(x){ if(x.done) done[x.i] = 1; });
+  carry.forEach(function(c){
+    if(r.items.some(function(x){ return x.k === c.k && String(x.id) === String(c.id); })) return;
+    for(var i = r.items.length - 1; i >= 0; i--){
+      var it = r.items[i];
+      if(it.k === c.k && !it.own && !it.carried && !done[i]){
+        r.items[i] = { k:c.k, id:c.id, carried:true };
+        if(c.why) r.items[i].why = c.why;
+        return;
+      }
+    }
+  });
+}
+/* How long an item had been left when the week began. Never done counts as
+   the longest of all. */
+function itemGap(it, wk){
+  if(it.k === "main"){
+    var t = null; liveAreas().forEach(function(a){ if(a.id === it.id) t = a; });
+    if(!t) return 0;
+    var h = tileGap(t).hist.filter(function(s){ return s.date < wk; });
+    return h.length ? daysBetween(h[h.length-1].date, wk) : 1e6;
+  }
+  if(it.k === "drill"){
+    var was = PLAN_BEFORE; PLAN_BEFORE = wk;
+    try{ var d = drillLast(it.id); } finally { PLAN_BEFORE = was; }
+    return d ? daysBetween(d, wk) : 1e6;
+  }
+  return 0;
 }
 /* The coach changed the focus areas: the quick drills still to do this week
    and later are drawn again, except any she chose herself. */
 function redrawDrills(wk, r){
   var st = weekState(wk, false);
-  r.items = r.items.filter(function(it, i){ return it.k !== "drill" || it.own || (st.rows[i] && st.rows[i].done); });
+  r.items = r.items.filter(function(it, i){ return (it.k !== "drill" && it.k !== "sc") || it.own || (st.rows[i] && st.rows[i].done); });
   fillWeek(r, null);
   try{ saveLocal(); }catch(e){}
 }
@@ -13350,16 +13478,19 @@ function pickMain(r){
 /* S&C: A and B, never the same one twice running. One a week alternates on
    what she last did, so a missed week does not skip one. */
 function lastSC(){
-  var s = planHist(mine()).filter(function(x){ return x.kind === "gym" && SC_IDS.indexOf(x.gymId) > -1; })
+  var s = planHist(mine()).filter(function(x){ return x.kind === "gym" && scIds().indexOf(x.gymId) > -1; })
     .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }).pop();
   return s ? s.gymId : null;
 }
 function pickSC(r){
   var have = itemsOf(r, "sc").map(function(x){ return x.id; });
-  var last = lastSC();
-  var first = last === 9 ? 10 : 9;
-  var order = [first, first === 9 ? 10 : 9];
-  for(var i = 0; i < order.length; i++) if(have.indexOf(order[i]) < 0) return { k:"sc", id:order[i] };
+  var ids = scIds(), last = lastSC();
+  /* start from the one after the last she did, and go round in order */
+  var from = last == null ? 0 : (ids.indexOf(last) + 1) % ids.length;
+  for(var i = 0; i < ids.length; i++){
+    var id = ids[(from + i) % ids.length];
+    if(have.indexOf(id) < 0) return { k:"sc", id:id };
+  }
   return null;
 }
 
@@ -13437,7 +13568,22 @@ function weekState(wk, make){
       used[s.id] = 1; x.done = s; return;
     }
   });
-  var extra = ss.filter(function(s){ return !used[s.id]; });
+  /* A session she chose instead takes a planned one's place. Not the one left
+     longest, which stays because it is the most overdue, but the one left
+     second longest (or the only one left), and that moves on to next week.
+     S&C swaps the same way but does not move on: A and B already take turns. */
+  var carry = [], gaps = {};
+  var extra = ss.filter(function(s){ return !used[s.id]; }).filter(function(s){
+    var k = sessKind(s);
+    var open = rows.filter(function(x){ return x.it.k === k && !x.done; });
+    if(!open.length) return true;
+    open.forEach(function(x){ if(gaps[x.i] == null) gaps[x.i] = itemGap(x.it, wk); });
+    open.sort(function(a, b){ return gaps[b.i] - gaps[a.i] || a.i - b.i; });
+    var pick = open.length >= 2 ? open[1] : open[0];
+    pick.done = s; pick.swapped = true;
+    if(k !== "sc"){ pick.moved = true; carry.push(pick.it); }
+    return false;
+  });
   var per = {}, met = true, planned = 0;
   WEEK_KINDS.forEach(function(k){
     var want = r ? itemsOf(r, k).length : (n[k] || 0);
@@ -13447,7 +13593,7 @@ function weekState(wk, make){
     planned += want;
     if(got < want) met = false;
   });
-  return { wk:wk, rec:r, rows:rows, extra:extra, per:per, planned:planned,
+  return { wk:wk, rec:r, rows:rows, extra:extra, carry:carry, per:per, planned:planned,
            met:planned > 0 && met, paused:weekPaused(wk) };
 }
 /* Before planning existed a week counted on the old single target. */
@@ -13463,7 +13609,7 @@ function weekMet(wk){
 function weekStamp(r){ r.at = Date.now(); }
 function setWeekNum(wk, k, v){
   var r = weekRec(wk, true); if(!r) return;
-  v = Math.max(0, Math.min(WEEK_MAX[k], v));
+  v = Math.max(0, Math.min(weekMax(k), v));
   var cur = itemsOf(r, k).length;
   if(v > cur){ r.n[k] = v; fillWeek(r, null); }
   else if(v < cur){
@@ -13531,13 +13677,19 @@ function mergeWeekMeta(mine, them){
       }
     });
   }
-  if(Array.isArray(them.focus) && (+them.focusAt || 0) > (+mine.focusAt || 0)){
-    mine.focus = weekClone(them.focus); mine.focusAt = them.focusAt; t = true;
-    markRedraw(mine);
-  }
-  if(them.weekPlan && typeof them.weekPlan === "object" && (+them.weekPlanAt || 0) > (+mine.weekPlanAt || 0)){
-    mine.weekPlan = weekClone(them.weekPlan); mine.weekPlanAt = them.weekPlanAt; t = true;
-  }
+  /* The coach's choices and her default numbers: a newer stamp wins, and a
+     field this device has never had is filled from the server. */
+  [["focus", "focusAt"], ["weekPlan", "weekPlanAt"], ["practice", "practiceAt"],
+   ["tests", "testsAt"], ["scProg", "scProgAt"]].forEach(function(f){
+    var v = them[f[0]]; if(v == null) return;
+    var newer = (+them[f[1]] || 0) > (+mine[f[1]] || 0);
+    if(newer || mine[f[0]] == null){
+      mine[f[0]] = weekClone(v);
+      if(them[f[1]] != null) mine[f[1]] = them[f[1]];
+      t = true;
+      if(newer && (f[0] === "focus" || f[0] === "scProg")) markRedraw(mine);
+    }
+  });
   return t;
 }
 
@@ -13551,12 +13703,14 @@ function weekItemView(it){
   if(it.k === "main"){
     var sk = TILE[it.id] || TILE[10], g = tileGap(area(it.id) || { id:it.id });
     var sub = g.days == null ? "Not played yet" : "Last played " + sinceWords(g.days);
+    if(it.carried) sub = "Moved on from last week \u00b7 " + sub.charAt(0).toLowerCase() + sub.slice(1);
     if(PAIRS[it.id] && isDefaultPractice(practiceFor(it.id))) sub = pairName(pairDue(it.id)) + " · " + sub.charAt(0).toLowerCase() + sub.slice(1);
     return { nm:sk.nm, sub:sub, tint:sk.tint, ic:TICON[sk.ic] };
   }
   if(it.k === "sc"){
     var gy = gymOf(it.id);
-    return { nm:"S&C · " + (gy ? stripTags(gy.name) : "Session"), sub:"New S&C · about 40 minutes",
+    var sp = SC_PROGS["new"].ids.indexOf(it.id) > -1 ? SC_PROGS["new"] : SC_PROGS["ext"];
+    return { nm:"S&C · " + (gy ? stripTags(gy.name) : "Session"), sub:sp.nm + " · " + sp.sub,
              tint:"var(--surface-2)", ic:TICON.gym };
   }
   var r = drillRef(it.id) || { name:"Drill", area:10 };
@@ -13564,6 +13718,7 @@ function weekItemView(it){
   var why = it.why || "";
   var foc = focusFor().filter(function(f){ return f.id === it.id; })[0];
   if(foc) why = foc.why ? "Focus · " + foc.why : "Focus";
+  if(it.carried) why = "Moved on from last week" + (why ? " · " + why : "");
   return { nm:r.name, sub:why || (r.gym ? "Optional S&C" : "Quick drill"), tint:r.gym ? "var(--surface-2)" : ts.tint,
            ic:r.gym ? (r.gym === 4 ? TICON.bolt : TICON.band) : TICON[ts.ic] };
 }
@@ -13628,12 +13783,17 @@ function renderWeek(){
     html += '<div class="wkgrp"><div class="wkgh"><h2>' + WEEK_WORD[k].replace("&", "&amp;") + '</h2>' +
             '<span class="num">' + pk.got + ' of ' + pk.want + '</span></div><div class="wkpips">' + pips + '</div>';
     rows.forEach(function(x){
-      var v = weekItemView(x.it);
-      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= 2);
+      var v = weekItemView(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
+      if(x.swapped){
+        var was = weekItemView(x.it).nm;
+        v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
+      }
+      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
       html += '<div class="wkrow' + (x.done ? " done" : "") + '" style="--tint:' + v.tint + '">' +
         '<button type="button" class="wkgo" data-go="' + x.i + '"' + (x.done ? ' disabled' : '') + '>' +
           '<span class="wkic">' + v.ic(22) + '</span>' +
-          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + (x.done ? doneWords(x.done) : v.sub) + '</span></span>' +
+          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + (x.done ? doneWords(x.done) : v.sub) + '</span>' +
+            (v.swap ? '<span class="wkswap">' + v.swap.replace(/&(?!amp;)/g, "&amp;") + '</span>' : '') + '</span>' +
           (x.done ? '<span class="wktick" aria-label="Done">✓</span>' : '<span class="wkstart">Start</span>') +
         '</button>' +
         (x.done ? '' : '<span class="wkacts">' +
@@ -13668,8 +13828,9 @@ function renderWeekResume(){
   var bar = $("weekResume"); if(!bar) return;
   var d = liveSessions()[0];
   if(!d){ bar.hidden = true; return; }
-  var when = d.date === today() ? "today" : "on " + fmtDate(d.date);
+  var when = d.date === today() ? "today" : fmtDate(d.date);
   $("weekResumeText").textContent = "Unfinished " + draftLabel(d) + " session from " + when + ", " + draftProgress(d) + ".";
+  $("weekResumeBank").hidden = !hasScore(d);
   bar.hidden = false;
 }
 
@@ -13684,7 +13845,7 @@ function weekOptions(wk, idx){
       out.push({ id:x.id, nm:v.nm, sub:v.sub, tint:v.tint, ic:v.ic, cur:x.id === it.id, also:!!inWeek[x.id] });
     });
   } else if(it.k === "sc"){
-    SC_IDS.forEach(function(id){
+    scIds().forEach(function(id){
       var v = weekItemView({ k:"sc", id:id });
       out.push({ id:id, nm:v.nm, sub:v.sub, tint:v.tint, ic:v.ic, cur:id === it.id, also:!!inWeek[id] });
     });
@@ -13750,15 +13911,17 @@ function renderSettings(){
   WEEK_KINDS.forEach(function(k){
     var v = itemsOf(r, k).length;
     html += '<div class="bwrow setrow"><span><b>' + WEEK_WORD[k].replace("&", "&amp;") + '</b>' +
-      (k === "sc" ? '<small>A and B take turns, never the same one twice running</small>'
+      (k === "sc" ? '<small>' + scProg().turn + '</small>'
        : k === "main" ? '<small>Longest since you did it, and least done lately</small>'
        : '<small>Your coach’s focus first, then where you are placing lowest</small>') + '</span>' +
       '<span class="bwstep"><button type="button" data-k="' + k + '" data-d="-1" aria-label="One fewer ' + WEEK_ONE[k] + '"' + (v <= 0 ? " disabled" : "") + '>−</button>' +
       '<b class="num" id="setN_' + k + '">' + v + '</b>' +
-      '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= WEEK_MAX[k] ? " disabled" : "") + '>+</button></span></div>';
+      '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= weekMax(k) ? " disabled" : "") + '>+</button></span></div>';
   });
   var list = r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); });
-  html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") + '</p>' +
+  var moving = which === "next" ? weekState(weekOf()).carry.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }) : [];
+  html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") +
+    (moving.length ? " Moving on from this week, and put in first on Monday: " + moving.join(", ") + "." : "") + '</p>' +
     '<label class="bwpause"><input type="checkbox" id="setPause"' + (st.paused ? " checked" : "") + '> ' +
       'Pause ' + (which === "next" ? "next" : "this") + ' week: exams, illness, a tournament. The streak waits.</label>' +
     (which === "this" ? '<button type="button" class="setgo" id="setSeeWeek">See this week</button>'
@@ -14385,6 +14548,13 @@ $("tabSettings").addEventListener("click", function(){
   openSettings(((new Date().getDay() + 6) % 7) >= 5 ? "next" : "this");
 });
 $("weekResumeGo").addEventListener("click", function(){ resumeDraft(); });
+$("weekResumeBank").addEventListener("click", function(){ var d = liveSessions()[0]; if(d) bankSession(d); });
+$("resumeBank").addEventListener("click", function(){ var d = liveSessions()[0]; if(d) bankSession(d); });
+$("weekResumeDrop").addEventListener("click", function(){
+  var d = liveSessions()[0]; if(!d){ renderWeek(); return; }
+  askDelete("The unfinished " + draftLabel(d) + " session. What is scored in it is lost.",
+    function(){ dropSession(d); render(); renderWeek(); });
+});
 $("wkSheetClose").addEventListener("click", closeWeekChange);
 $("wkSheet").addEventListener("click", function(e){ if(e.target === this) closeWeekChange(); });
 $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show("home"); });
@@ -14439,6 +14609,7 @@ $("exportJson").addEventListener("click", function(){
   else setStatus("The download did not start in this browser.");
 });
 $("coachLink").addEventListener("click", openCoach);
+$("progBack").addEventListener("click", function(){ renderCoach(); show("coach"); });
 $("coachOut").addEventListener("click", function(){ coachSet(false); show("week"); });
 $("coachFile").addEventListener("change", function(){
   var f = this.files && this.files[0];
@@ -14556,6 +14727,7 @@ function renderCoach(){
       (stale && all.length ? '<p class="cnote"><em>Worth a look</em>Nothing scored in the last ten days.</p>' : '')+
       (p.checks ? '<p class="cnote"><em>Their check list</em>'+String(p.checks).replace(/</g,"&lt;")+'</p>' : '')+
       '<div class="acts">'+
+        '<button type="button" data-go="prog">Programme</button>'+
         '<button type="button" data-go="sessions">Sessions</button>'+
         '<button type="button" data-go="bench">Tour</button>'+
         '<button type="button" data-go="home">Practice</button>'+
@@ -14563,7 +14735,7 @@ function renderCoach(){
       '</div>';
 
     card.insertBefore(coachWeekLine(p), card.querySelector(".acts"));
-    card.insertBefore(coachFocusBox(p), card.querySelector(".acts"));
+    card.insertBefore(coachProgLine(p), card.querySelector(".acts"));
     var drop = card.querySelector("[data-drop]");
     if(drop) drop.addEventListener("click", function(){ removePlayer(p); });
 
@@ -14572,7 +14744,8 @@ function renderCoach(){
         state.activePlayer = p.id;
         saveLocal(); renderPlayer(); render();
         var to = b.getAttribute("data-go");
-        if(to === "sessions"){ renderSessions(); show("sessions"); }
+        if(to === "prog"){ renderProg(); show("prog"); }
+        else if(to === "sessions"){ renderSessions(); show("sessions"); }
         else if(to === "bench"){ renderBench(); show("bench"); }
         else show("home");
       });
@@ -14638,6 +14811,57 @@ function coachFocusBox(p){
   }
   draw();
   return box;
+}
+
+/* ---- her programme: the coach's page for one player ----
+   Which session she does in each area, which test and how often, which S&C
+   programme, and the quick drills her week starts with. She sees the result on
+   This week; the choosing is done here. */
+function coachProgLine(p){
+  var el = document.createElement("p"); el.className = "cnote";
+  var foc = focusFor(p).map(function(f){ return drillRef(f.id).name + (f.why ? " (" + f.why + ")" : ""); });
+  el.innerHTML = '<em>Programme</em>';
+  el.appendChild(document.createTextNode(scProg(p).nm + " \u00b7 focus: " + (foc.length ? foc.join(", ") : "none")));
+  return el;
+}
+function renderProg(){
+  var host = $("progBody"); if(!host) return;
+  var p = playerObj(); if(!p) return;
+  $("progWho").textContent = p.name || "Player";
+  host.innerHTML = "";
+
+  var g1 = document.createElement("div"); g1.className = "setgrp";
+  g1.innerHTML = '<div class="wkgh"><h2>Main sessions and tests</h2></div>' +
+    '<p class="note">The session she does in each area, and the test that comes round every so many sessions.</p>';
+  liveAreas().forEach(function(a){
+    var sk = TILE[a.id] || {};
+    var hd = document.createElement("div"); hd.className = "proghd";
+    hd.innerHTML = '<span class="wkic" style="--tint:' + sk.tint + '">' + TICON[sk.ic](18) + '</span><b>' + (sk.nm || a.name) + '</b>';
+    g1.appendChild(hd);
+    g1.appendChild(testBox(a));
+  });
+  host.appendChild(g1);
+
+  var g2 = document.createElement("div"); g2.className = "setgrp";
+  var cur = p.scProg || "new";
+  g2.innerHTML = '<div class="wkgh"><h2>S&amp;C</h2></div>' +
+    '<div class="setseg">' + Object.keys(SC_PROGS).map(function(k){
+      var sp = SC_PROGS[k];
+      return '<button type="button" data-sc="' + k + '" aria-pressed="' + (k === cur) + '"><b>' + sp.nm + '</b><small>' +
+        sp.ids.map(function(id){ return stripTags(gymOf(id).name); }).join(", ") + '</small></button>';
+    }).join("") + '</div><p class="note">' + scProg(p).turn + '. Her week picks from these.</p>';
+  g2.querySelectorAll("[data-sc]").forEach(function(b){
+    b.onclick = function(){
+      p.scProg = b.getAttribute("data-sc"); p.scProgAt = Date.now();
+      markRedraw(p); saveEdit(); renderProg();
+    };
+  });
+  host.appendChild(g2);
+
+  var g3 = document.createElement("div"); g3.className = "setgrp";
+  g3.innerHTML = '<div class="wkgh"><h2>Quick drills</h2></div>';
+  g3.appendChild(coachFocusBox(p));
+  host.appendChild(g3);
 }
 
 /* ---- removing a player ----
