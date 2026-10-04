@@ -229,6 +229,28 @@
   .sqcell.three{background:var(--surface-2)}
   .sqsum{margin-top:10px}
   .p9pick{grid-template-columns:repeat(3, 1fr)}
+  :root{ --p9-easy:#2f7d63; --p9-med:#efcf3f; --p9-hard:#c34848 }
+  .p9head{border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); margin:4px 0 12px}
+  .p9head h3{margin:0 0 6px; font-size:20px; text-decoration:underline; text-underline-offset:3px; text-align:center}
+  .p9head p{margin:6px 0; font-size:13px; color:var(--ink-2); line-height:1.4}
+  .p9dist{display:flex; gap:6px; flex-wrap:wrap; margin:8px 0}
+  .p9dist span{flex:1 1 30%; min-width:0; font-size:12px; border-radius:8px; padding:6px 8px; text-align:center; line-height:1.3}
+  .p9dist b{display:block; font-size:15px}
+  .p9dist .p9-easy, .p9t.p9-easy{background:var(--p9-easy); color:#fff}
+  .p9dist .p9-medium, .p9t.p9-medium{background:var(--p9-med); color:#1d1d1d}
+  .p9dist .p9-hard, .p9t.p9-hard{background:var(--p9-hard); color:#fff}
+  .p9card{overflow-x:auto}
+  .p9card table{width:100%; border-collapse:collapse; background:var(--surface); font-variant-numeric:tabular-nums}
+  .p9card th, .p9card td{border:1.5px solid var(--ink); text-align:center; padding:0}
+  .p9card thead th{font-size:11px; font-weight:700; padding:6px 2px; line-height:1.15}
+  .p9card thead th:first-child{width:30%}
+  .p9t{font-size:13px; font-weight:700; padding:12px 4px !important}
+  .p9card td button{width:100%; height:44px; border:0; background:none; font:inherit; font-size:24px; color:var(--ink); cursor:pointer; padding:0}
+  .p9card td.p9c{height:40px; font-size:22px}
+  .p9c.ok{color:var(--ink); font-weight:700}
+  .p9c.x{color:var(--muted)}
+  .p9tot th{font-size:13px; padding:10px 4px !important}
+  .p9tot td{font-size:17px; font-weight:700; height:40px}
   .p9grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:6px}
   .p9grid .sqcell{padding:7px 0}
   .p9grid .sqcell .h{font-size:11px; color:var(--ink-2); font-weight:600}
@@ -7806,62 +7828,64 @@ function p9Total(d, a){
 /* Better is more of the nine completed, then fewer attempts: a failed shot
    scores 0, so attempts alone would reward failing one. */
 function p9Key(s){ var a = testById("t-short-p9"); var r = p9Total(s, a); return r.made * 100 - r.total; }
+/* The card itself, as the squad prints it: a row for each shot, five attempt
+   boxes across, a cross for a miss and a tick where it went in, and a total
+   under each attempt column. Tap the box where she did it; tap the fifth again
+   if all five missed. */
+function p9Grid(a, d, live){
+  var sets = liveSets(a), col = [0, 0, 0, 0, 0];
+  var rows = sets.map(function(s, i){
+    var v = p9Att(d, s), cells = "";
+    for(var k = 1; k <= P9_MAX; k++){
+      var mark = "", cls = "";
+      if(v != null){
+        if(v === P9_FAIL){ mark = "✕"; cls = " x"; }
+        else if(k < v){ mark = "✕"; cls = " x"; }
+        else if(k === v){ mark = "✓"; cls = " ok"; col[k-1]++; }
+      }
+      cells += live
+        ? '<td><button type="button" class="p9c' + cls + '" data-r="' + i + '" data-k="' + k + '" aria-label="' + s.label + ', attempt ' + k + '">' + mark + '</button></td>'
+        : '<td class="p9c' + cls + '">' + mark + '</td>';
+    }
+    return '<tr><th class="p9t p9-' + s.tier + '">' + s.label + '</th>' + cells + '</tr>';
+  }).join("");
+  var tot = p9Total(d, a);
+  return '<div class="p9card"><table><thead><tr><th>Shot type</th>' +
+    [1, 2, 3, 4, 5].map(function(k){ return '<th>Attempt<br>' + k + '</th>'; }).join("") + '</tr></thead><tbody>' + rows +
+    '<tr class="p9tot"><th>Total</th>' + col.map(function(n){ return '<td>' + (tot.done ? n : "") + '</td>'; }).join("") + '</tr></tbody></table></div>' +
+    '<p class="note sqsum"><b>' + tot.total + '</b> attempts · <b>' + tot.made + '</b> of 9 completed' +
+    (tot.done === 9 ? (tot.made === 9 && tot.total === 9 ? ' · perfect' : ' · 9 is perfect') : ' · ' + tot.done + ' of 9 played') + '</p>';
+}
+function p9Head(){
+  return '<div class="p9head"><h3>Perfect 9</h3><p>Complete the 9 shots in as few shots as possible, with 9 being the perfect score. To complete a shot it must finish inside:</p>' +
+    '<div class="p9dist"><span class="p9-easy">Easy <b>3 ft</b> one club</span><span class="p9-medium">Medium <b>6 ft</b> two clubs</span><span class="p9-hard">Hard <b>9 ft</b> three clubs</span></div>' +
+    '<p>Do not leave the shot you are on until you have achieved the desired footage.</p></div>';
+}
 function buildP9(a){
   var d = state.draft, sets = liveSets(a);
   d.shots = d.shots || {};
-  var firstOpen = -1;
-  sets.forEach(function(s, i){ if(firstOpen < 0 && p9Att(d, s) == null) firstOpen = i; });
-  if(d.sqAt == null || d.sqAt < 0 || d.sqAt >= sets.length) d.sqAt = firstOpen < 0 ? 0 : firstOpen;
-  var at = d.sqAt, cur = sets[at], done = firstOpen < 0, have = p9Att(d, cur), sum = p9Total(d, a);
   var host = $("sessCards"); host.innerHTML = "";
-  var top = document.createElement("p"); top.className = "shotask";
-  top.textContent = done ? "All nine in. Check the card, then save."
-    : "Stay on each shot until it finishes inside its distance. Tap how many attempts it took.";
-  host.appendChild(top);
-  var card = document.createElement("div"); card.className = "sqnow p9now p9-" + cur.tier;
-  card.innerHTML = '<p class="eyebrow">Shot ' + (at + 1) + ' of 9' + (have != null ? ' \u00b7 changing it' : '') + '</p>' +
-    '<h3>' + cur.label + '</h3><p class="sqpar">Finish inside <b>' + cur.clubs + '</b>, about ' + cur.ft + ' ft.</p>' +
-    '<div class="sqpick p9pick">' + [1, 2, 3, 4, 5, P9_FAIL].map(function(n){
-      return '<button type="button" data-a="' + n + '"' + (have === n ? ' class="on"' : '') + '><b>' + (n === P9_FAIL ? "\u2715" : n) + '</b><span>' +
-        (n === 1 ? "first go" : n === P9_FAIL ? "not in five, 0" : "attempts") + '</span></button>';
-    }).join("") + '</div>';
-  host.appendChild(card);
-  card.querySelectorAll("[data-a]").forEach(function(b){
+  var wrap = document.createElement("div");
+  wrap.innerHTML = p9Head() + p9Grid(a, d, true) +
+    '<p class="note">Tap the attempt that went in: the ones before it fill with crosses. All five missed? Tap attempt 5 again. Tap a tick to clear the row.</p>';
+  host.appendChild(wrap);
+  wrap.querySelectorAll("[data-r]").forEach(function(b){
     b.addEventListener("click", function(){
-      d.shots[cur.id] = [{ z:"a" + b.getAttribute("data-a") }];
-      var next = -1;
-      for(var k = 1; k <= sets.length; k++){ var j = (at + k) % sets.length; if(p9Att(d, sets[j]) == null){ next = j; break; } }
-      d.sqAt = next < 0 ? at : next;
+      var s = sets[+b.getAttribute("data-r")], k = +b.getAttribute("data-k"), v = p9Att(d, s);
+      if(v === k && k === P9_MAX) d.shots[s.id] = [{ z:"a" + P9_FAIL }];          /* the fifth missed too */
+      else if(v === k || (v === P9_FAIL && k === P9_MAX)) delete d.shots[s.id];  /* tap again to clear */
+      else d.shots[s.id] = [{ z:"a" + k }];
       stashNotes(); buildP9(a); updateTotal();
       if($("sessNotes")) $("sessNotes").value = d.notes || "";
     });
   });
-  var grid = document.createElement("div"); grid.className = "sqgrid";
-  grid.innerHTML = '<p class="eyebrow">The card \u00b7 tap a shot to change it</p><div class="p9grid">' + sets.map(function(s, i){
-    var v = p9Att(d, s);
-    return '<button type="button" class="sqcell p9-' + s.tier + (i === at ? " at" : "") + '" data-h="' + i + '">' +
-      '<span class="h">' + s.label + '</span><span class="ft">' + s.ft + ' ft</span>' +
-      '<span class="p">' + (v == null ? "\u2013" : v === P9_FAIL ? "\u2715" : v) + '</span></button>';
-  }).join("") + '</div><p class="note sqsum">' + sum.done + ' of 9 shots played \u00b7 ' + sum.made + ' completed \u00b7 ' + sum.total + ' attempts' +
-    (sum.done === 9 ? (sum.total === 9 && sum.made === 9 ? ' \u00b7 perfect' : ' \u00b7 perfect is 9') : '') + '</p>';
-  host.appendChild(grid);
-  grid.querySelectorAll("[data-h]").forEach(function(b){
-    b.addEventListener("click", function(){ d.sqAt = +b.getAttribute("data-h"); stashNotes(); buildP9(a); if($("sessNotes")) $("sessNotes").value = d.notes || ""; });
-  });
-  var nb = notesBlock("sessNotes", "Session notes \u00b7 what worked \u00b7 one thing to fix");
+  var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   saveDraft();
 }
 function p9PastHtml(a, s){
-  var sum = p9Total(s, a);
-  var rows = liveSets(a).map(function(set){
-    var v = p9Att(s, set);
-    return '<tr><td>' + set.label + '</td><td>' + set.clubs + ' (' + set.ft + ' ft)</td><td>' + (v == null ? "\u2013" : v === P9_FAIL ? "0, not in five" : v) + '</td></tr>';
-  }).join("");
-  return '<div class="pastsum"><div><b>' + sum.total + '</b><span>attempts</span></div><div><b>' + sum.made + '</b><span>of 9 completed</span></div>' +
-    '<div><b>9</b><span>is perfect</span></div></div>' +
-    '<div class="sqpast"><table><thead><tr><th>Shot</th><th>Finish inside</th><th>Attempts</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  return p9Head().replace('<h3>Perfect 9</h3>', '') + p9Grid(a, s, false);
 }
 /* The saved card, read back */
 function sq18PastHtml(a, s){
@@ -13687,10 +13711,17 @@ function weekDocBody(){
   ss.filter(function(x){ return x.kind === "test" && testById(x.testId) && testById(x.testId).shape === "p9"; }).forEach(function(x){
     var a = testById(x.testId);
     h += wPara(a.name + ", " + fmtDate(x.date) + ": " + x.total + " attempts, " + p9Total(x, a).made + " of 9 completed (9 in 9 is perfect)", { b:true, sz:24, before:120 });
-    h += wTable([["Shot", "Finish inside", "Attempts"]].concat(liveSets(a).map(function(set){
-      var v = p9Att(x, set);
-      return [set.label, set.clubs + " (" + set.ft + " ft)", v == null ? "" : v === P9_FAIL ? "0 (not in five)" : String(v)];
-    })), [1800, 2600, 1400]);
+    var colT = [0, 0, 0, 0, 0];
+    var body9 = liveSets(a).map(function(set){
+      var v = p9Att(x, set), row = [set.label + " (" + set.ft + " ft)"];
+      for(var k = 1; k <= P9_MAX; k++){
+        row.push(v == null ? "" : v === P9_FAIL || k < v ? "\u2715" : k === v ? "\u2713" : "");
+        if(v === k) colT[k-1]++;
+      }
+      return row;
+    });
+    h += wTable([["Shot type", "Attempt 1", "Attempt 2", "Attempt 3", "Attempt 4", "Attempt 5"]].concat(body9)
+      .concat([["Total"].concat(colT.map(String))]), [2200, 1100, 1100, 1100, 1100, 1100]);
   });
   /* any records */
   var recs = []; ss.forEach(function(x){ recordsFor(x).forEach(function(r){ recs.push(r.title + ": " + r.body); }); });
