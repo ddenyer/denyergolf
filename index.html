@@ -278,6 +278,26 @@
   .revtab tr.revtot td{font-weight:800; border-top:1.5px solid var(--line-strong)}
   .revtab tr.sc td{color:var(--muted); font-size:12.5px}
   .revacts{display:flex; flex-direction:column; gap:8px}
+  /* ---------- arranged under the pillars ---------- */
+  .pilhd{display:flex; align-items:center; gap:9px; margin:18px 0 8px}
+  .pilhd h2, .pilhd h3{margin:0; font-size:16px; font-weight:800; letter-spacing:-.012em; flex:1; min-width:0}
+  .pilhd .pn{width:24px; height:24px; border-radius:999px; background:var(--tint, var(--surface-2)); color:var(--ink);
+    display:grid; place-items:center; font-size:12.5px; font-weight:800; flex:none; box-shadow:inset 0 0 0 1px var(--line)}
+  .pilhd .pn.sc{background:var(--surface-2)}
+  .pilhd .pr{font-size:12.5px; color:var(--muted); font-weight:600; flex:none}
+  .pillist .pilsec:first-child .pilhd, #histList .hsec:first-child .pilhd{margin-top:4px}
+  .pillist .tilegrid{margin:0}
+  .pillist .tilegrid.one{grid-template-columns:1fr}
+  .note.pil5{margin:0 0 6px}
+  .wkpil .pilhd{margin:0}
+  .wkpil .wkgh{display:none}
+  .wkp5 .wknote{margin-top:4px}
+  .wksum{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px}
+  .wksum span{display:flex; align-items:baseline; gap:5px; padding:5px 10px; border-radius:999px; background:var(--surface-2);
+    font-size:12.5px; color:var(--ink-2)}
+  .wksum span b{font-size:13.5px; color:var(--ink)}
+  .wksum span.ok{background:var(--accent-wash)}
+  .wktx b em{margin-left:4px}
   /* ---------- England Golf: the five pillars ---------- */
   .eglink{display:block; width:100%; text-align:left; margin:0 0 12px; padding:10px 12px; border:1px solid var(--line-strong);
     border-radius:10px; background:var(--surface); color:var(--ink); font:inherit; font-size:13.5px; font-weight:600; cursor:pointer}
@@ -2181,7 +2201,7 @@
     </div>
     <div class="tilehd"><h2>England Golf Performance Pillars</h2><span id="tileSort">Least played first</span></div>
     <button type="button" class="eglink" id="egOpen">The five pillars · Regional Girls targets</button>
-    <div class="tilegrid" id="areaList"></div>
+    <div class="pillist" id="areaList"></div>
     <div id="homeGoals" class="homeseason"></div>
   </section>
 
@@ -3632,7 +3652,9 @@ function areaWord(a){ return a ? String(a.name||"").replace(/\s*\(.*\)\s*$/, "")
    session took the whole Sessions tab down with it, delete button and all. */
 function areaTitle(a){
   if(!a) return "Practice · format no longer on this device";
-  return a.retired ? a.name + " · earlier format" : areaNo(a) + " · " + a.name;
+  /* the pillar number lives in the heading above it now; a quick drill was
+     showing its id here, because a drill has no number of its own */
+  return a.retired ? a.name + " · earlier format" : a.name;
 }
 /* A 7 ft circle round a 50-yard flag is a 48 to 52 yard shot. Saying it that way
    turns an abstract target into a number she can aim at. */
@@ -7202,9 +7224,29 @@ function renderHome(){
     if(y.key !== x.key) return y.key - x.key;   /* longest gap first */
     return areaNo(x.t) - areaNo(y.t);           /* and a stable tie */
   });
-  rows.forEach(function(r, i){
+  /* The longest left still gets Start here; the tiles sit under England
+     Golf's pillars, in their order, one pillar to a row. */
+  var first = rows.length ? rows[0].t.id : null;
+  var byP = {};
+  rows.forEach(function(r){ var k = r.t.no || 9; (byP[k] = byP[k] || []).push(r); });
+  [1, 2, 3, 4].forEach(function(n){
+    var list = (byP[n] || []).sort(function(x, y){ return liveAreas().indexOf(x.t) - liveAreas().indexOf(y.t); });
+    if(!list.length) return;
+    var hd = document.createElement("div"); hd.className = "pilsec";
+    hd.innerHTML = pillarHead(n, null, "h3");
+    var grid = document.createElement("div"); grid.className = "tilegrid" + (list.length === 1 ? " one" : "");
+    hd.appendChild(grid);
+    host.appendChild(hd);
+    list.forEach(function(r){ tileFor(r, grid, list.length === 1, r.t.id === first); });
+  });
+  var p5 = document.createElement("div"); p5.className = "pilsec";
+  p5.innerHTML = pillarHead(5, "in UpGame", "h3") + '<p class="note pil5">Strategy and tactical awareness is kept in UpGame. Log your rounds here as play so they count towards DiSE.</p>';
+  host.appendChild(p5);
+  renderResume();
+}
+function tileFor(r, host, wide, start){
+  (function(){
     var t = r.t, a = r.a, sk = TILE[t.id] || TILE[10];
-    var wide = (i === 0);
     var dueNow = testDue(t.id);
     var nm = sk.nm || t.name;
     var sub = isDefaultPractice(r.pid) ? sk.sub : a.name;
@@ -7220,7 +7262,7 @@ function renderHome(){
     /* A test waiting is said once, on the bar, where Tests is a thumb away.
        Saying it here as well cost the tile the line that tells her how long it
        has been, which is the thing this screen exists to say. */
-    var tags = wide ? '<span class="tag">Start here</span>' : "";
+    var tags = start ? '<span class="tag">Start here</span>' : "";
     var best = tileBest(r);
     var line = '<div class="nm">'+nm+'</div>'+
                '<div class="sub">'+sub+'</div>'+
@@ -7239,9 +7281,7 @@ function renderHome(){
       openSession(pairDue(t.id));
     });
     host.appendChild(b);
-  });
-
-  renderResume();
+  })();
 }
 
 /* S&C has a tab of its own: it is a different kind of session from a golf area,
@@ -7355,7 +7395,7 @@ function renderBalance(){
     else if(s.kind==="gym") counts[6]++;
     else { var tid = typeOf(s.areaId); counts[tid]=(counts[tid]||0)+1; }
   });
-  var BKEYS = [10,11,2,3,4,6,7,8,9];
+  var BKEYS = [4,3,2,10,11,6,7,8,9];   /* England Golf's pillar order, then S&C */
   if(counts[1]) BKEYS.push(1);   // only if there are sessions in the earlier format
   var maxN = 1; BKEYS.forEach(function(k){ if(counts[k]>maxN) maxN = counts[k]; });
   var names = {10:"Tee shots",11:"Approach",2:"Wedge play",3:"Short game",4:"Holing out",
@@ -12425,7 +12465,7 @@ function renderConditions(){
 
   // area filter
   var seg = document.createElement("div"); seg.className="cseg";
-  [["all","All"],["10","Tee"],["11","Approach"],["2","Wedge"],["3","Short game"]].forEach(function(o){
+  [["all","All"],["3","Short game"],["2","Wedge"],["10","Tee"],["11","Approach"]].forEach(function(o){
     var b = document.createElement("button"); b.type="button"; b.textContent=o[1];
     b.setAttribute("aria-selected", sel===o[0] ? "true":"false");
     b.addEventListener("click", function(){ state.condArea = o[0]; renderConditions(); });
@@ -13066,9 +13106,19 @@ function renderProgress(){
   renderStrengths();
   renderBalance();
   renderConditions();
-  var host = $("charts"); host.innerHTML="";
+  var outer = $("charts"); outer.innerHTML="";
+  /* the same charts, filed under England Golf's pillars, S&C last */
+  var PB = {};
+  function bucket(k){
+    if(!PB[k]){ PB[k] = document.createElement("div"); PB[k].className = "pilsec"; }
+    return PB[k];
+  }
+  var host = { appendChild:function(el){ bucket(el.__pil == null ? "sc" : el.__pil).appendChild(el); },
+               querySelector:function(q){ return outer.querySelector(q) || (PB[4] && PB[4].querySelector(q)); } };
   var any=false;
-  AREAS.concat(PRACTICE.filter(function(p){ return p.paired; })).forEach(function(a){
+  AREAS.concat(PRACTICE.filter(function(p){ return p.paired; })).slice().sort(function(x, y){
+    return (pillarNo(x.id) || 9) - (pillarNo(y.id) || 9);
+  }).forEach(function(a){
     var hist = sessionsFor(a.id).filter(function(s){ return !thinSession(s); });
     if(!hist.length) return;
     any=true;
@@ -13081,6 +13131,7 @@ function renderProgress(){
                      (isSG(a) ? 'best '+fmtSG(best)+' strokes' : 'best '+best+' / '+areaMax(a))+
                      (played.length ? ' · compete won '+wonN+'/'+played.length : '')+'</span></div>'+
                      lineChart(hist, isSG(a) ? 0 : areaMax(a), a.name, isSG(a));
+    card.__pil = pillarNo(a.id) || 4;
     host.appendChild(card);
 
     /* Speed is measured on the driver set, which lives in Tee shots now. It used
@@ -13092,7 +13143,7 @@ function renderProgress(){
         var pb=0, gain=null;
         sr.forEach(function(x){ if(x.f>pb) pb=x.f; });
         if(sr.length>1) gain = Math.round((sr[sr.length-1].f - sr[0].f)*10)/10;
-        var sc = document.createElement("div"); sc.className="chartcard speedcard";
+        var sc = document.createElement("div"); sc.className="chartcard speedcard"; sc.__pil = 4;
         sc.innerHTML = '<div class="hd"><span class="nm">Club head speed · driver</span><span class="pb num">fastest '+pb+' mph'+
           (gain!==null ? ' · '+(gain>0?"+":"")+gain+' since '+sr[0].d : '')+'</span></div>'+
           speedChart(sr)+
@@ -13114,7 +13165,13 @@ function renderProgress(){
     host.appendChild(card);
   });
 
-  if(!any) host.innerHTML = '<div class="empty">No sessions saved yet. Run a session and score it.</div>';
+  [1, 2, 3, 4, "sc"].forEach(function(k){
+    if(!PB[k]) return;
+    var hd = document.createElement("div"); hd.innerHTML = pillarHead(k);
+    PB[k].insertBefore(hd.firstChild, PB[k].firstChild);
+    outer.appendChild(PB[k]);
+  });
+  if(!any) outer.innerHTML = '<div class="empty">No sessions saved yet. Run a session and score it.</div>';
 
 }
 
@@ -13159,8 +13216,29 @@ function renderSessions(){
     return a.date<b.date?1:a.date>b.date?-1:0;
   });
   if(!all.length){ list.innerHTML = '<div class="empty">Nothing logged.</div>'; return; }
-  var wrapEl = document.createElement("div"); wrapEl.className="hlist";
-  all.forEach(function(x){
+  /* Unfinished ones first, on their own; then the rest under England Golf's
+     pillars, then S&C, then play and coaching, newest first in each. */
+  var groups = [{ key:"open", list:all.filter(function(x){ return sessStatus(x).key !== "done"; }) }];
+  var doneList = all.filter(function(x){ return sessStatus(x).key === "done"; });
+  PILLAR_ORDER.forEach(function(k){
+    var l = doneList.filter(function(x){ var p = pillarOfSession(x); return (p == null ? null : p) === k; });
+    if(l.length) groups.push({ key:k, list:l });
+  });
+  groups.forEach(function(g){
+    if(!g.list.length) return;
+    var mins = g.list.reduce(function(t, x){ return t + sessMins(x); }, 0);
+    var sec = document.createElement("div"); sec.className = "hsec";
+    sec.innerHTML = g.key === "open"
+      ? '<div class="pilhd"><span class="pn sc"></span><h2>Unfinished</h2><span class="pr">' + g.list.length + '</span></div>'
+      : pillarHead(g.key, g.list.length + (g.list.length === 1 ? ' session' : ' sessions') + (mins ? ' \u00b7 ' + fmtMins(mins) : ''));
+    var wrapEl = document.createElement("div"); wrapEl.className="hlist";
+    sec.appendChild(wrapEl);
+    list.appendChild(sec);
+    g.list.forEach(function(x){ histRow(x, wrapEl); });
+  });
+}
+function histRow(x, wrapEl){
+  (function(){
     var label = sessLabel(x), st = sessStatus(x), open = st.key !== "done";
     var row = document.createElement("div");
     row.className = "hrow" + (open ? " live" : "");
@@ -13204,8 +13282,7 @@ function renderSessions(){
         });
     });
     wrapEl.appendChild(row);
-  });
-  list.appendChild(wrapEl);
+  })();
 }
 
 function render(){
@@ -14056,6 +14133,39 @@ document.addEventListener("click", function(e){
   var b = e.target && e.target.closest ? e.target.closest("#egOpen") : null;
   if(b) openPillars();
 });
+/* Which England Golf pillar a thing belongs to: 1 to 4, or "sc" for S&C
+   (speed sticks and the band count as S&C here, as they do in the hours).
+   The retired combined ball flight format is pillar 4. */
+function pillarNo(areaId){
+  var a = area(areaId);
+  if(a && a.isTest) a = area(a.area);
+  if(a && a.isDrill) a = area(a.area);
+  if(a && !a.retired && a.no) return a.no;
+  if(a && a.type != null && area(a.type) && area(a.type).no) return area(a.type).no;
+  if(+areaId === 1) return 4;
+  return null;
+}
+function pillarOfDrill(id){ var r = drillRef(id); if(!r) return null; return r.gym ? "sc" : pillarNo(r.area); }
+function pillarOfItem(it){ return it.k === "sc" ? "sc" : it.k === "drill" ? pillarOfDrill(it.id) : pillarNo(it.id); }
+function pillarOfCoach(c){
+  if(c.k === "test"){ var t = testById(c.id); return t ? pillarNo(t.area) : null; }
+  return pillarOfItem({ k:c.k, id:c.k === "drill" ? c.id : +c.id });
+}
+function pillarOfSession(x){
+  if(x.kind === "gym") return "sc";
+  if(x.kind === "log") return "log";
+  if(x.kind === "drill") return pillarOfDrill(x.drillId);
+  if(x.kind === "test"){ var t = testById(x.testId); return t ? pillarNo(t.area) : pillarNo(x.areaId); }
+  return pillarNo(x.areaId);
+}
+var PILLAR_ORDER = [1, 2, 3, 4, "sc", "log", null];
+function pillarHead(key, right, tag){
+  var p = typeof key === "number" ? EG_PILLARS[key - 1] : null;
+  var nm = p ? p.nm : key === "sc" ? "S&amp;C" : key === "log" ? "Play, coaching and other practice" : "Other";
+  return '<div class="pilhd"' + (p ? ' style="--tint:' + p.tint + '"' : '') + '>' +
+    (p ? '<span class="pn num">' + p.n + '</span>' : '<span class="pn sc"></span>') +
+    '<' + (tag || "h2") + '>' + nm + '</' + (tag || "h2") + '>' + (right ? '<span class="pr">' + right + '</span>' : '') + '</div>';
+}
 function openPillars(){
   $("wkSheetTitle").textContent = "The Five Pillars of Performance";
   $("wkSheetBody").innerHTML = pillarsHtml();
@@ -14982,71 +15092,83 @@ function renderWeek(){
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
   if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
-  /* The squad's tests and the coach's own sessions sit together under Squad:
-     both set for her, both every week, neither hers to change. */
-  if(st.squad.length || st.squadExtra.length || st.coach.length){
-    var sp = { want:st.per.squad.want + st.per.coach.want, got:st.per.squad.got + st.per.coach.got }, spips = "";
-    for(var si = 0; si < Math.max(sp.want, sp.got); si++) spips += '<i class="' + (si < sp.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp wksquad"><div class="wkgh"><h2>Squad</h2><span class="num">' + sp.got + ' of ' + sp.want + '</span></div>' +
-            '<div class="wkpips">' + spips + '</div>';
-    st.squad.forEach(function(q){
-      var t = testById(q.id), sk = TILE[t.area] || TILE[10];
-      var v = { nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic] };
-      if(q.done){ html += doneRow(v, q.done, null, false); return; }
-      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-squad="' + q.id + '"><span class="wkic">' + v.ic(22) + '</span>' +
-        '<span class="wktx"><b>' + v.nm + '</b><span>' + v.sub + '</span></span><span class="wkstart">Start</span></button></div>';
-    });
-    st.squadExtra.forEach(function(x){
-      var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
-      html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }, x, null, true);
-    });
-    if(st.coach.length) html += '<div class="wkoh wkcoachh">Coach</div>';
-    st.coach.forEach(function(q, qi){
-      var v = coachView(q.c);
-      if(q.of > 1) v.sub += " \u00b7 " + (q.i + 1) + " of " + q.of;
-      if(q.done){ html += doneRow(v, q.done, null, false); return; }
-      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-coach="' + qi + '"><span class="wkic">' + v.ic(22) + '</span>' +
-        '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + String(v.sub).replace(/&(?!amp;)/g, "&amp;").replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
-    });
-    html += '</div>';
-  }
-  WEEK_KINDS.forEach(function(k){
-    var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
-    if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
-    var pips = "";
-    for(var i = 0; i < Math.max(pk.want, pk.got); i++) pips += '<i class="' + (i < pk.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp"><div class="wkgh"><h2>' + WEEK_WORD[k].replace("&", "&amp;") + '</h2>' +
-            '<span class="num">' + (pk.got > pk.want ? pk.got + ' done \u00b7 ' + pk.want + ' planned' : pk.got + ' of ' + pk.want) +
-            '</span></div><div class="wkpips">' + pips + '</div>';
-    rows.forEach(function(x){
-      var v = weekItemView(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
-      if(x.swapped){
-        var was = weekItemView(x.it).nm;
-        v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
-      }
-      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
-      if(x.done){ html += doneRow(v, x.done, v.swap, false); return; }
-      html += '<div class="wkrow' + (x.done ? " done" : "") + '" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-go="' + x.i + '"' + (x.done ? ' disabled' : '') + '>' +
-          '<span class="wkic">' + v.ic(22) + '</span>' +
-          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + (x.done ? doneWords(x.done) : v.sub) + '</span>' +
-            (v.swap ? '<span class="wkswap">' + v.swap.replace(/&(?!amp;)/g, "&amp;") + '</span>' : '') + '</span>' +
-          (x.done ? '<span class="wktick" aria-label="Done">✓</span>' : '<span class="wkstart">Start</span>') +
-        '</button>' +
-        (x.done ? '' : '<span class="wkacts">' +
-          (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
-          '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(v.nm).replace(/"/g, "") + ' from this week">×</button></span>') +
-      '</div>';
-    });
-    /* everything she did is on the page, not only what she planned: a fourth
-       session in a week of three is a row of its own */
-    st.extra.filter(function(s){ return sessKind(s) === k; }).forEach(function(s){
-      html += doneRow(weekItemView({ k:k, id:sessRef(s) }), s, null, true);
-    });
-    html += '</div>';
+  /* Everything on the week, the same rows as ever, arranged under England
+     Golf's pillars: squad, coach, main sessions and quick drills for each pillar
+     together, then S&C. What kind each row is says so on the row, and the
+     counts by kind sit in one line at the top. */
+  var esc = function(t){ return String(t).replace(/&(?!amp;)/g, "&amp;"); };
+  var sum = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); }).map(function(k){
+    var x = st.per[k];
+    return '<span data-k="' + k + '" class="' + (x.got >= x.want ? "ok" : "") + '"><b class="num">' + (x.got > x.want ? x.got + ' done \u00b7 ' + x.want + ' planned' : x.got + ' of ' + x.want) + '</b>' + esc(weekShort(k)) + '</span>';
   });
+  if(sum.length) html += '<div class="wksum">' + sum.join("") + '</div>';
+  var G = {};
+  function put(key, kind, done, rowHtml){
+    key = key == null ? null : key;
+    (G[key] = G[key] || { rows:[], want:0, got:0 }).rows.push(rowHtml);
+    if(kind !== "extra"){ G[key].want++; if(done) G[key].got++; } else G[key].got++;
+  }
+  function tagged(v, word){ v.nm = esc(v.nm) + (word ? ' <em>' + word + '</em>' : ''); return v; }
+  function openRow(v, attr, kind){
+    return '<div class="wkrow" data-kind="' + kind + '" style="--tint:' + v.tint + '">' +
+      '<button type="button" class="wkgo" ' + attr + '><span class="wkic">' + v.ic(22) + '</span>' +
+      '<span class="wktx"><b>' + v.nm + '</b><span>' + esc(v.sub).replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
+  }
+  st.squad.forEach(function(q){
+    var t = testById(q.id), sk = TILE[t.area] || TILE[10];
+    var v = tagged({ nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic], kind:"squad" }, "squad");
+    put(pillarNo(t.area), "squad", !!q.done, q.done ? doneRow(v, q.done, null, false) : openRow(v, 'data-squad="' + q.id + '"', "squad"));
+  });
+  st.squadExtra.forEach(function(x){
+    var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
+    put(pillarNo(t.area), "extra", true, doneRow(tagged({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic], kind:"squad" }, "squad"), x, null, true));
+  });
+  st.coach.forEach(function(q, qi){
+    var v = tagged(coachView(q.c), "coach"); v.kind = "coach";
+    if(q.of > 1) v.sub += " · " + (q.i + 1) + " of " + q.of;
+    put(pillarOfCoach(q.c), "coach", !!q.done, q.done ? doneRow(v, q.done, null, false) : openRow(v, 'data-coach="' + qi + '"', "coach"));
+  });
+  var WORD = { main:"main session", drill:"quick drill", sc:"" };
+  st.rows.forEach(function(x){
+    var k = x.it.k, ref = x.swapped ? { k:k, id:sessRef(x.done) } : x.it;
+    var v = tagged(weekItemView(ref), WORD[k]); v.kind = k;
+    if(x.swapped){
+      var was = weekItemView(x.it).nm;
+      v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
+    }
+    var key = pillarOfItem(ref);
+    if(x.done){ put(key, k, true, doneRow(v, x.done, v.swap, false)); return; }
+    var canChange = !(k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
+    put(key, k, false, '<div class="wkrow" data-kind="' + k + '" style="--tint:' + v.tint + '">' +
+      '<button type="button" class="wkgo" data-go="' + x.i + '">' +
+        '<span class="wkic">' + v.ic(22) + '</span>' +
+        '<span class="wktx"><b>' + v.nm + '</b><span>' + v.sub + '</span></span>' +
+        '<span class="wkstart">Start</span>' +
+      '</button>' +
+      '<span class="wkacts">' +
+        (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
+        '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(weekItemView(x.it).nm).replace(/"/g, "") + ' from this week">×</button></span>' +
+    '</div>');
+  });
+  /* everything she did is on the page, not only what she planned */
+  st.extra.forEach(function(x){
+    var k = sessKind(x), ref = { k:k, id:sessRef(x) };
+    var v = tagged(weekItemView(ref), WORD[k]); v.kind = k;
+    put(pillarOfItem(ref), "extra", true, doneRow(v, x, null, true));
+  });
+  PILLAR_ORDER.forEach(function(key){
+    var g = G[key];
+    if(typeof key === "number" && key === 4 && !g){ return; }
+    if(!g) return;
+    var pips = "";
+    for(var i = 0; i < Math.max(g.want, g.got); i++) pips += '<i class="' + (i < g.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp wkpil" data-pillar="' + key + '">' +
+      pillarHead(key, '<span class="num">' + (g.got > g.want ? g.got + ' done · ' + g.want + ' planned' : g.got + ' of ' + g.want) + '</span>') +
+      '<div class="wkpips">' + pips + '</div>' + g.rows.join("") + '</div>';
+  });
+  if(st.planned || st.extra.length)
+    html += '<div class="wkgrp wkpil wkp5">' + pillarHead(5, 'in UpGame') +
+      '<p class="wknote">Strategy and tactical awareness lives in UpGame. Rounds you log here count as play towards DiSE.</p></div>';
   if(!st.planned) html += '<p class="wknote">Nothing planned this week. Set your numbers in Settings.</p>';
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
@@ -15080,7 +15202,7 @@ function wellDone(s, extra){
 }
 function doneRow(v, s, swap, extra){
   var esc = function(t){ return String(t).replace(/&(?!amp;)/g, "&amp;"); };
-  return '<div class="wkrow done' + (extra ? " extra" : "") + '" style="--tint:' + v.tint + '">' +
+  return '<div class="wkrow done' + (extra ? " extra" : "") + '"' + (v.kind ? ' data-kind="' + v.kind + '"' : '') + ' style="--tint:' + v.tint + '">' +
     '<div class="wkgo">' +
       '<span class="wkic">' + v.ic(22) + '</span>' +
       '<span class="wktx"><b>' + esc(v.nm) + '</b><span>' + doneWords(s) + '</span>' +
