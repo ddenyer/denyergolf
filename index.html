@@ -14114,6 +14114,17 @@ var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills", squad:"
 var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill", squad:"squad test" };
 /* What the coach has made compulsory, every week from the week it was set:
    [{id, from}]. A week before it was set is never judged on it. */
+/* Perfect 9 arrived after the putting card was already switched on, and it is
+   just as compulsory, so a player who has the one gets the other from the same
+   week, once. The coach can still switch it off; it is not added back. */
+function addSquadP9(p){
+  if(!p || !Array.isArray(p.squad) || p.p9Added) return false;
+  var putt = p.squad.filter(function(x){ return x && x.id === SQ18_ID; })[0];
+  if(!putt || p.squad.some(function(x){ return x && x.id === "t-short-p9"; })){ return false; }
+  p.squad.push({ id:"t-short-p9", from:putt.from || weekOf() });
+  p.p9Added = true; p.squadAt = Date.now();
+  return true;
+}
 function squadFor(wk, p){
   p = p || playerObj(); if(!p || !Array.isArray(p.squad)) return [];
   return p.squad.filter(function(x){ return x && x.id && (!wk || !x.from || wk >= x.from) && testById(x.id); });
@@ -14529,6 +14540,7 @@ function mergeWeekMeta(mine, them){
       if(them[f[1]] != null) mine[f[1]] = them[f[1]];
       t = true;
       if(newer && (f[0] === "focus" || f[0] === "scProg")) markRedraw(mine);
+      if(f[0] === "squad") addSquadP9(mine);
     }
   });
   return t;
@@ -15982,7 +15994,7 @@ try{
   /* not "moved": there is already a function of that name in here, and a var at
      this scope hoists over it and takes the goals page down with it */
   var fixedUp = migrateToStrokes();
-  (state.players || []).forEach(function(p){ fixedUp += dropSeededTargets(p); });
+  (state.players || []).forEach(function(p){ fixedUp += dropSeededTargets(p); if(addSquadP9(p)) fixedUp++; });
   if(fixedUp) saveLocal();
 }catch(e){}
 applyCouponIdentity();
