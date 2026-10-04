@@ -61,12 +61,21 @@ function addDays(date, n) {
 }
 // Her week as she set it in the app: the stored plan if there is one, else her
 // default numbers, else the old single target.
+// What the squad and the coach have made compulsory count too, and the
+// coach's quick drills come first when a drill is named.
+export function requiredOf(pl, monday) {
+  const on = (x) => x && x.id && (!x.from || monday >= x.from);
+  const squad = (Array.isArray(pl.squad) ? pl.squad : []).filter(on);
+  const coach = (Array.isArray(pl.coach) ? pl.coach : []).filter(on);
+  return { n: squad.length + coach.length, drills: coach.filter((c) => c.k === 'drill').map((c) => ({ k: 'drill', id: c.id })) };
+}
 export function planOf(pl, monday) {
   const w = pl.weeks && pl.weeks[monday];
+  const req = requiredOf(pl, monday);
   const sum = (n) => (n ? (+n.main || 0) + (+n.sc || 0) + (+n.drill || 0) : 0);
-  if (w && w.n) return { total: sum(w.n), items: Array.isArray(w.items) ? w.items : [], paused: !!w.paused };
-  if (pl.weekPlan) return { total: sum(pl.weekPlan), items: [], paused: false };
-  return { total: Math.max(0, Math.min(14, +pl.weekTarget || 0)), items: [], paused: false };
+  if (w && w.n) return { total: sum(w.n) + req.n, items: req.drills.concat(Array.isArray(w.items) ? w.items : []), paused: !!w.paused };
+  if (pl.weekPlan) return { total: sum(pl.weekPlan) + req.n, items: req.drills, paused: false };
+  return { total: Math.max(0, Math.min(14, +pl.weekTarget || 0)), items: req.drills, paused: false };
 }
 export function isPaused(pl, monday) {
   return (pl.pauseWeeks || []).indexOf(monday) > -1 || !!(pl.weeks && pl.weeks[monday] && pl.weeks[monday].paused);
@@ -90,7 +99,7 @@ export function message(row, L, week, target, today, extra = {}) {
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   if (extra.plan) {
     return { title: 'Set next week',
-             body: 'How many main sessions, S&C and quick drills? Your numbers; the app picks the sessions.',
+             body: 'How many main sessions and S&C? Your numbers; the app picks the sessions.',
              url: '/?go=settings&wk=next' };
   }
   const lead = row.cue ? cap(row.cue) + ': ten minutes on the mat?' : 'Ten minutes on the mat?';
