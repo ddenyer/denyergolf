@@ -202,6 +202,7 @@
   .bellitem.new{border-color:var(--accent)}
   .bellitem.kudos b::before{content:"\2713  "; color:var(--accent)}
   .bellitem.news{background:var(--surface-2)}
+  .bellitem.coach{background:var(--accent-wash); border-color:var(--accent-fill)}
   .bellitem.new b::after{content:" \00b7  new"; color:var(--accent); font-weight:600; font-size:12px}
   /* ---------- the 18-hole putting card ---------- */
   .sqnow{border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--surface); margin:10px 0 14px}
@@ -277,6 +278,8 @@
   .revtab tr.revtot td{font-weight:800; border-top:1.5px solid var(--line-strong)}
   .revtab tr.sc td{color:var(--muted); font-size:12.5px}
   .revacts{display:flex; flex-direction:column; gap:8px}
+  .rmtest{margin-top:8px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:999px;
+    padding:7px 14px; font:inherit; font-size:13px; font-weight:600; cursor:pointer}
   .revacts #revWeek{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:10px;
     padding:10px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   /* ---------- DiSE hours ---------- */
@@ -2013,6 +2016,14 @@
   .cflist button{width:28px; height:28px; flex:none; border:1px solid var(--line-strong); border-radius:7px;
     background:var(--surface); color:var(--ink-2)}
   .cfgap{width:28px; flex:none}
+  .cmsgto{display:flex; flex-wrap:wrap; gap:6px 16px; margin:4px 0 10px; font-size:14px}
+  .cmsgto label{display:flex; align-items:center; gap:6px}
+  .cmsg textarea{width:100%; box-sizing:border-box; font:inherit; font-size:14.5px; padding:9px 10px; border:1px solid var(--line-strong);
+    border-radius:9px; background:var(--surface); color:var(--ink); resize:vertical}
+  .cmsgfoot{display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; color:var(--muted)}
+  .cmsgfoot button{background:var(--accent-fill); color:var(--on-accent); border:0; border-radius:999px; padding:8px 16px;
+    font:inherit; font-size:13.5px; font-weight:700; cursor:pointer}
+  .cmsgfoot button:disabled{opacity:.5}
   .cflist li b small{display:block; font-weight:500; font-size:11.5px; color:var(--muted)}
   .cfocus .cflist li{flex-wrap:wrap; row-gap:6px}
   .cfocus .cflist li > input{flex:1 1 100%; width:auto; order:9}
@@ -13902,10 +13913,10 @@ function recordsFor(sess){
    or drill is found on its own by comparing the catalogue with what this
    device has seen before. The first time it looks, it only takes note. */
 var NEWS = [
-  { id:"2026-10-04-coach", date:"2026-10-04", title:"New: Coach sessions",
-    body:"Your coach now sets compulsory sessions, shown under Coach on This week next to Squad, every week. Quick drills are yours to choose: none by default, add some in Settings if you want to work on something." },
+  { id:"2026-10-04-coach", date:"2026-10-04", title:"New: Coach sessions and messages",
+    body:"Your coach now sets compulsory sessions, shown under Squad on This week, every week. Quick drills are yours to choose: none by default, add some in Settings if you want to work on something. Messages from your coach arrive as a push and stay here on the bell." },
   { id:"2026-10-04-dise", date:"2026-10-04", title:"New: DiSE hours",
-    body:"Your running total towards 200 hours of practice and play is at the top of Progress. Every session already logged counts. Log rounds and coaching with Log play or coaching on This week." },
+    body:"Your running total towards 200 hours of practice, play and S&C is at the top of Progress. Every session already logged counts. Log rounds and coaching with Log play or coaching on This week." },
   { id:"2026-10-03-ott", date:"2026-10-03", title:"Tee shots: distance now counts your speed",
     body:"Off the tee, distance is priced from your club head speed at the LPGA rate: 94 mph carries 218 yards. The range balls make no difference, because club speed is the club, not the ball. Get faster and it shows. Your past tee sessions have been priced the same way." },
   { id:"2026-10-01-week", date:"2026-10-01", title:"New: This week",
@@ -13960,8 +13971,20 @@ function feedItems(){
   return out.concat(catalogueNews());
 }
 
+/* Messages from the coach: pushed to her phone, and kept here too, so one
+   that never reached a phone (reminders off, Focus on) is still read. */
+function coachNotes(p){
+  p = p || playerObj();
+  var cut = Date.now() - 14 * 86400000;
+  return ((p && p.coachNotes) || []).filter(function(n){ return n && n.text && +n.at >= cut; });
+}
 function bellItems(){
   var out = [], wk = weekOf();
+  coachNotes().forEach(function(n){
+    var d = new Date(+n.at);
+    out.push({ key:"cn:" + n.at, kind:"coach", title:"From your coach \u00b7 " + d.getDate() + " " + MON[d.getMonth()],
+               body:String(n.text).replace(/[<>]/g, "") });
+  });
   var dow = (new Date().getDay() + 6) % 7;
   var wst = weekState(wk);
   if(!wst.paused && wst.planned){
@@ -13982,7 +14005,7 @@ function bellItems(){
     var nr = weekRec(nextWeek(), false);
     if(!nr || !nr.set)
       out.push({ key:"plan:"+nextWeek(), kind:"nudge", title:"Set next week", go:"plan",
-                 body:"How many main sessions, S&C and quick drills. Your numbers; the app picks the sessions." });
+                 body:"Look back at this week, log any rounds or lessons, then set next week. Your numbers; the app picks the sessions." });
   }
   /* kudos, records, weeks in a row and what is new */
   feedItems().forEach(function(x){ out.push(x); });
@@ -14088,9 +14111,10 @@ function remindBlock(){
     '<div class="bwrow"><span>At</span><select id="rmTime" aria-label="Reminder time">'+
       times.map(function(x){ return '<option'+(x === t ? " selected" : "")+'>'+x+'</option>'; }).join("")+'</select></div>'+
     '<div class="bwrow"><span>When I</span><input id="rmCue" maxlength="40" placeholder="finish dinner" value="'+String(r.cue||"").replace(/"/g,"&quot;")+'" aria-label="Your cue"></div>'+
-    '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>';
+    '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>'+
+    '<button type="button" class="rmtest" id="rmTest"'+(r.on ? '' : ' hidden')+'>Send a test</button>';
   return '<div class="wkgh"><h2>Reminders</h2><span>this phone</span></div>'+body+
-    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; on Sunday, set next week; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a quick drill or ten minutes on the mat.</p>';
+    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a quick drill or ten minutes on the mat. On Sunday at 8.15pm there is one more: review the week and plan the next, unless next week is already set.</p>';
 }
 function urlB64(s){
   var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
@@ -14120,9 +14144,31 @@ function remindOn(){
     return remindSend(sub, true).then(function(res){
       if(!res.ok) throw new Error("The server said no (" + ((res.d && res.d.reason) || res.status) + ").");
       var r = remindPrefs(); r.on = true; r.endpoint = sub.endpoint; remindSave(r);
-      remindSay("On. A test message is on its way.");
+      remindSay("On. " + testWords(res.d && res.d.sent, res.d && res.d.why));
+      var tb = $("rmTest"); if(tb) tb.hidden = false;
     });
   });
+}
+/* What the push service said to the test message, in words: the server hands
+   back its status, so a refusal shows here instead of a message that never comes. */
+function testWords(code, why){
+  code = +code || 0; why = why ? " (" + String(why).replace(/[{}"]/g, "").slice(0, 60) + ")" : "";
+  if(code >= 200 && code < 300) return "Test message sent. Nothing in a minute? Check iPhone Settings, Notifications, Longer Closer Lower, and that Focus is off.";
+  if(code === 404 || code === 410) return "This phone's sign-up has run out. Untick the box and tick it again.";
+  if(code === 401 || code === 403) return "The push service refused the server's key (" + code + why + "). Tell whoever set the app up.";
+  if(code) return "The push service said " + code + why + ". Try again in a minute.";
+  return "Saved, but no test message went. Try Send a test.";
+}
+function remindTest(){
+  remindSay("Sending a test\u2026");
+  return navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
+    .then(function(sub){
+      if(!sub) throw new Error("This phone is not signed up. Untick the box and tick it again.");
+      return remindSend(sub, true);
+    }).then(function(res){
+      if(!res.ok) throw new Error("The server said no (" + ((res.d && res.d.reason) || res.status) + ").");
+      remindSay(testWords(res.d && res.d.sent, res.d && res.d.why));
+    }).catch(function(e){ remindSay(e && e.message ? e.message : "That did not work."); });
 }
 function remindOff(){
   var r = remindPrefs();
@@ -14133,10 +14179,11 @@ function remindOff(){
       return p.then(function(){
         if(ep) return cloudPost("/api/dg-push", { action:"off", code:cloudCode(), player:playerKey(state.activePlayer), endpoint:ep });
       });
-    }).then(function(){ r.on = false; remindSave(r); remindSay("Off."); });
+    }).then(function(){ r.on = false; remindSave(r); remindSay("Off."); var tb = $("rmTest"); if(tb) tb.hidden = true; });
 }
 function wireRemind(){
   var on = $("rmOn"); if(!on) return;
+  if($("rmTest")) $("rmTest").onclick = remindTest;
   on.onchange = function(){
     var want = on.checked;
     remindSay(want ? "Turning on…" : "Turning off…");
@@ -14684,7 +14731,8 @@ function mergeWeekMeta(mine, them){
   /* The coach's choices and her default numbers: a newer stamp wins, and a
      field this device has never had is filled from the server. */
   [["focus", "focusAt"], ["weekPlan", "weekPlanAt"], ["practice", "practiceAt"],
-   ["tests", "testsAt"], ["scProg", "scProgAt"], ["squad", "squadAt"], ["coach", "coachAt"]].forEach(function(f){
+   ["tests", "testsAt"], ["scProg", "scProgAt"], ["squad", "squadAt"], ["coach", "coachAt"],
+   ["coachNotes", "coachNotesAt"]].forEach(function(f){
     var v = them[f[0]]; if(v == null) return;
     var newer = (+them[f[1]] || 0) > (+mine[f[1]] || 0);
     if(newer || mine[f[0]] == null){
@@ -15852,9 +15900,67 @@ function lastDate(list){
   return list.slice().sort(function(a,b){ return a.date<b.date?-1:1; })[list.length-1].date;
 }
 
+/* ---- a message from the coach ----
+   To one player or all of them: a push to every phone each has signed up for
+   reminders, and a note on her bell either way. Sent with the code this
+   device signed in with, so it only reaches the players that code covers. */
+function coachMsgBox(){
+  var box = document.createElement("div"); box.className = "pcardc cmsg";
+  var esc = function(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); };
+  var ps = state.players.filter(function(p){ return playerKey(p.id); });
+  box.innerHTML = '<div class="hd"><span class="who">Message players</span><span class="when">a push to their phones</span></div>' +
+    (cloudReady() && ps.length
+      ? '<div class="cmsgto">' + ps.map(function(p){
+          return '<label><input type="checkbox" data-to="' + esc(p.id) + '" checked> ' + esc(p.name || "Player") + '</label>';
+        }).join("") + '</div>' +
+        '<textarea id="cmsgText" maxlength="160" rows="3" placeholder="e.g. Great work on Saturday. Bunkers twice this week, please."></textarea>' +
+        '<div class="cmsgfoot"><span id="cmsgCount">0 / 160</span><button type="button" id="cmsgSend">Send</button></div>' +
+        '<p class="cnote" id="cmsgSay">It also goes on her bell, so she sees it even with reminders off.</p>'
+      : '<p class="cnote">Sign in with your code to message players.</p>');
+  var ta = box.querySelector("#cmsgText"), send = box.querySelector("#cmsgSend"), say = box.querySelector("#cmsgSay");
+  if(!ta) return box;
+  ta.oninput = function(){ box.querySelector("#cmsgCount").textContent = ta.value.length + " / 160"; send.textContent = "Send"; send.removeAttribute("data-sure"); };
+  box.querySelectorAll("[data-to]").forEach(function(c){ c.onchange = function(){ send.textContent = "Send"; send.removeAttribute("data-sure"); }; });
+  send.onclick = function(){
+    var text = ta.value.replace(/\s+/g, " ").trim();
+    var to = [].slice.call(box.querySelectorAll("[data-to]")).filter(function(c){ return c.checked; })
+      .map(function(c){ return state.players.filter(function(p){ return p.id === c.getAttribute("data-to"); })[0]; }).filter(Boolean);
+    if(!text){ say.textContent = "Write the message first."; return; }
+    if(!to.length){ say.textContent = "Tick at least one player."; return; }
+    /* one tap to check, a second to send: it lands on their phones at once */
+    if(!send.hasAttribute("data-sure")){
+      send.setAttribute("data-sure", "1");
+      send.textContent = "Send to " + (to.length === 1 ? to[0].name : to.length + " players") + "?";
+      return;
+    }
+    send.disabled = true; say.textContent = "Sending\u2026";
+    var at = Date.now();
+    to.forEach(function(p){
+      p.coachNotes = [{ at:at, text:text }].concat(p.coachNotes || []).slice(0, 10);
+      p.coachNotesAt = at;
+      asPlayer(p, function(){ try{ cloudMeta(); }catch(e){} });
+    });
+    try{ saveLocal(); }catch(e){}
+    cloudPost("/api/dg-push", { action:"msg", code:cloudCode(), players:to.map(function(p){ return playerKey(p.id); }), text:text })
+      .then(function(res){
+        var r = (res.d && res.d.results) || {};
+        say.textContent = to.map(function(p){
+          var x = r[playerKey(p.id)];
+          if(!res.ok && !x) return p.name + ": on her bell; the push did not go (" + ((res.d && res.d.reason) || res.status) + ")";
+          if(!x || !x.phones) return p.name + ": on her bell (no phone signed up for reminders)";
+          return p.name + ": sent to " + x.sent + " of " + x.phones + " phone" + (x.phones > 1 ? "s" : "") + (x.sent < x.phones ? " (" + x.status.join(", ") + ")" : "");
+        }).join(". ") + ".";
+        ta.value = ""; box.querySelector("#cmsgCount").textContent = "0 / 160";
+      }, function(){ say.textContent = "On their bells. The push did not go: no connection."; })
+      .then(function(){ send.disabled = false; send.textContent = "Send"; send.removeAttribute("data-sure"); });
+  };
+  return box;
+}
+
 function renderCoach(){
   var host = $("coachList"); if(!host) return;
   host.innerHTML = "";
+  host.appendChild(coachMsgBox());
 
   var real = state.sessions.filter(function(s){ return !s.sample; }).length;
   $("coachLede").textContent = real
