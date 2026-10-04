@@ -278,6 +278,35 @@
   .revtab tr.revtot td{font-weight:800; border-top:1.5px solid var(--line-strong)}
   .revtab tr.sc td{color:var(--muted); font-size:12.5px}
   .revacts{display:flex; flex-direction:column; gap:8px}
+  /* ---------- England Golf: the five pillars ---------- */
+  .eglink{display:block; width:100%; text-align:left; margin:0 0 12px; padding:10px 12px; border:1px solid var(--line-strong);
+    border-radius:10px; background:var(--surface); color:var(--ink); font:inherit; font-size:13.5px; font-weight:600; cursor:pointer}
+  .eglink::after{content:" \2192"; color:var(--accent)}
+  .egbox{background:var(--surface-2); border-radius:9px; padding:8px 10px; margin:0 0 10px}
+  .egbox em, .egblk em, .egfoot em, .egapp em, .egbeh em{display:block; font-style:normal; font-size:10.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:4px}
+  .egbox ul{margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:4px 14px; font-size:13.5px; font-weight:600}
+  .egp{display:flex; flex-direction:column; gap:10px}
+  .egsub{margin:0; font-size:12.5px; color:var(--muted); font-weight:600}
+  .egcol{border-radius:12px; background:var(--surface); border:1px solid var(--line); overflow:hidden}
+  .egcol header{display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--tint)}
+  .egcol header h4{margin:0; font-size:15.5px; font-weight:800; letter-spacing:-.01em; color:var(--tile-ink, var(--ink))}
+  .egn{width:26px; height:26px; border-radius:999px; background:var(--surface); color:var(--ink); display:grid; place-items:center;
+    font-size:13.5px; font-weight:800; flex:none}
+  .egblk{padding:9px 12px 0}
+  .egtg{margin:0; padding:0; list-style:none}
+  .egtg li{display:flex; justify-content:space-between; gap:10px; padding:4px 0; border-top:1px solid var(--line); font-size:13.5px}
+  .egtg li:first-child{border-top:0}
+  .egtg b{font-size:14.5px}
+  .egl{margin:0; padding:0 0 0 17px; font-size:13px; line-height:1.4; color:var(--ink-2)}
+  .egl li{margin:2px 0}
+  .egfoot{padding:8px 12px 0; font-size:13.5px; font-weight:600}
+  .egapp{margin:8px 12px 10px; padding-top:8px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-2); line-height:1.4}
+  .egcol.up{border-style:dashed}
+  .egbeh{border-radius:12px; padding:10px 12px; background:var(--accent-wash)}
+  .egbeh div{display:flex; flex-wrap:wrap; gap:6px}
+  .egbeh span{background:var(--surface); border-radius:999px; padding:5px 10px; font-size:12.5px; font-weight:700}
+  .egnote{margin:0; font-size:12px; color:var(--muted)}
   .rmtest{margin-top:8px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:999px;
     padding:7px 14px; font:inherit; font-size:13px; font-weight:600; cursor:pointer}
   .revacts #revWeek{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:10px;
@@ -2151,6 +2180,7 @@
       </span>
     </div>
     <div class="tilehd"><h2>England Golf Performance Pillars</h2><span id="tileSort">Least played first</span></div>
+    <button type="button" class="eglink" id="egOpen">The five pillars · Regional Girls targets</button>
     <div class="tilegrid" id="areaList"></div>
     <div id="homeGoals" class="homeseason"></div>
   </section>
@@ -2621,9 +2651,9 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"Coach sessions: compulsory every week, set by your coach and shown with the squad\u2019s. Quick drills are now optional, none by default" };
+var BUILD = { on:"2026-10-05", note:"England Golf\u2019s Five Pillars of Performance: their order, names and Regional Girls targets, the whole sheet on Practice and Goals, and the three driver shots on tee shots" };
 var AREAS = [
-{ id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
+{ id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
   /* The distance she is chasing and the speed she is chasing it at. The two
      together give her own yards per mile an hour, which is what turns a
@@ -2642,19 +2672,23 @@ var AREAS = [
      is 30 yards, which is the 72% figure, so this is tighter than a fairway on purpose.
      No second ring: the PGA corridor is wider, not tighter, because the men miss by
      more yards at the same angle. */
-  plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then ten the app calls. Forty-five in all, full routine every one",
+  plan:"10 min warm-up \u2192 45 min: 35 balls to the corridor, then the three driver shots: ten drivers, the app calls stock, fairway finder or bomb. Forty-five in all, bullet proof routine every one",
   sets:[
     {id:"a", sgKind:"ott", ottClub:1.00, label:"Driver \u00b7 15 balls", short:"Driver", tc:"26 yd", r2:0.66, word:"the driver", tgt:"Inside a 26-yd corridor scores, 13 each side of the line. Speed measured across all fifteen",
       max:15, metrics:[{id:"chsAvg", label:"Average"},{id:"chsFast", label:"Fastest"},{id:"chsSlow", label:"Slowest"}], metricLabel:"Club head speed \u00b7 mph", metricNote:"The average of the fifteen, and the fastest and slowest"},
     {id:"c", sgKind:"ott", ottClub:0.93, label:"3-wood \u00b7 10 balls", short:"3-wood", tc:"23 yd", r2:0.66, word:"the 3-wood", tgt:"Inside a 23-yd corridor scores, 11 or 12 each side", max:10},
     {id:"e", sgKind:"ott", ottClub:0.87, label:"5-wood / 2 hybrid \u00b7 10 balls", short:"5-wood / 2H", tc:"22 yd", r2:0.66, word:"the 5-wood", tgt:"Inside a 22-yd corridor scores, 11 each side", max:10},
-    {id:"r", rot:true, allWin:true, balls:10, guide:"windows", label:"Rotation \u00b7 ten balls, the app calls the club and the window",
-      tgt:"Club and window drawn at random every ball. A point for the window, a point for the corridor",
-      parts:[{id:"w", label:"Window", max:10},{id:"t", label:"Target", max:10}]}
+    /* England Golf's three driver shots, in place of the windows: the app calls
+       one each ball, driver only. The parts keep their ids (w and t) so a
+       session scored under the windows still reads. */
+    {id:"r", rot:true, allWin:true, balls:10, guide:"drive3", clubs:["a"],
+      label:"Three driver shots \u00b7 ten balls, the app calls stock, fairway finder or bomb",
+      tgt:"Driver only. Each ball the app calls one of the three: stock, fairway finder or bomb. A point for delivering the shot that was called, a point for the corridor",
+      parts:[{id:"w", label:"Shot called", max:10},{id:"t", label:"Corridor", max:10}]}
   ],
   placing:{n:45, p:0.66, sd:0.065, field:"LPGA Tour players"} },
 
-{ id:11, no:2, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true, sg:true, sgKind:"app",
+{ id:11, no:4, quads:true, name:"Approach (Ball flight control)", sub:"125, 145, 165 and 185 yards · into greens", block:"long", track:true, sg:true, sgKind:"app",
   targets:"GIR 67 → 73% · 145y ± 9 yd · pin high on approaches, not short",
   /* WHERE THE RATES COME FROM  (rebuilt 25 Sep 2026, LPGA proximity table)
 
@@ -2683,7 +2717,7 @@ var AREAS = [
      Before this, the sets held r2 0.55 and the placing model held p 0.66. Those are
      the same quantity and they disagreed by eleven points, which is why a fair
      approach session placed near the bottom of the hundred. */
-  plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
+  plan:"10 min warm-up \u2192 50 min: 8 sets of five, then twenty the app calls. Sixty balls, bullet proof routine every one",
   sets:[
     {id:"a", label:"125y", short:"125 yards", tc:"40 ft", dist:125, r1:0.168, r2:0.845, word:"125 yards", tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
     {id:"b", guide:"windows", label:"125y \u00b7 five windows", tc:"40 ft", dist:125, r1:0.168, r2:0.845, word:"125 yards", tgt:"Same club, same target. A point for the window, a point for the circle",
@@ -2713,7 +2747,7 @@ var AREAS = [
    already scored under it still open and still chart. Not offered on the home page. */
 { id:1, retired:true, name:"Ball flight control", sub:"Tee shots & approach · earlier format", block:"long",
   targets:"GIR 67 → 73% · driving accuracy 71 → 82% · driving distance 272+ · 150y ± 9 yd · club-head speed + 5 mph · a fade on demand",
-  plan:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, full routine every ball) → 10 min compete",
+  plan:"10 min warm-up → 40 min benchmark (9 sets, 50 balls, bullet proof routine every ball) → 10 min compete",
   sets:[
     {id:"a", label:"Approach 125y", tgt:"Within 5 yards. Tour average from here is about 7 yards. Hit the number, not the club: club up into the wind, down with it.", max:5},
     {id:"b", guide:"windows", label:"Five windows · 125y", tgt:"Same club, same target. Five balls: a point for the window, a point for within 5 yards",
@@ -2733,7 +2767,7 @@ var AREAS = [
 
 { id:2, no:3, quads:true, name:"Precise wedge play", sub:"Wedges 30–90y · distance and flight control", block:"in100", track:true, sg:true, sgKind:"pitch",
   targets:"30y → 8y wide · 50y → 12y wide · 70y → 12y wide · 90y → 14y wide · tighter dispersion · low, normal and high on command",
-  plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, full routine every one",
+  plan:"10 min warm-up → 50 min: 8 sets of five, then twenty the app calls. Sixty balls, bullet proof routine every one",
   sets:[
     {id:"a", label:"30y", short:"30 yards", tc:"20 ft", dist:30, r1:0.352, r2:0.782, word:"30 yards", tgt:"Inside the circle scores · the LPGA 62% circle from here", max:5},
     {id:"b", guide:"heights", label:"30y · five heights", tc:"20 ft", dist:30, r1:0.352, r2:0.782, word:"30 yards", tgt:"Same club. One normal, two higher, two lower. A point for the height, a point for the circle",
@@ -2753,9 +2787,9 @@ var AREAS = [
   placing:{n:60, p:0.685, sd:0.05, bullP:0.257, field:"LPGA Tour players"},
   placingWas:{n:60, p:0.628, sd:0.05, field:"LPGA Tour players"} },
 
-{ id:3, no:4, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces", sg:true,
+{ id:3, no:2, name:"Outstanding short game", sub:"Chipping, pitching & bunkers · up and down from anywhere", block:"in100", track:true, twoTier:true, unit:"paces", sg:true,
   targets:"Up and down 50 → 60%+ · bunker save 40 → 50% · every ball scored in strokes gained on the LPGA field",
-  plan:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, full routine every one",
+  plan:"10 min warm-up → 45 min: fifteen sets of five, 75 shots, bullet proof routine every one",
   /* Four rings and the hole, because on a practice green a club length is the only
      thing you can measure: one club is about 3 ft, two about 6, four about 12. Knot
      a string at those and it works anywhere.
@@ -2791,10 +2825,10 @@ var AREAS = [
   ],
   placing:{n:75, p:0.395, sd:0.05, bullP:0.101, field:"LPGA Tour players"} },
 
-{ id:4, no:5, name:"World-class holing out", sub:"Putting · holing-out day, alternating with a lag day", block:"in100", track:true, shape:"clock",
+{ id:4, no:1, name:"World class holing out", sub:"Putting · holing-out day, alternating with a lag day", block:"in100", track:true, shape:"clock",
   sg:true, hitLabel:"holed",
   targets:"Under 29 putts a round · no more than two three-putts in three rounds · 6 ft 55 → 70% · 9 ft 50% · 12 ft 30% · a point is holed, or inside one step (about 3 ft) on the lag",
-  plan:"Golf warm-up → about 30 min: the ladder twice for pace, then 55 around the clock, five-ball sets, full routine every one",
+  plan:"Golf warm-up → about 30 min: the ladder twice for pace, then 55 around the clock, five-ball sets, bullet proof routine every one",
   /* The test is the 55 clock putts and nothing else. A tour player holes 35.9 of them,
      which is 65.3%, so the clock calibrates to two in three on its own. The ladder has no
      tour equivalent to be placed against and the rotation mixes lags in with holing out,
@@ -3481,7 +3515,7 @@ function area(id){
    What keys to the practice session: its own history, its placing, its per-target rates
    and its runs, because all of those depend on the exact sets. What keys to the task:
    the balance chart and the question of whether she practised approach at all. */
-function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }); }
+function liveAreas(){ return AREAS.filter(function(a){ return !a.retired; }).sort(function(a, b){ return (a.no || 99) - (b.no || 99); }); }
 /* A set marked `gone` has been taken out of the drill but NOT out of the data.
    New sessions never offer it; anything already logged against it still renders,
    still totals and still counts, so a session she has played stays complete at
@@ -3492,7 +3526,7 @@ var PRACTICE = [
 { id:"p-approach-short", type:11, track:true, quads:true,
   name:"Approach \u00b7 short irons", sub:"110, 125, 140 and 155 yards \u00b7 the scoring clubs",
   targets:"GIR 67 \u2192 73% \u00b7 proximity inside the circle \u00b7 pin high, not short",
-  plan:"10 min warm-up \u2192 45 min: eight sets of five, 40 balls, full routine every one",
+  plan:"10 min warm-up \u2192 45 min: eight sets of five, 40 balls, bullet proof routine every one",
   sets:[
     {id:"a", label:"110y", short:"110 yards", tc:"24 ft", dist:110, r2:0.61, word:"110 yards",
      tgt:"Inside the circle scores. Tap the quarter it finished in", max:5},
@@ -3959,6 +3993,14 @@ var DRILLS = [
   ott:{ total:272, speedUp:5, from:10 },
   ruleText:"Inside the 26-yard corridor scores. Straight but short still counts, because the corridor measures line. Strokes gained is priced off the speed logged with it.",
   from:10, use:["a"] },
+
+{ id:"d-tee-three", area:10, place:0, needs:"height", mins:20,
+  name:"Three driver shots", sub:"Stock, fairway finder and bomb, the app calls them",
+  why:"England Golf's ball flight control pillar asks for three driver shots on demand: a stock shot, a fairway finder and a bomb. Fifteen drivers, five of each in an order you cannot predict, which is how they are needed on the course.",
+  where:"Range, outdoors", shape:"corridor", sg:true, hitLabel:"in the fairway", rotFrom:10,
+  ott:{ total:272, speedUp:5, from:10 },
+  ruleText:"The app calls the shot each ball. A point for delivering the shot that was called, a point for the 26-yard corridor. Strokes gained is priced off the speed logged on tee shots.",
+  from:10, use:["r"], caps:{r:15} },
 
 { id:"d-tee-woods", area:10, place:0, needs:"height", mins:20,
   name:"The woods", sub:"3-wood and 5-wood, ten each",
@@ -6889,10 +6931,14 @@ function renderGoals(){
 
   var perf = document.createElement("div"); perf.className="goalgrp";
   perf.innerHTML = '<h2>Performance</h2><p class="lede">What has to improve to get there. '+
-    'These are the targets each session opens with.</p>';
+    'England Golf\u2019s Regional Girls targets for each pillar, and the targets each session opens with.</p>'+
+    '<button type="button" class="eglink" data-eg="1">The five pillars \u00b7 the whole England Golf sheet</button>';
+  perf.querySelector("[data-eg]").onclick = openPillars;
   liveAreas().forEach(function(a){
     var card = document.createElement("div"); card.className="goalarea";
-    card.innerHTML = '<div class="gahd"><span class="n num">'+areaNo(a)+'</span><b>'+a.name+'</b></div>';
+    card.innerHTML = '<div class="gahd"><span class="n num">'+areaNo(a)+'</span><b>'+egName(a)+'</b></div>' +
+      (EG_TARGETS[a.id] ? '<div class="egbox"><em>England Golf \u00b7 Regional Girls</em><ul>' +
+        EG_TARGETS[a.id].map(function(t){ return '<li>' + t + '</li>'; }).join("") + '</ul></div>' : '');
     card.appendChild(bulletBox({
       eyebrow:"Targets",
       lines: function(){ return targetsFor(a.id); },
@@ -6912,6 +6958,11 @@ function renderGoals(){
     }));
     perf.appendChild(card);
   });
+  var five = document.createElement("div"); five.className = "goalarea egfive";
+  five.innerHTML = '<div class="gahd"><span class="n num">5</span><b>Strategy and Tactical Awareness</b></div>' +
+    '<div class="egbox"><em>England Golf \u00b7 Regional Girls</em><ul>' + EG_PILLARS[4].targets.map(function(t){ return '<li>' + t + '</li>'; }).join("") + '</ul></div>' +
+    '<p class="galive">Kept in UpGame. Rounds logged here count as play towards DiSE.</p>';
+  perf.appendChild(five);
   host.appendChild(perf);
 
   var ref = document.createElement("div"); ref.className = "goalgrp";
@@ -9389,7 +9440,7 @@ function summaryBlock(a, sess){
     });
     wsvg = wsvg.replace('<g class="marks"></g>', '<g class="marks">'+wout+'</g>');
     html += sumCard(g.heading+' · '+pool.wn+' balls', wsvg,
-      'Through the ' + g.word + ' that was called ' + pctText(pool.w.__hit||0, pool.wn) + ' of the time.');
+      (g.hitText ? g.hitText + ' ' : 'Through the ' + g.word + ' that was called ') + pctText(pool.w.__hit||0, pool.wn) + ' of the time.');
   }
   if(pool.cn || pool.ln) html += slopeRows(puttSlopeStats([sess]));
   wrap.innerHTML = html;
@@ -9577,7 +9628,7 @@ function zoneLabel(a, z){
 function trackKind(a, s){
   if(!a || !a.track) return null;
   if(s.guide === "ladder") return "lag";
-  if(s.parts) return (s.guide === "windows" || s.guide === "heights") ? "grid" : null;
+  if(s.parts) return (s.guide === "windows" || s.guide === "heights" || s.guide === "drive3") ? "grid" : null;
   if(s.max && s.max <= 20) return "shot";
   return null;
 }
@@ -10390,6 +10441,18 @@ var GRIDS = {
            {w:4,x:48,y:160,W:92,H:64},{w:5,x:160,y:160,W:92,H:64}],
     order:[1,2,3,4,5]
   },
+  /* England Golf's three driver shots: the app calls one, the tap says which
+     one actually came off */
+  drive3:{
+    vb:"0 0 300 258", frame:null, ball:{cx:150, cy:250},
+    word:"shot", heading:"The three driver shots", title:"Which driver shot it was",
+    hitText:"The shot that was called came off",
+    cols:4, dx:28, dy:26, mx:74, my:26, px:150, py:30,
+    cells:[{w:1,x:56,y:8,W:188,H:72,lab:"Stock",sub:"your go-to drive"},
+           {w:2,x:56,y:86,W:188,H:72,lab:"Fairway finder",sub:"in play first"},
+           {w:3,x:56,y:164,W:188,H:72,lab:"Bomb",sub:"full speed"}],
+    order:[1,2,3], even:true
+  },
   heights:{
     vb:"0 0 300 258", frame:null, ball:{cx:150, cy:250},
     word:"height", heading:"Which heights", title:"Which height the ball came out at",
@@ -10632,7 +10695,7 @@ function rotPool(a){
   src.sets.forEach(function(x){
     if(x.rot || x.guide === "ladder") return;
     if(x.parts && (x.guide === "windows" || x.guide === "heights")){ windowed = true; gk = x.guide; }
-    else if(!x.parts && x.tc) pool.push({label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist,
+    else if(!x.parts && x.tc) pool.push({id:x.id, label:x.short || x.label, tc:x.tc, bull:x.bull, dist:x.dist,
                                          r1:x.r1, r2:x.r2, word:x.word,
                                          /* what the ball is worth depends on what it was asked
                                             to do, so the draw has to carry that too */
@@ -10673,6 +10736,9 @@ function makeClockRot(a, s){
 function makeRotCalls(a, s){
   if(areaShape(a) === "clock") return makeClockRot(a, s);
   var spec = rotPool(a), n = ballsIn(s), wantWin = !!(s.parts && (spec.windowed || s.allWin));
+  /* a rotation can name its own grid (the three driver shots) and its own clubs */
+  if(s.guide && GRIDS[s.guide]) spec.grid = s.guide;
+  if(s.clubs){ var only = spec.pool.filter(function(p){ return s.clubs.indexOf(p.id) > -1; }); if(only.length) spec.pool = only; }
   var order = gridOrder(spec.grid), calls = [], i;
   for(i=0;i<n;i++){
     var p = spec.pool.length ? spec.pool[i % spec.pool.length] : {label:"", tc:s.tc};
@@ -10685,9 +10751,11 @@ function makeRotCalls(a, s){
   if(wantWin){
     var slots = []; for(i=0;i<n;i++) slots.push(i);
     var take = s.allWin ? n : Math.floor(n/2);
-    shuffle(slots).slice(0, take).forEach(function(ix){
+    var even = !!grid(spec.grid).even;
+    shuffle(slots).slice(0, take).forEach(function(ix, j){
       calls[ix].kind = "w";
-      calls[ix].win = order[Math.floor(Math.random()*order.length)];
+      /* the three driver shots come round evenly; windows are drawn at random */
+      calls[ix].win = even ? order[j % order.length] : order[Math.floor(Math.random()*order.length)];
     });
   }
   return calls;
@@ -10969,8 +11037,8 @@ function shotRow(a, s, last, cfg){
       ask.innerHTML = '<span class="callnum">Ball '+(cur+1)+' of '+nb+'</span>'+
         '<span class="callclub">'+c.label+'</span>'+
         (c.dist && bandText(c.dist, c.tc) ? '<span class="callband">'+bandText(c.dist, c.tc)+'</span>' : '')+
-        (c.quiet ? '' : '<span class="callwin">'+(c.kind === "w" ? 'through window '+c.win : 'find the target')+'</span>')+
-        '<span class="calldo">'+(c.kind === "w" && st === "w" ? 'Tap the '+word+' it went through.'
+        (c.quiet ? '' : '<span class="callwin">'+(c.kind === "w" ? (gridCell(gridOf(c), c.win) && gridCell(gridOf(c), c.win).lab ? gridCell(gridOf(c), c.win).lab : 'through window '+c.win) : 'find the target')+'</span>')+
+        '<span class="calldo">'+(c.kind === "w" && st === "w" ? (gridOf(c) === "drive3" ? 'Tap the shot it actually was.' : 'Tap the '+word+' it went through.')
           : (shotDone(s, sh, c) ? 'Logged. Tap a ball below to change it.' : 'Tap where it finished.'))+'</span>';
     } else if(c.kind === "w"){
       ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' \u00b7 called at <b>'+gridLabel(gridOf(c), c.win).toLowerCase()+'</b>. '+
@@ -13168,7 +13236,7 @@ function pastShots(a, set, sess){
   var any = false; shots.forEach(function(x){ if(x && (x.z || x.w != null)) any = true; });
   if(!any) return "";
   var kind = trackKind(a, set) || (set.parts ? "grid" : "shot");
-  var gkind = set.guide === "heights" ? "heights" : "windows";
+  var gkind = (set.guide === "heights" || set.guide === "drive3") ? set.guide : "windows";
   var calls = callsFor(a, set);
 
   function marks(list){
@@ -13720,7 +13788,7 @@ function weekDocBody(){
   var weekH = (mins.practice + mins.tech + mins.play) / 60, dh = diseHours();
   h += wPara("England Golf Performance Pillars", { b:true, sz:26, before:120 });
   h += wTable([["Pillar", "Sessions", "Time"]]
-    .concat(bp.pillars.concat(bp.extra).map(function(r){ return [r.full || r.nm, r.n ? String(r.n) : "\u2013", fmtMins(r.mins)]; }))
+    .concat(bp.pillars.concat(bp.extra).map(function(r){ return r.upgame ? [r.full, "\u2013", "in UpGame"] : [r.full || r.nm, r.n ? String(r.n) : "\u2013", fmtMins(r.mins)]; }))
     .concat([["DiSE this week", String(bp.total.n), fmtMins(bp.total.mins)]]), [5400, 1500, 1800]);
   h += wPara(st.paused ? "This week was paused." : st.met ? "Week done: everything planned was completed." : "Week not complete.", {});
   h += wPara("DiSE hours in total: " + hrs(dh.total) + " of " + DISE_TARGET +
@@ -13912,7 +13980,93 @@ function recordsFor(sess){
 /* What is new in the app. Written by hand for a feature; a new session, test
    or drill is found on its own by comparing the catalogue with what this
    device has seen before. The first time it looks, it only takes note. */
+/* ============ England Golf: the Five Pillars of Performance ============
+   The Regional Girls sheet, in its own words: the five pillars, their objective
+   targets (through GDL and in practice), what each asks the player to be able
+   to do, and the skills challenges that go with it. "In the app" is where each
+   pillar is practised here. Strategy and tactical awareness is the one pillar
+   kept in UpGame, so it is shown but not tracked. */
+var EG_PILLARS = [
+  { n:1, nm:"World Class Holing Out", areas:[4], tint:"var(--t-putt)",
+    targets:["Inside 6 ft: 90%", "Medium range: 20%", "Long range: 7%", "Total footage holed: 59 ft"],
+    learn:["Start the ball online", "Control the pace", "Read the green", "Adopt a bullet proof routine"],
+    ch:"1 to 6",
+    app:"Holing-out day and lag day · Regional Squad Putting SGx18 · Lag and hole out · Inside six feet, Nine and twelve, The lag, The rotation · mat and garden drills" },
+  { n:2, nm:"Outstanding Short Game", areas:[3], tint:"var(--t-short)",
+    targets:["Inside 3 ft: 17%", "Inside 6 ft: 37%", "Inside 15 ft: 79%", "Inside 30 ft: 90%"],
+    learn:["Hit a basic chip, pitch, lob and bunker shot", "Control the strike quality by understanding the low point",
+           "Hit high, medium and low flight trajectories", "Adopt shot decision making using the five L\u2019s: lie, landing spot, loft, length of swing and line to the hole",
+           "Adopt technique to the lie at hand"],
+    ch:"7 to 10",
+    app:"Short game session · Regional Squad Perfect 9 · The Watson matrix, The Hundred · Bunkers, Awkward lies, Up and down" },
+  { n:3, nm:"Precise Wedge Play", areas:[2], tint:"var(--t-wedge)",
+    targets:["Wedge approaches: 76%", "All short approaches: 73%"],
+    learn:["Consistently strike the pitch", "Control club speed", "Control ball speed", "Understand dynamic loft",
+           "Control the launch angle", "Control the ball flight and direction", "Adopt a clear distance control system or wedge chart"],
+    ch:"11 to 14",
+    app:"Wedge session, 30 to 90 yards and five heights · Right number, wedges · The wedge ladder" },
+  { n:4, nm:"Ball Flight Control", areas:[10, 11], tint:"var(--t-tee)",
+    targets:["Driving fairways or semi: 83%", "Medium approaches: 50%", "Long approaches: 24%"],
+    learn:["Understand your own golf swing", "Control the low point, path, angle of attack, clubface and strike",
+           "Control one shape outstandingly well", "Understand slope conditions and the effect on ball flight",
+           "Deliver three driver shots: stock shot, fairway finder, bomb", "Commit to ball speed development"],
+    ch:"15 to 17",
+    app:"Tee shots, with the three driver shots · Approach, 125 to 185 yards and five windows · Speed and corridor, Fade on demand, Right number approach · The driver, Three driver shots, The woods, Windows · speed sticks" },
+  { n:5, nm:"Strategy and Tactical Awareness", areas:[], tint:"var(--surface-2)", upgame:true,
+    targets:["GIR: 60% (11 greens or more)", "Par 3 score: 3.30", "Par 4 score: 4.40", "Par 5 score: 4.99"],
+    learn:["Undertake effective pre-round planning", "Identify landing areas and targets", "Use a course planner and record shot history",
+           "Work out maximum and minimum yardages for shot selection", "Adopt decision making skills and a robust shot selection process",
+           "Record post round and tournament reflections", "Adopt an effective hydration and nutrition routine"],
+    ch:"18 to 20",
+    app:"In UpGame. Rounds logged here count as play towards DiSE." }
+];
+var EG_BEHAVIOURS = ["Positive mindset", "Great attitude", "High quality practice habits", "Thorough preparation", "Bullet proof routines"];
+/* Each tile's own share of the Regional Girls targets: ball flight control is
+   split here into off the tee and into greens, so each gets its half. */
+var EG_TARGETS = { 4:EG_PILLARS[0].targets, 3:EG_PILLARS[1].targets, 2:EG_PILLARS[2].targets,
+                   10:["Driving fairways or semi: 83%"], 11:["Medium approaches: 50%", "Long approaches: 24%"] };
+function egPillarOf(areaId){ var out = null; EG_PILLARS.forEach(function(p){ if(p.areas.indexOf(areaId) > -1) out = p; }); return out; }
+function egName(a){
+  var p = egPillarOf(a.id); if(!p) return a.name;
+  if(a.id === 10) return p.nm + ": off the tee";
+  if(a.id === 11) return p.nm + ": into greens";
+  return p.nm;
+}
+function pillarsHtml(){
+  var esc = function(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  return '<div class="egp">' +
+    '<p class="egsub">England Golf \u00b7 Regional Girls</p>' +
+    EG_PILLARS.map(function(p){
+      return '<section class="egcol' + (p.upgame ? ' up' : '') + '" style="--tint:' + p.tint + '">' +
+        '<header><span class="egn num">' + p.n + '</span><h4>' + esc(p.nm) + '</h4></header>' +
+        '<div class="egblk"><em>Objective targets</em><ul class="egtg">' + p.targets.map(function(t){
+          var i = t.lastIndexOf(": ");
+          return '<li><span>' + esc(i > 0 ? t.slice(0, i) : t) + '</span>' + (i > 0 ? '<b class="num">' + esc(t.slice(i + 2)) + '</b>' : '') + '</li>';
+        }).join("") + '</ul></div>' +
+        '<div class="egblk"><em>Be able to</em><ul class="egl">' + p.learn.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join("") + '</ul></div>' +
+        '<div class="egfoot"><span><em>Skills challenges</em>' + p.ch + '</span></div>' +
+        '<p class="egapp"><em>' + (p.upgame ? 'Where' : 'In this app') + '</em>' + esc(p.app) + '</p>' +
+      '</section>';
+    }).join("") +
+    '<section class="egbeh"><em>Underpinning behaviours</em><div>' + EG_BEHAVIOURS.map(function(b){ return '<span>' + b + '</span>'; }).join("") + '</div></section>' +
+    '<p class="egnote">Objective targets are measured through GDL and in practice. In this app every pillar also has its own LPGA-based targets, on Goals.</p>' +
+  '</div>';
+}
+document.addEventListener("click", function(e){
+  var b = e.target && e.target.closest ? e.target.closest("#egOpen") : null;
+  if(b) openPillars();
+});
+function openPillars(){
+  $("wkSheetTitle").textContent = "The Five Pillars of Performance";
+  $("wkSheetBody").innerHTML = pillarsHtml();
+  $("wkSheetBody").onclick = null;
+  $("wkSheet").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
 var NEWS = [
+  { id:"2026-10-05-pillars", date:"2026-10-05", title:"England Golf's Five Pillars of Performance",
+    body:"The pillars now follow England Golf's numbering, 1 World Class Holing Out to 5 Strategy and Tactical Awareness, with the Regional Girls targets on Goals. Tap The five pillars on Practice or Goals to see the whole sheet. Tee shots now end with the three driver shots: stock, fairway finder and bomb." },
   { id:"2026-10-04-coach", date:"2026-10-04", title:"New: Coach sessions and messages",
     body:"Your coach now sets compulsory sessions, shown under Squad on This week, every week. Quick drills are yours to choose: none by default, add some in Settings if you want to work on something. Messages from your coach arrive as a push and stay here on the bell." },
   { id:"2026-10-04-dise", date:"2026-10-04", title:"New: DiSE hours",
@@ -15116,7 +15270,7 @@ function fmtMins(m){
 function weekByPillar(wk){
   var end = addDays(wk, 6);
   var rows = liveAreas().slice().sort(function(a, b){ return (a.no || 99) - (b.no || 99); }).map(function(a){
-    return { id:a.id, nm:"Pillar " + areaNo(a) + " · " + ((TILE[a.id] || {}).nm || a.name), full:"Pillar " + areaNo(a) + ": " + a.name, n:0, mins:0 };
+    return { id:a.id, nm:"Pillar " + areaNo(a) + " \u00b7 " + egName(a), full:"Pillar " + areaNo(a) + ": " + egName(a), n:0, mins:0 };
   });
   var by = {}; rows.forEach(function(r){ by[r.id] = r; });
   var other = { play:{ nm:"Play", n:0, mins:0 }, tech:{ nm:"Technique and coaching", n:0, mins:0 },
@@ -15131,6 +15285,7 @@ function weekByPillar(wk){
   });
   var extra = [sc].concat(["play", "tech", "prac"].map(function(k){ return other[k]; })).filter(function(r){ return r.n; });
   var tot = rows.concat(extra).reduce(function(a, r){ return { n:a.n + r.n, mins:a.mins + r.mins }; }, { n:0, mins:0 });
+  rows.push({ id:"eg5", nm:"Pillar 5 \u00b7 Strategy and Tactical Awareness", full:"Pillar 5: Strategy and Tactical Awareness", n:0, mins:0, upgame:true });
   return { pillars:rows, extra:extra, total:tot, sc:sc };
 }
 /* Before she sets next week, a look back at this one: what got done, what did
@@ -15153,6 +15308,7 @@ function weekReview(){
      : st.met ? '<p class="wkdone">Week done. Everything you set yourself.</p>' : '') +
     '<table class="revtab"><thead><tr><th>By pillar</th><th>Sessions</th><th>Time</th></tr></thead><tbody>' +
       bp.pillars.concat(bp.extra).map(function(r){
+        if(r.upgame) return '<tr class="gap"><td>' + esc(r.nm) + '</td><td colspan="2" class="num">in UpGame</td></tr>';
         return '<tr' + (r.n ? '' : ' class="gap"') + '><td>' + esc(r.nm) + '</td><td class="num">' + (r.n || "\u2013") + '</td><td class="num">' + fmtMins(r.mins) + '</td></tr>';
       }).join("") +
       '<tr class="revtot"><td>DiSE this week</td><td class="num">' + bp.total.n + '</td><td class="num">' + fmtMins(bp.total.mins) + '</td></tr>' +
