@@ -67,7 +67,8 @@ export function requiredOf(pl, monday) {
   const on = (x) => x && x.id && (!x.from || monday >= x.from);
   const squad = (Array.isArray(pl.squad) ? pl.squad : []).filter(on);
   const coach = (Array.isArray(pl.coach) ? pl.coach : []).filter(on);
-  return { n: squad.length + coach.length, drills: coach.filter((c) => c.k === 'drill').map((c) => ({ k: 'drill', id: c.id })) };
+  const reps = coach.reduce((t, c) => t + Math.max(1, Math.min(7, Math.round(+c.n || 1))), 0);
+  return { n: squad.length + reps, drills: coach.filter((c) => c.k === 'drill').map((c) => ({ k: 'drill', id: c.id })) };
 }
 export function planOf(pl, monday) {
   const w = pl.weeks && pl.weeks[monday];
