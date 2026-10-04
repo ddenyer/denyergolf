@@ -228,6 +228,25 @@
   .sqpast table{width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums}
   .sqpast th, .sqpast td{text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
   .sqpast th{font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em}
+  /* ---------- DiSE hours ---------- */
+  .disepanel .wkgh span{color:var(--muted)}
+  .disebig{display:flex; align-items:baseline; gap:8px; margin:8px 0 8px}
+  .disebig b{font-size:40px; font-weight:800; letter-spacing:-.02em; color:var(--accent)}
+  .disebig span{color:var(--muted); font-size:14px}
+  .disebar{position:relative; height:10px; border-radius:999px; background:var(--line-strong); overflow:hidden}
+  .disebar i{position:absolute; left:0; top:0; bottom:0; background:var(--accent); border-radius:999px}
+  .disebar s{position:absolute; top:0; bottom:0; width:2px; background:var(--surface); opacity:.7}
+  .disesplit{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:12px 0 4px}
+  .disesplit div{background:var(--surface-2); border-radius:9px; padding:8px 6px; text-align:center}
+  .disesplit b{display:block; font-size:18px; font-weight:800}
+  .disesplit span{display:block; font-size:10.5px; color:var(--muted); line-height:1.25; margin-top:2px}
+  .disesplit .off b{color:var(--muted)}
+  .logchips{display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin:10px 0 4px}
+  .logchips button{font:inherit; font-size:13px; padding:9px 4px; border:1px solid var(--line-strong); border-radius:9px;
+    background:var(--surface); color:var(--ink); cursor:pointer}
+  .logchips button b, .logchips button small{display:block}
+  .logchips button small{font-size:11px; color:var(--muted); margin-top:1px}
+  .logchips button[aria-pressed="true"]{border-color:var(--accent-fill); background:var(--accent-wash); font-weight:700}
   /* ---------- this week ---------- */
   .wkhead{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:2px 0 6px}
   .wkhead h1{margin:2px 0 0}
@@ -2185,6 +2204,7 @@
     <h1>Progress</h1>
     <p class="lede">What the practice says about the goals, where the misses lean, and how each area is moving.</p>
 
+    <div id="diseCard"></div>
     <div id="goalProg"></div>
 
     <div class="panel">
@@ -2522,7 +2542,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"The squad test: the 18-hole strokes gained putting challenge, scored hole by hole against the sheet\u2019s own numbers (benchmark 31.02). When your coach switches it on it sits at the top of This week, every week, and the week is not done without it. Also: tee shots priced from club head speed at the LPGA rate" };
+var BUILD = { on:"2026-10-04", note:"DiSE hours: a running total towards 200 hours of practice and play on Progress, counting every session you have logged at an estimate of its length, plus play (18 holes 4 hours, 9 holes 2) and technique or coaching logged in hours. The bell marks every 25. Also: the squad putting challenge, compulsory when your coach switches it on" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -12769,6 +12789,7 @@ function renderStrengths(){
 }
 
 function renderProgress(){
+  renderDise();
   renderGoalProgress();
   renderStrengths();
   renderBalance();
@@ -12848,6 +12869,7 @@ function sessStatus(x){
   return { key:"part", word:"Incomplete" };
 }
 function sessLabel(x){
+  if(x.kind === "log") return logLabel(x);
   return isSpeed(x) ? "Speed sticks"
        : isBand(x) ? "Band session"
        : isPrep(x) ? "Movement prep"
@@ -12879,7 +12901,7 @@ function renderSessions(){
     var note = x.notes ? x.notes.replace(/</g,"&lt;") : "";
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
-      '<span class="s">'+(x.kind==="gym" ? x.total+"/"+x.max+" sets"
+      '<span class="s">'+(x.kind==="log" ? hrs(x.hours||0)+" h" : x.kind==="gym" ? x.total+"/"+x.max+" sets"
                           : x.sgUnknown ? "\u2013"
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
                           : x.total+"/"+x.max)+'</span>'+
@@ -12982,6 +13004,15 @@ function pastShots(a, set, sess){
 }
 
 function openPast(s){
+  if(s && s.kind === "log"){
+    $("pastKind").textContent = "Hours towards DiSE";
+    $("pastName").textContent = logLabel(s);
+    $("pastWhen").textContent = fmtDate(s.date);
+    $("pastBody").innerHTML = '<div class="pastsum"><div><b>' + hrs(s.hours || 0) + '</b><span>hours</span></div></div>' +
+      '<div class="pastnotes"><p class="eyebrow">Note</p><p>' + (s.notes ? String(s.notes).replace(/</g, "&lt;") : "No note.") + '</p></div>';
+    show("past");
+    return;
+  }
   var isGym = s.kind === "gym";
   var name = isGym
     ? (isSpeed(s) ? "Speed sticks" : isBand(s) ? "Band session" : isPrep(s) ? "Movement prep"
@@ -13242,6 +13273,146 @@ function daysSinceType(typeId){
 }
 /* The messages. Each has a key, so a phone shows the dot for what it has not
    seen and not for the same thing every time. */
+/* ============ DiSE: 200 hours of practice and play ============
+   Every finished session she logs here counts, at an estimate of how long that
+   kind of session takes (a part-done one at its share), and play and coaching,
+   which never come through a scored session, are logged in hours on their own.
+   S&C is shown beside it but not counted: the 200 hours are golf. */
+var DISE_TARGET = 200, DISE_STEP = 25;
+var LOG_PLAY = [{ id:"18", nm:"18 holes", h:4 }, { id:"9", nm:"9 holes", h:2 }];
+var LOG_TECH = [0.5, 1, 1.5, 2, 3];
+function sessMins(s){
+  if(!s || s.status === "live" || s.sample) return 0;
+  if(s.kind === "log") return Math.round((+s.hours || 0) * 60);
+  var f = s.partial != null ? Math.max(0.25, +s.partial || 0) : 1, base;
+  if(s.kind === "gym"){
+    if(isSquash(s)) return 0;                 /* a warm-up is part of the session after it */
+    base = isSpeed(s) || isBand(s) ? 15 : isPrep(s) ? 10 : 40;
+  } else if(s.kind === "drill"){
+    var d = drillById(s.drillId); base = (d && d.mins) || 20;
+  } else if(s.kind === "test"){
+    var t = testById(s.testId); base = t && t.squad ? 35 : 45;
+  } else if(s.kind === "practice"){
+    base = 60;
+  } else return 0;
+  return Math.round(base * f);
+}
+function hoursKind(s){
+  if(s.kind === "log") return s.logType === "play" ? "play" : "tech";
+  if(s.kind === "gym") return "sc";
+  if(s.kind === "practice" || s.kind === "drill" || s.kind === "test") return "practice";
+  return null;
+}
+function diseHours(){
+  var by = { practice:0, tech:0, play:0, sc:0 };
+  mine().forEach(function(s){ var k = hoursKind(s); if(k) by[k] += sessMins(s) / 60; });
+  var total = by.practice + by.tech + by.play;
+  /* the pace: the last four weeks, and when that gets her to 200 */
+  var cut = addDays(today(), -28), recent = 0;
+  mine().forEach(function(s){ var k = hoursKind(s); if(k && k !== "sc" && s.date >= cut) recent += sessMins(s) / 60; });
+  var perWeek = recent / 4, eta = null;
+  if(total < DISE_TARGET && perWeek > 0.25) eta = addDays(today(), Math.ceil((DISE_TARGET - total) / perWeek * 7));
+  return { by:by, total:total, perWeek:perWeek, eta:eta };
+}
+function hrs(x){ var r = Math.round(x * 2) / 2; return (r % 1 ? r.toFixed(1) : String(r)); }
+function longDate(iso){ var d = new Date(iso + "T12:00:00"); return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear(); }
+function renderDise(){
+  var host = $("diseCard"); if(!host) return;
+  var h = diseHours(), pc = Math.min(100, h.total / DISE_TARGET * 100);
+  host.innerHTML =
+    '<div class="panel disepanel"><div class="wkgh"><h2>DiSE · practice and play</h2><span>' +
+      (h.total >= DISE_TARGET ? "done" : hrs(DISE_TARGET - h.total) + " h to go") + '</span></div>' +
+    '<div class="disebig"><b class="num">' + hrs(h.total) + '</b><span>of ' + DISE_TARGET + ' hours</span></div>' +
+    '<div class="disebar"><i style="width:' + pc.toFixed(1) + '%"></i>' +
+      [1, 2, 3, 4, 5, 6, 7].map(function(m){ return '<s style="left:' + (m * DISE_STEP / DISE_TARGET * 100) + '%"></s>'; }).join("") + '</div>' +
+    '<div class="disesplit">' +
+      '<div><b class="num">' + hrs(h.by.practice) + '</b><span>practice<br>in the app</span></div>' +
+      '<div><b class="num">' + hrs(h.by.tech) + '</b><span>technique<br>and coaching</span></div>' +
+      '<div><b class="num">' + hrs(h.by.play) + '</b><span>play</span></div>' +
+      '<div class="off"><b class="num">' + hrs(h.by.sc) + '</b><span>S&amp;C<br>not counted</span></div>' +
+    '</div>' +
+    '<p class="note">' + (h.perWeek ? hrs(h.perWeek) + ' hours a week over the last four weeks' +
+      (h.eta ? ', which gets you to ' + DISE_TARGET + ' by ' + longDate(h.eta) + '.' : '.') : 'Nothing in the last four weeks yet.') +
+      ' Sessions count at an estimate of how long they take: a main session an hour, a test 45 minutes, a quick drill its own length.</p>' +
+    '<button type="button" class="setgo" id="diseLog">Log play or coaching</button></div>';
+  $("diseLog").onclick = function(){ openLogHours(); };
+}
+/* the bell: every 25 hours, said once, for a fortnight */
+function diseFeed(){
+  var list = mine().filter(function(s){ var k = hoursKind(s); return k && k !== "sc"; })
+    .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  var out = [], run = 0, next = DISE_STEP;
+  list.forEach(function(s){
+    run += sessMins(s) / 60;
+    while(run >= next && next <= DISE_TARGET){
+      if(daysBetween(s.date) <= 14)
+        out.push({ key:"dise:" + next, kind:"good", date:s.date, go:"dise",
+          title:next >= DISE_TARGET ? DISE_TARGET + " hours. DiSE practice and play done" : next + " hours towards DiSE",
+          body:next >= DISE_TARGET ? "Every hour of it logged. Well done." : (DISE_TARGET - next) + " to go. Reached on " + fmtDate(s.date) + "." });
+      next += DISE_STEP;
+    }
+  });
+  return out.reverse();
+}
+
+/* ---- logging play and coaching, in hours ---- */
+var LOGQ = null;
+function openLogHours(){
+  LOGQ = LOGQ || { type:"play", pick:"18", hours:"", date:today(), note:"" };
+  drawLogHours();
+  $("wkSheet").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function drawLogHours(){
+  var q = LOGQ;
+  $("wkSheetTitle").textContent = "Log play or coaching";
+  var chips = q.type === "play"
+    ? LOG_PLAY.map(function(o){ return '<button type="button" data-pick="' + o.id + '" aria-pressed="' + (q.pick === o.id) + '"><b>' + o.nm + '</b><small>' + o.h + ' hours</small></button>'; }).join("") +
+      '<button type="button" data-pick="other" aria-pressed="' + (q.pick === "other") + '"><b>Other</b><small>tournament, part round</small></button>'
+    : LOG_TECH.map(function(v){ return '<button type="button" data-pick="' + v + '" aria-pressed="' + (q.pick === String(v)) + '"><b>' + hrs(v) + '</b><small>' + (v === 1 ? "hour" : "hours") + '</small></button>'; }).join("") +
+      '<button type="button" data-pick="other" aria-pressed="' + (q.pick === "other") + '"><b>Other</b><small>hours</small></button>';
+  $("wkSheetBody").innerHTML =
+    '<p class="note">Hours towards DiSE that do not come through a scored session.</p>' +
+    '<div class="setseg"><button type="button" data-type="play" aria-pressed="' + (q.type === "play") + '"><b>Play</b><small>on the course</small></button>' +
+      '<button type="button" data-type="tech" aria-pressed="' + (q.type === "tech") + '"><b>Technique</b><small>coaching, lessons, squad</small></button></div>' +
+    '<div class="logchips">' + chips + '</div>' +
+    (q.pick === "other" ? '<div class="bwrow"><span>Hours</span><input id="logHours" type="number" min="0.25" max="12" step="0.25" inputmode="decimal" value="' + (q.hours || "") + '" aria-label="Hours"></div>' : '') +
+    '<div class="bwrow"><span>Date</span><input id="logDate" type="date" value="' + q.date + '" aria-label="Date"></div>' +
+    '<div class="bwrow"><span>Note</span><input id="logNote" maxlength="60" placeholder="' + (q.type === "play" ? "Course, competition" : "Who with, what on") + '" value="' + String(q.note || "").replace(/"/g, "&quot;") + '" aria-label="Note"></div>' +
+    '<p class="note" id="logMsg"></p>' +
+    '<button type="button" class="setgo" id="logSave">Log it</button>';
+  var body = $("wkSheetBody");
+  function keep(){ if($("logHours")) q.hours = $("logHours").value; q.date = $("logDate").value || today(); q.note = $("logNote").value; }
+  body.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    if(b.hasAttribute("data-type")){ keep(); q.type = b.getAttribute("data-type"); q.pick = q.type === "play" ? "18" : "1"; drawLogHours(); return; }
+    if(b.hasAttribute("data-pick")){ keep(); q.pick = b.getAttribute("data-pick"); drawLogHours(); return; }
+    if(b.id === "logSave"){ keep(); saveLogHours(); }
+  };
+}
+function saveLogHours(){
+  var q = LOGQ, h = 0, holes = null;
+  if(q.pick === "other") h = parseFloat(q.hours);
+  else if(q.type === "play"){ var o = LOG_PLAY.filter(function(x){ return x.id === q.pick; })[0]; h = o ? o.h : 0; holes = o ? +o.id : null; }
+  else h = parseFloat(q.pick);
+  if(!(h > 0 && h <= 12)){ $("logMsg").textContent = "Put in the hours, up to 12."; return; }
+  var s = { id:uid(), playerId:state.activePlayer, kind:"log", logType:q.type, hours:Math.round(h * 4) / 4,
+            holes:holes, date:q.date || today(), status:"done", notes:(q.note || "").trim(), scores:{}, shots:{} };
+  state.sessions.push(s);
+  saveLocal(); pushDoc(s);
+  LOGQ = null;
+  $("wkSheet").hidden = true; document.body.style.overflow = "";
+  setStatus("Logged: " + logLabel(s) + ", " + hrs(s.hours) + " h.");
+  render();
+  if(state.view === "week") renderWeek();
+  if(state.view === "history") renderDise();
+  paintBell();
+}
+function logLabel(s){
+  if(s.logType === "play") return "Play" + (s.holes ? " · " + s.holes + " holes" : "");
+  return "Technique and coaching";
+}
+
 /* ---------- the bell: kudos, records and what is new ----------
    None of this is a phone notification. It is the Strava feed: every session
    gets its kudos, anything significant gets said once, and a new session, test
@@ -13254,12 +13425,14 @@ function hashPick(list, id){
   return list[h % list.length];
 }
 function sessTitle(s){
+  if(s.kind === "log") return logLabel(s);
   if(s.kind === "drill"){ var d = drillById(s.drillId); return d ? d.name : "Quick drill"; }
   if(s.kind === "test"){ var t = testById(s.testId); return t ? t.name : "Test"; }
   if(s.kind === "gym") return stripTags(sessLabel(s));
   var sk = TILE[typeOf(s.areaId)]; return sk ? sk.nm : areaTitle(area(s.areaId));
 }
 function sessResult(s){
+  if(s.kind === "log") return hrs(s.hours || 0) + " hours";
   if(s.kind === "gym") return (s.total || 0) + " of " + (s.max || 0) + " sets";
   var a = area(s.drillId || s.testId || s.areaId);
   if(s.total == null || s.sgUnknown) return "";
@@ -13345,6 +13518,8 @@ function recordsFor(sess){
    or drill is found on its own by comparing the catalogue with what this
    device has seen before. The first time it looks, it only takes note. */
 var NEWS = [
+  { id:"2026-10-04-dise", date:"2026-10-04", title:"New: DiSE hours",
+    body:"Your running total towards 200 hours of practice and play is at the top of Progress. Every session already logged counts. Log rounds and coaching with Log play or coaching on This week." },
   { id:"2026-10-03-ott", date:"2026-10-03", title:"Tee shots: distance now counts your speed",
     body:"Off the tee, distance is priced from your club head speed at the LPGA rate: 94 mph carries 218 yards. The range balls make no difference, because club speed is the club, not the ball. Get faster and it shows. Your past tee sessions have been priced the same way." },
   { id:"2026-10-01-week", date:"2026-10-01", title:"New: This week",
@@ -13390,6 +13565,7 @@ function feedItems(){
     }
     recordsFor(s).forEach(function(r){ out.push(r); });
   });
+  diseFeed().forEach(function(x){ out.push(x); });
   /* weeks in a row, the ones worth saying */
   var sn = weekStreakNow();
   if(sn.st.met && [2, 4, 8, 12, 26, 52].indexOf(sn.n) > -1)
@@ -13480,6 +13656,7 @@ function openBell(){
     var g = b.getAttribute("data-bgo");
     closeBell();
     if(g === "week") show("week");
+    else if(g === "dise"){ renderProgress(); show("history"); }
     else if(g === "plan") openSettings("next");
     else openSettings();
   };
@@ -14174,7 +14351,8 @@ function renderWeek(){
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
   var n = st.rec ? st.rec.n : defaultNums();
   html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
-          '<button type="button" id="wkSet">Change in Settings</button></div>';
+          '<button type="button" id="wkSet">Change in Settings</button>' +
+          '<button type="button" id="wkLog">Log play or coaching</button></div>';
   host.innerHTML = html;
 
   host.onclick = function(e){
@@ -14182,6 +14360,7 @@ function renderWeek(){
     var r = weekRec(wk, true);
     if(b.id === "wkUndo"){ weekUndo(); renderWeek(); paintBell(); return; }
     if(b.id === "wkSet"){ openSettings(); return; }
+    if(b.id === "wkLog"){ openLogHours(); return; }
     if(b.hasAttribute("data-squad")){ state.fromWeek = true; openTest(b.getAttribute("data-squad")); return; }
     if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
     if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
@@ -14272,6 +14451,7 @@ function openWeekChange(wk, idx){
   document.body.style.overflow = "hidden";
 }
 function closeWeekChange(){
+  LOGQ = null;
   $("wkSheet").hidden = true; document.body.style.overflow = "";
   if(state.view === "week") renderWeek(); else if(state.view === "settings") renderSettings();
   paintBell();
@@ -15161,7 +15341,9 @@ function coachWeekLine(p){
     return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&C" : k === "main" ? "main" : k === "squad" ? "squad" : "drills");
   });
   el.innerHTML = '<em>This week</em>';
-  el.appendChild(document.createTextNode(wst.paused ? "Paused." : bits.length ? bits.join(" · ") + (wst.met ? ". Done." : ".") : "Nothing planned."));
+  var dh = asPlayer(p, function(){ return diseHours(); });
+  el.appendChild(document.createTextNode((wst.paused ? "Paused." : bits.length ? bits.join(" · ") + (wst.met ? ". Done." : ".") : "Nothing planned.") +
+    " DiSE: " + hrs(dh.total) + " of " + DISE_TARGET + " hours."));
   return el;
 }
 function coachFocusBox(p){
