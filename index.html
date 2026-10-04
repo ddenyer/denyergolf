@@ -2565,7 +2565,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"Review, the new tab at the top: this week looked back on, with a button to log a round, a lesson or practice away from the app, and next week planned underneath. Always there, not only on a Sunday. DiSE hours on Progress count all of it towards 200" };
+var BUILD = { on:"2026-10-04", note:"The weekly review can be downloaded as a Word file from the bottom of Review: every session and score, the squad card hole by hole, the hours and the DiSE hours still to go, and next week\u2019s plan, ready to email or upload. Review is the tab at the top for looking back at the week and planning the next" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -13442,6 +13442,153 @@ function logLabel(s){
   return "Technique and coaching";
 }
 
+/* ============ the week as a Word file ============
+   A real .docx, built here with no library: Word's format is a zip of a few
+   XML files, and a zip with nothing compressed is a short piece of code. Arial,
+   black text, grey shading only, so it prints and emails as well as it reads.
+   On a phone it goes to the share sheet, so it can be mailed or saved straight
+   away; elsewhere it downloads. */
+var CRC_T = null;
+function crc32(b){
+  if(!CRC_T){ CRC_T = []; for(var n = 0; n < 256; n++){ var c = n; for(var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; CRC_T[n] = c >>> 0; } }
+  var crc = 0xFFFFFFFF; for(var i = 0; i < b.length; i++) crc = CRC_T[(crc ^ b[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function zipStore(files){
+  var enc = new TextEncoder(), parts = [], central = [], off = 0;
+  function u16(v){ return [v & 255, (v >>> 8) & 255]; }
+  function u32(v){ return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  files.forEach(function(f){
+    var name = enc.encode(f.name), data = typeof f.data === "string" ? enc.encode(f.data) : f.data, crc = crc32(data);
+    var head = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+    parts.push(new Uint8Array(head), name, data);
+    central.push([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length),
+      u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), name);
+    off += head.length + name.length + data.length;
+  });
+  var cdStart = off, cdLen = 0;
+  central.forEach(function(c, i){ if(i % 2 === 0){ parts.push(new Uint8Array(c)); cdLen += c.length; } else { parts.push(c); cdLen += c.length; } });
+  parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdLen), u32(cdStart), u16(0))));
+  var total = 0; parts.forEach(function(p){ total += p.length; });
+  var out = new Uint8Array(total), at = 0; parts.forEach(function(p){ out.set(p, at); at += p.length; });
+  return out;
+}
+function xq(t){ return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function wRun(t, o){
+  o = o || {};
+  return '<w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:color w:val="000000"/>' + (o.b ? '<w:b/>' : '') +
+    '<w:sz w:val="' + (o.sz || 20) + '"/></w:rPr><w:t xml:space="preserve">' + xq(t) + '</w:t></w:r>';
+}
+function wPara(t, o){
+  o = o || {};
+  return '<w:p><w:pPr><w:spacing w:before="' + (o.before || 0) + '" w:after="' + (o.after == null ? 80 : o.after) + '"/></w:pPr>' +
+    (Array.isArray(t) ? t.map(function(r){ return wRun(r.t, r); }).join("") : wRun(t, o)) + '</w:p>';
+}
+function wTable(rows, widths){
+  var cell = function(t, head, w){
+    return '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (head ? '<w:shd w:val="clear" w:color="auto" w:fill="D9D9D9"/>' : '') +
+      '</w:tcPr>' + wPara(t, { b:head, sz:18, after:0 }) + '</w:tc>';
+  };
+  var b = '<w:top w:val="single" w:sz="4" w:color="808080"/><w:left w:val="single" w:sz="4" w:color="808080"/><w:bottom w:val="single" w:sz="4" w:color="808080"/>' +
+          '<w:right w:val="single" w:sz="4" w:color="808080"/><w:insideH w:val="single" w:sz="4" w:color="BFBFBF"/><w:insideV w:val="single" w:sz="4" w:color="BFBFBF"/>';
+  return '<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>' + b + '</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr>' +
+    '<w:tblGrid>' + widths.map(function(w){ return '<w:gridCol w:w="' + w + '"/>'; }).join("") + '</w:tblGrid>' +
+    rows.map(function(r, i){ return '<w:tr>' + r.map(function(c, j){ return cell(c, i === 0, widths[j]); }).join("") + '</w:tr>'; }).join("") +
+    '</w:tbl>' + wPara("", { after:120 });
+}
+function docxFrom(body){
+  var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body +
+    '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>';
+  return zipStore([
+    { name:"[Content_Types].xml", data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>' },
+    { name:"_rels/.rels", data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>' },
+    { name:"word/document.xml", data:doc }
+  ]);
+}
+/* What goes in it: the week as it happened, the hours, the squad card, the plan. */
+function weekDocBody(){
+  var p = playerObj(), wk = weekOf(), end = addDays(wk, 6), st = weekState(wk), nm = (p && p.name) || "Player";
+  var h = wPara("Weekly review", { b:true, sz:36, after:40 }) +
+          wPara(nm + ", " + weekRange(wk) + " " + wk.slice(0, 4), { sz:24, after:200 });
+  /* the summary */
+  var groups = ["squad"].concat(WEEK_KINDS).filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var mins = { practice:0, tech:0, play:0 };
+  mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
+  var weekH = (mins.practice + mins.tech + mins.play) / 60, dh = diseHours();
+  h += wPara("Summary", { b:true, sz:26, before:120 });
+  h += wTable([["", "Done", "Planned"]].concat(groups.map(function(k){ return [k === "sc" ? "S&C" : WEEK_WORD[k], String(st.per[k].got), String(st.per[k].want)]; })), [3600, 1600, 1600]);
+  h += wPara(st.paused ? "This week was paused." : st.met ? "Week done: everything planned was completed." : "Week not complete.", {});
+  h += wPara("DiSE hours this week: " + hrs(weekH) + " (practice " + hrs(mins.practice / 60) + ", technique and coaching " + hrs(mins.tech / 60) + ", play " + hrs(mins.play / 60) + ").", {});
+  h += wPara("DiSE hours in total: " + hrs(dh.total) + " of " + DISE_TARGET +
+    (dh.total >= DISE_TARGET ? ". Target reached." : ", " + hrs(DISE_TARGET - dh.total) + " hours to go.") , {});
+  if(dh.total < DISE_TARGET) h += wPara(dh.perWeek
+      ? "At " + hrs(dh.perWeek) + " hours a week (the last four weeks), the " + DISE_TARGET + " are reached by " + longDate(dh.eta) + "."
+      : "No hours in the last four weeks to project from.", { after:200 });
+  else h += wPara("", { after:120 });
+  /* every session */
+  var ss = mine().filter(function(x){ return x.date >= wk && x.date <= end && !x.sample; })
+    .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  h += wPara("Sessions", { b:true, sz:26, before:120 });
+  if(ss.length){
+    h += wTable([["Date", "Session", "Result", "Time", "Notes"]].concat(ss.map(function(x){
+      var res = x.kind === "log" ? "" : (sessResult(x) || "") + (x.partial != null ? " (part done)" : "");
+      return [fmtDate(x.date), sessTitle(x), res, hrs(sessMins(x) / 60) + " h", x.notes || ""];
+    })), [1000, 3000, 1900, 800, 2900]);
+  } else h += wPara("Nothing logged this week.", { after:200 });
+  /* the squad card, hole by hole */
+  ss.filter(function(x){ return x.kind === "test" && testById(x.testId) && testById(x.testId).shape === "sg18"; }).forEach(function(x){
+    var a = testById(x.testId);
+    h += wPara(a.name + ", " + fmtDate(x.date) + ": " + sq18Fmt(x.total || 0) + " strokes gained", { b:true, sz:24, before:120 });
+    h += wTable([["Hole", "Putt", "SG par", "Putts", "SG"]].concat(liveSets(a).map(function(set, i){
+      var n = sq18Putts(x, set);
+      return [String(i + 1), set.pd + " ft", set.par.toFixed(2), n == null ? "" : n === 4 ? "4+" : String(n), n == null ? "" : sq18Fmt(set.par - n)];
+    })), [900, 1200, 1300, 1100, 1300]);
+  });
+  /* any records */
+  var recs = []; ss.forEach(function(x){ recordsFor(x).forEach(function(r){ recs.push(r.title + ": " + r.body); }); });
+  if(recs.length){ h += wPara("Records", { b:true, sz:26, before:120 }); recs.forEach(function(r){ h += wPara(r, {}); }); }
+  /* next week, as set */
+  var nr = weekRec(nextWeek(), false);
+  h += wPara("Next week, " + weekRange(nextWeek()), { b:true, sz:26, before:200 });
+  if(nr){
+    var sq = squadFor(nextWeek());
+    h += wPara((sq.length ? sq.length + " squad, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
+    h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
+  } else h += wPara("Not planned yet.", {});
+  h += wPara("From Longer Closer Lower, " + fmtDate(today()) + ".", { sz:16, before:240 });
+  return h;
+}
+function shareOrDownload(name, bytes, type){
+  var blob = new Blob([bytes], { type:type });
+  try{
+    if(typeof File !== "undefined" && navigator.canShare){
+      var file = new File([blob], name, { type:type });
+      if(navigator.canShare({ files:[file] })){
+        navigator.share({ files:[file], title:name }).catch(function(){});
+        return "shared";
+      }
+    }
+  }catch(e){}
+  try{
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    return "downloaded";
+  }catch(e){ return null; }
+}
+function downloadWeekDoc(){
+  var p = playerObj(), nm = ((p && p.name) || "player").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  var bytes = docxFrom(weekDocBody());
+  var how = shareOrDownload("weekly-review-" + nm + "-" + weekOf() + ".docx", bytes,
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  setStatus(how ? "Your weekly review is ready as a Word file." : "The Word file could not be made in this browser.");
+  return bytes;
+}
+
 /* ---------- the bell: kudos, records and what is new ----------
    None of this is a phone notification. It is the Strava feed: every session
    gets its kudos, anything significant gets said once, and a new session, test
@@ -13465,6 +13612,7 @@ function sessResult(s){
   if(s.kind === "gym") return (s.total || 0) + " of " + (s.max || 0) + " sets";
   var a = area(s.drillId || s.testId || s.areaId);
   if(s.total == null || s.sgUnknown) return "";
+  if(a && a.shape === "sg18") return sq18Fmt(s.total) + " strokes gained";
   if(a && isSG(a)) return fmtSG(s.total) + " strokes";
   return s.max ? s.total + " of " + s.max : String(s.total);
 }
@@ -14549,6 +14697,9 @@ function renderSettings(mode){
     '</div>';
 
   if(!rev) html += '<div class="setgrp">' + remindBlock() + '</div>';
+  if(rev) html += '<div class="setgrp"><div class="wkgh"><h2>Send it on</h2></div>' +
+    '<p class="note">The week as a Word file: every session and score, the squad card, the hours and the hours still to go for DiSE, and next week\u2019s plan. Ready to email or upload.</p>' +
+    '<button type="button" class="setgo" id="revDoc">Download as a Word file</button></div>';
   host.innerHTML = html;
 
   host.querySelectorAll("[data-wk]").forEach(function(b){
@@ -14564,6 +14715,7 @@ function renderSettings(mode){
   $("setPause").onchange = function(){ setWeekPaused(wk, this.checked); redraw(); paintBell(); };
   if($("setSeeWeek")) $("setSeeWeek").onclick = function(){ renderWeek(); show("week"); };
   if($("revLog")) $("revLog").onclick = function(){ openLogHours(); };
+  if($("revDoc")) $("revDoc").onclick = function(){ downloadWeekDoc(); };
   if($("revWeek")) $("revWeek").onclick = function(){ renderWeek(); show("week"); };
   if($("setConfirm")) $("setConfirm").onclick = function(){
     var rr = weekRec(wk, true); rr.set = true; weekStamp(rr); weekSave(); redraw(); paintBell();
