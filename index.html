@@ -2014,6 +2014,12 @@
     background:var(--surface); color:var(--ink-2)}
   .cfgap{width:28px; flex:none}
   .cflist li b small{display:block; font-weight:500; font-size:11.5px; color:var(--muted)}
+  .cfocus .cflist li{flex-wrap:wrap; row-gap:6px}
+  .cfocus .cflist li > input{flex:1 1 100%; width:auto; order:9}
+  .cfn{display:flex; align-items:center; gap:4px; flex:none}
+  .cfn > span{display:flex; flex-direction:column; align-items:center; min-width:42px; font-size:10.5px; color:var(--muted); line-height:1.1}
+  .cfn > span b{font-size:16px; color:var(--ink); font-weight:800}
+  .cfn button:disabled{opacity:.35}
   .setgrp .cfocus{margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
   .cfadd{display:flex; gap:8px}
   .cfadd select{flex:1; min-width:0; font:inherit; font-size:13px; padding:6px 8px; border:1px solid var(--line-strong);
@@ -13754,8 +13760,8 @@ function weekDocBody(){
   h += wPara("Next week, " + weekRange(nextWeek()), { b:true, sz:26, before:200 });
   if(nr){
     var sq = squadFor(nextWeek()), cq = coachFor(nextWeek());
-    h += wPara((sq.length ? sq.length + " squad, " : "") + (cq.length ? cq.length + " coach, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
-    h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(cq.map(function(c){ return coachView(c).nm + " (coach)"; })).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
+    h += wPara((sq.length ? sq.length + " squad, " : "") + (cq.length ? coachSlots(cq) + " coach, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
+    h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(cq.map(function(c){ return coachName(c) + " (coach)"; })).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
   } else h += wPara("Not planned yet.", {});
   h += wPara("From Longer Closer Lower, " + fmtDate(today()) + ".", { sz:16, before:240 });
   return h;
@@ -14216,6 +14222,11 @@ function coachOk(c){
   if(c.k === "drill") return !!drillRef(c.id);
   return false;
 }
+/* how many times a week: speed sticks twice is one entry with n:2 */
+var COACH_MAXN = 7;
+function coachN(c){ return Math.max(1, Math.min(COACH_MAXN, Math.round(+c.n || 1))); }
+function coachSlots(list){ return list.reduce(function(a, c){ return a + coachN(c); }, 0); }
+function coachName(c){ var n = coachN(c); return coachView(c).nm + (n > 1 ? " \u00d7" + n : ""); }
 function coachIds(k, p){ return coachList(p).filter(function(c){ return c.k === k; }).map(function(c){ return String(c.id); }); }
 function coachMatch(c, s){
   var k = sessKind(s); if(!k) return false;
@@ -14537,12 +14548,15 @@ function weekState(wk, make){
   var squadExtra = ss.filter(function(x){ return !used[x.id] && sessKind(x) === "squad"; });
   squadExtra.forEach(function(x){ used[x.id] = 1; });
   /* the coach's: required too, matched next, never swapped */
-  var coach = coachFor(wk).map(function(c){
-    var done = null;
-    for(var j = 0; j < ss.length; j++){
-      if(!used[ss[j].id] && coachMatch(c, ss[j])){ used[ss[j].id] = 1; done = ss[j]; break; }
+  var coach = [];
+  coachFor(wk).forEach(function(c){
+    for(var i = 0, n = coachN(c); i < n; i++){
+      var done = null;
+      for(var j = 0; j < ss.length; j++){
+        if(!used[ss[j].id] && coachMatch(c, ss[j])){ used[ss[j].id] = 1; done = ss[j]; break; }
+      }
+      coach.push({ c:c, done:done, i:i, of:n });
     }
-    return { c:c, done:done };
   });
   var rows = (r ? r.items : []).map(function(it, i){ return { it:it, i:i, done:null }; });
   rows.forEach(function(x){
@@ -14788,6 +14802,7 @@ function renderWeek(){
     if(st.coach.length) html += '<div class="wkoh wkcoachh">Coach</div>';
     st.coach.forEach(function(q, qi){
       var v = coachView(q.c);
+      if(q.of > 1) v.sub += " \u00b7 " + (q.i + 1) + " of " + q.of;
       if(q.done){ html += doneRow(v, q.done, null, false); return; }
       html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
         '<button type="button" class="wkgo" data-coach="' + qi + '"><span class="wkic">' + v.ic(22) + '</span>' +
@@ -14977,9 +14992,9 @@ function renderSettings(mode){
     '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_squad">' + sqw.length + '</b><span class="setlock"></span></span></div>';
   var cow = coachFor(wk);
   html += '<div class="bwrow setrow setsquad"><span><b>Coach</b><small>' +
-    (cow.length ? cow.map(function(c){ return coachView(c).nm.replace(/&(?!amp;)/g, "&amp;"); }).join(", ") + ' \u00b7 set by your coach, every week'
+    (cow.length ? cow.map(function(c){ return coachName(c).replace(/&(?!amp;)/g, "&amp;"); }).join(", ") + ' \u00b7 set by your coach, every week'
                 : 'Set by your coach. Nothing set at the moment.') + '</small></span>' +
-    '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_coach">' + cow.length + '</b><span class="setlock"></span></span></div>';
+    '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_coach">' + coachSlots(cow) + '</b><span class="setlock"></span></span></div>';
   WEEK_KINDS.forEach(function(k){
     var v = itemsOf(r, k).length;
     html += '<div class="bwrow setrow"><span><b>' + WEEK_WORD[k].replace("&", "&amp;") + '</b>' +
@@ -14991,7 +15006,7 @@ function renderSettings(mode){
       '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= weekMax(k) ? " disabled" : "") + '>+</button></span></div>';
   });
   var list = sqw.map(function(q){ return testById(q.id).name + " (squad)"; })
-    .concat(cow.map(function(c){ return coachView(c).nm.replace(/&(?!amp;)/g, "&amp;") + " (coach)"; }))
+    .concat(cow.map(function(c){ return coachName(c).replace(/&(?!amp;)/g, "&amp;") + " (coach)"; }))
     .concat(r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }));
   var moving = which === "next" ? weekState(weekOf()).carry.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }) : [];
   html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") +
@@ -15078,7 +15093,8 @@ function weekReview(){
   var bp = weekByPillar(wk);
   var left = [];
   st.squad.forEach(function(q){ if(!q.done) left.push(testById(q.id).name); });
-  st.coach.forEach(function(q){ if(!q.done) left.push(coachView(q.c).nm); });
+  var cl = {}; st.coach.forEach(function(q){ if(!q.done){ var k = coachView(q.c).nm; if(!cl[k]) left.push(k); cl[k] = (cl[k] || 0) + 1; } });
+  left = left.map(function(k){ return cl[k] > 1 ? k + " \u00d7" + cl[k] : k; });
   st.rows.forEach(function(x){ if(!x.done) left.push(weekItemView(x.it).nm); });
   var mins = { practice:0, tech:0, play:0 };
   mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
@@ -15948,14 +15964,25 @@ function coachSetBox(p){
     box.innerHTML = '<p class="cnote"><em>Coach</em>Your own compulsory sessions. Every week from the week you add one, on top of her numbers. Her week is not done until they are.</p>' +
       (list.length ? '<ul class="cflist">' + list.map(function(c, i){
         var v = asPlayer(p, function(){ return coachView(c); });
+        var n = coachN(c);
         return '<li><b>' + esc(v.nm) + (c.from ? '<small>since ' + esc(fmtDate(c.from)) + '</small>' : '') + '</b>' +
-          '<input data-why="' + i + '" value="' + String(c.why || "").replace(/"/g, "&quot;") + '" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why">' +
-          '<button type="button" data-del="' + i + '" aria-label="Remove">×</button></li>';
+          '<span class="cfn"><button type="button" data-dn="' + i + '" aria-label="Fewer a week"' + (n <= 1 ? ' disabled' : '') + '>\u2212</button>' +
+            '<span><b class="num">' + n + '</b>a week</span>' +
+            '<button type="button" data-upn="' + i + '" aria-label="More a week"' + (n >= COACH_MAXN ? ' disabled' : '') + '>+</button></span>' +
+          '<button type="button" data-del="' + i + '" aria-label="Remove">\u00d7</button>' +
+          '<input data-why="' + i + '" value="' + String(c.why || "").replace(/"/g, "&quot;") + '" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why"></li>';
       }).join("") + '</ul>' : '<p class="cnote">None set.</p>') +
       '<div class="cfadd"><select aria-label="Add a coach session">' + opts + '</select><button type="button" data-add="1">Add</button></div>';
     box.querySelectorAll("[data-why]").forEach(function(inp){
       inp.onchange = function(){ var l = cur(); var i = +inp.getAttribute("data-why");
         l[i] = Object.assign({}, l[i], { why:inp.value.trim() }); save(l); };
+    });
+    box.querySelectorAll("[data-dn],[data-upn]").forEach(function(b){
+      b.onclick = function(){
+        var up = b.hasAttribute("data-upn"), i = +b.getAttribute(up ? "data-upn" : "data-dn");
+        var l = cur(), n = Math.max(1, Math.min(COACH_MAXN, coachN(l[i]) + (up ? 1 : -1)));
+        l[i] = Object.assign({}, l[i], { n:n }); save(l);
+      };
     });
     box.querySelectorAll("[data-del]").forEach(function(b){
       b.onclick = function(){ var l = cur(); l.splice(+b.getAttribute("data-del"), 1); save(l); };
@@ -15977,7 +16004,7 @@ function coachSetBox(p){
    This week; the choosing is done here. */
 function coachProgLine(p){
   var el = document.createElement("p"); el.className = "cnote";
-  var co = asPlayer(p, function(){ return coachList(p).map(function(c){ return coachView(c).nm; }); });
+  var co = asPlayer(p, function(){ return coachList(p).map(function(c){ return coachName(c); }); });
   el.innerHTML = '<em>Programme</em>';
   var sq = (p.squad || []).filter(function(x){ return x && testById(x.id); }).map(function(x){ return testById(x.id).name; });
   el.appendChild(document.createTextNode((sq.length ? "Squad: " + sq.join(", ") + " \u00b7 " : "") + (co.length ? "Coach: " + co.join(", ") + " \u00b7 " : "") + scProg(p).nm));
