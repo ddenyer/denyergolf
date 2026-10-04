@@ -268,6 +268,14 @@
   .revrows b{display:block; font-size:18px; font-weight:800}
   .revrows b small{font-size:12px; font-weight:600; color:var(--muted)}
   .revrows span{display:block; font-size:10.5px; color:var(--muted); margin-top:2px}
+  .revtab{width:100%; border-collapse:collapse; margin:10px 0 4px; font-size:13.5px}
+  .revtab th{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:600; text-align:right; padding:4px 0 6px 8px}
+  .revtab th:first-child, .revtab td:first-child{text-align:left; padding-left:0}
+  .revtab td{padding:7px 0 7px 8px; border-top:1px solid var(--line); text-align:right; white-space:nowrap}
+  .revtab td:first-child{white-space:normal}
+  .revtab tr.gap td{color:var(--muted)}
+  .revtab tr.revtot td{font-weight:800; border-top:1.5px solid var(--line-strong)}
+  .revtab tr.sc td{color:var(--muted); font-size:12.5px}
   .revacts{display:flex; flex-direction:column; gap:8px}
   .revacts #revWeek{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:10px;
     padding:10px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
@@ -343,6 +351,7 @@
   .wkopt{border:1px solid var(--line); border-radius:12px; background:var(--surface)}
   .wkopt.cur{opacity:.55}
   .wkoh{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:10px 0 0}
+  .wkoh.wkcoachh{margin:16px 0 0}
   .wkrmall{width:100%; margin-top:14px; border:1px solid var(--line-strong); background:var(--surface); color:var(--accent);
     border-radius:10px; padding:11px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   /* ---------- settings ---------- */
@@ -2124,14 +2133,14 @@
         <button id="resumeDrop" class="ghost">Discard</button>
       </span>
     </div>
-    <div class="tilehd"><h2>The five areas</h2><span id="tileSort">Least played first</span></div>
+    <div class="tilehd"><h2>England Golf Performance Pillars</h2><span id="tileSort">Least played first</span></div>
     <div class="tilegrid" id="areaList"></div>
     <div id="homeGoals" class="homeseason"></div>
   </section>
 
   <!-- SESSION -->
   <section id="viewSession" hidden>
-    <button class="backbtn" id="sessionBack">← All areas</button>
+    <button class="backbtn" id="sessionBack">← All pillars</button>
     <div class="shead">
       <div>
         <div class="eyebrow" id="sessArea">Area</div>
@@ -2154,7 +2163,7 @@
 
   <!-- GYM -->
   <section id="viewGym" hidden>
-    <button class="backbtn" id="gymBack">← All areas</button>
+    <button class="backbtn" id="gymBack">← All pillars</button>
     <div class="shead">
       <div>
         <div class="eyebrow">Strength &amp; conditioning</div>
@@ -2248,7 +2257,7 @@
 
   <section id="viewHistory" hidden>
     <h1>Progress</h1>
-    <p class="lede">What the practice says about the goals, where the misses lean, and how each area is moving.</p>
+    <p class="lede">What the practice says about the goals, where the misses lean, and how each pillar is moving.</p>
 
     <div id="diseCard"></div>
     <div id="goalProg"></div>
@@ -6029,8 +6038,8 @@ function show(view){
   state.view = view;
   /* started from This week: Back goes back there, until she leaves the session */
   if(view !== "session" && view !== "gym") state.fromWeek = false;
-  if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All areas";
-  if($("gymBack")) $("gymBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All areas";
+  if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All pillars";
+  if($("gymBack")) $("gymBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All pillars";
   /* Leaving the session screen stops the matrix clock. It is rebuilt from the
      stored start time on the way back in, so nothing is lost by stopping it,
      and an interval left running on a screen nobody is looking at is how a
@@ -6833,8 +6842,8 @@ function testBox(a){
   var when = document.createElement("p"); when.className = "note tnote";
   function paintWhen(){
     var plan2 = testPlan(a.id);
-    if(!avail.length){ when.textContent = "Nothing in the library for this area yet."; return; }
-    if(!plan2){ when.textContent = "No test set for this area."; return; }
+    if(!avail.length){ when.textContent = "Nothing in the library for this pillar yet."; return; }
+    if(!plan2){ when.textContent = "No test set for this pillar."; return; }
     var due = testDue(a.id), n = sinceLastTest(a.id);
     when.textContent = due
       ? "Due now: " + n + " sessions since the last one."
@@ -7671,7 +7680,7 @@ function openSession(areaId, resume){
   paintTick();
   $("sessArea").textContent = a.isDrill ? "Quick drill"
                             : a.isTest ? "Test"
-                            : (a.retired ? "Earlier format" : "Area "+areaNo(a));
+                            : (a.retired ? "Earlier format" : "Pillar "+areaNo(a));
   $("sessName").textContent = a.name;
   $("sessDate").value = state.draft.date;
   renderSessSeg(areaId);
@@ -8038,7 +8047,7 @@ function buildSessionCards(a, last){
 
   cards.forEach(function(c){ host.appendChild(c); });
   fillIntro(a);
-  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this area? Edit it here and it comes with you."});
+  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this pillar? Edit it here and it comes with you."});
   deckInit(cards, "sessProg");
 }
 function monitorNote(){
@@ -9435,7 +9444,7 @@ function buildSessionList(a, last){
   var ce = document.createElement("div"); ce.id = "sessChecksEnd"; ce.style.marginTop = "16px";
   host.appendChild(ce);
   fillIntro(a);
-  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this area? Edit it here and it comes with you."});
+  renderChecks("sessChecksEnd", a.id, {prompt:"Anything to carry into the next session in this pillar? Edit it here and it comes with you."});
   state.deck = null;
   $("sessProg").innerHTML = "";
   updateNav();
@@ -12369,7 +12378,7 @@ function renderConditions(){
       barBlock("Rain", groupStats(pool,"rain",pct), "golf","rain", overall, ["dry","showers","wet"]) +
       barBlock("Off grass or mat", groupStats(pool,"surface",pct), "golf","surface", overall, ["grass","mat"]));
     host.insertAdjacentHTML("beforeend",
-      '<p class="note">Bars are the average session score as a percentage of that area\'s maximum, so the areas are comparable. The vertical mark is the overall average across every outdoor session in this filter, currently '+Math.round(overall)+'%.</p>');
+      '<p class="note">Bars are the average session score as a percentage of that pillar\'s maximum, so the pillars are comparable. The vertical mark is the overall average across every outdoor session in this filter, currently '+Math.round(overall)+'%.</p>');
   }
 
   // putting by green speed
@@ -12856,7 +12865,7 @@ function renderGoalProgress(){
 
   if(!rows.length && sp.length < 2){
     html += '<p class="note">Nothing scored yet. Numbers appear from the first session, and trends once there are ' +
-            MIN_SESSIONS + ' in an area.</p>';
+            MIN_SESSIONS + ' in a pillar.</p>';
   }
 
   rows.forEach(function(r){
@@ -12960,7 +12969,7 @@ function renderStrengths(){
           pairs.push(sides[i].a.name + ' and ' + sides[j].a.name + ', both ' + sides[i].dir);
     if(pairs.length){
       html += '<p class="note"><b>Worth joining up:</b> ' + pairs.join('; ') +
-              '. A lean that shows in two areas is more likely to be one cause than two.</p>';
+              '. A lean that shows in two pillars is more likely to be one cause than two.</p>';
     }
   }
   host.innerHTML = html;
@@ -13201,7 +13210,7 @@ function openPast(s){
   var who = (state.players.filter(function(p){ return p.id===s.playerId; })[0] || {}).name || "";
 
   $("pastKind").textContent = isGym ? "Strength & conditioning"
-    : (area(s.areaId) ? (area(s.areaId).retired ? "Earlier format" : "Area " + areaNo(area(s.areaId))) : "Practice");
+    : (area(s.areaId) ? (area(s.areaId).retired ? "Earlier format" : "Pillar " + areaNo(area(s.areaId))) : "Practice");
   $("pastName").textContent = name;
   $("pastWhen").textContent = fmtDate(s.date) + (who ? " \u00b7 " + who : "");
 
@@ -13464,10 +13473,19 @@ function daysSinceType(typeId){
    Every finished session she logs here counts, at an estimate of how long that
    kind of session takes (a part-done one at its share), and play and coaching,
    which never come through a scored session, are logged in hours on their own.
-   S&C is shown beside it but not counted: the 200 hours are golf. */
+   S&C counts too (David, 4 October): DiSE has its own unit on physical
+   capability. Session A or B 45 minutes, speed sticks and the band 15. */
 var DISE_TARGET = 200, DISE_STEP = 25;
 var LOG_PLAY = [{ id:"18", nm:"18 holes", h:4 }, { id:"9", nm:"9 holes", h:2 }];
 var LOG_TECH = [0.5, 1, 1.5, 2, 3];
+/* How long each kind of session takes, from its own plan, warm-up included,
+   then rounded up to the next quarter hour: setting up, walking between
+   stations and picking up balls all take time the plan does not count.
+   Reviewed 4 October with David. */
+var MINS_MAIN = { 10:55, 11:60, 2:60, 3:55, 4:40, "p-approach-short":55, "p-putt-lag":40 };
+var MINS_TEST = { "t-tee-speed":25, "t-approach-fade":30, "t-approach-depth":30, "t-wedge-number":30,
+                  "t-putt-lag":30, "t-hundred":60, "t-putt-sg18":60, "t-short-p9":45 };
+function quarterUp(m){ return Math.max(15, Math.ceil(m / 15) * 15); }
 function sessMins(s){
   if(!s || s.status === "live" || s.sample) return 0;
   if(s.kind === "log") return Math.round((+s.hours || 0) * 60);
@@ -13478,11 +13496,14 @@ function sessMins(s){
   } else if(s.kind === "drill"){
     var d = drillById(s.drillId); base = (d && d.mins) || 20;
   } else if(s.kind === "test"){
-    var t = testById(s.testId); base = t && t.shape === "sg18" ? 60 : t && t.shape === "p9" ? 45 : 45;   /* the squad putting card takes an hour */
+    var t = testById(s.testId);
+    /* the Watson matrix has its own clock: the time it actually took, plus the warm-up */
+    if(t && t.shape === "gauntlet" && s.mx && +s.mx.end > 0) base = Math.min(+s.mx.end, gtLimit(t)) / 60000 + 10;
+    else base = MINS_TEST[s.testId] || 45;
   } else if(s.kind === "practice"){
-    base = 60;
+    base = MINS_MAIN[s.areaId] || MINS_MAIN[typeOf(s.areaId)] || 60;
   } else return 0;
-  return Math.round(base * f);
+  return Math.round(quarterUp(base) * f);
 }
 function hoursKind(s){
   if(s.kind === "log") return s.logType === "play" ? "play" : s.logType === "prac" ? "practice" : "tech";
@@ -13493,10 +13514,10 @@ function hoursKind(s){
 function diseHours(){
   var by = { practice:0, tech:0, play:0, sc:0 };
   mine().forEach(function(s){ var k = hoursKind(s); if(k) by[k] += sessMins(s) / 60; });
-  var total = by.practice + by.tech + by.play;
+  var total = by.practice + by.tech + by.play + by.sc;
   /* the pace: the last four weeks, and when that gets her to 200 */
   var cut = addDays(today(), -28), recent = 0;
-  mine().forEach(function(s){ var k = hoursKind(s); if(k && k !== "sc" && s.date >= cut) recent += sessMins(s) / 60; });
+  mine().forEach(function(s){ var k = hoursKind(s); if(k && s.date >= cut) recent += sessMins(s) / 60; });
   var perWeek = recent / 4, eta = null;
   if(total < DISE_TARGET && perWeek > 0.25) eta = addDays(today(), Math.ceil((DISE_TARGET - total) / perWeek * 7));
   return { by:by, total:total, perWeek:perWeek, eta:eta };
@@ -13507,7 +13528,7 @@ function renderDise(){
   var host = $("diseCard"); if(!host) return;
   var h = diseHours(), pc = Math.min(100, h.total / DISE_TARGET * 100);
   host.innerHTML =
-    '<div class="panel disepanel"><div class="wkgh"><h2>DiSE · practice and play</h2><span>' +
+    '<div class="panel disepanel"><div class="wkgh"><h2>DiSE hours</h2><span>' +
       (h.total >= DISE_TARGET ? "done" : hrs(DISE_TARGET - h.total) + " h to go") + '</span></div>' +
     '<div class="disebig"><b class="num">' + hrs(h.total) + '</b><span>of ' + DISE_TARGET + ' hours</span></div>' +
     '<div class="disebar"><i style="width:' + pc.toFixed(1) + '%"></i>' +
@@ -13516,17 +13537,17 @@ function renderDise(){
       '<div><b class="num">' + hrs(h.by.practice) + '</b><span>practice</span></div>' +
       '<div><b class="num">' + hrs(h.by.tech) + '</b><span>technique<br>and coaching</span></div>' +
       '<div><b class="num">' + hrs(h.by.play) + '</b><span>play</span></div>' +
-      '<div class="off"><b class="num">' + hrs(h.by.sc) + '</b><span>S&amp;C<br>not counted</span></div>' +
+      '<div><b class="num">' + hrs(h.by.sc) + '</b><span>S&amp;C</span></div>' +
     '</div>' +
     '<p class="note">' + (h.perWeek ? hrs(h.perWeek) + ' hours a week over the last four weeks' +
       (h.eta ? ', which gets you to ' + DISE_TARGET + ' by ' + longDate(h.eta) + '.' : '.') : 'Nothing in the last four weeks yet.') +
-      ' Sessions count at an estimate of how long they take: a main session an hour, the squad putting challenge an hour, other tests 45 minutes, a quick drill its own length.</p>' +
+      ' Sessions count at how long each one takes, warm-up included, to the next quarter hour: most main sessions an hour, putting 45 minutes, most tests half an hour, the squad putting card an hour, the Watson matrix the time on its clock, S&amp;C 45 minutes, speed sticks and the band 15.</p>' +
     '<button type="button" class="setgo" id="diseLog">Log play, coaching or practice</button></div>';
   $("diseLog").onclick = function(){ openLogHours(); };
 }
 /* the bell: every 25 hours, said once, for a fortnight */
 function diseFeed(){
-  var list = mine().filter(function(s){ var k = hoursKind(s); return k && k !== "sc"; })
+  var list = mine().filter(function(s){ return !!hoursKind(s); })
     .sort(function(a, b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   var out = [], run = 0, next = DISE_STEP;
   list.forEach(function(s){
@@ -13676,15 +13697,15 @@ function weekDocBody(){
   var p = playerObj(), wk = weekOf(), end = addDays(wk, 6), st = weekState(wk), nm = (p && p.name) || "Player";
   var h = wPara("Weekly review", { b:true, sz:36, after:40 }) +
           wPara(nm + ", " + weekRange(wk) + " " + wk.slice(0, 4), { sz:24, after:200 });
-  /* the summary */
-  var groups = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var bp = weekByPillar(wk);
   var mins = { practice:0, tech:0, play:0 };
   mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
   var weekH = (mins.practice + mins.tech + mins.play) / 60, dh = diseHours();
-  h += wPara("Summary", { b:true, sz:26, before:120 });
-  h += wTable([["", "Done", "Planned"]].concat(groups.map(function(k){ return [k === "sc" ? "S&C" : WEEK_WORD[k], String(st.per[k].got), String(st.per[k].want)]; })), [3600, 1600, 1600]);
+  h += wPara("England Golf Performance Pillars", { b:true, sz:26, before:120 });
+  h += wTable([["Pillar", "Sessions", "Time"]]
+    .concat(bp.pillars.concat(bp.extra).map(function(r){ return [r.full || r.nm, r.n ? String(r.n) : "\u2013", fmtMins(r.mins)]; }))
+    .concat([["DiSE this week", String(bp.total.n), fmtMins(bp.total.mins)]]), [5400, 1500, 1800]);
   h += wPara(st.paused ? "This week was paused." : st.met ? "Week done: everything planned was completed." : "Week not complete.", {});
-  h += wPara("DiSE hours this week: " + hrs(weekH) + " (practice " + hrs(mins.practice / 60) + ", technique and coaching " + hrs(mins.tech / 60) + ", play " + hrs(mins.play / 60) + ").", {});
   h += wPara("DiSE hours in total: " + hrs(dh.total) + " of " + DISE_TARGET +
     (dh.total >= DISE_TARGET ? ". Target reached." : ", " + hrs(DISE_TARGET - dh.total) + " hours to go.") , {});
   if(dh.total < DISE_TARGET) h += wPara(dh.perWeek
@@ -13698,7 +13719,7 @@ function weekDocBody(){
   if(ss.length){
     h += wTable([["Date", "Session", "Result", "Time", "Notes"]].concat(ss.map(function(x){
       var res = x.kind === "log" ? "" : (sessResult(x) || "") + (x.partial != null ? " (part done)" : "");
-      return [fmtDate(x.date), sessTitle(x), res, hrs(sessMins(x) / 60) + " h", x.notes || ""];
+      return [fmtDate(x.date), sessTitle(x), res, fmtMins(sessMins(x)), x.notes || ""];
     })), [1000, 3000, 1900, 800, 2900]);
   } else h += wPara("Nothing logged this week.", { after:200 });
   /* the squad card, hole by hole */
@@ -14457,7 +14478,7 @@ function drillCandidates(){
     var sk = TILE[w.id] || {};
     drillChoices().map(drillRef).filter(function(d){ return d && d.area === w.id && !d.gym; })
       .sort(function(a, b){ var x = drillLast(a.id) || "0000", y = drillLast(b.id) || "0000"; return x < y ? -1 : x > y ? 1 : 0; })
-      .forEach(function(d){ add(d.id, (sk.nm || "This area") + " · placing " + ordinal(Math.round(w.place)) + " of 100 lately", "weak"); });
+      .forEach(function(d){ add(d.id, (sk.nm || "This pillar") + " · placing " + ordinal(Math.round(w.place)) + " of 100 lately", "weak"); });
   });
   drillChoices().slice().sort(function(a, b){ var x = drillLast(a) || "0000", y = drillLast(b) || "0000"; return x < y ? -1 : x > y ? 1 : 0; })
     .forEach(function(id){ add(id, drillLast(id) ? "Waited longest" : "Not tried yet", "rest"); });
@@ -14745,14 +14766,16 @@ function renderWeek(){
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
   if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
-  if(st.squad.length || st.squadExtra.length){
-    var sp = st.per.squad, spips = "";
+  /* The squad's tests and the coach's own sessions sit together under Squad:
+     both set for her, both every week, neither hers to change. */
+  if(st.squad.length || st.squadExtra.length || st.coach.length){
+    var sp = { want:st.per.squad.want + st.per.coach.want, got:st.per.squad.got + st.per.coach.got }, spips = "";
     for(var si = 0; si < Math.max(sp.want, sp.got); si++) spips += '<i class="' + (si < sp.got ? "on" : "") + '"></i>';
     html += '<div class="wkgrp wksquad"><div class="wkgh"><h2>Squad</h2><span class="num">' + sp.got + ' of ' + sp.want + '</span></div>' +
             '<div class="wkpips">' + spips + '</div>';
     st.squad.forEach(function(q){
       var t = testById(q.id), sk = TILE[t.area] || TILE[10];
-      var v = { nm:t.name, sub:"Set by your squad coach \u00b7 every week", tint:sk.tint, ic:TICON[sk.ic] };
+      var v = { nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic] };
       if(q.done){ html += doneRow(v, q.done, null, false); return; }
       html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
         '<button type="button" class="wkgo" data-squad="' + q.id + '"><span class="wkic">' + v.ic(22) + '</span>' +
@@ -14762,13 +14785,7 @@ function renderWeek(){
       var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
       html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }, x, null, true);
     });
-    html += '</div>';
-  }
-  if(st.coach.length){
-    var cp = st.per.coach, cpips = "";
-    for(var ci = 0; ci < cp.want; ci++) cpips += '<i class="' + (ci < cp.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp wksquad wkcoach"><div class="wkgh"><h2>Coach</h2><span class="num">' + cp.got + ' of ' + cp.want + '</span></div>' +
-            '<div class="wkpips">' + cpips + '</div>';
+    if(st.coach.length) html += '<div class="wkoh wkcoachh">Coach</div>';
     st.coach.forEach(function(q, qi){
       var v = coachView(q.c);
       if(q.done){ html += doneRow(v, q.done, null, false); return; }
@@ -15015,12 +15032,50 @@ function renderSettings(mode){
 }
 function renderWeekReview(){ renderSettings("review"); }
 function openReview(){ renderWeekReview(); show("review"); }
+/* The week by England Golf Performance Pillar: how many sessions in each and
+   how long they took, then what was logged in hours (play, coaching, other
+   practice), S&C, and the DiSE total. Every pillar is
+   listed even when empty, so a pillar left alone all week shows as a gap. */
+function pillarOf(s){
+  var id = null;
+  if(s.kind === "practice") id = typeOf(s.areaId);
+  else if(s.kind === "test"){ var t = testById(s.testId); id = t ? t.area : null; }
+  else if(s.kind === "drill"){ var d = drillById(s.drillId); id = d ? d.area : null; }
+  return liveAreas().some(function(a){ return a.id === id; }) ? id : null;
+}
+function fmtMins(m){
+  m = Math.round(m || 0);
+  if(!m) return "–";
+  if(m < 60) return m + " min";
+  var h = Math.floor(m / 60), r = m % 60;
+  return h + " h" + (r ? " " + r + " min" : "");
+}
+function weekByPillar(wk){
+  var end = addDays(wk, 6);
+  var rows = liveAreas().slice().sort(function(a, b){ return (a.no || 99) - (b.no || 99); }).map(function(a){
+    return { id:a.id, nm:"Pillar " + areaNo(a) + " · " + ((TILE[a.id] || {}).nm || a.name), full:"Pillar " + areaNo(a) + ": " + a.name, n:0, mins:0 };
+  });
+  var by = {}; rows.forEach(function(r){ by[r.id] = r; });
+  var other = { play:{ nm:"Play", n:0, mins:0 }, tech:{ nm:"Technique and coaching", n:0, mins:0 },
+                prac:{ nm:"Other practice", n:0, mins:0 } }, sc = { nm:"S&C", n:0, mins:0 };
+  mine().forEach(function(s){
+    if(s.date < wk || s.date > end || s.sample || s.status === "live") return;
+    var m = sessMins(s), pid = pillarOf(s), r = null;
+    if(pid != null) r = by[pid];
+    else if(s.kind === "log") r = other[s.logType === "play" ? "play" : s.logType === "prac" ? "prac" : "tech"];
+    else if(s.kind === "gym" && m) r = sc;
+    if(r){ r.n++; r.mins += m; }
+  });
+  var extra = [sc].concat(["play", "tech", "prac"].map(function(k){ return other[k]; })).filter(function(r){ return r.n; });
+  var tot = rows.concat(extra).reduce(function(a, r){ return { n:a.n + r.n, mins:a.mins + r.mins }; }, { n:0, mins:0 });
+  return { pillars:rows, extra:extra, total:tot, sc:sc };
+}
 /* Before she sets next week, a look back at this one: what got done, what did
    not, the hours it added, and a way to log anything that happened away from
    the app, so the week she plans from is the week that actually happened. */
 function weekReview(){
   var wk = weekOf(), st = weekState(wk), end = addDays(wk, 6);
-  var groups = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var bp = weekByPillar(wk);
   var left = [];
   st.squad.forEach(function(q){ if(!q.done) left.push(testById(q.id).name); });
   st.coach.forEach(function(q){ if(!q.done) left.push(coachView(q.c).nm); });
@@ -15032,10 +15087,12 @@ function weekReview(){
   return '<div class="setgrp revgrp"><div class="wkgh"><h2>This week, before you plan the next</h2><span>' + weekRange(wk) + '</span></div>' +
     (st.paused ? '<p class="note">This week was paused.</p>'
      : st.met ? '<p class="wkdone">Week done. Everything you set yourself.</p>' : '') +
-    '<div class="revrows">' + groups.map(function(k){
-      var x = st.per[k];
-      return '<div><b class="num">' + x.got + '<small> of ' + x.want + '</small></b><span>' + esc(k === "sc" ? "S&C" : WEEK_WORD[k]) + '</span></div>';
-    }).join("") + '<div><b class="num">' + hrs(tot) + '<small> h</small></b><span>DiSE hours</span></div></div>' +
+    '<table class="revtab"><thead><tr><th>By pillar</th><th>Sessions</th><th>Time</th></tr></thead><tbody>' +
+      bp.pillars.concat(bp.extra).map(function(r){
+        return '<tr' + (r.n ? '' : ' class="gap"') + '><td>' + esc(r.nm) + '</td><td class="num">' + (r.n || "\u2013") + '</td><td class="num">' + fmtMins(r.mins) + '</td></tr>';
+      }).join("") +
+      '<tr class="revtot"><td>DiSE this week</td><td class="num">' + bp.total.n + '</td><td class="num">' + fmtMins(bp.total.mins) + '</td></tr>' +
+    '</tbody></table>' +
     (left.length && !st.met ? '<p class="note">Not done: ' + left.map(esc).join(", ") + '.</p>' : '') +
     '<p class="note">' + hrs(all) + ' of ' + DISE_TARGET + ' DiSE hours so far. Played a round, had a lesson, or practised without the app this week? Log it now so it counts.</p>' +
     '<div class="revacts"><button type="button" class="setgo" id="revLog">Log play, coaching or practice</button>' +
@@ -15934,7 +15991,7 @@ function renderProg(){
 
   var g1 = document.createElement("div"); g1.className = "setgrp";
   g1.innerHTML = '<div class="wkgh"><h2>Main sessions and tests</h2></div>' +
-    '<p class="note">The session she does in each area, and the test that comes round every so many sessions.</p>';
+    '<p class="note">The session she does in each pillar, and the test that comes round every so many sessions.</p>';
   liveAreas().forEach(function(a){
     var sk = TILE[a.id] || {};
     var hd = document.createElement("div"); hd.className = "proghd";
