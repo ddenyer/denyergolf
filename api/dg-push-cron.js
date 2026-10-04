@@ -12,11 +12,17 @@
 // which is what stops anyone else from triggering a round of messages.
 
 import { sbHeaders, timedFetch } from './dg-load.js';
-import { sendPush } from './_webpush.js';
+import { sendPush, lastPush } from './_webpush.js';
 import { vapid } from './dg-push.js';
 
 const WINDOW = 15;   // minutes, the cron interval
 const LAST = 21 * 60;
+// Sunday 8.15pm: the look back and the plan, on its own, as well as her daily one
+const SUNDAY_AT = 20 * 60 + 15;
+export function sundayDue(row, L) {
+  const sent = (row.sent && typeof row.sent === 'object') ? row.sent : {};
+  return L.dow === 6 && L.mins >= SUNDAY_AT && L.mins < SUNDAY_AT + WINDOW && sent.sun !== L.date;
+}
 const WARMUPS = new Set([11, 12, 13]);   // a warm-up is not a session
 
 // The three mat drills, in turn. A reminder that names one small thing gets done;
@@ -187,7 +193,7 @@ export function diseTotal(all) { return all.reduce((t, x) => t + sessMins(x), 0)
 
 // ---- what a session is called, for the unfinished-session push ----
 export function sessionName(x) {
-  if (x.kind === 'practice') { const a = PRACTICE_TYPE[x.area] != null ? PRACTICE_TYPE[x.area] : +x.area; return MAIN[a] || 'practice'; }
+  if (x.kind === 'practice') { const a = PRACTICE_TYPE[x.area] != null ? PRACTICE_TYPE[x.area] : +x.area; return MAIN[a] ? MAIN[a].toLowerCase() : 'practice'; }
   if (x.kind === 'test') { const t = TESTS[testOf(x)]; return t ? t[0] : 'test'; }
   if (x.kind === 'drill') return DRILLS[x.drill] || DRILL_NAMES[x.drill] || 'quick drill';
   if (x.kind === 'gym') return GYM[+x.gym] ? 'S&C ' + GYM[+x.gym] : (DRILL_NAMES['gym:' + x.gym] || 'S&C');
@@ -233,9 +239,9 @@ export function message(row, L, week, target, today, extra = {}) {
              url: '/?go=week' };
   }
   if (extra.plan) {
-    return { title: 'Set next week',
-             body: 'Log any rounds or lessons from this week first, so they count. Then how many main sessions and S&C next week?',
-             url: '/?go=settings&wk=next' };
+    return { title: 'Review your week, plan the next',
+             body: 'Look back at this week and log any rounds or lessons so they count. Then set next week.',
+             url: '/?go=review' };
   }
   if (extra.prog) {
     return { title: 'Your coach updated your programme',
@@ -298,7 +304,8 @@ export default async function handler(req, res) {
     for (const row of rows) {
       out.checked++;
       const L = localNow(row.tz || 'Europe/London');
-      if (!dueNow(row, L)) { out.skipped++; continue; }
+      const sunday = sundayDue(row, L);
+      if (!sunday && !dueNow(row, L)) { out.skipped++; continue; }
 
       const p = encodeURIComponent(row.player);
       if (!(row.player in metaCache)) {
@@ -328,12 +335,15 @@ export default async function handler(req, res) {
       const yesterday = addDays(L.date, -1);
       const live = all.filter((x) => x.status === 'live' && x.played_on === yesterday &&
                                     (next.live || []).indexOf(x.session_id) < 0)[0];
-      const planNext = L.dow === 6 && !nextSet(pl, monday);
       const paused = isPaused(pl, monday);
 
-      let msg = null;
-      if (live) { msg = message(row, L, 0, 0, 0, { live: sessionName(live) }); next.live = [live.session_id].concat(next.live || []).slice(0, 20); }
-      else if (planNext) msg = message(row, L, 0, 0, 0, { plan: true });
+      let msg = null, sentKey = { last_sent: L.date };
+      if (sunday) {
+        // the 8.15 one: sent unless next week is already set, paused or not
+        next.sun = L.date; sentKey = {};
+        if (!nextSet(pl, monday)) msg = message(row, L, 0, 0, 0, { plan: true });
+      }
+      else if (live) { msg = message(row, L, 0, 0, 0, { live: sessionName(live) }); next.live = [live.session_id].concat(next.live || []).slice(0, 20); }
       else if (stamp > next.prog) { msg = message(row, L, 0, 0, 0, { prog: progSummary(pl, monday) }); next.prog = stamp; }
       else if (diseNow > next.dise && diseNow > 0 && next.dise < 200) { msg = message(row, L, 0, 0, 0, { dise: Math.min(200, diseNow) }); next.dise = diseNow; }
       else if (!paused && counts(ss.filter((x) => x.played_on === L.date)) === 0) {
@@ -365,9 +375,13 @@ export default async function handler(req, res) {
         out.dropped++;
         continue;
       }
+      next.last = { status, reason: lastPush.reason, at: L.date };
       if (status >= 200 && status < 300) {
-        await patchSent({ last_sent: L.date });
+        await patchSent(sentKey);
         out.sent++;
+      } else {
+        await patchSent({});      // the refusal is kept on the row, for looking up
+        out.failed = (out.failed || 0) + 1;
       }
     }
     return res.status(200).json({ ok: true, ...out });

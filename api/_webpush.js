@@ -81,7 +81,12 @@ export async function sendPush(sub, data, vapid, ttl = 6 * 3600) {
     },
     body,
   });
+  // the push service's own words when it refuses, for the record (Apple sends
+  // a reason such as BadJwtToken)
+  lastPush.status = r.status;
+  lastPush.reason = r.ok ? '' : String(await r.text().catch(() => '')).slice(0, 200);
   return r.status;
 }
+export const lastPush = { status: 0, reason: '' };
 
 export { b64u, unb64u };
