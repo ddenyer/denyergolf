@@ -14090,7 +14090,7 @@ function remindBlock(){
     '<div class="bwrow"><span>When I</span><input id="rmCue" maxlength="40" placeholder="finish dinner" value="'+String(r.cue||"").replace(/"/g,"&quot;")+'" aria-label="Your cue"></div>'+
     '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>';
   return '<div class="wkgh"><h2>Reminders</h2><span>this phone</span></div>'+body+
-    '<p class="note">On a Sunday the reminder is the one that asks you to set next week.</p>';
+    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; on Sunday, set next week; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a quick drill or ten minutes on the mat.</p>';
 }
 function urlB64(s){
   var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
