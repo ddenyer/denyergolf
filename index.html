@@ -152,6 +152,10 @@
     white-space:nowrap;
   }
   nav.lookrow button svg{width:16px; height:16px; color:var(--ink)}
+  /* five pills across a phone: the words stay, the icons go, rather than the
+     icons being squeezed to nothing */
+  nav.lookrow button svg{flex:none}
+  @media (max-width:440px){ nav.lookrow button svg{display:none} nav.lookrow button{padding:7px 6px} }
   /* A tint alone was invisible in the dark, where the page tint and the card
      surface are a shade apart. The live pill carries the accent instead, which
      reads on either ground. */
@@ -228,6 +232,17 @@
   .sqpast table{width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums}
   .sqpast th, .sqpast td{text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
   .sqpast th{font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em}
+  /* ---------- the look back before planning ---------- */
+  .revgrp{border:1px solid var(--accent-fill); background:var(--surface)}
+  .revrows{display:grid; grid-template-columns:repeat(auto-fit, minmax(56px, 1fr)); gap:5px; margin:10px 0 2px}
+  .revrows div{padding:8px 3px !important}
+  .revrows div{background:var(--surface-2); border-radius:9px; padding:8px 6px; text-align:center}
+  .revrows b{display:block; font-size:18px; font-weight:800}
+  .revrows b small{font-size:12px; font-weight:600; color:var(--muted)}
+  .revrows span{display:block; font-size:10.5px; color:var(--muted); margin-top:2px}
+  .revacts{display:flex; flex-direction:column; gap:8px}
+  .revacts #revWeek{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:10px;
+    padding:10px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   /* ---------- DiSE hours ---------- */
   .disepanel .wkgh span{color:var(--muted)}
   .disebig{display:flex; align-items:baseline; gap:8px; margin:8px 0 8px}
@@ -2027,6 +2042,7 @@
       <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
       <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
       <button id="tabSettings" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.7 6.3a5.6 5.6 0 0 1-7.4 6.9l-7 7a2.1 2.1 0 0 1-3-3l7-7a5.6 5.6 0 0 1 6.9-7.4l-3.4 3.4.6 2.9 2.9.6z"></path></svg><span>Settings</span></button>
+      <button id="tabReview" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.4"></rect><path d="M9 2.8h6v3H9z"></path><path d="m8.8 13.2 2.2 2.2 4.4-4.6"></path></svg><span>Review</span></button>
     </nav></div>
 </header>
 
@@ -2250,6 +2266,13 @@
     <p class="lede">Outcome, then what has to improve to get there, then what you do in the week.</p>
     <div id="goalsBody"></div>
     <p class="note" id="buildStamp"></p>
+  </section>
+
+  <!-- REVIEW: this week, and the plan for the next -->
+  <section id="viewReview" hidden>
+    <div class="eyebrow" id="revWho"></div>
+    <h1>Review</h1>
+    <div id="revBody"></div>
   </section>
 
   <!-- SETTINGS -->
@@ -2542,7 +2565,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"DiSE hours: a running total towards 200 hours of practice and play on Progress, counting every session you have logged at an estimate of its length, plus play (18 holes 4 hours, 9 holes 2) and technique or coaching logged in hours. The bell marks every 25. Also: the squad putting challenge, compulsory when your coach switches it on" };
+var BUILD = { on:"2026-10-04", note:"Review, the new tab at the top: this week looked back on, with a button to log a round, a lesson or practice away from the app, and next week planned underneath. Always there, not only on a Sunday. DiSE hours on Progress count all of it towards 200" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -5971,6 +5994,7 @@ function show(view){
   if(view !== "session") mxStop();
   $("viewWeek").hidden = view!=="week";
   $("viewSettings").hidden = view!=="settings";
+  $("viewReview").hidden = view!=="review";
   if(view==="week") renderWeek();
   $("viewHome").hidden = view!=="home";
   $("viewSession").hidden = view!=="session";
@@ -5990,6 +6014,7 @@ function show(view){
     $("buildStamp").textContent = "Version " + BUILD.on + " \u00b7 " + BUILD.note + ".";
   $("tabWeek").setAttribute("aria-selected", view==="week"?"true":"false");
   $("tabSettings").setAttribute("aria-selected", view==="settings"?"true":"false");
+  $("tabReview").setAttribute("aria-selected", view==="review"?"true":"false");
   $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
   $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
   $("tabDrills").setAttribute("aria-selected", view==="drills"?"true":"false");
@@ -13298,7 +13323,7 @@ function sessMins(s){
   return Math.round(base * f);
 }
 function hoursKind(s){
-  if(s.kind === "log") return s.logType === "play" ? "play" : "tech";
+  if(s.kind === "log") return s.logType === "play" ? "play" : s.logType === "prac" ? "practice" : "tech";
   if(s.kind === "gym") return "sc";
   if(s.kind === "practice" || s.kind === "drill" || s.kind === "test") return "practice";
   return null;
@@ -13326,7 +13351,7 @@ function renderDise(){
     '<div class="disebar"><i style="width:' + pc.toFixed(1) + '%"></i>' +
       [1, 2, 3, 4, 5, 6, 7].map(function(m){ return '<s style="left:' + (m * DISE_STEP / DISE_TARGET * 100) + '%"></s>'; }).join("") + '</div>' +
     '<div class="disesplit">' +
-      '<div><b class="num">' + hrs(h.by.practice) + '</b><span>practice<br>in the app</span></div>' +
+      '<div><b class="num">' + hrs(h.by.practice) + '</b><span>practice</span></div>' +
       '<div><b class="num">' + hrs(h.by.tech) + '</b><span>technique<br>and coaching</span></div>' +
       '<div><b class="num">' + hrs(h.by.play) + '</b><span>play</span></div>' +
       '<div class="off"><b class="num">' + hrs(h.by.sc) + '</b><span>S&amp;C<br>not counted</span></div>' +
@@ -13334,7 +13359,7 @@ function renderDise(){
     '<p class="note">' + (h.perWeek ? hrs(h.perWeek) + ' hours a week over the last four weeks' +
       (h.eta ? ', which gets you to ' + DISE_TARGET + ' by ' + longDate(h.eta) + '.' : '.') : 'Nothing in the last four weeks yet.') +
       ' Sessions count at an estimate of how long they take: a main session an hour, a test 45 minutes, a quick drill its own length.</p>' +
-    '<button type="button" class="setgo" id="diseLog">Log play or coaching</button></div>';
+    '<button type="button" class="setgo" id="diseLog">Log play, coaching or practice</button></div>';
   $("diseLog").onclick = function(){ openLogHours(); };
 }
 /* the bell: every 25 hours, said once, for a fortnight */
@@ -13365,20 +13390,21 @@ function openLogHours(){
 }
 function drawLogHours(){
   var q = LOGQ;
-  $("wkSheetTitle").textContent = "Log play or coaching";
+  $("wkSheetTitle").textContent = "Log play, coaching or practice";
   var chips = q.type === "play"
     ? LOG_PLAY.map(function(o){ return '<button type="button" data-pick="' + o.id + '" aria-pressed="' + (q.pick === o.id) + '"><b>' + o.nm + '</b><small>' + o.h + ' hours</small></button>'; }).join("") +
       '<button type="button" data-pick="other" aria-pressed="' + (q.pick === "other") + '"><b>Other</b><small>tournament, part round</small></button>'
     : LOG_TECH.map(function(v){ return '<button type="button" data-pick="' + v + '" aria-pressed="' + (q.pick === String(v)) + '"><b>' + hrs(v) + '</b><small>' + (v === 1 ? "hour" : "hours") + '</small></button>'; }).join("") +
       '<button type="button" data-pick="other" aria-pressed="' + (q.pick === "other") + '"><b>Other</b><small>hours</small></button>';
   $("wkSheetBody").innerHTML =
-    '<p class="note">Hours towards DiSE that do not come through a scored session.</p>' +
+    '<p class="note">Hours towards DiSE that do not come through a scored session. The date can be any day.</p>' +
     '<div class="setseg"><button type="button" data-type="play" aria-pressed="' + (q.type === "play") + '"><b>Play</b><small>on the course</small></button>' +
-      '<button type="button" data-type="tech" aria-pressed="' + (q.type === "tech") + '"><b>Technique</b><small>coaching, lessons, squad</small></button></div>' +
+      '<button type="button" data-type="tech" aria-pressed="' + (q.type === "tech") + '"><b>Technique</b><small>coaching, lessons, squad</small></button>' +
+      '<button type="button" data-type="prac" aria-pressed="' + (q.type === "prac") + '"><b>Practice</b><small>not in the app</small></button></div>' +
     '<div class="logchips">' + chips + '</div>' +
     (q.pick === "other" ? '<div class="bwrow"><span>Hours</span><input id="logHours" type="number" min="0.25" max="12" step="0.25" inputmode="decimal" value="' + (q.hours || "") + '" aria-label="Hours"></div>' : '') +
     '<div class="bwrow"><span>Date</span><input id="logDate" type="date" value="' + q.date + '" aria-label="Date"></div>' +
-    '<div class="bwrow"><span>Note</span><input id="logNote" maxlength="60" placeholder="' + (q.type === "play" ? "Course, competition" : "Who with, what on") + '" value="' + String(q.note || "").replace(/"/g, "&quot;") + '" aria-label="Note"></div>' +
+    '<div class="bwrow"><span>Note</span><input id="logNote" maxlength="60" placeholder="' + (q.type === "play" ? "Course, competition" : q.type === "prac" ? "What you worked on" : "Who with, what on") + '" value="' + String(q.note || "").replace(/"/g, "&quot;") + '" aria-label="Note"></div>' +
     '<p class="note" id="logMsg"></p>' +
     '<button type="button" class="setgo" id="logSave">Log it</button>';
   var body = $("wkSheetBody");
@@ -13406,10 +13432,13 @@ function saveLogHours(){
   render();
   if(state.view === "week") renderWeek();
   if(state.view === "history") renderDise();
+  if(state.view === "settings") renderSettings();
+  if(state.view === "review") renderWeekReview();
   paintBell();
 }
 function logLabel(s){
   if(s.logType === "play") return "Play" + (s.holes ? " · " + s.holes + " holes" : "");
+  if(s.logType === "prac") return "Practice, not in the app";
   return "Technique and coaching";
 }
 
@@ -13657,7 +13686,7 @@ function openBell(){
     closeBell();
     if(g === "week") show("week");
     else if(g === "dise"){ renderProgress(); show("history"); }
-    else if(g === "plan") openSettings("next");
+    else if(g === "plan") openReview();
     else openSettings();
   };
   $("bellWrap").hidden = false;
@@ -14352,7 +14381,7 @@ function renderWeek(){
   var n = st.rec ? st.rec.n : defaultNums();
   html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
           '<button type="button" id="wkSet">Change in Settings</button>' +
-          '<button type="button" id="wkLog">Log play or coaching</button></div>';
+          '<button type="button" id="wkLog">Log play, coaching or practice</button></div>';
   host.innerHTML = html;
 
   host.onclick = function(e){
@@ -14453,19 +14482,30 @@ function openWeekChange(wk, idx){
 function closeWeekChange(){
   LOGQ = null;
   $("wkSheet").hidden = true; document.body.style.overflow = "";
-  if(state.view === "week") renderWeek(); else if(state.view === "settings") renderSettings();
+  if(state.view === "week") renderWeek(); else if(state.view === "settings") renderSettings(); else if(state.view === "review") renderWeekReview();
   paintBell();
 }
 
 /* ---- settings ---- */
 function settingsWeek(){ return state.setWeek === "next" ? nextWeek() : weekOf(); }
-function renderSettings(){
-  var host = $("setBody"); if(!host) return;
+/* Settings and Review share one builder. Review is the look back at this week
+   and the plan for the next, always to hand on its own tab; Settings has both
+   weeks' numbers, the coach's focus and the reminder. Only one of the two is
+   ever drawn at a time, so their buttons never share an id. */
+function renderSettings(mode){
+  var rev = mode === "review";
+  var host = $(rev ? "revBody" : "setBody"); if(!host) return;
+  var other = $(rev ? "setBody" : "revBody"); if(other) other.innerHTML = "";
+  var redraw = function(){ renderSettings(mode); };
   var p = playerObj();
-  $("setWho").textContent = p ? p.name : "";
-  var which = state.setWeek === "next" ? "next" : "this";
-  var wk = settingsWeek(), r = weekRec(wk, true), st = weekState(wk);
-  var html =
+  $(rev ? "revWho" : "setWho").textContent = p ? p.name : "";
+  var which = rev ? "next" : (state.setWeek === "next" ? "next" : "this");
+  var wk = which === "next" ? nextWeek() : weekOf(), r = weekRec(wk, true), st = weekState(wk);
+  var html = rev ? weekReview() : "";
+  html += rev
+    ? '<div class="setgrp"><div class="wkgh"><h2>Plan next week</h2><span>' + weekRange(nextWeek()) + '</span></div>' +
+      '<p class="note">How many of each you mean to do. You pick the numbers; the app picks the sessions.</p>'
+    :
     '<div class="setgrp"><div class="wkgh"><h2>Your week</h2></div>' +
     '<div class="setseg">' +
       '<button type="button" data-wk="this" aria-pressed="' + (which === "this") + '"><b>This week</b><small>' + weekRange(weekOf()) + '</small></button>' +
@@ -14501,32 +14541,61 @@ function renderSettings(){
       : '<button type="button" class="setgo" id="setConfirm">That’s my week</button>') +
     '</div>';
 
-  var foc = focusFor();
-  html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
+  var foc = rev ? [] : focusFor();
+  if(!rev) html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
     (foc.length ? '<ul class="setfocus">' + foc.map(function(f){
       var d = drillRef(f.id); return '<li><b>' + d.name.replace(/&(?!amp;)/g, "&amp;") + '</b>' + (f.why ? '<span>' + String(f.why).replace(/</g, "&lt;") + '</span>' : '') + '</li>';
     }).join("") + '</ul>' : '<p class="note">None set. Quick drills come from where you are placing lowest.</p>') +
     '</div>';
 
-  html += '<div class="setgrp">' + remindBlock() + '</div>';
+  if(!rev) html += '<div class="setgrp">' + remindBlock() + '</div>';
   host.innerHTML = html;
 
   host.querySelectorAll("[data-wk]").forEach(function(b){
-    b.onclick = function(){ state.setWeek = b.getAttribute("data-wk"); renderSettings(); };
+    b.onclick = function(){ state.setWeek = b.getAttribute("data-wk"); redraw(); };
   });
   host.querySelectorAll("[data-k]").forEach(function(b){
     b.onclick = function(){
       var k = b.getAttribute("data-k");
       setWeekNum(wk, k, itemsOf(weekRec(wk, true), k).length + (+b.getAttribute("data-d")));
-      renderSettings(); paintBell();
+      redraw(); paintBell();
     };
   });
-  $("setPause").onchange = function(){ setWeekPaused(wk, this.checked); renderSettings(); paintBell(); };
+  $("setPause").onchange = function(){ setWeekPaused(wk, this.checked); redraw(); paintBell(); };
   if($("setSeeWeek")) $("setSeeWeek").onclick = function(){ renderWeek(); show("week"); };
+  if($("revLog")) $("revLog").onclick = function(){ openLogHours(); };
+  if($("revWeek")) $("revWeek").onclick = function(){ renderWeek(); show("week"); };
   if($("setConfirm")) $("setConfirm").onclick = function(){
-    var rr = weekRec(wk, true); rr.set = true; weekStamp(rr); weekSave(); renderSettings(); paintBell();
+    var rr = weekRec(wk, true); rr.set = true; weekStamp(rr); weekSave(); redraw(); paintBell();
   };
-  wireRemind();
+  if(!rev) wireRemind();
+}
+function renderWeekReview(){ renderSettings("review"); }
+function openReview(){ renderWeekReview(); show("review"); }
+/* Before she sets next week, a look back at this one: what got done, what did
+   not, the hours it added, and a way to log anything that happened away from
+   the app, so the week she plans from is the week that actually happened. */
+function weekReview(){
+  var wk = weekOf(), st = weekState(wk), end = addDays(wk, 6);
+  var groups = ["squad"].concat(WEEK_KINDS).filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var left = [];
+  st.squad.forEach(function(q){ if(!q.done) left.push(testById(q.id).name); });
+  st.rows.forEach(function(x){ if(!x.done) left.push(weekItemView(x.it).nm); });
+  var mins = { practice:0, tech:0, play:0 };
+  mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
+  var tot = (mins.practice + mins.tech + mins.play) / 60, all = diseHours().total;
+  var esc = function(t){ return String(t).replace(/&(?!amp;)/g, "&amp;"); };
+  return '<div class="setgrp revgrp"><div class="wkgh"><h2>This week, before you plan the next</h2><span>' + weekRange(wk) + '</span></div>' +
+    (st.paused ? '<p class="note">This week was paused.</p>'
+     : st.met ? '<p class="wkdone">Week done. Everything you set yourself.</p>' : '') +
+    '<div class="revrows">' + groups.map(function(k){
+      var x = st.per[k];
+      return '<div><b class="num">' + x.got + '<small> of ' + x.want + '</small></b><span>' + esc(k === "sc" ? "S&C" : WEEK_WORD[k]) + '</span></div>';
+    }).join("") + '<div><b class="num">' + hrs(tot) + '<small> h</small></b><span>DiSE hours</span></div></div>' +
+    (left.length && !st.met ? '<p class="note">Not done: ' + left.map(esc).join(", ") + '.</p>' : '') +
+    '<p class="note">' + hrs(all) + ' of ' + DISE_TARGET + ' DiSE hours so far. Played a round, had a lesson, or practised without the app this week? Log it now so it counts.</p>' +
+    '<div class="revacts"><button type="button" class="setgo" id="revLog">Log play, coaching or practice</button>' +
+    '<button type="button" id="revWeek">See this week</button></div></div>';
 }
 function openSettings(which){
   if(which) state.setWeek = which;
@@ -14540,7 +14609,9 @@ function handleGo(search){
   var go = q.get("go");
   if(go === "drill" && q.get("id") && drillById(q.get("id"))) openDrill(q.get("id"));
   else if(go === "bell") openBell();
-  else if(go === "settings") openSettings(q.get("wk") === "next" ? "next" : null);
+  else if(go === "settings" && q.get("wk") === "next") openReview();
+  else if(go === "review") openReview();
+  else if(go === "settings") openSettings(null);
   else if(go === "week") show("week");
 }
 
@@ -15115,10 +15186,8 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
 
 /* ---------- wiring ---------- */
 $("tabWeek").addEventListener("click", function(){ show("week"); });
-$("tabSettings").addEventListener("click", function(){
-  /* at the weekend the week worth setting is the next one */
-  openSettings(((new Date().getDay() + 6) % 7) >= 5 ? "next" : "this");
-});
+$("tabSettings").addEventListener("click", function(){ openSettings("this"); });
+$("tabReview").addEventListener("click", openReview);
 $("weekResumeGo").addEventListener("click", function(){ resumeDraft(); });
 $("weekResumeBank").addEventListener("click", function(){ var d = liveSessions()[0]; if(d) bankSession(d); });
 $("resumeBank").addEventListener("click", function(){ var d = liveSessions()[0]; if(d) bankSession(d); });
