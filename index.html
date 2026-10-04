@@ -298,6 +298,7 @@
   .setrow small{font-size:11.5px; color:var(--muted); line-height:1.3}
   .setrow .bwstep{flex:none}
   .setrow .bwstep b{min-width:22px; text-align:center; font-size:17px}
+  .setlock{width:30px; height:30px; display:grid; place-items:center; font-size:14px; opacity:.6}
   .bwstep button:disabled{opacity:.35}
   .setlist{font-size:12.5px}
   .setgo{margin-top:12px; width:100%; background:var(--accent-fill); color:var(--on-accent); border:0; border-radius:10px;
@@ -14172,7 +14173,7 @@ function renderWeek(){
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
   var n = st.rec ? st.rec.n : defaultNums();
-  html += '<div class="wkfoot"><span>' + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
+  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
           '<button type="button" id="wkSet">Change in Settings</button></div>';
   host.innerHTML = html;
 
@@ -14291,6 +14292,13 @@ function renderSettings(){
       '<button type="button" data-wk="next" aria-pressed="' + (which === "next") + '"><b>Next week</b><small>' + weekRange(nextWeek()) + '</small></button>' +
     '</div>' +
     '<p class="note">How many of each you mean to do. You pick the numbers; the app picks the sessions, and you can change any of them on This week.</p>';
+  /* The squad's tests come first and are not hers to change: set by the coach,
+     every week, so they show here with the count but no buttons. */
+  var sqw = squadFor(wk);
+  html += '<div class="bwrow setrow setsquad"><span><b>Squad</b><small>' +
+    (sqw.length ? sqw.map(function(q){ return testById(q.id).name; }).join(", ") + ' \u00b7 set by your coach, every week'
+                : 'Set by your coach. Nothing set at the moment.') + '</small></span>' +
+    '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_squad">' + sqw.length + '</b><span class="setlock"></span></span></div>';
   WEEK_KINDS.forEach(function(k){
     var v = itemsOf(r, k).length;
     html += '<div class="bwrow setrow"><span><b>' + WEEK_WORD[k].replace("&", "&amp;") + '</b>' +
@@ -14301,7 +14309,8 @@ function renderSettings(){
       '<b class="num" id="setN_' + k + '">' + v + '</b>' +
       '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= weekMax(k) ? " disabled" : "") + '>+</button></span></div>';
   });
-  var list = r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); });
+  var list = sqw.map(function(q){ return testById(q.id).name + " (squad)"; })
+    .concat(r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }));
   var moving = which === "next" ? weekState(weekOf()).carry.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }) : [];
   html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") +
     (moving.length ? " Moving on from this week, and put in first on Monday: " + moving.join(", ") + "." : "") + '</p>' +
@@ -14312,10 +14321,6 @@ function renderSettings(){
       : '<button type="button" class="setgo" id="setConfirm">That’s my week</button>') +
     '</div>';
 
-  var sq = squadFor(null);
-  if(sq.length) html += '<div class="setgrp"><div class="wkgh"><h2>Squad</h2><span>set by your coach</span></div>' +
-    '<ul class="setfocus">' + sq.map(function(q){ return '<li><b>' + testById(q.id).name + '</b><span>every week</span></li>'; }).join("") + '</ul>' +
-    '<p class="note">On top of your own numbers, and part of every week.</p></div>';
   var foc = focusFor();
   html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
     (foc.length ? '<ul class="setfocus">' + foc.map(function(f){
