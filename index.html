@@ -292,6 +292,10 @@
   .wkpil .pilhd{margin:0}
   .wkpil .wkgh{display:none}
   .wkp5 .wknote{margin-top:4px}
+  .wktx .wkpt{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--ink-2); margin:1px 0 1px}
+  .wkpt i{font-style:normal; width:16px; height:16px; border-radius:999px; background:var(--pt); display:grid; place-items:center;
+    font-size:10px; color:var(--ink); box-shadow:inset 0 0 0 1px var(--line)}
   .wksum{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px}
   .wksum span{display:flex; align-items:baseline; gap:5px; padding:5px 10px; border-radius:999px; background:var(--surface-2);
     font-size:12.5px; color:var(--ink-2)}
@@ -14159,6 +14163,13 @@ function pillarOfSession(x){
   return pillarNo(x.areaId);
 }
 var PILLAR_ORDER = [1, 2, 3, 4, "sc", "log", null];
+/* On This week each row says which pillar it belongs to, in a line of its own
+   under the name. S&C rows carry nothing: S&C is not one of the five. */
+function pillarTag(n){
+  if(typeof n !== "number" || !EG_PILLARS[n - 1]) return "";
+  var p = EG_PILLARS[n - 1];
+  return '<span class="wkpt" style="--pt:' + p.tint + '"><i>' + p.n + '</i>' + p.nm + '</span>';
+}
 function pillarHead(key, right, tag){
   var p = typeof key === "number" ? EG_PILLARS[key - 1] : null;
   var nm = p ? p.nm : key === "sc" ? "S&amp;C" : key === "log" ? "Play, coaching and other practice" : "Other";
@@ -15092,83 +15103,73 @@ function renderWeek(){
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
   if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
-  /* Everything on the week, the same rows as ever, arranged under England
-     Golf's pillars: squad, coach, main sessions and quick drills for each pillar
-     together, then S&C. What kind each row is says so on the row, and the
-     counts by kind sit in one line at the top. */
-  var esc = function(t){ return String(t).replace(/&(?!amp;)/g, "&amp;"); };
-  var sum = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); }).map(function(k){
-    var x = st.per[k];
-    return '<span data-k="' + k + '" class="' + (x.got >= x.want ? "ok" : "") + '"><b class="num">' + (x.got > x.want ? x.got + ' done \u00b7 ' + x.want + ' planned' : x.got + ' of ' + x.want) + '</b>' + esc(weekShort(k)) + '</span>';
-  });
-  if(sum.length) html += '<div class="wksum">' + sum.join("") + '</div>';
-  var G = {};
-  function put(key, kind, done, rowHtml){
-    key = key == null ? null : key;
-    (G[key] = G[key] || { rows:[], want:0, got:0 }).rows.push(rowHtml);
-    if(kind !== "extra"){ G[key].want++; if(done) G[key].got++; } else G[key].got++;
+  /* The squad's tests and the coach's own sessions sit together under Squad:
+     both set for her, both every week, neither hers to change. */
+  if(st.squad.length || st.squadExtra.length || st.coach.length){
+    var sp = { want:st.per.squad.want + st.per.coach.want, got:st.per.squad.got + st.per.coach.got }, spips = "";
+    for(var si = 0; si < Math.max(sp.want, sp.got); si++) spips += '<i class="' + (si < sp.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp wksquad"><div class="wkgh"><h2>Squad</h2><span class="num">' + sp.got + ' of ' + sp.want + '</span></div>' +
+            '<div class="wkpips">' + spips + '</div>';
+    st.squad.forEach(function(q){
+      var t = testById(q.id), sk = TILE[t.area] || TILE[10];
+      var v = { nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic], pil:pillarNo(t.area) };
+      if(q.done){ html += doneRow(v, q.done, null, false); return; }
+      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-squad="' + q.id + '"><span class="wkic">' + v.ic(22) + '</span>' +
+        '<span class="wktx"><b>' + v.nm + '</b>' + pillarTag(v.pil) + '<span>' + v.sub + '</span></span><span class="wkstart">Start</span></button></div>';
+    });
+    st.squadExtra.forEach(function(x){
+      var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
+      html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic], pil:pillarNo(t.area) }, x, null, true);
+    });
+    if(st.coach.length) html += '<div class="wkoh wkcoachh">Coach</div>';
+    st.coach.forEach(function(q, qi){
+      var v = coachView(q.c); v.pil = pillarOfCoach(q.c);
+      if(q.of > 1) v.sub += " \u00b7 " + (q.i + 1) + " of " + q.of;
+      if(q.done){ html += doneRow(v, q.done, null, false); return; }
+      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-coach="' + qi + '"><span class="wkic">' + v.ic(22) + '</span>' +
+        '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b>' + pillarTag(v.pil) + '<span>' + String(v.sub).replace(/&(?!amp;)/g, "&amp;").replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
+    });
+    html += '</div>';
   }
-  function tagged(v, word){ v.nm = esc(v.nm) + (word ? ' <em>' + word + '</em>' : ''); return v; }
-  function openRow(v, attr, kind){
-    return '<div class="wkrow" data-kind="' + kind + '" style="--tint:' + v.tint + '">' +
-      '<button type="button" class="wkgo" ' + attr + '><span class="wkic">' + v.ic(22) + '</span>' +
-      '<span class="wktx"><b>' + v.nm + '</b><span>' + esc(v.sub).replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
-  }
-  st.squad.forEach(function(q){
-    var t = testById(q.id), sk = TILE[t.area] || TILE[10];
-    var v = tagged({ nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic], kind:"squad" }, "squad");
-    put(pillarNo(t.area), "squad", !!q.done, q.done ? doneRow(v, q.done, null, false) : openRow(v, 'data-squad="' + q.id + '"', "squad"));
-  });
-  st.squadExtra.forEach(function(x){
-    var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
-    put(pillarNo(t.area), "extra", true, doneRow(tagged({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic], kind:"squad" }, "squad"), x, null, true));
-  });
-  st.coach.forEach(function(q, qi){
-    var v = tagged(coachView(q.c), "coach"); v.kind = "coach";
-    if(q.of > 1) v.sub += " · " + (q.i + 1) + " of " + q.of;
-    put(pillarOfCoach(q.c), "coach", !!q.done, q.done ? doneRow(v, q.done, null, false) : openRow(v, 'data-coach="' + qi + '"', "coach"));
-  });
-  var WORD = { main:"main session", drill:"quick drill", sc:"" };
-  st.rows.forEach(function(x){
-    var k = x.it.k, ref = x.swapped ? { k:k, id:sessRef(x.done) } : x.it;
-    var v = tagged(weekItemView(ref), WORD[k]); v.kind = k;
-    if(x.swapped){
-      var was = weekItemView(x.it).nm;
-      v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
-    }
-    var key = pillarOfItem(ref);
-    if(x.done){ put(key, k, true, doneRow(v, x.done, v.swap, false)); return; }
-    var canChange = !(k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
-    put(key, k, false, '<div class="wkrow" data-kind="' + k + '" style="--tint:' + v.tint + '">' +
-      '<button type="button" class="wkgo" data-go="' + x.i + '">' +
-        '<span class="wkic">' + v.ic(22) + '</span>' +
-        '<span class="wktx"><b>' + v.nm + '</b><span>' + v.sub + '</span></span>' +
-        '<span class="wkstart">Start</span>' +
-      '</button>' +
-      '<span class="wkacts">' +
-        (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
-        '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(weekItemView(x.it).nm).replace(/"/g, "") + ' from this week">×</button></span>' +
-    '</div>');
-  });
-  /* everything she did is on the page, not only what she planned */
-  st.extra.forEach(function(x){
-    var k = sessKind(x), ref = { k:k, id:sessRef(x) };
-    var v = tagged(weekItemView(ref), WORD[k]); v.kind = k;
-    put(pillarOfItem(ref), "extra", true, doneRow(v, x, null, true));
-  });
-  PILLAR_ORDER.forEach(function(key){
-    var g = G[key];
-    if(typeof key === "number" && key === 4 && !g){ return; }
-    if(!g) return;
+  WEEK_KINDS.forEach(function(k){
+    var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
+    if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
     var pips = "";
-    for(var i = 0; i < Math.max(g.want, g.got); i++) pips += '<i class="' + (i < g.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp wkpil" data-pillar="' + key + '">' +
-      pillarHead(key, '<span class="num">' + (g.got > g.want ? g.got + ' done · ' + g.want + ' planned' : g.got + ' of ' + g.want) + '</span>') +
-      '<div class="wkpips">' + pips + '</div>' + g.rows.join("") + '</div>';
+    for(var i = 0; i < Math.max(pk.want, pk.got); i++) pips += '<i class="' + (i < pk.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp"><div class="wkgh"><h2>' + WEEK_WORD[k].replace("&", "&amp;") + '</h2>' +
+            '<span class="num">' + (pk.got > pk.want ? pk.got + ' done \u00b7 ' + pk.want + ' planned' : pk.got + ' of ' + pk.want) +
+            '</span></div><div class="wkpips">' + pips + '</div>';
+    rows.forEach(function(x){
+      var v = weekItemView(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
+      v.pil = pillarOfItem(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
+      if(x.swapped){
+        var was = weekItemView(x.it).nm;
+        v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
+      }
+      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
+      if(x.done){ html += doneRow(v, x.done, v.swap, false); return; }
+      html += '<div class="wkrow' + (x.done ? " done" : "") + '" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-go="' + x.i + '"' + (x.done ? ' disabled' : '') + '>' +
+          '<span class="wkic">' + v.ic(22) + '</span>' +
+          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b>' + pillarTag(v.pil) + '<span>' + (x.done ? doneWords(x.done) : v.sub) + '</span>' +
+            (v.swap ? '<span class="wkswap">' + v.swap.replace(/&(?!amp;)/g, "&amp;") + '</span>' : '') + '</span>' +
+          (x.done ? '<span class="wktick" aria-label="Done">✓</span>' : '<span class="wkstart">Start</span>') +
+        '</button>' +
+        (x.done ? '' : '<span class="wkacts">' +
+          (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
+          '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(v.nm).replace(/"/g, "") + ' from this week">×</button></span>') +
+      '</div>';
+    });
+    /* everything she did is on the page, not only what she planned: a fourth
+       session in a week of three is a row of its own */
+    st.extra.filter(function(s){ return sessKind(s) === k; }).forEach(function(s){
+      var ve = weekItemView({ k:k, id:sessRef(s) }); ve.pil = pillarOfItem({ k:k, id:sessRef(s) });
+      html += doneRow(ve, s, null, true);
+    });
+    html += '</div>';
   });
-  if(st.planned || st.extra.length)
-    html += '<div class="wkgrp wkpil wkp5">' + pillarHead(5, 'in UpGame') +
-      '<p class="wknote">Strategy and tactical awareness lives in UpGame. Rounds you log here count as play towards DiSE.</p></div>';
   if(!st.planned) html += '<p class="wknote">Nothing planned this week. Set your numbers in Settings.</p>';
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
@@ -15205,7 +15206,7 @@ function doneRow(v, s, swap, extra){
   return '<div class="wkrow done' + (extra ? " extra" : "") + '"' + (v.kind ? ' data-kind="' + v.kind + '"' : '') + ' style="--tint:' + v.tint + '">' +
     '<div class="wkgo">' +
       '<span class="wkic">' + v.ic(22) + '</span>' +
-      '<span class="wktx"><b>' + esc(v.nm) + '</b><span>' + doneWords(s) + '</span>' +
+      '<span class="wktx"><b>' + esc(v.nm) + '</b>' + pillarTag(v.pil) + '<span>' + doneWords(s) + '</span>' +
         (swap ? '<span class="wkswap">' + esc(swap) + '</span>' : '') +
         '<span class="wkpraise">' + wellDone(s, extra) + '</span></span>' +
       '<span class="wktick" aria-label="Done">\u2713</span>' +
