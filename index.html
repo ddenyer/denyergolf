@@ -199,6 +199,35 @@
   .bellitem.kudos b::before{content:"\2713  "; color:var(--accent)}
   .bellitem.news{background:var(--surface-2)}
   .bellitem.new b::after{content:" \00b7  new"; color:var(--accent); font-weight:600; font-size:12px}
+  /* ---------- the 18-hole putting card ---------- */
+  .sqnow{border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--surface); margin:10px 0 14px}
+  .sqnow h3{margin:2px 0 4px; font-size:30px; font-weight:800; letter-spacing:-.02em}
+  .sqpar{margin:0 0 12px; font-size:13px; color:var(--ink-2)}
+  .sqpick{display:grid; grid-template-columns:repeat(4, 1fr); gap:8px}
+  .sqpick button{border:1px solid var(--line-strong); background:var(--surface-2); border-radius:12px; padding:12px 4px;
+    display:flex; flex-direction:column; align-items:center; gap:2px; font:inherit; color:var(--ink); cursor:pointer}
+  .sqpick button b{font-size:24px; font-weight:800}
+  .sqpick button span{font-size:11px; color:var(--muted)}
+  .sqpick button.on{border-color:var(--accent-fill); background:var(--accent-wash)}
+  .sqnine{margin-top:10px}
+  .sqhd{display:flex; justify-content:space-between; font-size:13px; margin:0 0 6px}
+  .sqhd span{font-weight:700; font-variant-numeric:tabular-nums}
+  .sqnine{display:grid; grid-template-columns:repeat(9, 1fr); gap:4px}
+  .sqnine .sqhd{grid-column:1 / -1}
+  .sqcell{border:1px solid var(--line); background:var(--surface); border-radius:8px; padding:5px 0; font:inherit; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; cursor:pointer}
+  .sqcell .h{font-size:9.5px; color:var(--muted)}
+  .sqcell .ft{font-size:9.5px; color:var(--muted); white-space:nowrap}
+  .sqcell .p{font-size:16px; font-weight:800}
+  .sqcell .sg{font-size:9px; font-variant-numeric:tabular-nums; color:var(--ink-2); min-height:11px}
+  .sqcell.at{border-color:var(--accent-fill); box-shadow:0 0 0 1px var(--accent-fill) inset}
+  .sqcell.holed{background:var(--accent-wash)}
+  .sqcell.three{background:var(--surface-2)}
+  .sqsum{margin-top:10px}
+  .sqpast{overflow-x:auto; margin-top:12px}
+  .sqpast table{width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums}
+  .sqpast th, .sqpast td{text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
+  .sqpast th{font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em}
   /* ---------- this week ---------- */
   .wkhead{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:2px 0 6px}
   .wkhead h1{margin:2px 0 0}
@@ -2492,7 +2521,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-01", note:"The bell is now a feed: kudos for every session, records (a new best, a run record, best ever on a set, a move up the LPGA placing, a drill or test best, weeks in a row) and anything new in the app. None of it comes to your phone; only the reminder does. Also new today: This week, Save as it is, and the coach sets your programme" };
+var BUILD = { on:"2026-10-04", note:"The squad test: the 18-hole strokes gained putting challenge, scored hole by hole against the sheet\u2019s own numbers (benchmark 31.02). When your coach switches it on it sits at the top of This week, every week, and the week is not done without it. Also: tee shots priced from club head speed at the LPGA rate" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3515,6 +3544,12 @@ function areaMax(a){ var m=0; liveSets(a).forEach(function(s){ m+=setMax(s); });
 
    Anything added to this list appears in the Goals dropdown on its own, for the area
    it names. Nothing else has to be touched. */
+/* The regional squad's 18-hole strokes gained putting challenge, exactly as
+   printed on the coach's sheet: one putt from each distance, holed out, and the
+   card's own expected putts so the app's number is always the sheet's number. */
+var SQ18 = [[3,1.04],[4,1.13],[5,1.23],[6,1.34],[7,1.42],[8,1.50],[10,1.61],[12,1.70],[15,1.79],
+            [18,1.85],[20,1.87],[25,1.93],[30,1.98],[35,2.03],[40,2.08],[45,2.12],[50,2.16],[60,2.24]];
+var SQ18_ID = "t-putt-sg18";
 var TESTS = [
 { id:"t-approach-pinhigh", retired:true, area:11, isTest:true, track:true, name:"Pin high or past",
   sub:"Never short from 125 to 185",
@@ -3642,6 +3677,16 @@ var TESTS = [
      parts:[{id:"l", label:"Inside 3 ft", max:6},{id:"t", label:"Down in two", max:6}]}
   ]},
 
+{ id:"t-putt-sg18", area:4, isTest:true, squad:true, sg:true, shape:"sg18",
+  name:"18-hole SG putting challenge", sub:"The squad test \u00b7 one putt from each of 18 distances, 3 ft to 60 ft",
+  why:"The regional squad's weekly test. Every hole is one putt from a set distance, holed out, and each is scored against the putts a good player expects from there. Plus means you beat the benchmark.",
+  where:"Practice green", balls:18,
+  ruleText:"Play the 18 holes in order, 3 ft to 60 ft, and hole out every one. Tap how many putts it took. Strokes gained on a hole is the card's expected putts less yours: holed from 8 ft is +0.50, two putts is \u22120.50. The 18-hole benchmark is 31.02.",
+  sets:SQ18.map(function(x, i){
+    return { id:"h"+(i+1), label:"Hole "+(i+1)+" \u00b7 "+x[0]+" ft", short:x[0]+" ft", sgKind:"card18",
+             pd:x[0], par:x[1], balls:1, max:1 };
+  }) },
+
 /* ---- the two short game matrices ----
    Neither of these is scored the way every other test is, so both carry a
    `shape` and neither has `sets`. Keeping `sets:[]` matters: openSession
@@ -3722,7 +3767,7 @@ function testById(id){
   for(var j=0;j<ct.length;j++){ if(ct[j].id===id) return ct[j]; }
   return null;
 }
-function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId && !t.retired; }); }
+function testsFor(areaId){ return allTests().filter(function(t){ return t.area === areaId && !t.retired && !t.squad; }); }
 var TEST_NEXT = {"t-approach-pinhigh":"t-approach-depth", "t-wedge-distance":"t-wedge-number",
                  "t-putt-six":"t-putt-lag", "t-short-oneclub":"t-hundred"};
 
@@ -4986,8 +5031,25 @@ function migrateToStrokes(){
     x.sgv = SGV;
     if(was !== x.total) moved++;
   });
+  /* Tee shots, once more: distance is now priced off club head speed at the
+     LPGA's yards per mph (see ottCarry), so every tee session already logged is
+     priced again on the same terms as the next one. The taps and the speeds are
+     untouched; only the strokes total moves. */
+  (state.sessions || []).forEach(function(x){
+    if(!x || x.kind === "gym" || x.sgo === SGO || x.status === "live") return;
+    var a = area(x.areaId);
+    if(!a || !a.ott || !isSG(a)){ return; }
+    var r = sgSession(a, x);
+    x.sgo = SGO;
+    if(!r) return;
+    var was = x.total;
+    x.total = Math.round(r.sg*100)/100;
+    x.balls = r.balls;
+    if(was !== x.total) moved++;
+  });
   return moved;
 }
+var SGO = 1;
 function loadLocal(){
   try{
     var raw = localStorage.getItem(LS);
@@ -7550,6 +7612,19 @@ function renderSession(){
     updateTotal();
     return;
   }
+  if(a && a.shape === "sg18"){
+    stashNotes();
+    var mb3 = $("sessMode") ? $("sessMode").parentNode : null;
+    if(mb3) mb3.hidden = true;
+    if($("sessProg")) $("sessProg").hidden = true;
+    if($("runBar")) $("runBar").hidden = true;
+    if($("navBack")) $("navBack").hidden = true;
+    if($("navNext")) $("navNext").hidden = true;
+    buildSq18(a);
+    if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
+    updateTotal();
+    return;
+  }
   var mb2 = $("sessMode") ? $("sessMode").parentNode : null;
   if(mb2) mb2.hidden = false;
   if($("sessProg")) $("sessProg").hidden = false;
@@ -7563,6 +7638,81 @@ function renderSession(){
   updateTotal();
 }
 
+/* ---- the 18-hole card: one hole at a time, tap the putts ---- */
+function sq18Putts(d, set){ var l = d.shots && d.shots[set.id]; var z = l && l[0] && l[0].z; return z ? parseInt(String(z).replace(/\D/g, ""), 10) : null; }
+function sq18Fmt(v){ return (v > 0 ? "+" : v < 0 ? "\u2212" : "") + Math.abs(v).toFixed(2); }
+function buildSq18(a){
+  var d = state.draft, sets = liveSets(a);
+  d.shots = d.shots || {};
+  var firstOpen = -1;
+  sets.forEach(function(s, i){ if(firstOpen < 0 && sq18Putts(d, s) == null) firstOpen = i; });
+  if(d.sqAt == null || d.sqAt < 0 || d.sqAt >= sets.length) d.sqAt = firstOpen < 0 ? 0 : firstOpen;
+  var at = d.sqAt, cur = sets[at], done = firstOpen < 0;
+  var host = $("sessCards"); host.innerHTML = "";
+  var front = 0, back = 0, played = 0, putts = 0;
+  sets.forEach(function(s, i){ var n = sq18Putts(d, s); if(n == null) return; played++; putts += n; if(i < 9) front += s.par - n; else back += s.par - n; });
+
+  var top = document.createElement("div"); top.className = "sqtop";
+  top.innerHTML = '<p class="shotask">' + (done ? "All 18 holes in. Check the card, then save."
+      : "Hole out from every distance, in order. Tap how many putts it took.") + '</p>';
+  host.appendChild(top);
+
+  var card = document.createElement("div"); card.className = "sqnow";
+  var have = sq18Putts(d, cur);
+  card.innerHTML = '<p class="eyebrow">Hole ' + (at + 1) + ' of 18' + (have != null ? ' \u00b7 changing it' : '') + '</p>' +
+    '<h3>' + cur.pd + ' ft</h3><p class="sqpar">Expected <b>' + cur.par.toFixed(2) + '</b> putts. Holed is ' +
+    sq18Fmt(cur.par - 1) + ', two putts is ' + sq18Fmt(cur.par - 2) + '.</p>' +
+    '<div class="sqpick">' + [1, 2, 3, 4].map(function(n){
+      return '<button type="button" data-p="' + n + '"' + (have === n ? ' class="on"' : '') + '><b>' + (n === 4 ? "4+" : n) + '</b><span>' +
+        (n === 1 ? "holed" : n === 2 ? "two putts" : n === 3 ? "three" : "four or more") + '</span></button>';
+    }).join("") + '</div>';
+  host.appendChild(card);
+  card.querySelectorAll("[data-p]").forEach(function(b){
+    b.addEventListener("click", function(){
+      d.shots[cur.id] = [{ z:"p" + b.getAttribute("data-p") }];
+      /* on to the next hole still to play, or stay put once the card is full */
+      var next = -1;
+      for(var k = 1; k <= sets.length; k++){ var j = (at + k) % sets.length; if(sq18Putts(d, sets[j]) == null){ next = j; break; } }
+      d.sqAt = next < 0 ? at : next;
+      stashNotes(); buildSq18(a); updateTotal();
+      if($("sessNotes")) $("sessNotes").value = d.notes || "";
+    });
+  });
+
+  var grid = document.createElement("div"); grid.className = "sqgrid";
+  grid.innerHTML = '<p class="eyebrow">The card \u00b7 tap a hole to change it</p>' + [0, 9].map(function(o){
+    return '<div class="sqnine"><div class="sqhd"><b>' + (o ? "Back nine" : "Front nine") + '</b><span>' +
+      (o ? (played > 9 || back ? sq18Fmt(back) : "") : (front || played ? sq18Fmt(front) : "")) + '</span></div>' +
+      sets.slice(o, o + 9).map(function(s, k){
+        var i = o + k, n = sq18Putts(d, s);
+        return '<button type="button" class="sqcell' + (i === at ? " at" : "") + (n == null ? "" : n === 1 ? " holed" : n >= 3 ? " three" : " two") + '" data-h="' + i + '">' +
+          '<span class="h">' + (i + 1) + '</span><span class="ft">' + s.pd + ' ft</span><span class="p">' + (n == null ? "\u2013" : n === 4 ? "4+" : n) + '</span>' +
+          '<span class="sg">' + (n == null ? "" : sq18Fmt(s.par - n)) + '</span></button>';
+      }).join("") + '</div>';
+  }).join("") +
+  '<p class="note sqsum">' + played + ' of 18 holes \u00b7 ' + putts + ' putts' + (played === 18 ? ' against a benchmark of 31.02' : '') + '</p>';
+  host.appendChild(grid);
+  grid.querySelectorAll("[data-h]").forEach(function(b){
+    b.addEventListener("click", function(){ d.sqAt = +b.getAttribute("data-h"); stashNotes(); buildSq18(a); if($("sessNotes")) $("sessNotes").value = d.notes || ""; });
+  });
+
+  var nb = notesBlock("sessNotes", "Session notes \u00b7 what worked \u00b7 one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+  saveDraft();
+}
+/* The saved card, read back */
+function sq18PastHtml(a, s){
+  var sets = liveSets(a), played = 0, putts = 0;
+  var rows = sets.map(function(set, i){
+    var n = sq18Putts(s, set); if(n != null){ played++; putts += n; }
+    return '<tr><td>' + (i + 1) + '</td><td>' + set.pd + ' ft</td><td>' + set.par.toFixed(2) + '</td><td>' + (n == null ? "\u2013" : n === 4 ? "4+" : n) +
+      '</td><td>' + (n == null ? "" : sq18Fmt(set.par - n)) + '</td></tr>';
+  }).join("");
+  return '<div class="pastsum"><div><b>' + sq18Fmt(s.total || 0) + '</b><span>strokes gained</span></div>' +
+    '<div><b>' + putts + '</b><span>putts</span></div><div><b>' + played + '</b><span>of 18 holes</span></div></div>' +
+    '<div class="sqpast"><table><thead><tr><th>Hole</th><th>Putt</th><th>SG par</th><th>Putts</th><th>SG</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
 function sessionIntro(){
   var d = document.createElement("div");
   d.innerHTML = '<div id="sessTargetBox"></div><div id="sessChecks"></div>'+
@@ -8393,22 +8543,27 @@ function ottBaseSpeed(pid, skipId){
   if(!v.length) return null;
   return v.reduce(function(t,x){ return t + x; }, 0) / v.length;
 }
-/* Her carry at the speed she swung today. The target is a total, so the ratio
-   is worked out in totals and the roll comes off at the end: what the engine
-   prices is carry against carry, and sgOttRemain puts the roll back on by lie.
-   Subtracting the fairway figure here and adding the lie figure there means a
-   drive up the middle is exactly whole, and one in the rough runs less, which
-   is the point of having the table at all. */
+/* Her carry at the speed she swung today, priced off club head speed alone.
+
+   Club speed is the club, not the ball, so a range ball cannot move it: the
+   Srixon range balls at the club fly shorter than her own ball, and nothing
+   here reads ball speed or carry off the monitor.
+
+   The yards per mile an hour are the LPGA's own: 218 yards carried at 94 mph
+   on Trackman, the same field this is all measured against. So at tour speed
+   she is level on distance, faster is longer and slower is shorter, and a
+   winter of speed work shows up in strokes. It used to be her own ratio worked
+   out from her recent average speed, which made the carry almost the same
+   whatever she swung (about 222 yards from 85 mph to 99), so getting faster
+   never counted. With no speed logged today it falls back on what she has
+   been swinging lately, and with none ever, on the tour's own speed. */
+var SG_OTT_FIELD_CHS = 94;
 function ottCarry(a, sess){
   var C = a && a.ott; if(!C) return null;
-  var total = C.total != null ? C.total : C.dist;   /* dist: what it was called */
-  if(total == null) return null;
   var pid = (C.from != null) ? C.from : (sess && sess.areaId);
-  var base = ottBaseSpeed(pid, sess && sess.id);
   var now = sess && sess.metrics && +sess.metrics.chsAvg;
-  var speed = (now > 0) ? now : base;
-  var hers = speed ? speed * (total / ((base || speed) + C.speedUp)) : total;
-  return Math.max(40, hers - SG_OTT_ROLL.fair);
+  var speed = (now > 0) ? now : (ottBaseSpeed(pid, sess && sess.id) || SG_OTT_FIELD_CHS);
+  return Math.max(40, speed * SG_OTT_FIELD.carry / SG_OTT_FIELD_CHS);
 }
 
 /* A rotation ball was asked to do something different from the ball before it,
@@ -8426,6 +8581,7 @@ function sgOfShot(set, z, v, ctx, i){
     var c = ctx && ctx.carry;
     return c ? sgOttOfShot(c * (S.ottClub || 1), z) : null;
   }
+  if(S && S.sgKind === "card18"){ var np = parseInt(String(z).replace(/\D/g, ""), 10); return np ? S.par - np : null; }
   if(S && S.sgKind === "putt") return sgPuttOfShot(S, z, ctx && ctx.calls ? ctx.calls[i] : null);
   if(S && S.sgKind) return sgFsOfShot(S.sgKind, S.dist, z, v);
   var B = sgBands(set); if(!B || z == null) return null;
@@ -8501,6 +8657,7 @@ function sgSession(a, sess){
    fill to and a chart has a top. */
 function sgAreaCeil(a){
   var t = 0;
+  if(a && a.shape === "sg18"){ liveSets(a).forEach(function(s){ t += s.par - 1; }); return Math.round(t*100)/100; }
   liveSets(a).forEach(function(s){
     var B = sgBands(s); if(!B) return;
     t += ballsIn(s) * B.base;
@@ -11207,7 +11364,7 @@ function updateTotal(){
     d.total = Math.round(sgr.sg*100)/100;
     d.max = sgAreaCeil(a);
     d.balls = sgr.balls;
-    $("totFig").textContent = fmtSG(sgr.sg);
+    $("totFig").textContent = a.shape === "sg18" ? sq18Fmt(sgr.sg) : fmtSG(sgr.sg);
     $("totOf").textContent = "strokes";
     /* The bar is one line on a phone. Anything longer than a count wraps into
        four lines and shoves the Next button off the screen, which is how it
@@ -12839,6 +12996,13 @@ function openPast(s){
   var h = "";
 
   var pa = isGym ? null : area(s.areaId);
+  if(pa && pa.shape === "sg18"){
+    $("pastBody").innerHTML = sq18PastHtml(pa, s) +
+      '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
+      (s.notes ? String(s.notes).replace(/</g,"&lt;") : "Nothing written down for this one.")+'</p></div>';
+    show("past");
+    return;
+  }
   if(pa && isMatrix(pa)){
     $("pastBody").innerHTML = mxPastHtml(pa, s) +
       '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
@@ -13180,6 +13344,8 @@ function recordsFor(sess){
    or drill is found on its own by comparing the catalogue with what this
    device has seen before. The first time it looks, it only takes note. */
 var NEWS = [
+  { id:"2026-10-03-ott", date:"2026-10-03", title:"Tee shots: distance now counts your speed",
+    body:"Off the tee, distance is priced from your club head speed at the LPGA rate: 94 mph carries 218 yards. The range balls make no difference, because club speed is the club, not the ball. Get faster and it shows. Your past tee sessions have been priced the same way." },
   { id:"2026-10-01-week", date:"2026-10-01", title:"New: This week",
     body:"The first tab. Set how many main sessions, S&C and quick drills in Settings; the app picks which. Change or remove any of them." },
   { id:"2026-10-01-bank", date:"2026-10-01", title:"New: Save as it is",
@@ -13242,7 +13408,7 @@ function bellItems(){
                  body:"Everything you set yourself this week."+(sn > 1 ? " That is "+sn+" weeks in a row." : "") });
     } else if(dow >= 4){
       var left = [];
-      WEEK_KINDS.forEach(function(k){ var x = wst.per[k]; for(var i = x.got; i < x.want; i++) left.push(k); });
+      WEEK_KINDS.concat(["squad"]).forEach(function(k){ var x = wst.per[k]; for(var i = x.got; i < x.want; i++) left.push(k); });
       if(left.length === 1)
         out.push({ key:"wk-one:"+wk+":"+left[0], kind:"nudge", title:"One more keeps your week", go:"week",
                    body:"One "+WEEK_ONE[left[0]]+" to go. It is on This week." });
@@ -13299,8 +13465,8 @@ function paintBell(){
 function openBell(){
   var host = $("bellBody"); if(!host) return;
   var items = bellItems(), seen = bellSeen(), wst = weekState(weekOf());
-  var sum = WEEK_KINDS.filter(function(k){ return wst.per[k].want; }).map(function(k){
-    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&amp;C" : k === "main" ? "main" : "drills"); }).join(" \u00b7 ");
+  var sum = ["squad"].concat(WEEK_KINDS).filter(function(k){ return wst.per[k].want; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&amp;C" : k === "main" ? "main" : k === "squad" ? "squad" : "drills"); }).join(" \u00b7 ");
   var week = '<div class="bellweek"><div class="bwhd"><b>Your week</b><span>'+(wst.paused ? "paused" : (sum || "nothing planned"))+'</span></div>'+
     '<div class="bellacts"><button type="button" data-bgo="week">This week</button><button type="button" data-bgo="settings">Settings</button></div></div>';
   var list = items.length ? items.map(function(x){
@@ -13442,8 +13608,14 @@ function wireRemind(){
    than the goals' mv, so a coach editing focus areas can never wipe a week a
    girl set on her phone, and an auto-drawn week never beats one she chose. */
 var WEEK_KINDS = ["main", "sc", "drill"];
-var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills" };
-var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill" };
+var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills", squad:"Squad" };
+var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill", squad:"squad test" };
+/* What the coach has made compulsory, every week from the week it was set:
+   [{id, from}]. A week before it was set is never judged on it. */
+function squadFor(wk, p){
+  p = p || playerObj(); if(!p || !Array.isArray(p.squad)) return [];
+  return p.squad.filter(function(x){ return x && x.id && (!wk || !x.from || wk >= x.from) && testById(x.id); });
+}
 var WEEK_DEF   = { main:3, sc:2, drill:3 };
 var WEEK_MAX   = { main:10, sc:2, drill:10 };
 function weekMax(k){ return k === "sc" ? scIds().length : WEEK_MAX[k]; }
@@ -13681,6 +13853,7 @@ function pickDrill(r){
 /* ---- what has been done ---- */
 function sessKind(s){
   if(!s || s.status === "live") return null;
+  if(s.kind === "test" && testById(s.testId) && testById(s.testId).squad) return "squad";
   if(s.kind === "practice" || s.kind === "test") return "main";
   if(s.kind === "drill") return "drill";
   if(s.kind === "gym"){
@@ -13692,6 +13865,7 @@ function sessKind(s){
 }
 function sessRef(s){
   var k = sessKind(s);
+  if(k === "squad") return s.testId;
   if(k === "main") return typeOf(s.testId || s.areaId);
   if(k === "sc") return s.gymId;
   if(k === "drill") return s.kind === "gym" ? "gym:" + s.gymId : s.drillId;
@@ -13711,6 +13885,17 @@ function weekState(wk, make){
   var r = weekRec(wk, make !== false);
   var n = r ? r.n : defaultNums();
   var ss = weekSessions(wk), used = {};
+  /* the squad's own tests: required, matched first, never swapped */
+  var paused0 = weekPaused(wk);
+  var squad = squadFor(wk).map(function(q){
+    var done = null;
+    for(var j = 0; j < ss.length; j++){
+      if(!used[ss[j].id] && sessKind(ss[j]) === "squad" && ss[j].testId === q.id){ used[ss[j].id] = 1; done = ss[j]; break; }
+    }
+    return { id:q.id, done:done };
+  });
+  var squadExtra = ss.filter(function(x){ return !used[x.id] && sessKind(x) === "squad"; });
+  squadExtra.forEach(function(x){ used[x.id] = 1; });
   var rows = (r ? r.items : []).map(function(it, i){ return { it:it, i:i, done:null }; });
   rows.forEach(function(x){
     for(var j = 0; j < ss.length; j++){
@@ -13744,8 +13929,11 @@ function weekState(wk, make){
     planned += want;
     if(got < want) met = false;
   });
+  per.squad = { want:squad.length, got:squad.filter(function(q){ return q.done; }).length + squadExtra.length };
+  planned += per.squad.want;
+  if(squad.some(function(q){ return !q.done; })) met = false;
   return { wk:wk, rec:r, rows:rows, extra:extra, carry:carry, per:per, planned:planned,
-           met:planned > 0 && met, paused:weekPaused(wk) };
+           squad:squad, squadExtra:squadExtra, met:planned > 0 && met, paused:paused0 };
 }
 /* Before planning existed a week counted on the old single target. */
 function weekMet(wk){
@@ -13831,7 +14019,7 @@ function mergeWeekMeta(mine, them){
   /* The coach's choices and her default numbers: a newer stamp wins, and a
      field this device has never had is filled from the server. */
   [["focus", "focusAt"], ["weekPlan", "weekPlanAt"], ["practice", "practiceAt"],
-   ["tests", "testsAt"], ["scProg", "scProgAt"]].forEach(function(f){
+   ["tests", "testsAt"], ["scProg", "scProgAt"], ["squad", "squadAt"]].forEach(function(f){
     var v = them[f[0]]; if(v == null) return;
     var newer = (+them[f[1]] || 0) > (+mine[f[1]] || 0);
     if(newer || mine[f[0]] == null){
@@ -13926,6 +14114,25 @@ function renderWeek(){
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
   if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
+  if(st.squad.length || st.squadExtra.length){
+    var sp = st.per.squad, spips = "";
+    for(var si = 0; si < Math.max(sp.want, sp.got); si++) spips += '<i class="' + (si < sp.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp wksquad"><div class="wkgh"><h2>Squad</h2><span class="num">' + sp.got + ' of ' + sp.want + '</span></div>' +
+            '<div class="wkpips">' + spips + '</div>';
+    st.squad.forEach(function(q){
+      var t = testById(q.id), sk = TILE[t.area] || TILE[10];
+      var v = { nm:t.name, sub:"Set by your squad coach \u00b7 every week", tint:sk.tint, ic:TICON[sk.ic] };
+      if(q.done){ html += doneRow(v, q.done, null, false); return; }
+      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-squad="' + q.id + '"><span class="wkic">' + v.ic(22) + '</span>' +
+        '<span class="wktx"><b>' + v.nm + '</b><span>' + v.sub + '</span></span><span class="wkstart">Start</span></button></div>';
+    });
+    st.squadExtra.forEach(function(x){
+      var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
+      html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }, x, null, true);
+    });
+    html += '</div>';
+  }
   WEEK_KINDS.forEach(function(k){
     var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
     if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
@@ -13974,6 +14181,7 @@ function renderWeek(){
     var r = weekRec(wk, true);
     if(b.id === "wkUndo"){ weekUndo(); renderWeek(); paintBell(); return; }
     if(b.id === "wkSet"){ openSettings(); return; }
+    if(b.hasAttribute("data-squad")){ state.fromWeek = true; openTest(b.getAttribute("data-squad")); return; }
     if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
     if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
     if(b.hasAttribute("data-chg")){ openWeekChange(wk, +b.getAttribute("data-chg")); return; }
@@ -14104,6 +14312,10 @@ function renderSettings(){
       : '<button type="button" class="setgo" id="setConfirm">That’s my week</button>') +
     '</div>';
 
+  var sq = squadFor(null);
+  if(sq.length) html += '<div class="setgrp"><div class="wkgh"><h2>Squad</h2><span>set by your coach</span></div>' +
+    '<ul class="setfocus">' + sq.map(function(q){ return '<li><b>' + testById(q.id).name + '</b><span>every week</span></li>'; }).join("") + '</ul>' +
+    '<p class="note">On top of your own numbers, and part of every week.</p></div>';
   var foc = focusFor();
   html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
     (foc.length ? '<ul class="setfocus">' + foc.map(function(f){
@@ -14940,8 +15152,8 @@ function asPlayer(p, fn){
 function coachWeekLine(p){
   var el = document.createElement("p"); el.className = "cnote";
   var wst = asPlayer(p, function(){ return weekState(weekOf(), false); });
-  var bits = WEEK_KINDS.filter(function(k){ return wst.per[k].want || wst.per[k].got; }).map(function(k){
-    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&C" : k === "main" ? "main" : "drills");
+  var bits = ["squad"].concat(WEEK_KINDS).filter(function(k){ return wst.per[k].want || wst.per[k].got; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&C" : k === "main" ? "main" : k === "squad" ? "squad" : "drills");
   });
   el.innerHTML = '<em>This week</em>';
   el.appendChild(document.createTextNode(wst.paused ? "Paused." : bits.length ? bits.join(" · ") + (wst.met ? ". Done." : ".") : "Nothing planned."));
@@ -14996,7 +15208,8 @@ function coachProgLine(p){
   var el = document.createElement("p"); el.className = "cnote";
   var foc = focusFor(p).map(function(f){ return drillRef(f.id).name + (f.why ? " (" + f.why + ")" : ""); });
   el.innerHTML = '<em>Programme</em>';
-  el.appendChild(document.createTextNode(scProg(p).nm + " \u00b7 focus: " + (foc.length ? foc.join(", ") : "none")));
+  var sq = (p.squad || []).filter(function(x){ return x && testById(x.id); }).map(function(x){ return testById(x.id).name; });
+  el.appendChild(document.createTextNode((sq.length ? "Squad: " + sq.join(", ") + " \u00b7 " : "") + scProg(p).nm + " \u00b7 focus: " + (foc.length ? foc.join(", ") : "none")));
   return el;
 }
 function renderProg(){
@@ -15032,6 +15245,26 @@ function renderProg(){
     };
   });
   host.appendChild(g2);
+
+  /* the squad's compulsory tests: on from this week, and every week after */
+  var g0 = document.createElement("div"); g0.className = "setgrp";
+  var on = {}; (p.squad || []).forEach(function(x){ if(x && x.id) on[x.id] = x; });
+  g0.innerHTML = '<div class="wkgh"><h2>Squad</h2></div>' +
+    '<p class="note">Compulsory every week, on top of the numbers she sets. Her week is not done until it is.</p>' +
+    allTests().filter(function(t){ return t.squad && !t.retired; }).map(function(t){
+      return '<label class="bwpause"><input type="checkbox" data-sq="' + t.id + '"' + (on[t.id] ? " checked" : "") + '> ' +
+        '<span><b>' + t.name + '</b>, every week' + (on[t.id] && on[t.id].from ? ' (since the week of ' + fmtDate(on[t.id].from) + ')' : '') + '</span></label>';
+    }).join("");
+  g0.querySelectorAll("[data-sq]").forEach(function(c){
+    c.onchange = function(){
+      var id = c.getAttribute("data-sq");
+      var list = (p.squad || []).filter(function(x){ return x && x.id !== id; });
+      if(c.checked) list.push({ id:id, from:weekOf() });
+      p.squad = list; p.squadAt = Date.now();
+      saveEdit(); renderProg();
+    };
+  });
+  host.insertBefore(g0, host.firstChild);
 
   var g3 = document.createElement("div"); g3.className = "setgrp";
   g3.innerHTML = '<div class="wkgh"><h2>Quick drills</h2></div>';
