@@ -2004,6 +2004,8 @@
   .cflist button{width:28px; height:28px; flex:none; border:1px solid var(--line-strong); border-radius:7px;
     background:var(--surface); color:var(--ink-2)}
   .cfgap{width:28px; flex:none}
+  .cflist li b small{display:block; font-weight:500; font-size:11.5px; color:var(--muted)}
+  .setgrp .cfocus{margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
   .cfadd{display:flex; gap:8px}
   .cfadd select{flex:1; min-width:0; font:inherit; font-size:13px; padding:6px 8px; border:1px solid var(--line-strong);
     border-radius:7px; background:var(--surface); color:var(--ink)}
@@ -2593,7 +2595,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"Two regional squad tests, each compulsory every week once your coach switches it on: Regional Squad Putting SGx18 and Regional Squad Perfect 9, nine short game shots finished inside one, two and three clubs in as few attempts as possible (9 is perfect). Both go in the weekly Word file" };
+var BUILD = { on:"2026-10-04", note:"Coach sessions: compulsory every week, set by your coach and shown with the squad\u2019s. Quick drills are now optional, none by default" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -13675,7 +13677,7 @@ function weekDocBody(){
   var h = wPara("Weekly review", { b:true, sz:36, after:40 }) +
           wPara(nm + ", " + weekRange(wk) + " " + wk.slice(0, 4), { sz:24, after:200 });
   /* the summary */
-  var groups = ["squad"].concat(WEEK_KINDS).filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var groups = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
   var mins = { practice:0, tech:0, play:0 };
   mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
   var weekH = (mins.practice + mins.tech + mins.play) / 60, dh = diseHours();
@@ -13730,9 +13732,9 @@ function weekDocBody(){
   var nr = weekRec(nextWeek(), false);
   h += wPara("Next week, " + weekRange(nextWeek()), { b:true, sz:26, before:200 });
   if(nr){
-    var sq = squadFor(nextWeek());
-    h += wPara((sq.length ? sq.length + " squad, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
-    h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
+    var sq = squadFor(nextWeek()), cq = coachFor(nextWeek());
+    h += wPara((sq.length ? sq.length + " squad, " : "") + (cq.length ? cq.length + " coach, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
+    h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(cq.map(function(c){ return coachView(c).nm + " (coach)"; })).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
   } else h += wPara("Not planned yet.", {});
   h += wPara("From Longer Closer Lower, " + fmtDate(today()) + ".", { sz:16, before:240 });
   return h;
@@ -13873,6 +13875,8 @@ function recordsFor(sess){
    or drill is found on its own by comparing the catalogue with what this
    device has seen before. The first time it looks, it only takes note. */
 var NEWS = [
+  { id:"2026-10-04-coach", date:"2026-10-04", title:"New: Coach sessions",
+    body:"Your coach now sets compulsory sessions, shown under Coach on This week next to Squad, every week. Quick drills are yours to choose: none by default, add some in Settings if you want to work on something." },
   { id:"2026-10-04-dise", date:"2026-10-04", title:"New: DiSE hours",
     body:"Your running total towards 200 hours of practice and play is at the top of Progress. Every session already logged counts. Log rounds and coaching with Log play or coaching on This week." },
   { id:"2026-10-03-ott", date:"2026-10-03", title:"Tee shots: distance now counts your speed",
@@ -13940,7 +13944,7 @@ function bellItems(){
                  body:"Everything you set yourself this week."+(sn > 1 ? " That is "+sn+" weeks in a row." : "") });
     } else if(dow >= 4){
       var left = [];
-      WEEK_KINDS.concat(["squad"]).forEach(function(k){ var x = wst.per[k]; for(var i = x.got; i < x.want; i++) left.push(k); });
+      WEEK_GROUPS.forEach(function(k){ var x = wst.per[k]; for(var i = x.got; i < x.want; i++) left.push(k); });
       if(left.length === 1)
         out.push({ key:"wk-one:"+wk+":"+left[0], kind:"nudge", title:"One more keeps your week", go:"week",
                    body:"One "+WEEK_ONE[left[0]]+" to go. It is on This week." });
@@ -13997,8 +14001,8 @@ function paintBell(){
 function openBell(){
   var host = $("bellBody"); if(!host) return;
   var items = bellItems(), seen = bellSeen(), wst = weekState(weekOf());
-  var sum = ["squad"].concat(WEEK_KINDS).filter(function(k){ return wst.per[k].want; }).map(function(k){
-    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&amp;C" : k === "main" ? "main" : k === "squad" ? "squad" : "drills"); }).join(" \u00b7 ");
+  var sum = WEEK_GROUPS.filter(function(k){ return wst.per[k].want; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + weekShort(k).replace("&", "&amp;"); }).join(" \u00b7 ");
   var week = '<div class="bellweek"><div class="bwhd"><b>Your week</b><span>'+(wst.paused ? "paused" : (sum || "nothing planned"))+'</span></div>'+
     '<div class="bellacts"><button type="button" data-bgo="week">This week</button><button type="button" data-bgo="settings">Settings</button></div></div>';
   var list = items.length ? items.map(function(x){
@@ -14141,8 +14145,11 @@ function wireRemind(){
    than the goals' mv, so a coach editing focus areas can never wipe a week a
    girl set on her phone, and an auto-drawn week never beats one she chose. */
 var WEEK_KINDS = ["main", "sc", "drill"];
-var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills", squad:"Squad" };
-var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill", squad:"squad test" };
+var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills", squad:"Squad", coach:"Coach" };
+var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill", squad:"squad test", coach:"coach session" };
+/* the order the week is shown and counted in: what the coaches set, then hers */
+var WEEK_GROUPS = ["squad", "coach", "main", "sc", "drill"];
+function weekShort(k){ return k === "sc" ? "S&C" : k === "main" ? "main" : k === "squad" ? "squad" : k === "coach" ? "coach" : "drills"; }
 /* What the coach has made compulsory, every week from the week it was set:
    [{id, from}]. A week before it was set is never judged on it. */
 /* Perfect 9 arrived after the putting card was already switched on, and it is
@@ -14160,7 +14167,72 @@ function squadFor(wk, p){
   p = p || playerObj(); if(!p || !Array.isArray(p.squad)) return [];
   return p.squad.filter(function(x){ return x && x.id && (!wk || !x.from || wk >= x.from) && testById(x.id); });
 }
-var WEEK_DEF   = { main:3, sc:2, drill:3 };
+/* The coach's own compulsory sessions, set on the Programme page: anything in
+   the app (a main session in an area, a test, a quick drill, an S&C session),
+   every week from the week it was set, on top of her numbers, exactly like
+   the squad's. [{k, id, from, why}], k one of main, test, drill, sc.
+   They replaced the coach's focus areas, which only steered the quick drills
+   the app picked; the girls' existing focus areas became coach sessions from
+   the week of 5 October, and quick drills became hers to choose, none by
+   default. */
+var COACH_FROM   = "2026-10-05";
+var COACH_DEPLOY = Date.parse("2026-10-04T18:00:00Z");
+function coachList(p){
+  p = p || playerObj(); if(!p) return [];
+  if(p.coach == null){
+    p.coach = focusFor(p).map(function(f){ return { k:"drill", id:f.id, from:COACH_FROM, why:f.why || "" }; });
+    p.coachAt = 1;
+  }
+  return (Array.isArray(p.coach) ? p.coach : []).filter(function(c){ return c && coachOk(c); });
+}
+function coachFor(wk, p){
+  return coachList(p).filter(function(c){ return !wk || !c.from || wk >= c.from; });
+}
+function coachOk(c){
+  if(c.k === "test"){ var t = testById(c.id); return !!(t && !t.retired && !t.squad); }
+  if(c.k === "main") return liveAreas().some(function(a){ return a.id === +c.id; });
+  if(c.k === "sc") return !!gymOf(+c.id);
+  if(c.k === "drill") return !!drillRef(c.id);
+  return false;
+}
+function coachIds(k, p){ return coachList(p).filter(function(c){ return c.k === k; }).map(function(c){ return String(c.id); }); }
+function coachMatch(c, s){
+  var k = sessKind(s); if(!k) return false;
+  if(c.k === "test") return s.kind === "test" && s.testId === c.id;
+  return c.k === k && String(sessRef(s)) === String(c.id);
+}
+function coachView(c){
+  var v;
+  if(c.k === "test"){ var t = testById(c.id), sk = TILE[t.area] || TILE[10]; v = { nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }; }
+  else v = weekItemView({ k:c.k, id:c.k === "drill" ? c.id : +c.id });
+  v.sub = "Set by your coach \u00b7 " + (c.why ? c.why : "every week");
+  return v;
+}
+function coachOpen(c){
+  state.fromWeek = true;
+  if(c.k === "test") openTest(c.id);
+  else weekOpen({ k:c.k, id:c.k === "drill" ? c.id : +c.id });
+}
+/* Once per device: the focus areas become coach sessions (coachList does
+   that), quick drills drop to none by default, and any week from the 5th
+   that the app drew before this arrived loses the drills it picked. A week or
+   a number she has changed since is left as she set it. */
+function coachMigrate(p){
+  if(!p || p.coachMig) return false;
+  p.coachMig = 1;
+  var ids = coachIds("drill", p);
+  if(p.weekPlan && !((+p.weekPlanAt || 0) > COACH_DEPLOY)){ p.weekPlan.drill = 0; p.weekPlanAt = Date.now(); }
+  Object.keys(p.weeks || {}).forEach(function(wk){
+    var r = p.weeks[wk];
+    if(wk < COACH_FROM || !r || !Array.isArray(r.items)) return;
+    if((+r.at || 0) > COACH_DEPLOY) return;
+    r.items = r.items.filter(function(it){ return it.k !== "drill" || (it.own && ids.indexOf(String(it.id)) < 0); });
+    r.n = r.n || {}; r.n.drill = r.items.filter(function(it){ return it.k === "drill"; }).length;
+    r.at = Date.now();
+  });
+  return true;
+}
+var WEEK_DEF   = { main:3, sc:2, drill:0 };
 var WEEK_MAX   = { main:10, sc:2, drill:10 };
 function weekMax(k){ return k === "sc" ? scIds().length : WEEK_MAX[k]; }
 /* the first week planned this way; before it, a week counted on the old
@@ -14220,7 +14292,7 @@ function defaultNums(){
   var p = playerObj();
   if(p && p.weekPlan) return weekClone(p.weekPlan);
   var t = p ? +p.weekTarget || 0 : 0;
-  if(t) return { main:Math.max(1, t - 2), sc:Math.min(2, t > 1 ? 2 : 1), drill:3 };
+  if(t) return { main:Math.max(1, t - 2), sc:Math.min(2, t > 1 ? 2 : 1), drill:0 };
   return weekClone(WEEK_DEF);
 }
 
@@ -14287,7 +14359,12 @@ function itemGap(it, wk){
    and later are drawn again, except any she chose herself. */
 function redrawDrills(wk, r){
   var st = weekState(wk, false);
-  r.items = r.items.filter(function(it, i){ return (it.k !== "drill" && it.k !== "sc") || it.own || (st.rows[i] && st.rows[i].done); });
+  var cm = coachIds("main");
+  r.items = r.items.filter(function(it, i){
+    if(it.own || (st.rows[i] && st.rows[i].done)) return true;
+    if(it.k === "main") return cm.indexOf(String(it.id)) < 0;
+    return it.k !== "drill" && it.k !== "sc";
+  });
   fillWeek(r, null);
   try{ saveLocal(); }catch(e){}
 }
@@ -14338,7 +14415,8 @@ function mainScores(r){
   return rows.sort(function(a, b){ return b.score - a.score || areaNo(area(a.id)) - areaNo(area(b.id)); });
 }
 function pickMain(r){
-  var top = mainScores(r)[0];
+  var set = coachIds("main"), all = mainScores(r);
+  var top = all.filter(function(x){ return set.indexOf(String(x.id)) < 0; })[0] || all[0];
   return top ? { k:"main", id:top.id } : null;
 }
 
@@ -14350,7 +14428,7 @@ function lastSC(){
   return s ? s.gymId : null;
 }
 function pickSC(r){
-  var have = itemsOf(r, "sc").map(function(x){ return x.id; });
+  var have = itemsOf(r, "sc").map(function(x){ return x.id; }).concat(coachIds("sc").map(Number));
   var ids = scIds(), last = lastSC();
   /* start from the one after the last she did, and go round in order */
   var from = last == null ? 0 : (ids.indexOf(last) + 1) % ids.length;
@@ -14370,14 +14448,11 @@ function weakAreas(){
     return { id:t.id, place:m, n:ser.length };
   }).sort(function(a, b){ return b.place - a.place; });
 }
-/* Quick drills: the coach's focus first, least recently done first, then the
-   areas she is placing worst in, then whatever has waited longest. */
+/* Quick drills, when she asks for any: the areas she is placing worst in,
+   least recently done first, then whatever has waited longest. */
 function drillCandidates(){
   var out = [], seen = {};
   function add(id, why, src){ if(seen[id] || !drillRef(id)) return; seen[id] = 1; out.push({ id:id, why:why, src:src }); }
-  var foc = focusFor().map(function(f, i){ return { f:f, i:i, last:drillLast(f.id) || "0000" }; })
-    .sort(function(a, b){ return a.last < b.last ? -1 : a.last > b.last ? 1 : a.i - b.i; });
-  foc.forEach(function(x){ add(x.f.id, x.f.why ? "Focus · " + x.f.why : "Focus", "focus"); });
   weakAreas().filter(function(w){ return w.n; }).forEach(function(w){
     var sk = TILE[w.id] || {};
     drillChoices().map(drillRef).filter(function(d){ return d && d.area === w.id && !d.gym; })
@@ -14389,7 +14464,7 @@ function drillCandidates(){
   return out;
 }
 function pickDrill(r){
-  var have = itemsOf(r, "drill").map(function(x){ return x.id; });
+  var have = itemsOf(r, "drill").map(function(x){ return x.id; }).concat(coachIds("drill"));
   var c = drillCandidates().filter(function(x){ return have.indexOf(x.id) < 0; })[0];
   return c ? { k:"drill", id:c.id, why:c.why } : null;
 }
@@ -14440,6 +14515,14 @@ function weekState(wk, make){
   });
   var squadExtra = ss.filter(function(x){ return !used[x.id] && sessKind(x) === "squad"; });
   squadExtra.forEach(function(x){ used[x.id] = 1; });
+  /* the coach's: required too, matched next, never swapped */
+  var coach = coachFor(wk).map(function(c){
+    var done = null;
+    for(var j = 0; j < ss.length; j++){
+      if(!used[ss[j].id] && coachMatch(c, ss[j])){ used[ss[j].id] = 1; done = ss[j]; break; }
+    }
+    return { c:c, done:done };
+  });
   var rows = (r ? r.items : []).map(function(it, i){ return { it:it, i:i, done:null }; });
   rows.forEach(function(x){
     for(var j = 0; j < ss.length; j++){
@@ -14476,8 +14559,11 @@ function weekState(wk, make){
   per.squad = { want:squad.length, got:squad.filter(function(q){ return q.done; }).length + squadExtra.length };
   planned += per.squad.want;
   if(squad.some(function(q){ return !q.done; })) met = false;
+  per.coach = { want:coach.length, got:coach.filter(function(q){ return q.done; }).length };
+  planned += per.coach.want;
+  if(coach.some(function(q){ return !q.done; })) met = false;
   return { wk:wk, rec:r, rows:rows, extra:extra, carry:carry, per:per, planned:planned,
-           squad:squad, squadExtra:squadExtra, met:planned > 0 && met, paused:paused0 };
+           squad:squad, squadExtra:squadExtra, coach:coach, met:planned > 0 && met, paused:paused0 };
 }
 /* Before planning existed a week counted on the old single target. */
 function weekMet(wk){
@@ -14563,14 +14649,14 @@ function mergeWeekMeta(mine, them){
   /* The coach's choices and her default numbers: a newer stamp wins, and a
      field this device has never had is filled from the server. */
   [["focus", "focusAt"], ["weekPlan", "weekPlanAt"], ["practice", "practiceAt"],
-   ["tests", "testsAt"], ["scProg", "scProgAt"], ["squad", "squadAt"]].forEach(function(f){
+   ["tests", "testsAt"], ["scProg", "scProgAt"], ["squad", "squadAt"], ["coach", "coachAt"]].forEach(function(f){
     var v = them[f[0]]; if(v == null) return;
     var newer = (+them[f[1]] || 0) > (+mine[f[1]] || 0);
     if(newer || mine[f[0]] == null){
       mine[f[0]] = weekClone(v);
       if(them[f[1]] != null) mine[f[1]] = them[f[1]];
       t = true;
-      if(newer && (f[0] === "focus" || f[0] === "scProg")) markRedraw(mine);
+      if(newer && (f[0] === "focus" || f[0] === "scProg" || f[0] === "coach")) markRedraw(mine);
       if(f[0] === "squad") addSquadP9(mine);
     }
   });
@@ -14600,8 +14686,6 @@ function weekItemView(it){
   var r = drillRef(it.id) || { name:"Drill", area:10 };
   var ts = TILE[r.area] || TILE[10];
   var why = it.why || "";
-  var foc = focusFor().filter(function(f){ return f.id === it.id; })[0];
-  if(foc) why = foc.why ? "Focus · " + foc.why : "Focus";
   if(it.carried) why = "Moved on from last week" + (why ? " · " + why : "");
   return { nm:r.name, sub:why || (r.gym ? "Optional S&C" : "Quick drill"), tint:r.gym ? "var(--surface-2)" : ts.tint,
            ic:r.gym ? (r.gym === 4 ? TICON.bolt : TICON.band) : TICON[ts.ic] };
@@ -14680,6 +14764,20 @@ function renderWeek(){
     });
     html += '</div>';
   }
+  if(st.coach.length){
+    var cp = st.per.coach, cpips = "";
+    for(var ci = 0; ci < cp.want; ci++) cpips += '<i class="' + (ci < cp.got ? "on" : "") + '"></i>';
+    html += '<div class="wkgrp wksquad wkcoach"><div class="wkgh"><h2>Coach</h2><span class="num">' + cp.got + ' of ' + cp.want + '</span></div>' +
+            '<div class="wkpips">' + cpips + '</div>';
+    st.coach.forEach(function(q, qi){
+      var v = coachView(q.c);
+      if(q.done){ html += doneRow(v, q.done, null, false); return; }
+      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
+        '<button type="button" class="wkgo" data-coach="' + qi + '"><span class="wkic">' + v.ic(22) + '</span>' +
+        '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b><span>' + String(v.sub).replace(/&(?!amp;)/g, "&amp;").replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
+    });
+    html += '</div>';
+  }
   WEEK_KINDS.forEach(function(k){
     var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
     if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
@@ -14719,7 +14817,7 @@ function renderWeek(){
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
   var n = st.rec ? st.rec.n : defaultNums();
-  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
+  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + (st.coach.length ? st.coach.length + ' coach \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
           '<button type="button" id="wkSet">Change in Settings</button>' +
           '<button type="button" id="wkLog">Log play, coaching or practice</button></div>';
   host.innerHTML = html;
@@ -14731,6 +14829,7 @@ function renderWeek(){
     if(b.id === "wkSet"){ openSettings(); return; }
     if(b.id === "wkLog"){ openLogHours(); return; }
     if(b.hasAttribute("data-squad")){ state.fromWeek = true; openTest(b.getAttribute("data-squad")); return; }
+    if(b.hasAttribute("data-coach")){ var cq = st.coach[+b.getAttribute("data-coach")]; if(cq) coachOpen(cq.c); return; }
     if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
     if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
     if(b.hasAttribute("data-chg")){ openWeekChange(wk, +b.getAttribute("data-chg")); return; }
@@ -14800,7 +14899,7 @@ function openWeekChange(wk, idx){
   var lastSrc = null;
   opts.forEach(function(o){
     if(it.k === "drill" && o.src !== lastSrc){
-      html += '<div class="wkoh">' + (o.src === "focus" ? "Your coach's focus" : o.src === "weak" ? "Where you are placing lowest" : "Everything else") + '</div>';
+      html += '<div class="wkoh">' + (o.src === "weak" ? "Where you are placing lowest" : "Everything else") + '</div>';
       lastSrc = o.src;
     }
     html += '<button type="button" class="wkopt' + (o.cur ? " cur" : "") + '" data-id="' + o.id + '"' + (o.cur ? " disabled" : "") +
@@ -14859,17 +14958,23 @@ function renderSettings(mode){
     (sqw.length ? sqw.map(function(q){ return testById(q.id).name; }).join(", ") + ' \u00b7 set by your coach, every week'
                 : 'Set by your coach. Nothing set at the moment.') + '</small></span>' +
     '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_squad">' + sqw.length + '</b><span class="setlock"></span></span></div>';
+  var cow = coachFor(wk);
+  html += '<div class="bwrow setrow setsquad"><span><b>Coach</b><small>' +
+    (cow.length ? cow.map(function(c){ return coachView(c).nm.replace(/&(?!amp;)/g, "&amp;"); }).join(", ") + ' \u00b7 set by your coach, every week'
+                : 'Set by your coach. Nothing set at the moment.') + '</small></span>' +
+    '<span class="bwstep"><span class="setlock" aria-label="Set by your coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.2c.7 0 1.3.6 1.3 1.3v8.4c0 .7-.6 1.3-1.3 1.3H5.8c-.7 0-1.3-.6-1.3-1.3v-8.4c0-.7.6-1.3 1.3-1.3zm2.2 0h5.6V7.5a2.8 2.8 0 0 0-5.6 0z"></path></svg></span><b class="num" id="setN_coach">' + cow.length + '</b><span class="setlock"></span></span></div>';
   WEEK_KINDS.forEach(function(k){
     var v = itemsOf(r, k).length;
     html += '<div class="bwrow setrow"><span><b>' + WEEK_WORD[k].replace("&", "&amp;") + '</b>' +
       (k === "sc" ? '<small>' + scProg().turn + '</small>'
        : k === "main" ? '<small>Longest since you did it, and least done lately</small>'
-       : '<small>Your coach’s focus first, then where you are placing lowest</small>') + '</span>' +
+       : '<small>Optional. Where you are placing lowest, then what has waited longest</small>') + '</span>' +
       '<span class="bwstep"><button type="button" data-k="' + k + '" data-d="-1" aria-label="One fewer ' + WEEK_ONE[k] + '"' + (v <= 0 ? " disabled" : "") + '>−</button>' +
       '<b class="num" id="setN_' + k + '">' + v + '</b>' +
       '<button type="button" data-k="' + k + '" data-d="1" aria-label="One more ' + WEEK_ONE[k] + '"' + (v >= weekMax(k) ? " disabled" : "") + '>+</button></span></div>';
   });
   var list = sqw.map(function(q){ return testById(q.id).name + " (squad)"; })
+    .concat(cow.map(function(c){ return coachView(c).nm.replace(/&(?!amp;)/g, "&amp;") + " (coach)"; }))
     .concat(r.items.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }));
   var moving = which === "next" ? weekState(weekOf()).carry.map(function(it){ return weekItemView(it).nm.replace(/&(?!amp;)/g, "&amp;"); }) : [];
   html += '<p class="note setlist">' + (list.length ? "The app has picked: " + list.join(", ") + "." : "Nothing planned.") +
@@ -14881,12 +14986,6 @@ function renderSettings(mode){
       : '<button type="button" class="setgo" id="setConfirm">That’s my week</button>') +
     '</div>';
 
-  var foc = rev ? [] : focusFor();
-  if(!rev) html += '<div class="setgrp"><div class="wkgh"><h2>Focus</h2><span>set by your coach</span></div>' +
-    (foc.length ? '<ul class="setfocus">' + foc.map(function(f){
-      var d = drillRef(f.id); return '<li><b>' + d.name.replace(/&(?!amp;)/g, "&amp;") + '</b>' + (f.why ? '<span>' + String(f.why).replace(/</g, "&lt;") + '</span>' : '') + '</li>';
-    }).join("") + '</ul>' : '<p class="note">None set. Quick drills come from where you are placing lowest.</p>') +
-    '</div>';
 
   if(!rev) html += '<div class="setgrp">' + remindBlock() + '</div>';
   if(rev) html += '<div class="setgrp"><div class="wkgh"><h2>Send it on</h2></div>' +
@@ -14921,9 +15020,10 @@ function openReview(){ renderWeekReview(); show("review"); }
    the app, so the week she plans from is the week that actually happened. */
 function weekReview(){
   var wk = weekOf(), st = weekState(wk), end = addDays(wk, 6);
-  var groups = ["squad"].concat(WEEK_KINDS).filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
+  var groups = WEEK_GROUPS.filter(function(k){ return st.per[k] && (st.per[k].want || st.per[k].got); });
   var left = [];
   st.squad.forEach(function(q){ if(!q.done) left.push(testById(q.id).name); });
+  st.coach.forEach(function(q){ if(!q.done) left.push(coachView(q.c).nm); });
   st.rows.forEach(function(x){ if(!x.done) left.push(weekItemView(x.it).nm); });
   var mins = { practice:0, tech:0, play:0 };
   mine().forEach(function(x){ if(x.date < wk || x.date > end) return; var k = hoursKind(x); if(k && mins[k] != null) mins[k] += sessMins(x); });
@@ -15739,9 +15839,9 @@ function renderCoach(){
   });
 }
 
-/* ---- her week and her focus areas ----
-   The week is read as she set it; the focus areas are the coach's to set. They
-   are the quick drills her week starts with, each with a few words of why, and
+/* ---- her week, and the sessions the coach makes compulsory ----
+   The week is read as she set it; the coach sessions are the coach's to set. They
+   are anything in the app, each with a few words of why, and
    they reach her phone by their own stamp, so nothing she set is touched. */
 function asPlayer(p, fn){
   var was = state.activePlayer; state.activePlayer = p.id;
@@ -15750,8 +15850,8 @@ function asPlayer(p, fn){
 function coachWeekLine(p){
   var el = document.createElement("p"); el.className = "cnote";
   var wst = asPlayer(p, function(){ return weekState(weekOf(), false); });
-  var bits = ["squad"].concat(WEEK_KINDS).filter(function(k){ return wst.per[k].want || wst.per[k].got; }).map(function(k){
-    return wst.per[k].got + " of " + wst.per[k].want + " " + (k === "sc" ? "S&C" : k === "main" ? "main" : k === "squad" ? "squad" : "drills");
+  var bits = WEEK_GROUPS.filter(function(k){ return wst.per[k].want || wst.per[k].got; }).map(function(k){
+    return wst.per[k].got + " of " + wst.per[k].want + " " + weekShort(k);
   });
   el.innerHTML = '<em>This week</em>';
   var dh = asPlayer(p, function(){ return diseHours(); });
@@ -15759,42 +15859,56 @@ function coachWeekLine(p){
     " DiSE: " + hrs(dh.total) + " of " + DISE_TARGET + " hours."));
   return el;
 }
-function coachFocusBox(p){
+/* The coach's own compulsory sessions: anything in the app, every week from
+   the week it is added, shown and counted on her week exactly like the
+   squad's. Each can carry a few words of why, which she sees on the row. */
+function coachChoices(){
+  var esc = function(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  var g = [];
+  g.push(["Main sessions", liveAreas().map(function(a){ return ["main|" + a.id, ((TILE[a.id] || {}).nm || a.name) + " session"]; })]);
+  g.push(["Tests", allTests().filter(function(t){ return !t.retired && !t.squad; }).map(function(t){ return ["test|" + t.id, t.name]; })]);
+  g.push(["Quick drills", drillChoices().map(function(id){ return ["drill|" + id, drillRef(id).name]; })]);
+  g.push(["S&C", GYM.filter(function(x){ return !x.extra && !x.retired; }).map(function(x){ return ["sc|" + x.id, "S&C · " + stripTags(x.name)]; })]);
+  return { groups:g, esc:esc };
+}
+function coachSetBox(p){
   var box = document.createElement("div"); box.className = "cfocus";
   function save(list){
-    p.focus = list; p.focusAt = Date.now();
+    p.coach = list; p.coachAt = Date.now();
     markRedraw(p);
     try{ saveLocal(); }catch(e){}
     asPlayer(p, function(){ try{ cloudMeta(); }catch(e){} });
     draw();
   }
+  function cur(){ return asPlayer(p, function(){ return coachList(p).slice(); }); }
   function draw(){
-    var foc = focusFor(p).slice();
-    var have = {}; foc.forEach(function(f){ have[f.id] = 1; });
-    var opts = drillChoices().filter(function(id){ return !have[id]; }).map(function(id){
-      return '<option value="'+id+'">'+drillRef(id).name.replace(/&/g,"&amp;")+'</option>'; }).join("");
-    box.innerHTML = '<p class="cnote"><em>Focus areas</em>The quick drills her week starts with, in this order.</p>' +
-      (foc.length ? '<ul class="cflist">' + foc.map(function(f, i){
-        return '<li><b>'+drillRef(f.id).name.replace(/&/g,"&amp;")+'</b>'+
-          '<input data-why="'+i+'" value="'+String(f.why||"").replace(/"/g,"&quot;")+'" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why">'+
-          (i ? '<button type="button" data-up="'+i+'" aria-label="Move up">↑</button>' : '<span class="cfgap"></span>')+
-          '<button type="button" data-del="'+i+'" aria-label="Remove">×</button></li>';
-      }).join("") + '</ul>' : '<p class="cnote">None. Her drills come from where she is placing lowest.</p>') +
-      '<div class="cfadd"><select aria-label="Add a focus area">'+opts+'</select><button type="button" data-add="1">Add</button></div>';
+    var list = cur(), ch = coachChoices(), esc = ch.esc;
+    var have = {}; list.forEach(function(c){ have[c.k + "|" + c.id] = 1; });
+    var opts = '<option value="">Add a session…</option>' + ch.groups.map(function(gr){
+      var o = gr[1].filter(function(x){ return !have[x[0]]; });
+      return o.length ? '<optgroup label="' + esc(gr[0]) + '">' + o.map(function(x){ return '<option value="' + esc(x[0]) + '">' + esc(x[1]) + '</option>'; }).join("") + '</optgroup>' : '';
+    }).join("");
+    box.innerHTML = '<p class="cnote"><em>Coach</em>Your own compulsory sessions. Every week from the week you add one, on top of her numbers. Her week is not done until they are.</p>' +
+      (list.length ? '<ul class="cflist">' + list.map(function(c, i){
+        var v = asPlayer(p, function(){ return coachView(c); });
+        return '<li><b>' + esc(v.nm) + (c.from ? '<small>since ' + esc(fmtDate(c.from)) + '</small>' : '') + '</b>' +
+          '<input data-why="' + i + '" value="' + String(c.why || "").replace(/"/g, "&quot;") + '" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why">' +
+          '<button type="button" data-del="' + i + '" aria-label="Remove">×</button></li>';
+      }).join("") + '</ul>' : '<p class="cnote">None set.</p>') +
+      '<div class="cfadd"><select aria-label="Add a coach session">' + opts + '</select><button type="button" data-add="1">Add</button></div>';
     box.querySelectorAll("[data-why]").forEach(function(inp){
-      inp.onchange = function(){ var l = focusFor(p).slice(); var i = +inp.getAttribute("data-why");
-        l[i] = { id:l[i].id, why:inp.value.trim() }; save(l); };
-    });
-    box.querySelectorAll("[data-up]").forEach(function(b){
-      b.onclick = function(){ var l = focusFor(p).slice(), i = +b.getAttribute("data-up");
-        var t = l[i-1]; l[i-1] = l[i]; l[i] = t; save(l); };
+      inp.onchange = function(){ var l = cur(); var i = +inp.getAttribute("data-why");
+        l[i] = Object.assign({}, l[i], { why:inp.value.trim() }); save(l); };
     });
     box.querySelectorAll("[data-del]").forEach(function(b){
-      b.onclick = function(){ var l = focusFor(p).slice(); l.splice(+b.getAttribute("data-del"), 1); save(l); };
+      b.onclick = function(){ var l = cur(); l.splice(+b.getAttribute("data-del"), 1); save(l); };
     });
-    var add = box.querySelector("[data-add]");
-    add.onclick = function(){ var v = box.querySelector("select").value; if(!v) return;
-      var l = focusFor(p).slice(); l.push({ id:v, why:"" }); save(l); };
+    box.querySelector("[data-add]").onclick = function(){
+      var v = box.querySelector("select").value; if(!v) return;
+      var k = v.slice(0, v.indexOf("|")), id = v.slice(v.indexOf("|") + 1);
+      if(k === "main" || k === "sc") id = +id;
+      var l = cur(); l.push({ k:k, id:id, from:weekOf(), why:"" }); save(l);
+    };
   }
   draw();
   return box;
@@ -15802,14 +15916,14 @@ function coachFocusBox(p){
 
 /* ---- her programme: the coach's page for one player ----
    Which session she does in each area, which test and how often, which S&C
-   programme, and the quick drills her week starts with. She sees the result on
+   programme, and the sessions the squad and the coach make compulsory. She sees the result on
    This week; the choosing is done here. */
 function coachProgLine(p){
   var el = document.createElement("p"); el.className = "cnote";
-  var foc = focusFor(p).map(function(f){ return drillRef(f.id).name + (f.why ? " (" + f.why + ")" : ""); });
+  var co = asPlayer(p, function(){ return coachList(p).map(function(c){ return coachView(c).nm; }); });
   el.innerHTML = '<em>Programme</em>';
   var sq = (p.squad || []).filter(function(x){ return x && testById(x.id); }).map(function(x){ return testById(x.id).name; });
-  el.appendChild(document.createTextNode((sq.length ? "Squad: " + sq.join(", ") + " \u00b7 " : "") + scProg(p).nm + " \u00b7 focus: " + (foc.length ? foc.join(", ") : "none")));
+  el.appendChild(document.createTextNode((sq.length ? "Squad: " + sq.join(", ") + " \u00b7 " : "") + (co.length ? "Coach: " + co.join(", ") + " \u00b7 " : "") + scProg(p).nm));
   return el;
 }
 function renderProg(){
@@ -15864,12 +15978,8 @@ function renderProg(){
       saveEdit(); renderProg();
     };
   });
+  g0.appendChild(coachSetBox(p));
   host.insertBefore(g0, host.firstChild);
-
-  var g3 = document.createElement("div"); g3.className = "setgrp";
-  g3.innerHTML = '<div class="wkgh"><h2>Quick drills</h2></div>';
-  g3.appendChild(coachFocusBox(p));
-  host.appendChild(g3);
 }
 
 /* ---- removing a player ----
@@ -16025,7 +16135,7 @@ try{
   /* not "moved": there is already a function of that name in here, and a var at
      this scope hoists over it and takes the goals page down with it */
   var fixedUp = migrateToStrokes();
-  (state.players || []).forEach(function(p){ fixedUp += dropSeededTargets(p); if(addSquadP9(p)) fixedUp++; });
+  (state.players || []).forEach(function(p){ fixedUp += dropSeededTargets(p); if(addSquadP9(p)) fixedUp++; if(coachMigrate(p)) fixedUp++; });
   if(fixedUp) saveLocal();
 }catch(e){}
 applyCouponIdentity();
