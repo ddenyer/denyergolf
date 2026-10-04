@@ -228,6 +228,12 @@
   .sqcell.holed{background:var(--accent-wash)}
   .sqcell.three{background:var(--surface-2)}
   .sqsum{margin-top:10px}
+  .p9pick{grid-template-columns:repeat(3, 1fr)}
+  .p9grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:6px}
+  .p9grid .sqcell{padding:7px 0}
+  .p9grid .sqcell .h{font-size:11px; color:var(--ink-2); font-weight:600}
+  .sqcell.p9-easy{background:var(--t-app)} .sqcell.p9-medium{background:var(--t-wedge)} .sqcell.p9-hard{background:var(--accent-wash)}
+  .p9now.p9-easy{border-left:5px solid var(--t-app)} .p9now.p9-medium{border-left:5px solid var(--t-wedge)} .p9now.p9-hard{border-left:5px solid var(--accent-wash)}
   .sqpast{overflow-x:auto; margin-top:12px}
   .sqpast table{width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums}
   .sqpast th, .sqpast td{text-align:left; padding:5px 6px; border-bottom:1px solid var(--line)}
@@ -2565,7 +2571,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-04", note:"The weekly review can be downloaded as a Word file from the bottom of Review: every session and score, the squad card hole by hole, the hours and the DiSE hours still to go, and next week\u2019s plan, ready to email or upload. Review is the tab at the top for looking back at the week and planning the next" };
+var BUILD = { on:"2026-10-04", note:"Two regional squad tests, each compulsory every week once your coach switches it on: Regional Squad Putting SGx18 and Regional Squad Perfect 9, nine short game shots finished inside one, two and three clubs in as few attempts as possible (9 is perfect). Both go in the weekly Word file" };
 var AREAS = [
 { id:10, no:1, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3594,6 +3600,12 @@ function areaMax(a){ var m=0; liveSets(a).forEach(function(s){ m+=setMax(s); });
 var SQ18 = [[3,1.04],[4,1.13],[5,1.23],[6,1.34],[7,1.42],[8,1.50],[10,1.61],[12,1.70],[15,1.79],
             [18,1.85],[20,1.87],[25,1.93],[30,1.98],[35,2.03],[40,2.08],[45,2.12],[50,2.16],[60,2.24]];
 var SQ18_ID = "t-putt-sg18";
+/* The squad's Perfect 9: nine short-game shots, each played until it finishes
+   inside its distance. The squad sheet leaves the distances blank to fill in;
+   ours are the app's own rings, so a Perfect 9 reads like every other short
+   game number here: one club, two clubs, three clubs. */
+var P9 = [["easy", "Easy", 3, "one club"], ["medium", "Medium", 6, "two clubs"], ["hard", "Hard", 9, "three clubs"]];
+var P9_MAX = 5, P9_FAIL = 0;   /* not done in five scores nothing for that shot */
 var TESTS = [
 { id:"t-approach-pinhigh", retired:true, area:11, isTest:true, track:true, name:"Pin high or past",
   sub:"Never short from 125 to 185",
@@ -3722,7 +3734,7 @@ var TESTS = [
   ]},
 
 { id:"t-putt-sg18", area:4, isTest:true, squad:true, sg:true, shape:"sg18",
-  name:"18-hole SG putting challenge", sub:"The squad test \u00b7 one putt from each of 18 distances, 3 ft to 60 ft",
+  name:"Regional Squad Putting SGx18", sub:"The squad test \u00b7 one putt from each of 18 distances, 3 ft to 60 ft",
   why:"The regional squad's weekly test. Every hole is one putt from a set distance, holed out, and each is scored against the putts a good player expects from there. Plus means you beat the benchmark.",
   where:"Practice green", balls:18,
   ruleText:"Play the 18 holes in order, 3 ft to 60 ft, and hole out every one. Tap how many putts it took. Strokes gained on a hole is the card's expected putts less yours: holed from 8 ft is +0.50, two putts is \u22120.50. The 18-hole benchmark is 31.02.",
@@ -3730,6 +3742,14 @@ var TESTS = [
     return { id:"h"+(i+1), label:"Hole "+(i+1)+" \u00b7 "+x[0]+" ft", short:x[0]+" ft", sgKind:"card18",
              pd:x[0], par:x[1], balls:1, max:1 };
   }) },
+
+{ id:"t-short-p9", area:3, isTest:true, squad:true, shape:"p9", lower:true,
+  name:"Regional Squad Perfect 9", sub:"The squad test \u00b7 nine short-game shots in as few attempts as possible",
+  why:"The regional squad's weekly short game test. Nine shots, three easy, three medium, three hard, and you stay on each one until it finishes inside its distance. Nine attempts is perfect.",
+  where:"Short game area", balls:9,
+  ruleText:"Easy shots finish inside one club (3 ft), medium inside two clubs (6 ft), hard inside three clubs (9 ft). Do not leave a shot until it is done, up to five attempts. Your score is the attempts it took across the nine: 9 is perfect, and lower is better. A shot not done in five scores 0, and the card says how many of the nine were completed.",
+  sets:(function(){ var out = []; P9.forEach(function(t){ for(var i = 1; i <= 3; i++)
+    out.push({ id:t[0].charAt(0) + i, label:t[1] + " " + i, short:t[1] + " " + i, tier:t[0], tierNm:t[1], ft:t[2], clubs:t[3], balls:1, max:1 }); }); return out; })() },
 
 /* ---- the two short game matrices ----
    Neither of these is scored the way every other test is, so both carry a
@@ -6420,6 +6440,20 @@ function testRecent(t, runs, pct){
     'the average of three, by about '+nz.three+'. Anything smaller is the day, not the player.</p>';
   return out;
 }
+function squadStat(t, runs){
+  if(!runs.length) return "Not run yet. It is compulsory every week when your coach switches it on";
+  if(t.shape === "p9"){
+    var bestR = runs.slice().sort(function(a, b){ return p9Key(b) - p9Key(a); })[0], lastR = runs[runs.length-1];
+    var fx = function(r){ var q = p9Total(r, t); return q.total + " attempts, " + q.made + "/9"; };
+    return runs.length + (runs.length === 1 ? " run" : " runs") + " \u00b7 last <b>" + fx(lastR) + "</b> \u00b7 best <b>" + fx(bestR) + "</b>" +
+      " \u00b7 nine completed in nine attempts is perfect";
+  }
+  var vals = runs.map(function(r){ return +r.total || 0; });
+  var best = Math.max.apply(null, vals);
+  var f = function(v){ return t.shape === "sg18" ? sq18Fmt(v) : String(v); };
+  return runs.length + (runs.length === 1 ? " run" : " runs") + " \u00b7 last <b>" + f(vals[vals.length-1]) + "</b> \u00b7 best <b>" + f(best) + "</b>" +
+    " \u00b7 plus beats the benchmark";
+}
 function renderTests(){
   var host = $("testList"); if(!host) return;
   host.innerHTML = "";
@@ -6428,6 +6462,7 @@ function renderTests(){
      showing a nought, which is a score she did not get. */
   function testFig(t, runs, tot, pct, mxs){
     if(!runs.length) return '<span>not run</span>';
+    if(t.squad){ var lst = runs[runs.length-1]; return '<b>' + (t.shape === "sg18" ? sq18Fmt(lst.total || 0) : lst.total) + '</b><span>last run</span>'; }
     if(mxs) return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
     if(tot.n >= 40) return '<b>'+pct+'%</b><span>'+runs.length+' '+(runs.length===1?"run":"runs")+'</span>';
     return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
@@ -6462,9 +6497,9 @@ function renderTests(){
         '<p class="note">'+t.why+'</p>'+
         '<p class="note"><b>Scoring.</b> '+t.ruleText+'</p>'+
         '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
-        (mxs ? '' : testRecent(t, runs, pct))+
+        (mxs || t.squad ? '' : testRecent(t, runs, pct))+
         '<p class="tstat">'+
-          (mxs ? mxs.text
+          (t.squad ? squadStat(t, runs) : mxs ? mxs.text
                : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
                         : 'Nothing logged yet')+
                  ' \u00b7 aiming for '+(t.target||100))+'</p>'+
@@ -7658,6 +7693,16 @@ function renderSession(){
     updateTotal();
     return;
   }
+  if(a && a.shape === "p9"){
+    stashNotes();
+    var mb4 = $("sessMode") ? $("sessMode").parentNode : null;
+    if(mb4) mb4.hidden = true;
+    ["sessProg", "runBar", "navBack", "navNext"].forEach(function(id){ if($(id)) $(id).hidden = true; });
+    buildP9(a);
+    if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
+    updateTotal();
+    return;
+  }
   if(a && a.shape === "sg18"){
     stashNotes();
     var mb3 = $("sessMode") ? $("sessMode").parentNode : null;
@@ -7746,6 +7791,77 @@ function buildSq18(a){
   nb.style.marginTop = "18px";
   host.appendChild(nb);
   saveDraft();
+}
+/* ---- Perfect 9: one shot at a time, tap the attempts it took ---- */
+function p9Att(d, set){
+  var l = d.shots && d.shots[set.id]; var z = l && l[0] && l[0].z; if(!z) return null;
+  var v = parseInt(String(z).replace(/\D/g, ""), 10);
+  return v > P9_MAX ? P9_FAIL : v;            /* an early card stored a failed shot as 6 */
+}
+function p9Total(d, a){
+  var t = 0, n = 0, made = 0;
+  liveSets(a).forEach(function(s){ var v = p9Att(d, s); if(v != null){ t += v; n++; if(v > 0) made++; } });
+  return { total:t, done:n, made:made };
+}
+/* Better is more of the nine completed, then fewer attempts: a failed shot
+   scores 0, so attempts alone would reward failing one. */
+function p9Key(s){ var a = testById("t-short-p9"); var r = p9Total(s, a); return r.made * 100 - r.total; }
+function buildP9(a){
+  var d = state.draft, sets = liveSets(a);
+  d.shots = d.shots || {};
+  var firstOpen = -1;
+  sets.forEach(function(s, i){ if(firstOpen < 0 && p9Att(d, s) == null) firstOpen = i; });
+  if(d.sqAt == null || d.sqAt < 0 || d.sqAt >= sets.length) d.sqAt = firstOpen < 0 ? 0 : firstOpen;
+  var at = d.sqAt, cur = sets[at], done = firstOpen < 0, have = p9Att(d, cur), sum = p9Total(d, a);
+  var host = $("sessCards"); host.innerHTML = "";
+  var top = document.createElement("p"); top.className = "shotask";
+  top.textContent = done ? "All nine in. Check the card, then save."
+    : "Stay on each shot until it finishes inside its distance. Tap how many attempts it took.";
+  host.appendChild(top);
+  var card = document.createElement("div"); card.className = "sqnow p9now p9-" + cur.tier;
+  card.innerHTML = '<p class="eyebrow">Shot ' + (at + 1) + ' of 9' + (have != null ? ' \u00b7 changing it' : '') + '</p>' +
+    '<h3>' + cur.label + '</h3><p class="sqpar">Finish inside <b>' + cur.clubs + '</b>, about ' + cur.ft + ' ft.</p>' +
+    '<div class="sqpick p9pick">' + [1, 2, 3, 4, 5, P9_FAIL].map(function(n){
+      return '<button type="button" data-a="' + n + '"' + (have === n ? ' class="on"' : '') + '><b>' + (n === P9_FAIL ? "\u2715" : n) + '</b><span>' +
+        (n === 1 ? "first go" : n === P9_FAIL ? "not in five, 0" : "attempts") + '</span></button>';
+    }).join("") + '</div>';
+  host.appendChild(card);
+  card.querySelectorAll("[data-a]").forEach(function(b){
+    b.addEventListener("click", function(){
+      d.shots[cur.id] = [{ z:"a" + b.getAttribute("data-a") }];
+      var next = -1;
+      for(var k = 1; k <= sets.length; k++){ var j = (at + k) % sets.length; if(p9Att(d, sets[j]) == null){ next = j; break; } }
+      d.sqAt = next < 0 ? at : next;
+      stashNotes(); buildP9(a); updateTotal();
+      if($("sessNotes")) $("sessNotes").value = d.notes || "";
+    });
+  });
+  var grid = document.createElement("div"); grid.className = "sqgrid";
+  grid.innerHTML = '<p class="eyebrow">The card \u00b7 tap a shot to change it</p><div class="p9grid">' + sets.map(function(s, i){
+    var v = p9Att(d, s);
+    return '<button type="button" class="sqcell p9-' + s.tier + (i === at ? " at" : "") + '" data-h="' + i + '">' +
+      '<span class="h">' + s.label + '</span><span class="ft">' + s.ft + ' ft</span>' +
+      '<span class="p">' + (v == null ? "\u2013" : v === P9_FAIL ? "\u2715" : v) + '</span></button>';
+  }).join("") + '</div><p class="note sqsum">' + sum.done + ' of 9 shots played \u00b7 ' + sum.made + ' completed \u00b7 ' + sum.total + ' attempts' +
+    (sum.done === 9 ? (sum.total === 9 && sum.made === 9 ? ' \u00b7 perfect' : ' \u00b7 perfect is 9') : '') + '</p>';
+  host.appendChild(grid);
+  grid.querySelectorAll("[data-h]").forEach(function(b){
+    b.addEventListener("click", function(){ d.sqAt = +b.getAttribute("data-h"); stashNotes(); buildP9(a); if($("sessNotes")) $("sessNotes").value = d.notes || ""; });
+  });
+  var nb = notesBlock("sessNotes", "Session notes \u00b7 what worked \u00b7 one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+  saveDraft();
+}
+function p9PastHtml(a, s){
+  var sum = p9Total(s, a);
+  var rows = liveSets(a).map(function(set){
+    var v = p9Att(s, set);
+    return '<tr><td>' + set.label + '</td><td>' + set.clubs + ' (' + set.ft + ' ft)</td><td>' + (v == null ? "\u2013" : v === P9_FAIL ? "0, not in five" : v) + '</td></tr>';
+  }).join("");
+  return '<div class="pastsum"><div><b>' + sum.total + '</b><span>attempts</span></div><div><b>' + sum.made + '</b><span>of 9 completed</span></div>' +
+    '<div><b>9</b><span>is perfect</span></div></div>' +
+    '<div class="sqpast"><table><thead><tr><th>Shot</th><th>Finish inside</th><th>Attempts</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
 }
 /* The saved card, read back */
 function sq18PastHtml(a, s){
@@ -11398,6 +11514,17 @@ function updateTotal(){
     saveDraft();
     return;
   }
+  if(a.shape === "p9"){
+    var p9 = p9Total(d, a);
+    d.total = p9.total; d.max = 9; d.balls = p9.done;
+    $("totFig").textContent = String(p9.total);
+    $("totOf").textContent = "attempts";
+    $("totVs").innerHTML = p9.made + "/9 done";
+    $("saveBtn").textContent = "Save session";
+    $("saveBtn").disabled = false;
+    saveDraft();
+    return;
+  }
   if(!d.scores) d.scores = {};
   var t = 0; a.sets.forEach(function(s){ setParts(s).forEach(function(p){ t += (d.scores[p.key]||0); }); });
   d.total = t;
@@ -12895,6 +13022,7 @@ function sessStatus(x){
 }
 function sessLabel(x){
   if(x.kind === "log") return logLabel(x);
+  if(x.kind === "test" && testById(x.testId)) return "Test \u00b7 " + testById(x.testId).name;
   return isSpeed(x) ? "Speed sticks"
        : isBand(x) ? "Band session"
        : isPrep(x) ? "Movement prep"
@@ -12927,6 +13055,7 @@ function renderSessions(){
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
       '<span class="s">'+(x.kind==="log" ? hrs(x.hours||0)+" h" : x.kind==="gym" ? x.total+"/"+x.max+" sets"
+                          : area(x.areaId) && area(x.areaId).shape === "p9" ? x.total+" att."
                           : x.sgUnknown ? "\u2013"
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
                           : x.total+"/"+x.max)+'</span>'+
@@ -13053,6 +13182,13 @@ function openPast(s){
   var h = "";
 
   var pa = isGym ? null : area(s.areaId);
+  if(pa && pa.shape === "p9"){
+    $("pastBody").innerHTML = p9PastHtml(pa, s) +
+      '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
+      (s.notes ? String(s.notes).replace(/</g,"&lt;") : "Nothing written down for this one.")+'</p></div>';
+    show("past");
+    return;
+  }
   if(pa && pa.shape === "sg18"){
     $("pastBody").innerHTML = sq18PastHtml(pa, s) +
       '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
@@ -13316,7 +13452,7 @@ function sessMins(s){
   } else if(s.kind === "drill"){
     var d = drillById(s.drillId); base = (d && d.mins) || 20;
   } else if(s.kind === "test"){
-    var t = testById(s.testId); base = t && t.squad ? 35 : 45;
+    var t = testById(s.testId); base = t && t.shape === "sg18" ? 60 : t && t.shape === "p9" ? 45 : 45;   /* the squad putting card takes an hour */
   } else if(s.kind === "practice"){
     base = 60;
   } else return 0;
@@ -13358,7 +13494,7 @@ function renderDise(){
     '</div>' +
     '<p class="note">' + (h.perWeek ? hrs(h.perWeek) + ' hours a week over the last four weeks' +
       (h.eta ? ', which gets you to ' + DISE_TARGET + ' by ' + longDate(h.eta) + '.' : '.') : 'Nothing in the last four weeks yet.') +
-      ' Sessions count at an estimate of how long they take: a main session an hour, a test 45 minutes, a quick drill its own length.</p>' +
+      ' Sessions count at an estimate of how long they take: a main session an hour, the squad putting challenge an hour, other tests 45 minutes, a quick drill its own length.</p>' +
     '<button type="button" class="setgo" id="diseLog">Log play, coaching or practice</button></div>';
   $("diseLog").onclick = function(){ openLogHours(); };
 }
@@ -13548,6 +13684,14 @@ function weekDocBody(){
       return [String(i + 1), set.pd + " ft", set.par.toFixed(2), n == null ? "" : n === 4 ? "4+" : String(n), n == null ? "" : sq18Fmt(set.par - n)];
     })), [900, 1200, 1300, 1100, 1300]);
   });
+  ss.filter(function(x){ return x.kind === "test" && testById(x.testId) && testById(x.testId).shape === "p9"; }).forEach(function(x){
+    var a = testById(x.testId);
+    h += wPara(a.name + ", " + fmtDate(x.date) + ": " + x.total + " attempts, " + p9Total(x, a).made + " of 9 completed (9 in 9 is perfect)", { b:true, sz:24, before:120 });
+    h += wTable([["Shot", "Finish inside", "Attempts"]].concat(liveSets(a).map(function(set){
+      var v = p9Att(x, set);
+      return [set.label, set.clubs + " (" + set.ft + " ft)", v == null ? "" : v === P9_FAIL ? "0 (not in five)" : String(v)];
+    })), [1800, 2600, 1400]);
+  });
   /* any records */
   var recs = []; ss.forEach(function(x){ recordsFor(x).forEach(function(r){ recs.push(r.title + ": " + r.body); }); });
   if(recs.length){ h += wPara("Records", { b:true, sz:26, before:120 }); recs.forEach(function(r){ h += wPara(r, {}); }); }
@@ -13613,6 +13757,7 @@ function sessResult(s){
   var a = area(s.drillId || s.testId || s.areaId);
   if(s.total == null || s.sgUnknown) return "";
   if(a && a.shape === "sg18") return sq18Fmt(s.total) + " strokes gained";
+  if(a && a.shape === "p9"){ var pr = p9Total(s, a); return s.total + " attempts, " + pr.made + " of 9 completed"; }
   if(a && isSG(a)) return fmtSG(s.total) + " strokes";
   return s.max ? s.total + " of " + s.max : String(s.total);
 }
@@ -13680,8 +13825,10 @@ function recordsFor(sess){
     var key = sess.kind === "drill" ? "drillId" : "testId";
     var pr2 = priorOf(sess, function(x){ return x.kind === sess.kind && x[key] === sess[key]; })
       .filter(function(x){ return x.total != null && !x.sgUnknown; });
-    if(pr2.length >= (sess.kind === "test" ? 1 : 2) && sess.total != null &&
-       sess.total > Math.max.apply(null, pr2.map(function(x){ return x.total; })))
+    var isP9 = sess.kind === "test" && sess.testId === "t-short-p9";
+    if(pr2.length >= (sess.kind === "test" ? 1 : 2) && sess.total != null && (isP9
+         ? p9Key(sess) > Math.max.apply(null, pr2.map(p9Key))
+         : sess.total > Math.max.apply(null, pr2.map(function(x){ return x.total; }))))
       push("best", (sess.kind === "test" ? "Test best: " : "Drill record: ") + name,
            sessResult(sess) + ", better than all " + pr2.length + " before it.");
     var br2 = sess.bestRun || 0, pr3 = 0;
@@ -14432,6 +14579,8 @@ function doneWords(s){
   if(!s) return "";
   if(s.kind === "gym") return "Done " + shortDate(s.date);
   var a = area(s.areaId);
+  if(s.total != null && a && a.shape === "p9") return "Done " + shortDate(s.date) + " · " + s.total + " attempts, " + p9Total(s, a).made + "/9";
+  if(s.total != null && a && a.shape === "sg18") return "Done " + shortDate(s.date) + " · " + sq18Fmt(s.total);
   if(s.total != null && a && isSG(a) && !s.sgUnknown) return "Done " + shortDate(s.date) + " · " + fmtSG(s.total);
   if(s.total != null && s.max) return "Done " + shortDate(s.date) + " · " + s.total + "/" + s.max;
   return "Done " + shortDate(s.date);
