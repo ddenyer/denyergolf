@@ -13,6 +13,7 @@
 //        coach or manager; the ticks are kept as they are on the server
 // POST { code, action:"tick", event, player, item, done }                anyone with that player
 // POST { code, action:"date", date:{ id?, players?, kind, title, start, end, venue, notes, with } }
+//        kind "holiday": a school holiday, start and end are dates (YYYY-MM-DD)
 // POST { code, action:"date_del", id }                                   coach or manager
 // POST { code, action:"cal" }  -> { ok, url }   the calendar link, made the first time
 // POST { code, action:"cal_new" } -> { ok, url } a new link; the old one stops working
@@ -30,9 +31,9 @@ import { addNews, playerNames, STATUS_NEWS, niceDates, niceWhen, applyProposal }
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const WHEN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
-export const STATUSES = ['none', 'considering', 'entered', 'ballot', 'confirmed', 'reserve', 'withdrawn', 'played'];
+export const STATUSES = ['none', 'option', 'considering', 'entered', 'ballot', 'confirmed', 'reserve', 'withdrawn', 'played'];
 const OWNERS = ['player', 'manager', 'coach'];
-const KINDS = ['squad', 'lesson', 'other'];
+const KINDS = ['squad', 'lesson', 'other', 'holiday'];
 const ITEM = /^[a-z0-9-]{1,24}$/;
 
 const txt = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '')
@@ -72,6 +73,13 @@ export function cleanEntry(x, keep) {
 }
 export function cleanDate(d) {
   d = d || {};
+  // a school holiday is whole days: start and end are dates, not times
+  if (d.kind === 'holiday') {
+    const a = day(d.start) || day(String(d.start || '').slice(0, 10));
+    const b = day(d.end) || day(String(d.end || '').slice(0, 10));
+    return { kind: 'holiday', title: txt(d.title, 80) || 'School holiday', start: a, end: b && a && b >= a ? b : a,
+      venue: '', notes: txt(d.notes, 300), with: '' };
+  }
   return {
     kind: KINDS.indexOf(d.kind) > -1 ? d.kind : 'other',
     title: txt(d.title, 80) || (d.kind === 'lesson' ? 'Lesson' : d.kind === 'squad' ? 'Squad day' : 'Golf'),
@@ -99,7 +107,9 @@ export async function calUrl(players, by, fresh) {
     await sb('dg_cal', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ token, players: keys, created_by: by }) });
   }
   const host = process.env.PUBLIC_HOST || 'training.denyergolf.com';
-  return { url: `https://${host}/api/dg-cal?k=${token}`, webcal: `webcal://${host}/api/dg-cal?k=${token}` };
+  return { url: `https://${host}/api/dg-cal?k=${token}`, webcal: `webcal://${host}/api/dg-cal?k=${token}`,
+    // the options as a calendar of their own, so they can have their own colour
+    options: `webcal://${host}/api/dg-cal?k=${token}&f=options` };
 }
 
 export default async function handler(req, res) {

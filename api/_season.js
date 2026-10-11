@@ -60,7 +60,8 @@ function anchorDate(a, ev, en) {
 // The same rules as checkFor() in the app.
 export function checkFor(ev, en, today) {
   const st = en.status || 'none', out = [];
-  if (st === 'none' || st === 'withdrawn') return out;
+  // an option is on the list to look at, nothing more: no checklist, no reminders
+  if (st === 'none' || st === 'withdrawn' || st === 'option') return out;
   CHECK.forEach((it) => {
     let applies = it.on ? (!!it.on[st] || (it.done && it.done(en) && st !== 'considering'))
                         : (!!LIVE[st] && (it.anchor !== 'confirmed' || /confirmed|played/.test(st)));

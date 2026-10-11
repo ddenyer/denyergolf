@@ -2,7 +2,9 @@
 //
 // The DenyerGolf calendar, as a feed a phone or a Mac subscribes to.
 //
-// GET /api/dg-cal?k=<key>   -> text/calendar
+// GET /api/dg-cal?k=<key>             -> text/calendar, the DenyerGolf calendar
+// GET /api/dg-cal?k=<key>&f=options   -> the options only, as a calendar of its
+//                                        own, so it can have its own colour
 //
 // The key is the only thing that opens it: long, random, made by
 // /api/dg-season (action "cal"), and replaced there when it has been passed
@@ -14,13 +16,19 @@
 //   - entries open and entries close, as all-day reminders
 //   - each player's practice round and tee times, once they are known
 //   - squad days, lessons and anything else on dg_dates
+//   - school holidays, as whole days
+//   - tournaments marked as an option (on the list to look at, not yet being
+//     considered), with their entry dates, each marked (option)
+// The options can also be had on their own (&f=options), though the app no
+// longer offers that link: one calendar is less to set up.
 // Times are kept in the app as UK local time and written here in UTC, so the
 // calendar is right on any phone in any time zone.
 
 import { sbHeaders, timedFetch, safeLabel, safeKeys } from './dg-load.js';
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const ACTIVE = { considering: 1, entered: 1, ballot: 1, confirmed: 1, reserve: 1, played: 1 };
-const WORD = { considering: 'considering', entered: 'entered', ballot: 'in the ballot', confirmed: 'confirmed', reserve: 'reserve', played: 'played' };
+const WORD = { option: 'option', considering: 'considering', entered: 'entered', ballot: 'in the ballot', confirmed: 'confirmed', reserve: 'reserve', played: 'played' };
 
 // UK local "2027-08-09T07:30" to a UTC Date, through the zone database rather
 // than a guess about when the clocks change.
@@ -69,8 +77,9 @@ export function whoLine(rows, nm) {
   return rows.map((r) => nm(r.player) + ' (' + WORD[r.status] + ')').join(', ');
 }
 
-export function buildIcs({ name, events, entries, dates, nm, now }) {
+export function buildIcs({ name, events, entries, dates, nm, now, set }) {
   now = now || new Date();
+  const opts = set === 'options';
   const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DenyerGolf//Longer Closer Lower//EN', 'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH', 'X-WR-CALNAME:' + esc(name || 'DenyerGolf'), 'X-WR-TIMEZONE:Europe/London',
     'REFRESH-INTERVAL;VALUE=DURATION:PT1H', 'X-PUBLISHED-TTL:PT1H'];
@@ -96,16 +105,42 @@ export function buildIcs({ name, events, entries, dates, nm, now }) {
   events.forEach((ev) => {
     // a player with no row yet is Considering: everything on the list starts there
     const rows = ev.players.map((p) => entries.find((x) => x.event === ev.id && x.player === p) || { event: ev.id, player: p, status: 'considering' })
-      .filter((x) => ACTIVE[x.status]);
-    if (!rows.length) return;
+      .filter((x) => (opts ? x.status === 'option' : ACTIVE[x.status]));
+    if (!rows.length) {
+      // nobody past Option: in the same calendar, marked as an option
+      if (!opts && ev.players.some((p) => { const x = entries.find((y) => y.event === ev.id && y.player === p); return x && x.status === 'option'; })) {
+        const d0 = [ev.venue, ev.entry, ev.flag, ev.notes, ev.link].filter(Boolean).join('\n');
+        const tag = ' (option' + (ev.confirmed ? '' : ', provisional') + ')';
+        if (ev.start) allDay(ev.id + '@denyergolf', ev.start, ev.end, ev.name + tag, d0, ev.venue, ev.link);
+        if (!ev.start && ev.month) {
+          const y = +ev.year || 2027, d1 = y + '-' + String(ev.month).padStart(2, '0') + '-01';
+          allDay(ev.id + '-month@denyergolf', d1, d1, ev.name + ': ' + MONTHS[ev.month - 1] + ', dates TBC (option)', d0, '', ev.link);
+        }
+        if (ev.open) allDay(ev.id + '-open@denyergolf', ev.open, ev.open, 'Entries open: ' + ev.name + ' (option)', d0, '', ev.link);
+        if (ev.close) allDay(ev.id + '-close@denyergolf', ev.close, ev.close, 'Entries close: ' + ev.name + ' (option)', d0, '', ev.link);
+      }
+      return;
+    }
     const who = whoLine(rows, nm);
     const desc = [ev.venue, ev.entry, ev.close ? 'Entries close ' + ev.close : '', ev.flag, ev.notes, ev.link].filter(Boolean).join('\n');
+    if (opts) {
+      // the options calendar: when it is, and when entries open and close
+      const tag = ev.confirmed ? '' : ' (provisional)';
+      if (ev.start) allDay(ev.id + '-opt@denyergolf', ev.start, ev.end, 'Option: ' + ev.name + tag, desc, ev.venue, ev.link);
+      if (!ev.start && ev.month) {
+        const y = +ev.year || 2027, d1 = y + '-' + String(ev.month).padStart(2, '0') + '-01';
+        allDay(ev.id + '-optm@denyergolf', d1, d1, 'Option: ' + ev.name + ', ' + MONTHS[ev.month - 1] + ', dates TBC', desc, '', ev.link);
+      }
+      if (ev.open) allDay(ev.id + '-optopen@denyergolf', ev.open, ev.open, 'Entries open (option): ' + ev.name, desc, '', ev.link);
+      if (ev.close) allDay(ev.id + '-optclose@denyergolf', ev.close, ev.close, 'Entries close (option): ' + ev.name, desc, '', ev.link);
+      return;
+    }
     // dates the organiser has not confirmed yet are typed in as a guide, and say so
     if (ev.start) allDay(ev.id + '@denyergolf', ev.start, ev.end, ev.name + (ev.confirmed ? '' : ' (provisional)') + ': ' + who, desc, ev.venue, ev.link);
     // no dates even as a guide: a note on the 1st of its month, so the month is held in mind
     if (!ev.start && ev.month) {
       const y = +ev.year || 2027, d1 = y + '-' + String(ev.month).padStart(2, '0') + '-01';
-      const mon = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][ev.month - 1];
+      const mon = MONTHS[ev.month - 1];
       allDay(ev.id + '-month@denyergolf', d1, d1, ev.name + ': ' + mon + ', dates TBC (' + who + ')', desc, '', ev.link);
     }
     const live = rows.filter((r) => r.status !== 'played');
@@ -117,8 +152,15 @@ export function buildIcs({ name, events, entries, dates, nm, now }) {
         nm(r.player) + ': ' + ev.name + ', round ' + t.r + ' tee time', '', ev.venue));
     });
   });
+  if (opts) { L.push('END:VCALENDAR'); return L.map(fold).join('\r\n') + '\r\n'; }
   dates.forEach((d) => {
     if (!d.start) return;
+    // a school holiday: whole days, no names, shown as free time
+    if (d.kind === 'holiday') {
+      const a = String(d.start).slice(0, 10), b = String(d.end || d.start).slice(0, 10);
+      allDay(d.id + '@denyergolf', a, b >= a ? b : a, d.title || 'School holiday', d.notes || '', '', null);
+      return;
+    }
     const who = names(d.players.map(nm));
     const desc = [d.with ? 'With ' + d.with : '', d.notes].filter(Boolean).join('\n');
     timed(d.id + '@denyergolf', d.start, d.kind === 'lesson' ? 60 : 180, (who ? who + ': ' : '') + d.title, desc, d.venue, d.end);
@@ -152,15 +194,17 @@ export default async function handler(req, res) {
     codes.forEach((r) => { if (r.label && Array.isArray(r.players) && r.players.length === 1) display[r.players[0]] = safeLabel(r.label); });
     const nm = (p) => display[p] || (p.charAt(0).toUpperCase() + p.slice(1));
     const mine = (p) => keys.indexOf(p) > -1;
+    const set = String((req.query && req.query.f) || '') === 'options' ? 'options' : '';
     const ics = buildIcs({
-      name: cal[0].name,
+      set,
+      name: set ? (cal[0].name || 'DenyerGolf') + ' Options' : cal[0].name,
       events: ev.map((r) => ({ ...r.body, id: r.id, players: r.players.filter(mine) })),
       entries: en.map((r) => ({ ...r.body, event: r.event_id, player: r.player })),
       dates: dt.map((r) => ({ ...r.body, id: r.id, players: r.players.filter(mine) })),
       nm,
     });
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Content-Disposition', 'inline; filename="DenyerGolf.ics"');
+    res.setHeader('Content-Disposition', 'inline; filename="' + (set ? 'DenyerGolf-Options' : 'DenyerGolf') + '.ics"');
     res.setHeader('Cache-Control', 'private, max-age=300');
     return res.status(200).send(ics);
   } catch (err) {
