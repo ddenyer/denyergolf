@@ -94,11 +94,21 @@ export function nextSet(pl, monday) {
 }
 const DRILL_NAMES = {
   'd-mat-run': 'The run', 'd-mat-startline': 'Start line', 'd-mat-pace': 'Pace', 'd-gdn-corners': 'Four corners',
-  'd-gdn-circle': 'The circle', 'gym:4': 'Speed sticks', 'gym:5': 'The band session',
+  'd-gdn-circle': 'The circle', 'c-mat-startline': 'Ten through the gate', 'gym:4': 'Speed sticks', 'gym:5': 'The band session',
 };
+// Every drill comes in three lengths (id, id-x2, id-x3; the 18-hole lag's are
+// lag18, lag36, lag54), and a session at any length is the drill on her week.
+// A challenge (c-...) keeps its own id.
+export function drillKey(id) {
+  return String(id || '').replace(/-x[23]$/, '').replace(/^d-putt-lag(36|54)$/, 'd-putt-lag18');
+}
+function drillReps(id) {
+  const m = /-x([23])$/.exec(String(id || '')) || /^d-putt-lag(36|54)$/.exec(String(id || ''));
+  return m ? (m[1] === '36' ? 2 : m[1] === '54' ? 3 : +m[1]) : 1;
+}
 // The first planned quick drill she can do at home and has not done this week.
 export function drillLeft(plan, ss) {
-  const did = new Set(ss.map((x) => (x.kind === 'gym' ? 'gym:' + x.gym : x.drill)).filter(Boolean));
+  const did = new Set(ss.map((x) => (x.kind === 'gym' ? 'gym:' + x.gym : drillKey(x.drill))).filter(Boolean));
   const it = plan.items.find((x) => x && x.k === 'drill' && DRILL_NAMES[x.id] && !did.has(x.id));
   return it ? it.id : null;
 }
@@ -115,11 +125,18 @@ const TESTS = {
   't-putt-sg18': ['Regional Squad Putting SGx18', 4], 't-short-p9': ['Regional Squad Perfect 9', 3], 't-watson': ['The Watson matrix', 3],
   't-hundred': ['The Hundred', 3],
 };
-const SQUAD_TESTS = new Set(['t-putt-sg18', 't-short-p9']);
+const SQUAD_TESTS = new Set(['t-putt-sg18', 't-short-p9', 't-watson']);
 const DRILLS = {
-  'd-tee-driver': 'The driver', 'd-tee-woods': 'The woods', 'd-app-windows': 'Windows', 'd-wedge-ladder': 'The wedge ladder',
-  'd-short-bunkers': 'Bunkers', 'd-short-awkward': 'Awkward lies', 'd-short-updown': 'Up and down', 'd-putt-six': 'Inside six feet',
-  'd-putt-nine': 'Nine and twelve', 'd-putt-rotation': 'The rotation', 'd-putt-lag': 'The lag',
+  'd-tee-driver': 'The driver', 'd-tee-three': 'Three driver shots', 'd-tee-woods': 'The woods', 'd-app-windows': 'Windows and fade',
+  'd-app-number': 'Right number, approach', 'd-wedge-ladder': 'The wedge ladder', 'd-wedge-number': 'Right number, wedges',
+  'd-wedge-heights': 'Three heights', 'd-short-bunkers': 'Bunkers', 'd-short-awkward': 'Awkward lies', 'd-short-updown': 'Up and down',
+  'd-short-pitch': 'Pitching', 'd-putt-holing': 'Holing out', 'd-putt-lag18': '18-hole lag',
+  'd-putt-six': 'Inside six feet', 'd-putt-nine': 'Nine and twelve', 'd-putt-rotation': 'The rotation', 'd-putt-lag': 'The lag',
+  'c-putt-lag18': '18-hole lag challenge', 'c-putt-holing': 'Ten from six feet', 'c-short-updown': 'Five up and downs',
+  'c-short-bunkers': 'Five from the sand', 'c-short-awkward': 'One of each', 'c-short-pitch': 'The pitch ladder',
+  'c-wedge-ladder': 'Up and down the ladder', 'c-wedge-number': 'Five numbers', 'c-wedge-heights': 'Three heights, two numbers',
+  'c-tee-driver': 'Ten in the corridor', 'c-tee-three': 'Three shots, twice', 'c-tee-woods': 'Five with the woods',
+  'c-app-windows': 'Fade on demand', 'c-app-number': 'Five numbers, approach',
 };
 const GYM = { 1: 'Session 1', 2: 'Session 2', 3: 'Session 3', 7: 'Strength 1', 8: 'Strength 2', 9: 'Session A', 10: 'Session B' };
 function testOf(x) { return x.test || (x.kind === 'test' ? x.area : null); }
@@ -134,7 +151,7 @@ function coachHit(c, x) {
   if (c.k === 'sc') return x.kind === 'gym' && +x.gym === +c.id;
   if (c.k === 'drill') {
     const m = /^gym:(\d+)$/.exec(String(c.id));
-    return m ? x.kind === 'gym' && +x.gym === +m[1] : x.kind === 'drill' && x.drill === c.id;
+    return m ? x.kind === 'gym' && +x.gym === +m[1] : x.kind === 'drill' && drillKey(x.drill) === c.id;
   }
   return false;
 }
@@ -167,10 +184,16 @@ export function requiredLeft(pl, monday, ss) {
 // quarter hour; a part-done one at its share; S&C counts; warm-ups do not.
 const MINS_MAIN = { 10: 55, 11: 60, 2: 60, 3: 55, 4: 40, 'p-approach-short': 55, 'p-putt-lag': 40 };
 const MINS_TEST = { 't-tee-speed': 25, 't-approach-fade': 30, 't-approach-depth': 30, 't-wedge-number': 30,
-                    't-putt-lag': 30, 't-hundred': 60, 't-putt-sg18': 60, 't-short-p9': 45 };
-const MINS_DRILL = { 'd-tee-driver': 20, 'd-tee-woods': 20, 'd-app-windows': 25, 'd-wedge-ladder': 20, 'd-short-bunkers': 25,
-  'd-short-awkward': 30, 'd-short-updown': 20, 'd-putt-six': 25, 'd-putt-nine': 20, 'd-putt-rotation': 10, 'd-putt-lag': 20,
-  'd-gdn-corners': 15, 'd-gdn-circle': 15, 'd-mat-startline': 12, 'd-mat-pace': 12, 'd-mat-run': 15 };
+                    't-putt-lag': 30, 't-putt-lag18': 30, 't-hundred': 60, 't-putt-sg18': 60, 't-short-p9': 45 };
+// one length of each drill; the longer lengths are two and three times this
+const MINS_DRILL = { 'd-tee-driver': 20, 'd-tee-three': 20, 'd-tee-woods': 20, 'd-app-windows': 20, 'd-app-number': 20,
+  'd-wedge-ladder': 20, 'd-wedge-number': 20, 'd-wedge-heights': 20, 'd-short-bunkers': 20, 'd-short-awkward': 20,
+  'd-short-updown': 20, 'd-short-pitch': 20, 'd-putt-holing': 20, 'd-putt-lag18': 15,
+  'd-putt-six': 25, 'd-putt-nine': 20, 'd-putt-rotation': 10, 'd-putt-lag': 20,
+  'd-gdn-corners': 10, 'd-gdn-circle': 10, 'd-mat-startline': 10, 'd-mat-pace': 10, 'd-mat-run': 15 };
+// a challenge's clock, for one that ran out
+const CH_LIMIT = { 'c-putt-lag18': 30, 'c-putt-holing': 15, 'c-mat-startline': 10, 'c-wedge-number': 15, 'c-tee-three': 15,
+  'c-tee-woods': 15, 'd-mat-run': 15 };
 const quarterUp = (m) => Math.max(15, Math.ceil(m / 15) * 15);
 export function sessMins(x) {
   if (!x || x.status === 'live' || x.sample === 'true' || x.sample === true) return 0;
@@ -181,7 +204,15 @@ export function sessMins(x) {
     const g = +x.gym;
     if (g === 11 || g === 12 || g === 13) return 0;
     base = g === 4 || g === 5 ? 15 : g === 6 ? 10 : 40;
-  } else if (x.kind === 'drill') base = MINS_DRILL[x.drill] || 20;
+  } else if (x.kind === 'drill') {
+    // a challenge counts the time on its clock and a warm-up, like the Watson matrix
+    const ch = /^c-/.test(x.drill || '') || x.drill === 'd-mat-run';
+    if (ch && +x.mxend > 0) base = Math.min(+x.mxend, (CH_LIMIT[x.drill] || 20) * 60000) / 60000 + 10;
+    else {
+      base = (MINS_DRILL[drillKey(x.drill)] || 20) * drillReps(x.drill);
+      if (x.pair === 'true' || x.pair === true) base = base * 4 / 3;   // taking turns
+    }
+  }
   else if (x.kind === 'test') {
     const t = testOf(x);
     base = t === 't-watson' && +x.mxend > 0 ? Math.min(+x.mxend, 45 * 60000) / 60000 + 10 : (MINS_TEST[t] || 45);
@@ -195,7 +226,7 @@ export function diseTotal(all) { return all.reduce((t, x) => t + sessMins(x), 0)
 export function sessionName(x) {
   if (x.kind === 'practice') { const a = PRACTICE_TYPE[x.area] != null ? PRACTICE_TYPE[x.area] : +x.area; return MAIN[a] ? MAIN[a].toLowerCase() : 'practice'; }
   if (x.kind === 'test') { const t = TESTS[testOf(x)]; return t ? t[0] : 'test'; }
-  if (x.kind === 'drill') return DRILLS[x.drill] || DRILL_NAMES[x.drill] || 'quick drill';
+  if (x.kind === 'drill') return DRILLS[drillKey(x.drill)] || DRILL_NAMES[drillKey(x.drill)] || 'drill';
   if (x.kind === 'gym') return GYM[+x.gym] ? 'S&C ' + GYM[+x.gym] : (DRILL_NAMES['gym:' + x.gym] || 'S&C');
   return 'practice';
 }
@@ -320,7 +351,7 @@ export default async function handler(req, res) {
       if (!(row.player in sessCache)) {
         const ar = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_sessions?player=eq.${p}` +
           `&select=session_id,played_on,kind,status,gym:body->>gymId,drill:body->>drillId,test:body->>testId,area:body->>areaId,` +
-          `partial:body->>partial,hours:body->>hours,logType:body->>logType,sample:body->>sample,mxend:body->mx->>end&limit=5000`, { headers: H });
+          `partial:body->>partial,hours:body->>hours,logType:body->>logType,sample:body->>sample,mxend:body->mx->>end,pair:body->>pair&limit=5000`, { headers: H });
         sessCache[row.player] = ar.ok ? await ar.json() : [];
       }
       const all = sessCache[row.player];
