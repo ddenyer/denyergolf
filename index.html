@@ -27,6 +27,7 @@
     --line:#ebebeb; --line-strong:#dddddd;
     --accent:#e0565b; --accent-fill:#d6484e; --accent-wash:#fdf0f1;
     --gold:#9a7620; --heritage:#14614a;
+    --ch-bg:#173f33; --ch-line:#14614a; --ch-ink:#f3f7f2; --ch-eb:#f2cf7c; --ch-ring:#e7c46d;
     --up:#008a05; --down:#c13515;
     --up-wash:#eef7ee; --down-wash:#fdf0eb;
     --radius:12px; --radius-lg:16px;
@@ -54,6 +55,7 @@
     --line:#323234; --line-strong:#454547;
     --accent:#ff6f74; --accent-fill:#ff8287; --accent-wash:#331c1e;
     --gold:#d7ab55; --heritage:#4e9c7a;
+    --ch-bg:#1d4a3b; --ch-line:#4e9c7a; --ch-ink:#eef5f0; --ch-eb:#e8c26a; --ch-ring:#d7ab55;
     --up:#4fbf58; --down:#ff8a5c;
     --up-wash:#17261a; --down-wash:#2a1e17;
     --card: 0 0 0 1px var(--tile-edge);
@@ -78,6 +80,7 @@
     --line:#323234; --line-strong:#454547;
     --accent:#ff6f74; --accent-fill:#ff8287; --accent-wash:#331c1e;
     --gold:#d7ab55; --heritage:#4e9c7a;
+    --ch-bg:#1d4a3b; --ch-line:#4e9c7a; --ch-ink:#eef5f0; --ch-eb:#e8c26a; --ch-ring:#d7ab55;
     --up:#4fbf58; --down:#ff8a5c;
     --up-wash:#17261a; --down-wash:#2a1e17;
     --card: 0 0 0 1px var(--tile-edge);
@@ -826,6 +829,21 @@
   .seg button b{display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600}
   .seg button[aria-selected="true"]{border-color:var(--accent-fill); background:var(--accent-wash); color:var(--ink)}
   .seg button .due{color:var(--accent)}
+  .seg.lagopts{flex-direction:column; gap:6px}
+  .lagrow{display:flex; gap:4px; flex-wrap:wrap}
+  .lagrow button{flex:1 1 0; min-width:0}
+  .lagrow button:disabled{opacity:.4}
+  .lagnote{margin:2px 0 0}
+  /* the challenge: the pressure version of the drill, in its own colour at
+     the top so it reads as a different thing, not a fourth length */
+  .seg .chbox{display:grid; gap:2px; width:100%; text-align:left; cursor:pointer; border-radius:13px; padding:11px 14px;
+    background:var(--ch-bg); border:1.5px solid var(--ch-line); color:var(--ch-ink); font:inherit}
+  .seg .chbox b{font-size:16px; letter-spacing:-.01em; text-transform:none; color:var(--ch-ink); font-weight:700}
+  .seg .chbox .cheb{font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ch-eb)}
+  .seg .chbox .chsub{font-size:12.5px; font-weight:500; color:var(--ch-ink); opacity:.85}
+  .seg .chbox .chbest{font-size:12px; font-weight:600; color:var(--ch-eb); margin-top:2px}
+  .seg .chbox[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ch-ring)}
+  .seg .chbox:disabled{opacity:.45; cursor:default}
   .prep{display:flex; flex-direction:column; gap:3px; margin-top:8px}
   .prep div{display:grid; grid-template-columns:18px 1fr auto; gap:8px; font-size:13px; color:var(--ink-2)}
   .prep div span:first-child{color:var(--muted); font-family:Figtree, "Helvetica Neue", Arial, sans-serif; font-size:11.5px}
@@ -1106,6 +1124,8 @@
      rather than read. The words are worth keeping, so they moved one tap in:
      the list is now something she can see all of, and the test she came for
      opens where it sits. */
+  .oldtests{margin:22px 0 6px}
+  .oldtests summary{cursor:pointer; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:6px 0}
   .testcard{background:var(--surface); border:0; box-shadow:var(--card);
     border-radius:12px; margin-bottom:9px; overflow:hidden}
   .trow{display:grid; grid-template-columns:auto 1fr auto auto; gap:11px; align-items:center;
@@ -1899,6 +1919,9 @@
 .zonehd.now b{color:var(--accent)}
 .drillcard.away{opacity:.62}
 .drillcard.off{opacity:.42}
+.chline b{color:var(--ink)}
+.tacts .chgo{border:1.5px solid var(--ch-line); background:var(--ch-bg); color:var(--ch-ink); border-radius:11px;
+  padding:9px 15px; font:inherit; font-size:13.5px; font-weight:700; cursor:pointer}
 .dtag{display:inline-block; margin-left:6px; font-size:9px; font-weight:700;
   letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
   border:1px solid var(--line-strong); border-radius:4px; padding:0 4px; vertical-align:1.5px}
@@ -2160,10 +2183,10 @@
      S&C and Tests are what she came to do several times a week. -->
 <nav class="tabs" role="tablist" aria-label="Practise">
   <button id="tabWeek" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path><path d="m8.4 15.6 2.4 2.3 4.8-4.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>This week</span></button>
-  <button id="tabPractice" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
+  <button id="tabPractice" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Core</span></button>
+  <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Squad</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
-  <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Tests</span></button>
-  <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Quick Drills</span></button>
+  <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Drills</span></button>
 </nav>
 
 
@@ -2192,6 +2215,7 @@
   </section>
 
   <section id="viewHome" hidden>
+    <h1 class="corehd">Core sessions</h1>
     <p class="banner warn" id="storeWarn" hidden></p>
     <div id="homeProj"></div>
     <p class="banner hello" id="helloBar" hidden></p>
@@ -2253,8 +2277,8 @@
 
   <!-- BENCHMARKS -->
   <section id="viewTests" hidden>
-    <h1>Tests</h1>
-    <p class="lede">Fixed tests, run every so often, under the same conditions every time. That is what makes them comparable. A test never changes once it has results against it.</p>
+    <h1>Squad</h1>
+    <p class="lede">The regional squad's tests, the same conditions every time so they compare. Your coach switches them on in your programme, and they show under Squad on This week.</p>
     <div id="testList"></div>
   </section>
 
@@ -2264,8 +2288,8 @@
        stays on the page, dimmed but readable, because some evenings the
        question is where to go rather than what to do. -->
   <section id="viewDrills" hidden>
-    <h1>Quick Drills</h1>
-    <p class="lede">Short sessions that supplement the main practice. Do these when time is short, or for a top up.</p>
+    <h1>Drills</h1>
+    <p class="lede">Drills by pillar, on top of the core sessions. Each comes in three lengths, and most have a challenge, the pressure version, at the top.</p>
     <div id="drillWhere"></div>
     <div id="drillList"></div>
   </section>
@@ -2675,7 +2699,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-05", note:"England Golf\u2019s Five Pillars of Performance: their order, names and Regional Girls targets, the whole sheet on Practice and Goals, and the three driver shots on tee shots" };
+var BUILD = { on:"2026-10-11", note:"Core, Squad and Drills tabs; drills by pillar in three lengths, on your own or with a partner, each with a challenge" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -2875,7 +2899,7 @@ var AREAS = [
     {id:"d", gone:true, sgKind:"putt", pd:40, lag:1, guide:"ladder", group:"Lag ladder · a point is inside one step", label:"Lag ladder · five targets each end, on a slope", xg:"Lag ladder", tgt:"30 putts · change ends after every five", max:30},
     {id:"r", gone:true, rot:true, balls:20, group:"Rotation · the app calls it", label:"Rotation · twenty putts, the app calls the length", xg:"Rotation", tgt:"Holing out from any station, or a lag. You do not know what is coming.", max:20}
   ],
-  setup:"Five targets at each end (A1–5 and B1–5), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. On a holing-out day it is the first two rounds only, ten putts, for pace. The full ladder is ten rounds, 50 putts, and that is the lag day. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
+  setup:"Five targets at each end (A1–5 and B1–5), one step apart, 10 paces (about 30 ft) between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1→B1-5, R2 B1→A1-5, R3 A2→B1-5 and so on. On a holing-out day it is the first two rounds only, ten putts, for pace. The full ladder is ten rounds, 50 putts, and that is the lag day. A point when the ball finishes between the targets in front and behind, about 3 ft. Pick a different slope each session, sometimes with side-break."
   }
 ];
 
@@ -2899,8 +2923,8 @@ var GUIDES = {
     "Ball 1 at the normal height. Balls 3 and 5 higher. Balls 2 and 4 lower.",
     "A point for the height you called, a point for finishing inside the target."
   ]},
-  ladder:{ title:"Lag ladder", svg:"<svg viewBox=\"0 0 300 446\" class=\"dg\" role=\"img\" aria-label=\"Lag ladder: five targets at each end, one step apart, fifteen steps between the ends\"> <g stroke=\"var(--line-strong)\" stroke-width=\"1.5\" stroke-dasharray=\"6 5\"> <line x1=\"104\" y1=\"24\" x2=\"196\" y2=\"24\"/> <line x1=\"104\" y1=\"192\" x2=\"196\" y2=\"192\"/> <line x1=\"104\" y1=\"254\" x2=\"196\" y2=\"254\"/> <line x1=\"104\" y1=\"422\" x2=\"196\" y2=\"422\"/> </g> <g fill=\"var(--accent-fill)\"> <circle cx=\"150\" cy=\"44\" r=\"7\"/><circle cx=\"150\" cy=\"76\" r=\"7\"/><circle cx=\"150\" cy=\"108\" r=\"7\"/> <circle cx=\"150\" cy=\"172\" r=\"7\"/> <circle cx=\"150\" cy=\"274\" r=\"7\"/><circle cx=\"150\" cy=\"306\" r=\"7\"/><circle cx=\"150\" cy=\"338\" r=\"7\"/> <circle cx=\"150\" cy=\"370\" r=\"7\"/><circle cx=\"150\" cy=\"402\" r=\"7\"/> </g> <circle cx=\"150\" cy=\"140\" r=\"8\" fill=\"var(--ink)\"/> <g fill=\"var(--ink-2)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" text-anchor=\"end\"> <text x=\"130\" y=\"48\">a5</text><text x=\"130\" y=\"80\">a4</text><text x=\"130\" y=\"112\">a3</text> <text x=\"130\" y=\"144\">a2</text><text x=\"130\" y=\"176\">a1</text> <text x=\"130\" y=\"278\">b1</text><text x=\"130\" y=\"310\">b2</text><text x=\"130\" y=\"342\">b3</text> <text x=\"130\" y=\"374\">b4</text><text x=\"130\" y=\"406\">b5</text> </g> <g stroke=\"var(--ink-2)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 108 L188 108 M170 172 L188 172 M188 108 L188 172\"/> </g> <text x=\"196\" y=\"144\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">1 point</text> <g stroke=\"var(--muted)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 274 L184 274 M170 306 L184 306 M184 274 L184 306\"/> </g> <text x=\"192\" y=\"294\" fill=\"var(--muted)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"11.5\">1 step, a club apart</text> <g stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <line x1=\"88\" y1=\"204\" x2=\"88\" y2=\"242\"/> </g> <path d=\"M88 198 L83 208 L93 208 Z\" fill=\"var(--ink-2)\"/> <path d=\"M88 248 L83 238 L93 238 Z\" fill=\"var(--ink-2)\"/> <text x=\"100\" y=\"227\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">15 steps</text> </svg>", steps:[
-    "Five targets at each end, A1 to A5 and B1 to B5, one step apart, about 15 steps between the ends, on a slope.",
+  ladder:{ title:"Lag ladder", svg:"<svg viewBox=\"0 0 300 446\" class=\"dg\" role=\"img\" aria-label=\"Lag ladder: five targets at each end, one step apart, ten paces between the ends\"> <g stroke=\"var(--line-strong)\" stroke-width=\"1.5\" stroke-dasharray=\"6 5\"> <line x1=\"104\" y1=\"24\" x2=\"196\" y2=\"24\"/> <line x1=\"104\" y1=\"192\" x2=\"196\" y2=\"192\"/> <line x1=\"104\" y1=\"254\" x2=\"196\" y2=\"254\"/> <line x1=\"104\" y1=\"422\" x2=\"196\" y2=\"422\"/> </g> <g fill=\"var(--accent-fill)\"> <circle cx=\"150\" cy=\"44\" r=\"7\"/><circle cx=\"150\" cy=\"76\" r=\"7\"/><circle cx=\"150\" cy=\"108\" r=\"7\"/> <circle cx=\"150\" cy=\"172\" r=\"7\"/> <circle cx=\"150\" cy=\"274\" r=\"7\"/><circle cx=\"150\" cy=\"306\" r=\"7\"/><circle cx=\"150\" cy=\"338\" r=\"7\"/> <circle cx=\"150\" cy=\"370\" r=\"7\"/><circle cx=\"150\" cy=\"402\" r=\"7\"/> </g> <circle cx=\"150\" cy=\"140\" r=\"8\" fill=\"var(--ink)\"/> <g fill=\"var(--ink-2)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" text-anchor=\"end\"> <text x=\"130\" y=\"48\">a5</text><text x=\"130\" y=\"80\">a4</text><text x=\"130\" y=\"112\">a3</text> <text x=\"130\" y=\"144\">a2</text><text x=\"130\" y=\"176\">a1</text> <text x=\"130\" y=\"278\">b1</text><text x=\"130\" y=\"310\">b2</text><text x=\"130\" y=\"342\">b3</text> <text x=\"130\" y=\"374\">b4</text><text x=\"130\" y=\"406\">b5</text> </g> <g stroke=\"var(--ink-2)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 108 L188 108 M170 172 L188 172 M188 108 L188 172\"/> </g> <text x=\"196\" y=\"144\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">1 point</text> <g stroke=\"var(--muted)\" stroke-width=\"1.4\" fill=\"none\"> <path d=\"M170 274 L184 274 M170 306 L184 306 M184 274 L184 306\"/> </g> <text x=\"192\" y=\"294\" fill=\"var(--muted)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"11.5\">1 step, a club apart</text> <g stroke=\"var(--ink-2)\" stroke-width=\"1.6\"> <line x1=\"88\" y1=\"204\" x2=\"88\" y2=\"242\"/> </g> <path d=\"M88 198 L83 208 L93 208 Z\" fill=\"var(--ink-2)\"/> <path d=\"M88 248 L83 238 L93 238 Z\" fill=\"var(--ink-2)\"/> <text x=\"100\" y=\"227\" fill=\"var(--ink)\" font-family=\"Figtree, Helvetica Neue, Arial, sans-serif\" font-size=\"12.5\" font-weight=\"600\">10 paces · 30 ft</text> </svg>", steps:[
+    "Five targets at each end, A1 to A5 and B1 to B5, one step apart, 10 paces (about 30 ft) between the ends, on a slope.",
     "Each round, putt five balls from one launch target to the five at the far end, then rotate the launch target and swap ends: R1 A1 to B1-5, R2 B1 to A1-5, R3 A2 to B1-5 and so on.",
     "Ten rounds is 50 putts.",
     "A point when the ball finishes between the targets in front and behind, about 3 ft.",
@@ -3581,7 +3605,7 @@ var PRACTICE = [
   name:"World-class holing out \u00b7 lag day", sub:"Putting \u00b7 the full lag ladder, then short ones",
   targets:"No more than two three-putts in three rounds \u00b7 Every lag inside one step, about 3 ft, from all ten markers \u00b7 Every four-footer holed",
   plan:"Golf warm-up \u2192 about 30 min: the full ladder, ten rounds, then ten four-footers around the clock",
-  setup:"Five targets at each end (A1\u20135 and B1\u20135), one step apart, about 15 steps between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1\u2192B1-5, R2 B1\u2192A1-5, R3 A2\u2192B1-5 and so on to B5. Ten rounds is 50 putts, every marker used. A point when the ball finishes between the targets in front and behind, about 3 ft. Then ten four-footers around the clock, because a good lag leaves one.",
+  setup:"Five targets at each end (A1\u20135 and B1\u20135), one step apart, 10 paces (about 30 ft) between the ends, on a slope. Putt five balls from one launch target to the five at the far end, then change ends and move the launch target on: R1 A1\u2192B1-5, R2 B1\u2192A1-5, R3 A2\u2192B1-5 and so on to B5. Ten rounds is 50 putts, every marker used. A point when the ball finishes between the targets in front and behind, about 3 ft. Then ten four-footers around the clock, because a good lag leaves one.",
   sets:[] }
 ];
 (function(){
@@ -3733,7 +3757,7 @@ var TESTS = [
     {id:"d", label:"185y \u00b7 five balls", short:"185 yards", tc:"Pin high", dist:185, balls:5, max:5,
      tgt:"Five balls. A point for pin high or past"}
   ]},
-{ id:"t-approach-fade", area:11, isTest:true, track:true, name:"Fade on demand",
+{ id:"t-approach-fade", retired:true, area:11, isTest:true, track:true, name:"Fade on demand",
   sub:"Start it left, finish it at the flag",
   why:"A fade is only worth having if it works when it is called for. The window makes her start the ball left; the circle makes it come back. Both on the same ball, or it does not count.",
   where:"Range or sim", balls:20, target:120,
@@ -3753,7 +3777,7 @@ var TESTS = [
      tgt:"Window 1 or 4, then back to the flag",
      parts:[{id:"w", label:"Window", max:5},{id:"t", label:"Target", max:5}]}
   ]},
-{ id:"t-tee-speed", area:10, isTest:true, track:true, shape:"corridor", rule:"corridor",
+{ id:"t-tee-speed", retired:true, area:10, isTest:true, track:true, shape:"corridor", rule:"corridor",
   name:"Speed and corridor", sub:"Fifteen drivers at full speed, still in play",
   why:"Speed is only worth having if it stays in the corridor. This is the test of whether the two can hold together: swing it as hard as she does on the range, and see what the corridor says.",
   where:"Range, outdoors", balls:15, target:90,
@@ -3808,7 +3832,7 @@ var TESTS = [
    the Approach-Iron Skill Test does (Robertson, Burnett and Newton), and score
    depth only: level with the flag, inside the circle's depth, whatever the line.
    Every miss is filed as short or long, which is the number the test is for. */
-{ id:"t-approach-depth", area:11, isTest:true, track:true, rule:"distance", rotFrom:11, depth:true,
+{ id:"t-approach-depth", retired:true, area:11, isTest:true, track:true, rule:"distance", rotFrom:11, depth:true,
   name:"Right number, approach", sub:"125 to 185, the app calls the number",
   why:"Short is the miss that costs most: it brings the front bunker and the false front into play and leaves the longest putt. This asks whether the ball got to the number without paying for one that flew the green, and it files every miss as short or long, so a habit of coming up short shows as a count.",
   where:"Range or sim", balls:20, target:120,
@@ -3817,7 +3841,7 @@ var TESTS = [
     {id:"r", rot:true, balls:20, max:20, label:"Twenty balls \u00b7 the app calls the number",
      tgt:"A new number every ball. Level with the flag scores"}
   ]},
-{ id:"t-wedge-number", area:2, isTest:true, track:true, rule:"distance", rotFrom:2, depth:true,
+{ id:"t-wedge-number", retired:true, area:2, isTest:true, track:true, rule:"distance", rotFrom:2, depth:true,
   name:"Right number, wedges", sub:"30, 50, 70 and 90, the app calls the number",
   why:"Wedges are a distance problem before they are a direction problem. Five balls at one number lets her find it with the first and repeat it; a round never gives her that. Here the number changes every ball, and every miss is filed as short or long.",
   where:"Range or sim", balls:20, target:120,
@@ -3829,7 +3853,19 @@ var TESTS = [
 /* Holing out is measured every holing-out day, 55 putts against the LPGA, which
    is a bigger and better test than twenty six-footers. What had no test at all
    was lag, so this is it: three lengths, holed out, counted twice. */
-{ id:"t-putt-lag", area:4, isTest:true, track:true,
+{ id:"t-putt-lag18", retired:true, area:4, isTest:true, track:true, shape:"gauntlet",
+  name:"18-hole lag challenge", sub:"All eighteen inside one step, in order, in 30 minutes",
+  why:"The pressure version of the 18-hole lag. Same set-up, three targets each end 10 paces apart, the same eighteen putts in the same order, and every one has to finish inside one step of its target. Miss one and you go back to the first. It records whether you got round, how long it took, how many times you started again and the furthest you got.",
+  where:"Practice green", balls:0, target:18,
+  limit:30*60,
+  ruleText:"All eighteen in a row inside one step (about three feet) of the target called, inside thirty minutes. A miss sends you back to A1 to B1. Recorded: the time, the number of attempts, and how far each attempt got.",
+  stations:lag18Seq(false).map(function(q, i){
+    return { id:"h" + (i + 1), name:q.from + " to " + q.to + q.t + " \u00b7 " + q.pd + " ft",
+             detail:"Inside one step of " + q.to + q.t + ", about three feet either side. Then walk to " + q.to + q.t + " for the next one." };
+  }),
+  sets:[] },
+
+{ id:"t-putt-lag", retired:true, area:4, isTest:true, track:true,
   name:"Lag and hole out", sub:"Eighteen putts from 20, 30 and 40 feet",
   why:"Three-putts are the putting stat that moves a score, and they start with the first putt. This counts both halves: how often the lag finishes inside three feet, and how often she is down in two. It is the test for the target of no more than two three-putts in three rounds.",
   where:"Practice green", balls:18, target:108,
@@ -3870,7 +3906,7 @@ var TESTS = [
    score; The Hundred produces a score and no time. Sharing a screen between
    them would have compromised both. */
 
-{ id:"t-watson", area:3, isTest:true, track:true, shape:"gauntlet",
+{ id:"t-watson", area:3, isTest:true, track:true, squad:true, shape:"gauntlet",
   name:"The Watson matrix", sub:"Five in a row, one miss and you start again",
   why:"Set by John Watson to the England squad. Five short game shots that have to come off consecutively: miss any one of them and you go back to the first. Forty five minutes on the clock. It is the only test here that can be failed outright, and that is the point of it.",
   where:"Short game area", balls:0, target:10,
@@ -3885,7 +3921,7 @@ var TESTS = [
   ],
   sets:[] },
 
-{ id:"t-hundred", area:3, isTest:true, track:true, shape:"card",
+{ id:"t-hundred", retired:true, area:3, isTest:true, track:true, shape:"card",
   name:"The Hundred", sub:"Twelve stations, four times round",
   why:"Forty eight shots across the whole short game, scored on proximity rather than up and down. A hundred points are available and nobody gets near them: a tour player scores thirty six. It is a benchmark rather than a drill, and it is the only test here that says where a shot pattern would finish in a tour field.",
   where:"Short game area", balls:48, target:200,
@@ -4004,6 +4040,10 @@ function drillSets(spec){
       if(caps[sid] != null) q.max = caps[sid];
       return q;
     });
+    /* a drill can say a set in its own words: "Set 2 of 4" means nothing out
+       of the session it came from */
+    var ov = (spec.over || {})[sid];
+    if(ov) for(k in ov) if(Object.prototype.hasOwnProperty.call(ov, k)) c[k] = ov[k];
     return c;
   }).filter(Boolean);
 }
@@ -4011,7 +4051,7 @@ function drillSets(spec){
 var DRILLS = [
 /* ---- range or sim ---- */
 { id:"d-tee-driver", area:10, place:0, needs:"height", mins:20,
-  name:"The driver", sub:"Fifteen to the corridor, speed across all fifteen",
+  name:"The driver", sub:"Fifteen at full speed, still in the corridor",
   why:"The shortest way to keep a driver alive over a winter. Fifteen balls at full speed with the corridor still counting, which is the only pairing that matters: speed you cannot keep in play is not speed.",
   where:"Range, outdoors", shape:"corridor", sg:true, hitLabel:"in the fairway",
   /* The speed history lives on the area, not on the drill, or every drill
@@ -4036,8 +4076,8 @@ var DRILLS = [
   ruleText:"Inside the corridor for that club scores: 23 yards with the 3-wood, 22 with the 5-wood.",
   from:10, use:["c","e"] },
 
-{ id:"d-app-windows", area:11, place:0, mins:25,
-  name:"Windows", sub:"Start it through your window, finish at the flag",
+{ id:"d-app-windows", area:11, place:0, mins:20,
+  name:"Windows and fade", sub:"Start it through your window, finish at the flag",
   why:"Flight control on demand, which is the difference between a shape she owns and one that turns up. The window makes her start it where she meant to; the circle makes it come back.",
   where:"Range or sim", sg:true, sgKind:"app", quads:true,
   ruleText:"A point for the window she called and a point for finishing inside the circle. Both on the same ball, or it counts once.",
@@ -4051,14 +4091,14 @@ var DRILLS = [
   from:2, use:["a","c","e","f"] },
 
 /* ---- short game area ---- */
-{ id:"d-short-bunkers", area:3, place:1, mins:25,
+{ id:"d-short-bunkers", area:3, place:1, mins:20,
   name:"Bunkers", sub:"Good lie at 10, 20 and 30, downhill and plugged",
   why:"Sand is the shot that decays fastest when it is not practised, and the only place to practise it is here. Three good lies to set the technique, then the two that actually cost shots.",
   where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
   ruleText:"Inside two clubs scores, inside one club scores as the bullseye, and strokes gained prices the lie as well as the distance.",
   from:3, use:["d1","d2","d3","e1","e2"] },
 
-{ id:"d-short-awkward", area:3, place:1, mins:30,
+{ id:"d-short-awkward", area:3, place:1, mins:20,
   name:"Awkward lies", sub:"Downhill, rough, collar, short-sided, bare, upslope",
   why:"Six lies she does not get to choose, which is the only realistic version of short game practice. Nobody on a course gets a good lie on demand.",
   where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
@@ -4073,33 +4113,111 @@ var DRILLS = [
   from:3, use:["a1","b1","b2","b3"] },
 
 /* ---- practice green ---- */
-{ id:"d-putt-six", area:4, place:2, mins:25,
+{ id:"d-putt-six", area:4, place:2, mins:25, hidden:true,
   name:"Inside six feet", sub:"Four and six feet, around the clock",
   why:"The two lengths that decide a card. Thirty five putts is enough to mean something and short enough to do after a round.",
   where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
   ruleText:"A holed putt scores and nothing else does. A tour player holes 90% from four feet and 68% from six.",
   from:4, use:["a","b"] },
 
-{ id:"d-putt-nine", area:4, place:2, mins:20,
+{ id:"d-putt-nine", area:4, place:2, mins:20, hidden:true,
   name:"Nine and twelve", sub:"The two lengths that decide a card",
   why:"Longer than a tap in, short enough that a tour player expects to hole a fair share. The band where a good putter separates from an average one.",
   where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
   ruleText:"A holed putt scores. A tour player holes 46% from nine feet and 32% from twelve.",
   from:4, use:["c","e"] },
 
-{ id:"d-putt-rotation", area:4, place:2, mins:10,
+{ id:"d-putt-rotation", area:4, place:2, mins:10, hidden:true,
   name:"The rotation", sub:"Twenty putts, the app calls the length",
   why:"The only putting practice where she does not know what is coming: a four-footer, then a lag, then a nine-footer. That is how putts arrive on a course. It did not fit in either putting day without breaking the thirty minutes, so it lives here.",
   where:"Practice green", shape:"clock", sg:true, hitLabel:"holed", rotFrom:4,
   ruleText:"Holed scores on the short ones. Inside one step, about three feet, scores on a lag. Strokes gained prices each putt at the length it was called.",
   from:4, use:["r"] },
 
-{ id:"d-putt-lag", area:4, place:2, mins:20,
+{ id:"d-putt-lag", area:4, place:2, mins:20, hidden:true,
   name:"The lag", sub:"The ladder, six rounds",
   why:"Lag is the one putting skill that cannot be trained anywhere but here. A mat stops at nine feet and the garden green at about eighteen, so a winter without this is a winter of three-putts waiting to happen.",
   where:"Practice green", shape:"clock", sg:true,
   ruleText:"A point when the ball finishes between the targets in front and behind, about three feet. Strokes gained prices the leave rather than the make.",
   from:4, use:["d"] },
+
+/* ---- the 18-hole lag ----
+   Three targets each end, 10 paces apart, one ball, every launch target to
+   every target at the other end both ways: eighteen putts. She picks the
+   length (one, two or three times round) and whether she is on her own or
+   with a partner at the top of the session. The three lengths are three
+   entries under one name, so each keeps its own time for DiSE; only the first
+   is listed. */
+{ id:"d-putt-lag18", area:4, place:2, mins:15, family:"lag18", reps:1,
+  name:"18-hole lag", sub:"Three targets each end, 10 paces apart, one ball",
+  why:"Every putt is a different length, 30 to 42 feet, and on your own you change ends every putt, so no two in a row are the same. That is how lag putts arrive on a course. With a partner, you each play three from your end and then swap.",
+  where:"Practice green", shape:"clock", sg:true, hitLabel:"inside one step",
+  ruleText:"A point when the ball finishes inside one step, about three feet, of the target called. Strokes gained prices each putt at its own length.",
+  sets:[{id:"l", sgKind:"putt", pd:36, lag:1, lagN:3, guide:"ladder", balls:18, max:18,
+         label:"18 putts \u00b7 A1 to B1, B1 to A1, A1 to B2 and on", tgt:"One ball. The app calls the launch and the target every putt"}] },
+{ id:"d-putt-lag36", area:4, place:2, mins:30, family:"lag18", reps:2, hidden:true,
+  name:"18-hole lag", sub:"Twice round, 36 putts",
+  why:"", where:"Practice green", shape:"clock", sg:true, hitLabel:"inside one step",
+  ruleText:"A point when the ball finishes inside one step, about three feet, of the target called. Strokes gained prices each putt at its own length.",
+  sets:[{id:"l", sgKind:"putt", pd:36, lag:1, lagN:3, guide:"ladder", balls:36, max:36,
+         label:"36 putts \u00b7 twice round", tgt:"One ball. The app calls the launch and the target every putt"}] },
+{ id:"d-putt-lag54", area:4, place:2, mins:45, family:"lag18", reps:3, hidden:true,
+  name:"18-hole lag", sub:"Three times round, 54 putts",
+  why:"", where:"Practice green", shape:"clock", sg:true, hitLabel:"inside one step",
+  ruleText:"A point when the ball finishes inside one step, about three feet, of the target called. Strokes gained prices each putt at its own length.",
+  sets:[{id:"l", sgKind:"putt", pd:36, lag:1, lagN:3, guide:"ladder", balls:54, max:54,
+         label:"54 putts \u00b7 three times round", tgt:"One ball. The app calls the launch and the target every putt"}] },
+
+/* Holing out: the three short-putt drills made one. Four lengths, the ones
+   that decide a card, in the order a putting day plays them. */
+{ id:"d-putt-holing", area:4, place:2, mins:20,
+  name:"Holing out", sub:"4, 6, 9 and 12 feet, around the clock",
+  why:"The lengths that decide a card, short to long. Thirty putts is enough to mean something and short enough to do after a round, and the challenge is the version with a consequence attached: ten from six feet, one miss and you start again.",
+  where:"Practice green", shape:"clock", sg:true, hitLabel:"holed",
+  ruleText:"A holed putt scores and nothing else does. A tour player holes 90% from four feet, 68% from six, 46% from nine and 32% from twelve.",
+  from:4, use:["a","b","c","e"], caps:{a:10, b:10, c:5, e:5},
+  over:{a:{tgt:"2 sets of 5 (one club plus grip)"}, b:{tgt:"2 sets of 5 (two clubs)"},
+        c:{tgt:"1 set of 5 (three clubs)"}, e:{tgt:"1 set of 5 (four clubs)"}} },
+
+/* ---- pitching ----
+   The Hundred was a short game benchmark; its chips, bunkers and awkward lies
+   live in the three drills above it now. What it had that nothing else did
+   was the full pitch, so the sets that left the short game session become a
+   drill of their own. */
+{ id:"d-short-pitch", area:3, place:1, mins:20,
+  name:"Pitching", sub:"30, 40 and 50 paces, then a bare lie at 40",
+  why:"The longer shots round the green, the ones that left the short game session to make room. A pitch is a distance shot before it is a technique shot, so the ladder goes up in tens and finishes on the lie that finds out a poor strike.",
+  where:"Short game area", sg:true, twoTier:true, unit:"paces", hitLabel:"inside two clubs",
+  ruleText:"Inside two clubs scores, inside one club scores as the bullseye. The lie is priced in, so the bare lie is worth more than the same result off grass.",
+  from:3, use:["a2","a3","a4","c3"],
+  over:{a2:{tgt:"Five balls · 50° · good lie · tap the ring it finished in"},
+        a3:{tgt:"Five balls · 50° · good lie · tap the ring it finished in"},
+        a4:{tgt:"Five balls · 50° · good lie · tap the ring it finished in"},
+        c3:{tgt:"Five balls · bare lie, you choose the loft · tap the ring it finished in"}} },
+
+/* ---- three heights and the two numbers drills ----
+   The two "right number" tests became drills when the tests went: the same
+   twenty balls, the app calling the number, every miss filed short or long. */
+{ id:"d-wedge-heights", area:2, place:0, mins:20,
+  name:"Three heights", sub:"Low, normal and high at 30, 50, 70 and 90 yards",
+  why:"England Golf's wedge pillar asks for the same number at different heights: dynamic loft, not a different club. One normal, two higher and two lower at each number, and the height has to be the one called.",
+  where:"Range or sim", sg:true, sgKind:"pitch", quads:true,
+  ruleText:"A point for the height she called and a point for finishing inside the circle. Both on the same ball, or it counts once.",
+  from:2, use:["b","d","i","g"] },
+{ id:"d-wedge-number", area:2, place:0, mins:20, rule:"distance", rotFrom:2, depth:true,
+  name:"Right number, wedges", sub:"30, 50, 70 and 90, the app calls the number",
+  why:"Wedges are a distance problem before they are a direction problem. Five balls at one number lets her find it with the first and repeat it; a round never gives her that. Here the number changes every ball, and every miss is filed as short or long.",
+  where:"Range or sim",
+  ruleText:"The app calls 30, 50, 70 or 90 for each ball. A point for a ball level with the flag, inside the depth of the 20 ft circle (about 7 yards either side), wherever it is left or right. Every miss is recorded as short or long.",
+  sets:[{id:"r", rot:true, balls:20, max:20, label:"Twenty balls \u00b7 the app calls the number",
+         tgt:"A new number every ball. Level with the flag scores"}] },
+{ id:"d-app-number", area:11, place:0, mins:20, rule:"distance", rotFrom:11, depth:true,
+  name:"Right number, approach", sub:"125 to 185, the app calls the number",
+  why:"Short is the miss that costs most: it brings the front bunker and the false front into play and leaves the longest putt. This asks whether the ball got to the number without paying for one that flew the green, and it files every miss as short or long, so a habit of coming up short shows as a count.",
+  where:"Range or sim",
+  ruleText:"The app calls 125, 145, 165 or 185 for each ball, in no order you can predict. A point for a ball level with the flag, inside the depth of the 40 ft circle (about 13 yards either side), wherever it is left or right. Every miss is recorded as short or long.",
+  sets:[{id:"r", rot:true, balls:20, max:20, label:"Twenty balls \u00b7 the app calls the number",
+         tgt:"A new number every ball. Level with the flag scores"}] },
 
 /* ---- garden green ----
    Twelve feet corner to corner and the slope runs on the diagonals, so there
@@ -4107,7 +4225,7 @@ var DRILLS = [
    together is what a course actually asks for, and a straight one barely
    exists out there. Both diagonals are played both ways, which halves the
    walking, and the number worth reading is the gap between the four. */
-{ id:"d-gdn-corners", area:4, place:3, needs:"dry", mins:15,
+{ id:"d-gdn-corners", area:4, place:3, needs:"dry", mins:10,
   name:"Four corners", sub:"Six paces corner to corner, both diagonals, each way",
   why:"Six paces corner to corner, about eighteen feet. That is past the range she expects to hole from, which is the point of scoring it on where the ball finished rather than on whether it went in: at this length a make rate would be two or three out of twenty and would say nothing. Four reads at that length, and almost nobody is equally good at all four.",
   where:"Garden green", shape:"qputt", home:true,
@@ -4133,7 +4251,7 @@ var DRILLS = [
      tgt:"Five balls. Same line, played back up it"}
   ] },
 
-{ id:"d-gdn-circle", area:4, place:3, needs:"dry", mins:15, shape:"clock",
+{ id:"d-gdn-circle", area:4, place:3, needs:"dry", mins:10, shape:"clock",
   name:"The circle", sub:"Eight round the middle hole, one miss and it starts again",
   why:"A circle drill on a green with no fall line, so every station reads differently and there is no symmetry to lean on. The closest thing at home to holing out with something at stake, and the only one of the four that uses the middle hole.",
   where:"Garden green", home:true,
@@ -4152,7 +4270,7 @@ var DRILLS = [
    The two that measure error rather than success, which is why they survive
    being done indoors. A fast flat mat does not make her face squarer and it
    does not make her pace more repeatable. */
-{ id:"d-mat-startline", area:4, place:4, mins:12, shape:"gate",
+{ id:"d-mat-startline", area:4, place:4, mins:10, shape:"gate",
   name:"Start line", sub:"Twenty through the gate, at six feet",
   why:"Face angle is about 92% of where a putt starts, and a gate is the only way to see it without a launch monitor. Two coins 19 inches in front of the ball, 55 mm apart, is 0.73 degrees of tolerance. A dead-weight putt from eight feet allows 0.77, so every ball through that gate was on a line good enough to hole from eight feet.",
   where:"The mat", home:true,
@@ -4166,7 +4284,7 @@ var DRILLS = [
      tgt:"Twenty balls. Gate 19 inches out, 55 mm wide. Clean through, or tap the marker you hit"}
   ] },
 
-{ id:"d-mat-pace", area:4, place:4, mins:12, shape:"trainer",
+{ id:"d-mat-pace", area:4, place:4, mins:10, shape:"trainer",
   name:"Pace", sub:"The micro target, and the length of the return",
   why:"The trainer's micro target only holds a ball delivered at eighteen inches past the hole, and Pelz's research put the optimum at seventeen. It is the right pace made into a gate. The ramp also returns the ball the distance it would have run past, so every putt gives a measured speed error, which is the rarest feedback there is at home.",
   where:"The mat", home:true,
@@ -4187,7 +4305,7 @@ var DRILLS = [
    Ten is a ceiling nobody should reach often. The micro target only holds a
    ball delivered at eighteen inches past, so this is not the trainer's own
    twenty five in a row, which only asks the ramp to accept the ball. */
-{ id:"d-mat-run", area:4, place:4, mins:15, shape:"gauntlet", pic:"trainer",
+{ id:"d-mat-run", area:4, place:4, mins:15, shape:"gauntlet", pic:"trainer", hidden:true, challengeOf:"d-mat-pace",
   name:"The run", sub:"Stuck in the micro target, one after another",
   why:"One miss and it starts again, which makes it the only thing on this list with a consequence attached to a single putt. What it measures is not really pace, it is whether she can deliver the same pace when the last four have gone in and she knows it.",
   where:"The mat", home:true, limit:15*60, balls:0, target:10,
@@ -4204,8 +4322,92 @@ var DRILLS = [
     {id:"r9",  name:"9",  detail:"Same putt, same pace."},
     {id:"r10", name:"10", detail:"The last one. Same putt, same pace."}
   ],
-  sets:[] }
+  sets:[] },
+
+/* ============ the challenges ============
+   The pressure version of a drill: a run of stations that all have to come
+   off in a row, against a clock, one miss and it starts again. They are
+   gauntlets, the same machinery as the Watson matrix and The run, and each
+   belongs to one drill: it sits at the top of that drill's page in its own
+   colour, and is not on the list by itself. What is kept is whether she got
+   round, the time, the attempts and how far each attempt got. */
+CH("c-putt-lag18", "lag18", 4, 2, 30, "18-hole lag challenge", "All eighteen inside one step, in order, in 30 minutes",
+   "The 18-hole lag with a consequence. Same set-up, three targets each end 10 paces apart, the same eighteen putts in the same order, and every one has to finish inside one step of its target. Miss one and you go back to the first.",
+   lag18Seq(false).map(function(q){
+     return [q.from + " to " + q.to + q.t + " \u00b7 " + q.pd + " ft",
+             "Inside one step of " + q.to + q.t + ", about three feet either side. Then walk to " + q.to + q.t + " for the next one."]; })),
+CH("c-putt-holing", "d-putt-holing", 4, 2, 15, "Ten from six feet", "Ten in a row, one miss and you start again",
+   "Six feet is where rounds are saved and thrown away. Ten in a row, moving round the hole, and the tenth is the same putt as the first with nine made behind it.",
+   inARow(10, "Six feet. Hole it.", "Move one station round the hole. Hole it.")),
+CH("c-mat-startline", "d-mat-startline", 4, 4, 10, "Ten through the gate", "Ten clean through the gate in a row",
+   "The gate with a consequence. Face angle does not change because the last seven went through, but the hands do.",
+   inARow(10, "Six feet. Clean through the gate without touching either coin.", "Same putt. Clean through the gate."), {home:true}),
+CH("c-short-updown", "d-short-updown", 3, 1, 20, "Five up and downs", "Chip and hole the putt, five in a row",
+   "The shot the short game is for, five times running. A good chip with a missed putt is a miss, which is how the card sees it.",
+   inARow(5, "Chip from a new spot, then hole the putt. Both, or it does not count.", "A new spot and a new distance. Chip it, hole the putt.")),
+CH("c-short-bunkers", "d-short-bunkers", 3, 1, 20, "Five from the sand", "Five inside two clubs in a row",
+   "Sand is the shot that decays fastest. Five in a row inside two clubs, a different lie or distance each one.",
+   inARow(5, "Inside two clubs.", "Change the lie or the distance. Inside two clubs.")),
+CH("c-short-awkward", "d-short-awkward", 3, 1, 20, "One of each", "Six awkward lies, all inside two clubs",
+   "Six lies she does not get to choose, one after another, and each has to finish inside two clubs. The one that keeps sending her back is the one to practise.",
+   [["Downhill lie \u00b7 20 paces", "Inside two clubs."], ["Out of the rough \u00b7 30 paces", "Inside two clubs."],
+    ["Off the collar \u00b7 8 paces", "Inside two clubs. Putter or wedge."], ["Short-sided \u00b7 10 paces", "Inside two clubs, no green to work with."],
+    ["Bare lie \u00b7 15 paces", "Inside two clubs."], ["Into an upslope \u00b7 20 paces", "Inside two clubs. Use the bank."]]),
+CH("c-short-pitch", "d-short-pitch", 3, 1, 20, "The pitch ladder", "Up the ladder and back down, all inside two clubs",
+   "30, 40, 50 paces and back again, one ball each, every one inside two clubs. Six shots, six different swings, no second ball.",
+   [["30 paces", "Inside two clubs."], ["40 paces", "Inside two clubs."], ["50 paces", "Inside two clubs."],
+    ["50 paces", "Same number again. Inside two clubs."], ["40 paces", "Inside two clubs."], ["30 paces", "Inside two clubs."]]),
+CH("c-wedge-ladder", "d-wedge-ladder", 2, 0, 20, "Up and down the ladder", "30 to 90 and back, all inside the circle",
+   "Eight numbers, one ball each, up the ladder and back down. Every one inside the 20 ft circle or you start again at 30.",
+   [["30 yards", "Inside the 20 ft circle."], ["50 yards", "Inside the 20 ft circle."], ["70 yards", "Inside the 20 ft circle."],
+    ["90 yards", "Inside the 20 ft circle."], ["90 yards", "Same number again."], ["70 yards", "Inside the 20 ft circle."],
+    ["50 yards", "Inside the 20 ft circle."], ["30 yards", "Inside the 20 ft circle."]]),
+CH("c-wedge-number", "d-wedge-number", 2, 0, 15, "Five numbers", "Five wedges level with the flag, in a row",
+   "The number changes every ball, so the first one cannot teach the second. Level with the flag, whatever the line.",
+   [["70 yards", "Level with the flag, inside the depth of the 20 ft circle."], ["30 yards", "Level with the flag."],
+    ["90 yards", "Level with the flag."], ["50 yards", "Level with the flag."], ["70 yards", "Level with the flag."]]),
+CH("c-wedge-heights", "d-wedge-heights", 2, 0, 20, "Three heights, two numbers", "Low, normal and high at 50 and 70, all inside the circle",
+   "Same number, three heights, and each one has to be the height called and inside the circle. Then again from further back.",
+   [["50 yards \u00b7 low", "The height called, and inside the 20 ft circle. Both, or it does not count."], ["50 yards \u00b7 normal", "Inside the circle."],
+    ["50 yards \u00b7 high", "Inside the circle."], ["70 yards \u00b7 low", "Inside the circle."], ["70 yards \u00b7 normal", "Inside the circle."],
+    ["70 yards \u00b7 high", "Inside the circle."]]),
+CH("c-tee-driver", "d-tee-driver", 10, 0, 20, "Ten in the corridor", "Ten drivers at full speed, all in the corridor",
+   "Speed you cannot keep in play is not speed. Ten in a row at full speed inside the 26-yard corridor.",
+   inARow(10, "Full speed. Inside the 26-yard corridor.", "Full speed. Inside the corridor."), {needs:"height"}),
+CH("c-tee-three", "d-tee-three", 10, 0, 15, "Three shots, twice", "Stock, fairway finder and bomb, all on demand",
+   "The three driver shots in an order you did not choose, twice through, each one the shot called and in the corridor.",
+   [["Stock", "The shot called, inside the corridor."], ["Bomb", "The shot called, inside the corridor."],
+    ["Fairway finder", "The shot called, inside the corridor."], ["Bomb", "Inside the corridor."],
+    ["Stock", "Inside the corridor."], ["Fairway finder", "Inside the corridor."]], {needs:"height"}),
+CH("c-tee-woods", "d-tee-woods", 10, 0, 15, "Five with the woods", "3-wood and 5-wood, all in the corridor",
+   "The two clubs that get skipped, five in a row, swapping each time.",
+   [["3-wood", "Inside the 23-yard corridor."], ["5-wood", "Inside the 22-yard corridor."], ["3-wood", "Inside the corridor."],
+    ["5-wood", "Inside the corridor."], ["3-wood", "Inside the corridor."]], {needs:"height"}),
+CH("c-app-windows", "d-app-windows", 11, 0, 20, "Fade on demand", "Window 1 or 4 and back to the flag, four numbers",
+   "A fade is only worth having if it works when it is called for. Start it left through window 1 or 4, finish inside the circle, at four numbers in a row.",
+   [["125 yards \u00b7 fade", "Window 1 or 4, then inside the 40 ft circle. Both, or it does not count."], ["145 yards \u00b7 fade", "Window 1 or 4, then inside the circle."],
+    ["165 yards \u00b7 fade", "Window 1 or 4, then inside the circle."], ["185 yards \u00b7 fade", "Window 1 or 4, then inside the circle."]]),
+CH("c-app-number", "d-app-number", 11, 0, 20, "Five numbers, approach", "Five irons level with the flag, in a row",
+   "Short is the miss that costs most. Five numbers, one ball each, every one level with the flag.",
+   [["145 yards", "Level with the flag, inside the depth of the 40 ft circle."], ["185 yards", "Level with the flag."],
+    ["125 yards", "Level with the flag."], ["165 yards", "Level with the flag."], ["145 yards", "Level with the flag."]])
 ];
+
+/* A challenge, in one line. `of` is the family it belongs to. */
+function CH(id, of, ar, place, mins, name, sub, why, st, extra){
+  var c = { id:id, area:ar, place:place, mins:mins, shape:"gauntlet", hidden:true, challengeOf:of,
+    name:name, sub:sub, why:why, where:DRILL_PLACES[place].nm, limit:mins*60, balls:0, target:st.length,
+    ruleText:"All " + st.length + " in a row inside " + mins + " minutes. A miss sends you back to the first. Recorded: the time, the number of attempts, and how far each attempt got.",
+    stations:st.map(function(x, i){ return { id:"s" + (i + 1), name:x[0], detail:x[1] }; }), sets:[] };
+  for(var k in (extra || {})) c[k] = extra[k];
+  if(c.home == null && DRILL_PLACES[place].zone === 1) c.home = true;
+  return c;
+}
+function inARow(n, first, rest){
+  var out = [];
+  for(var i = 1; i <= n; i++) out.push([i === n ? i + ", the last one" : String(i), i === 1 ? first : rest]);
+  return out;
+}
 
 /* Slices are resolved once, at load. After this a drill is an ordinary area
    with sets, and every render path that already walks sets walks these too. */
@@ -4217,7 +4419,72 @@ DRILLS.forEach(function(d){
   (d.sets || []).forEach(function(s){ if(s.dist != null && !s.sgKind) s.sgKind = d.sgKind; });
 });
 
+/* Every drill on the list comes in three lengths, the way the 18-hole lag
+   does: the same sets twice or three times over, under one name. Each length
+   is its own entry so it keeps its own time for DiSE, and only the first is
+   listed. Ball counts in the words are scaled with it. */
+var DRILL_LENS = [1, 2, 3];
+var NUM_WORD = { One:1, Two:2, Three:3, Four:4, Five:5, Six:6, Eight:8, Ten:10, Twelve:12, Fifteen:15, Twenty:20, Thirty:30 };
+function numWord(n){
+  var w = { 2:"Two", 3:"Three", 4:"Four", 5:"Five", 6:"Six", 8:"Eight", 9:"Nine", 10:"Ten", 12:"Twelve", 15:"Fifteen", 16:"Sixteen",
+            18:"Eighteen", 20:"Twenty", 24:"Twenty four", 30:"Thirty", 32:"Thirty two", 36:"Thirty six", 40:"Forty", 45:"Forty five",
+            48:"Forty eight", 60:"Sixty" }[n];
+  return w || String(n);
+}
+function scaleWords(t, k){
+  if(!t || k === 1) return t;
+  return String(t)
+    .replace(/\b(\d+) (balls|putts|shots)\b/g, function(m, n, u){ return (+n * k) + " " + u; })
+    .replace(/\b(\d+) sets? of 5\b/g, function(m, n){ return (+n * k) + " sets of 5"; })
+    .replace(/^(One|Two|Three|Four|Five|Six|Eight|Ten|Twelve|Fifteen|Twenty|Thirty) (balls|putts|shots)\b/, function(m, w, u){ return numWord(NUM_WORD[w] * k) + " " + u; });
+}
+function drillVariant(d, k){
+  var v = {}, key;
+  for(key in d) if(Object.prototype.hasOwnProperty.call(d, key)) v[key] = d[key];
+  v.id = d.id + "-x" + k; v.reps = k; v.hidden = true; v.mins = d.mins * k;
+  v.sets = (d.sets || []).map(function(s){
+    var c = JSON.parse(JSON.stringify(s));
+    if(c.parts){ c.balls = ballsIn(s) * k; c.parts.forEach(function(p){ if(p.max != null) p.max *= k; }); }
+    else if(c.balls != null) c.balls *= k;
+    if(c.max != null) c.max *= k;
+    c.label = scaleWords(c.label, k); c.tgt = scaleWords(c.tgt, k);
+    return c;
+  });
+  return v;
+}
+DRILLS.slice().forEach(function(d){
+  if(d.hidden || d.family || mxShape(d)) return;
+  d.family = d.id; d.reps = 1;
+  DRILL_LENS.slice(1).forEach(function(k){ DRILLS.push(drillVariant(d, k)); });
+});
+
 function allDrills(){ return DRILLS; }
+/* The family a drill or a challenge belongs to, its listed (shortest) member,
+   and its challenge. */
+function drillFamKey(d){ return d ? (d.challengeOf || d.family || null) : null; }
+function drillBase(d){
+  var k = drillFamKey(d); if(!k) return d;
+  return lagFamily(k)[0] || d;
+}
+function drillKey(id){
+  var d = drillById(id); if(!d || d.challengeOf || !d.family) return id;
+  return (lagFamily(d.family)[0] || d).id;
+}
+function challengeFor(famKey){
+  if(!famKey) return null;
+  return DRILLS.filter(function(x){ return x.challengeOf === famKey; })[0] || null;
+}
+/* A partner only makes sense where there is somewhere to stand opposite her:
+   the green and the short game area. */
+function drillPairs(d){ var b = drillBase(d); return !!b && !b.challengeOf && (b.place === 1 || b.place === 2); }
+function drillFamSessions(d, playerId){
+  var k = drillFamKey(d), ids = {};
+  if(!k || d.challengeOf) ids[d.id] = 1;
+  else lagFamily(k).forEach(function(x){ ids[x.id] = 1; });
+  return state.sessions.filter(function(x){
+    return x.kind === "drill" && ids[x.drillId] && x.playerId === (playerId || state.activePlayer);
+  }).sort(function(a,b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
+}
 function drillById(id){
   for(var i=0;i<DRILLS.length;i++){ if(DRILLS[i].id === id) return DRILLS[i]; }
   return null;
@@ -4470,7 +4737,7 @@ function gtTimeUp(a, d){
   d.total = gtBest(d); d.max = gtN(a);
   try{ renderSession(); }catch(e){}
   try{ saveCurrent(); }catch(e){}
-  try{ setStatus("Forty five minutes. The matrix was saved as it stood."); }catch(e){}
+  try{ setStatus(Math.round(gtLimit(a) / 60000) + " minutes. " + (a.isDrill ? "The challenge" : "The matrix") + " was saved as it stood."); }catch(e){}
 }
 
 /* ---- the gauntlet page ---- */
@@ -4521,20 +4788,25 @@ function gtPause(){
 function gtGiveUp(){
   var d = state.draft, a = d ? area(d.areaId) : null;
   if(!a) return;
-  if(!confirm("Give up on this matrix?\n\nNothing is kept: the attempts and the time on the clock "
+  var what = a.isDrill ? "challenge" : "matrix";
+  if(!confirm("Give up on this " + what + "?\n\nNothing is kept: the attempts and the time on the clock "
             + "are thrown away, and it will not appear in her history.")) return;
   mxStop();
   dropSession(d);
   state.draft = null;
   render();
-  show("tests");
-  renderTests();
-  setStatus("Matrix abandoned. Nothing was saved.");
+  if(a.isDrill){ show("drills"); renderDrills(); }
+  else { show("tests"); renderTests(); }
+  setStatus((a.isDrill ? "Challenge" : "Matrix") + " abandoned. Nothing was saved.");
 }
+/* A gauntlet's runs, wherever it lives: a test's under its test id, a
+   challenge's under its drill id. */
+function mxSessions(a, playerId){ return a && a.isDrill ? drillSessions(a.id, playerId) : testSessions(a.id, playerId); }
 function mxAfter(a, d){
   d.total = (a.shape === "gauntlet") ? gtBest(d) : cdPts(a, cdHits(d));
   d.max   = (a.shape === "gauntlet") ? gtN(a) : cdMax(a);
   saveDraft();
+  if(a.isDrill && a.challengeOf) renderSessSeg(a.id);
   renderSession();
   updateTotal();
 }
@@ -4953,10 +5225,11 @@ function gtResultHtml(a, d){
   var heldLine = heldMs ? ' <span class="mxheld">Paused for '+mmss(heldMs)+'.</span>' : '';
   var h = '<div class="mxres '+(won ? "won" : "out")+'">';
   if(won){
-    h += '<p class="eyebrow">Matrix complete</p><div class="mxbig">'+mmss(ms)+'</div>'+
+    h += '<p class="eyebrow">'+(a.isDrill ? "Challenge complete" : "Matrix complete")+'</p><div class="mxbig">'+mmss(ms)+'</div>'+
       '<p>'+tries+' '+(tries===1?"attempt":"attempts")+', and '+mmss(lim-ms)+' to spare.'+heldLine+'</p>'+
       '<p>'+(prev == null
-        ? 'The first time she has finished it. Two current England players never have.'
+        ? (a.isDrill ? 'The first time she has got round. That time is the one to beat now.'
+                     : 'The first time she has finished it. Two current England players never have.')
         : (ms < prev ? 'A new best by '+mmss(prev-ms)+'. '+mmss(ms)+' is the time to beat now.'
                      : mmss(prev)+' is still the one to beat.'))+'</p>';
   } else {
@@ -4971,6 +5244,11 @@ function gtResultHtml(a, d){
    an England squad reads as a personal failure every time she runs it. */
 function gtHonest(a, d){
   var best = gtBest(d), n = gtN(a);
+  if(a.isDrill){
+    if(best >= n - 1) return "One from the end. Any miss anywhere sends her back to the start, so getting this deep is most of the work.";
+    if(best * 2 >= n) return "More than halfway. One miss anywhere sends her back to the first, so the furthest she gets is the number to push.";
+    return "Built to be failed. One miss puts her back to the first, and the furthest she gets is the number to push next time.";
+  }
   if(best >= n - 1)
     return "One shot from finishing a test two current England players have never completed. "+
            "That is not a failed session.";
@@ -4982,7 +5260,7 @@ function gtHonest(a, d){
 }
 /* Her completed times, and the one to beat. */
 function gtRunStrip(a, d){
-  var done = testSessions(a.id, d.playerId).filter(function(x){
+  var done = mxSessions(a, d.playerId).filter(function(x){
     return x.status !== "live" && x.id !== d.id && gtComplete(a, x); });
   var mine = gtComplete(a, d) ? [gtElapsed(a, d)] : [];
   var times = done.map(function(x){ return gtElapsed(a, x); }).concat(mine);
@@ -4995,7 +5273,7 @@ function gtRunStrip(a, d){
          (t === best ? " best" : "")+'">'+mmss(t)+'</span>';
   });
   var allRuns = done.length + mine.length +
-    testSessions(a.id, d.playerId).filter(function(x){
+    mxSessions(a, d.playerId).filter(function(x){
       return x.status !== "live" && x.id !== d.id && !gtComplete(a, x); }).length +
     (gtComplete(a, d) ? 0 : 1);
   h += '</div><p class="note">'+times.length+' completed of '+allRuns+
@@ -5006,7 +5284,7 @@ function gtRunStrip(a, d){
 /* The best completed time before this one, or null if this is the first. */
 function gtBestEver(a, s){
   var best = null;
-  testSessions(a.id, s.playerId).forEach(function(x){
+  mxSessions(a, s.playerId).forEach(function(x){
     if(x.id === s.id) return;
     if(x.date > s.date) return;
     if(!gtComplete(a, x)) return;
@@ -6119,11 +6397,17 @@ function setStatus(t){ var el=document.getElementById("status"); if(el) el.textC
 /* ============ rendering ============ */
 var $ = function(id){ return document.getElementById(id); };
 
+/* back goes where she came from: the week, the drills, the squad's tests or the core sessions */
+function paintBack(){
+  var bk = state.draft ? state.draft.kind : null;
+  if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week"
+    : bk === "drill" ? "\u2190 Drills" : bk === "test" ? "\u2190 Squad" : "\u2190 Core sessions";
+}
 function show(view){
   state.view = view;
   /* started from This week: Back goes back there, until she leaves the session */
   if(view !== "session" && view !== "gym") state.fromWeek = false;
-  if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All pillars";
+  paintBack();
   if($("gymBack")) $("gymBack").textContent = state.fromWeek ? "\u2190 This week" : "\u2190 All pillars";
   /* Leaving the session screen stops the matrix clock. It is rebuilt from the
      stored start time on the way back in, so nothing is lost by stopping it,
@@ -6153,9 +6437,11 @@ function show(view){
   $("tabWeek").setAttribute("aria-selected", view==="week"?"true":"false");
   $("tabSettings").setAttribute("aria-selected", view==="settings"?"true":"false");
   $("tabReview").setAttribute("aria-selected", view==="review"?"true":"false");
-  $("tabPractice").setAttribute("aria-selected", (view==="home"||view==="session")?"true":"false");
-  $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test")?"true":"false");
-  $("tabDrills").setAttribute("aria-selected", view==="drills"?"true":"false");
+  /* a session sits under the tab it was started from */
+  var sk = view === "session" && state.draft ? state.draft.kind : null;
+  $("tabPractice").setAttribute("aria-selected", (view==="home"||(view==="session" && sk!=="drill" && sk!=="test"))?"true":"false");
+  $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test"||sk==="test")?"true":"false");
+  $("tabDrills").setAttribute("aria-selected", (view==="drills"||sk==="drill")?"true":"false");
   $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
   $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
@@ -6438,6 +6724,9 @@ function sinceLastTest(typeId){
   return sessionsFor(practiceFor(typeId)).filter(function(x){ return x.date >= from; }).length;
 }
 function testDue(areaId){
+  /* Oct 2026: tests no longer come round every so many sessions. The squad's
+     are set by the coach; the rest became drills and challenges. */
+  return null;
   var plan = testPlan(areaId); if(!plan) return null;
   var every = Math.max(1, plan.every || 5), n = sinceLastTest(areaId);
   if(n < every) return null;
@@ -6580,14 +6869,23 @@ function renderTests(){
      showing a nought, which is a score she did not get. */
   function testFig(t, runs, tot, pct, mxs){
     if(!runs.length) return '<span>not run</span>';
+    if(mxs) return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
     if(t.squad){ var lst = runs[runs.length-1]; return '<b>' + (t.shape === "sg18" ? sq18Fmt(lst.total || 0) : lst.total) + '</b><span>last run</span>'; }
     if(mxs) return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
     if(tot.n >= 40) return '<b>'+pct+'%</b><span>'+runs.length+' '+(runs.length===1?"run":"runs")+'</span>';
     return '<b>'+runs.length+'</b><span>'+(runs.length===1?"run":"runs")+'</span>';
   }
-  allTests().forEach(function(t){
+  var earlier = allTests().filter(function(t){ return !t.squad && testSessions(t.id).length; });
+  var fold = null;
+  allTests().filter(function(t){ return t.squad && !t.retired; }).concat(earlier).forEach(function(t){
     var a = area(t.area), runs = testSessions(t.id);
     if(t.retired && !runs.length) return;
+    if(!t.squad && !fold){
+      fold = document.createElement("details"); fold.className = "oldtests";
+      fold.innerHTML = '<summary>Earlier tests \u00b7 ' + earlier.length + '</summary>' +
+        '<p class="note">Kept for the runs against them. The ones still in use live on as drills or challenges.</p>';
+      host.appendChild(fold);
+    }
     var tot = {n:0, got:0};
     if(!isMatrix(t)) runs.forEach(function(r){ var x = testTally(t, r); tot.n += x.n; tot.got += x.got; });
     var pct = tot.n ? Math.round(100*tot.got/tot.n) : null;
@@ -6617,11 +6915,11 @@ function renderTests(){
         '<div class="tbar"><span style="width:'+fill+'%"></span></div>'+
         (mxs || t.squad ? '' : testRecent(t, runs, pct))+
         '<p class="tstat">'+
-          (t.squad ? squadStat(t, runs) : mxs ? mxs.text
+          (mxs ? mxs.text : t.squad ? squadStat(t, runs)
                : (tot.n ? tot.got+' of '+tot.n+' balls'+(tot.n >= 40 ? ' \u00b7 <b>'+pct+'%</b>' : ' \u00b7 not enough yet to read a rate')
                         : 'Nothing logged yet')+
                  ' \u00b7 aiming for '+(t.target||100))+'</p>'+
-        (t.retired ? '<p class="note">Retired. Kept for the runs against it; its replacement is in the list.</p>' :
+        (t.retired ? '<p class="note">Retired. Kept for the runs against it.</p>' :
         '<div class="tacts"><button type="button" class="pri" data-run="'+t.id+'">Run this test</button>'+
           '<span class="twhere">'+(mxs ? mxs.where : t.balls+' balls')+' \u00b7 '+t.where+'</span></div>')+
       '</div>';
@@ -6636,7 +6934,7 @@ function renderTests(){
     if(due && !isMatrix(t)){ row.setAttribute("aria-expanded","true"); det.hidden = false; }
     var rb = card.querySelector("[data-run]");
     if(rb) rb.addEventListener("click", function(){ openTest(t.id); });
-    host.appendChild(card);
+    (t.squad ? host : fold).appendChild(card);
   });
   if(!allTests().length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
   var tools = document.createElement("div"); tools.className = "tools";
@@ -6682,19 +6980,24 @@ function drillLapBest(d){
   return best;
 }
 function drillBest(d){
-  var runs = drillSessions(d.id), best = null, i, x, v;
+  var runs = drillFamSessions(d).filter(function(x){ return x.status !== "live"; }), best = null, i, x, v, k;
   var lapB = drillLapBest(d);
   if(lapB !== null) return runs.length ? { big:String(lapB), small:"in a row, your best" } : null;
+  /* Across all three lengths, so a best is compared like for like: strokes
+     per ball, or the share of the points, and shown at its own length. */
   for(i=0;i<runs.length;i++){
     x = runs[i];
     if(!x || x.total == null || x.sgUnknown || thinSession(x)) continue;
+    var xd = drillById(x.drillId) || d;
     v = x.total;
-    if(best === null || v > best.v) best = {v:v, s:x};
+    k = isSG(d) ? v / Math.max(1, drillBallsN(xd)) : v / Math.max(1, x.max || areaMax(xd));
+    if(best === null || k > best.k) best = {v:v, k:k, s:x, d:xd};
   }
   if(best === null) return null;
+  var at = best.d.reps > 1 ? " at " + drillBallsN(best.d) + " " + drillUnit(best.d) : "";
   if(isMatrix(d)) return { big:String(best.v), small:"best lap" };
-  if(isSG(d)) return { big:fmtSG(best.v), small:"strokes, your best" };
-  return { big:best.v + " of " + (best.s.max || areaMax(d)), small:"your best" };
+  if(isSG(d)) return { big:fmtSG(best.v), small:"strokes, your best" + at };
+  return { big:best.v + " of " + (best.s.max || areaMax(best.d)), small:"your best" };
 }
 function drillBalls(d){
   if(isMatrix(d)) return (d.stations || []).length + " stations";
@@ -6704,95 +7007,76 @@ function drillBalls(d){
 }
 function renderDrills(){
   var host = $("drillList"); if(!host) return;
-  var here = drillWhere(), zoneHere = DRILL_PLACES[here].zone;
-
   var picker = $("drillWhere");
-  if(picker){
-    picker.className = "wherebar";
-    picker.innerHTML = '<span class="wherelab">Where are you?</span>' +
-      '<span class="wherechips">' + DRILL_PLACES.map(function(pl, i){
-        return '<button type="button" class="wchip" data-pl="' + i + '" aria-pressed="' +
-          (i === here) + '">' + pl.nm + '</button>';
-      }).join("") + '</span>';
-    picker.onclick = function(e){
-      var b = e.target.closest ? e.target.closest("[data-pl]") : null;
-      if(!b) return;
-      state.drillPlace = +b.dataset.pl;
-      saveLocal();
-      renderDrills();
-    };
-  }
-
+  if(picker){ picker.hidden = true; picker.innerHTML = ""; }
   host.innerHTML = "";
-  var order = zoneHere === 1 ? [1, 0] : [0, 1];
-  order.forEach(function(z, zi){
-    var live = zi === 0;
-    var zh = document.createElement("div");
-    zh.className = "zonehd" + (live ? " now" : "");
-    zh.innerHTML = '<b>' + DRILL_ZONES[z] + '</b><i></i>';
-    host.appendChild(zh);
 
-    DRILL_PLACES.forEach(function(pl, pi){
-      if(pl.zone !== z) return;
-      var mine = allDrills().filter(function(x){ return x.place === pi; });
-      if(!mine.length) return;
-      var hd = document.createElement("div");
-      hd.className = "grouphd";
-      hd.innerHTML = '<b>' + pl.nm + '</b><span>' +
-        (pi === here ? "where you are" : live ? "a walk away" : "not today") + '</span>';
-      host.appendChild(hd);
+  /* By pillar, the way the squad sheet is laid out. Inside a pillar the club
+     drills come first and the ones she can do at home after them, tagged. */
+  [1, 2, 3, 4].forEach(function(pn){
+    var mine = allDrills().filter(function(x){ return !x.hidden && pillarNo(x.area) === pn; })
+      .sort(function(a, b){ return drillPlace(a).zone - drillPlace(b).zone; });
+    if(!mine.length) return;
+    var hd = document.createElement("div");
+    hd.innerHTML = pillarHead(pn, mine.length + (mine.length === 1 ? " drill" : " drills"));
+    host.appendChild(hd.firstChild);
 
-      mine.forEach(function(d){
-        var sk = TILE[d.area] || TILE[10];
-        var best = drillBest(d), runs = drillSessions(d.id);
-        var off = pl.zone !== zoneHere;
-        var card = document.createElement("div");
-        card.className = "testcard drillcard" +
-          (off ? " off" : pi === here ? "" : " away");
-        var did = "ddet-" + d.id;
-        card.innerHTML =
-          '<button type="button" class="trow" aria-expanded="false" aria-controls="' + did + '" ' +
-            'style="--tint:' + sk.tint + '">' +
-            '<span class="puck">' + TICON[sk.ic](21) + '</span>' +
-            '<span class="tx"><span class="nm">' + d.name +
-              (d.needs === "height" ? '<span class="dtag">outdoors</span>' : '') +
-              (d.needs === "dry" ? '<span class="dtag">dry</span>' : '') + '</span>' +
-              '<span class="sub">' + drillBalls(d) + ' · about ' + (d.mins || 20) + ' min</span></span>' +
-            '<span class="rt">' + (best ? '<b>' + best.big + '</b><span>' + best.small + '</span>'
-                                        : '<span>not tried yet</span>') + '</span>' +
-            '<span class="chev">' +
-              '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-              'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-              '<path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg></span>' +
-          '</button>' +
-          '<div class="tdet" id="' + did + '" hidden>' +
-            '<p class="note">' + d.sub + '.</p>' +
-            '<p class="note">' + d.why + '</p>' +
-            '<p class="note"><b>Scoring.</b> ' + d.ruleText + '</p>' +
-            '<p class="tstat">' + (runs.length
-                ? runs.length + (runs.length === 1 ? " run" : " runs") + ' logged'
-                : 'Nothing logged yet') + '</p>' +
-            '<div class="tacts"><button type="button" class="pri" data-run="' + d.id + '">Start</button>' +
-              '<span class="twhere">' + drillBalls(d) + ' · ' + d.where + '</span></div>' +
-          '</div>';
-        var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
-        row.addEventListener("click", function(){
-          var open = row.getAttribute("aria-expanded") === "true";
-          row.setAttribute("aria-expanded", open ? "false" : "true");
-          det.hidden = open;
-        });
-        card.querySelector("[data-run]").addEventListener("click", function(){ openDrill(d.id); });
-        host.appendChild(card);
+    mine.forEach(function(d){
+      var sk = TILE[d.area] || TILE[10], pl = drillPlace(d);
+      var best = drillBest(d), runs = drillFamSessions(d).filter(function(x){ return x.status !== "live"; });
+      var ch = challengeFor(drillFamKey(d)), fam = lagFamily(drillFamKey(d));
+      var lens = fam.length > 1 ? fam.map(function(x){ return lagMinsFor(x, false); }).join(", ") + " min" : "about " + (d.mins || 20) + " min";
+      var card = document.createElement("div");
+      card.className = "testcard drillcard";
+      var did = "ddet-" + d.id;
+      card.innerHTML =
+        '<button type="button" class="trow" aria-expanded="false" aria-controls="' + did + '" ' +
+          'style="--tint:' + sk.tint + '">' +
+          '<span class="puck">' + TICON[sk.ic](21) + '</span>' +
+          '<span class="tx"><span class="nm">' + d.name +
+            (pl.zone === 1 ? '<span class="dtag home">home</span>' : '') +
+            (d.needs === "height" ? '<span class="dtag">outdoors</span>' : '') +
+            (d.needs === "dry" ? '<span class="dtag">dry</span>' : '') + '</span>' +
+            '<span class="sub">' + pl.nm + ' \u00b7 ' + lens + (ch ? ' \u00b7 challenge' : '') + '</span></span>' +
+          '<span class="rt">' + (best ? '<b>' + best.big + '</b><span>' + best.small + '</span>'
+                                      : '<span>not tried yet</span>') + '</span>' +
+          '<span class="chev">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            '<path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg></span>' +
+        '</button>' +
+        '<div class="tdet" id="' + did + '" hidden>' +
+          '<p class="note">' + d.sub + '.</p>' +
+          (d.why ? '<p class="note">' + d.why + '</p>' : '') +
+          '<p class="note"><b>Scoring.</b> ' + d.ruleText + '</p>' +
+          (ch ? '<p class="note chline"><b>Challenge: ' + ch.name + '.</b> ' + ch.sub + ', inside ' + Math.round(gtLimit(ch) / 60000) + ' minutes. ' + chBestTxt(ch) + '.</p>' : '') +
+          '<p class="tstat">' + (runs.length
+              ? runs.length + (runs.length === 1 ? " run" : " runs") + ' logged'
+              : 'Nothing logged yet') + (fam.length > 1 ? ' \u00b7 ' + fam.map(function(x){ return drillBallsN(x); }).join(", ") + ' ' + drillUnit(d) : '') +
+              (drillPairs(d) ? ' \u00b7 on your own or with a partner' : '') + '</p>' +
+          '<div class="tacts"><button type="button" class="pri" data-run="' + d.id + '">Start</button>' +
+            (ch ? '<button type="button" class="chgo" data-ch="' + ch.id + '">Challenge</button>' : '') +
+            '<span class="twhere">' + d.where + '</span></div>' +
+        '</div>';
+      var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
+      row.addEventListener("click", function(){
+        var open = row.getAttribute("aria-expanded") === "true";
+        row.setAttribute("aria-expanded", open ? "false" : "true");
+        det.hidden = open;
       });
+      card.querySelector("[data-run]").addEventListener("click", function(){ openDrill(d.id); });
+      var cb = card.querySelector("[data-ch]");
+      if(cb) cb.addEventListener("click", function(){ openDrill(ch.id); });
+      host.appendChild(card);
     });
   });
 
   var note = document.createElement("p");
   note.className = "note";
-  note.textContent = "A drill is its own thing. It shows up in your history and it keeps its own " +
-    "best, but it never stands in for a full session and it is never placed against a tour field. " +
-    "The two on the mat and the two in the garden are scored in their own counts, because a mat is " +
-    "flat and fast and a make rate on one flatters you.";
+  note.textContent = "Every drill comes in three lengths, picked at the top when you start. The challenge " +
+    "is the pressure version: one miss and you go back to the start, against the clock. A drill keeps " +
+    "its own best and shows up in your history, but it never stands in for a core session. The ones on " +
+    "the mat and in the garden are scored in their own counts, because a mat is flat and fast and a make rate on one flatters you.";
   host.appendChild(note);
 }
 
@@ -6869,73 +7153,11 @@ function testBox(a){
     else pl.practice[a.id] = psel.value;
     pl.practiceAt = Date.now();
     saveEdit();
-    paintWhen(); renderHome(); renderTests();
+    renderHome(); renderTests();
   });
   prow.appendChild(psel);
   box.appendChild(prow);
 
-  var hd = document.createElement("span"); hd.className = "eyebrow"; hd.style.marginTop = "12px";
-  hd.style.display = "block"; hd.textContent = "Test \u00b7 every so many sessions";
-  box.appendChild(hd);
-  var plan = testPlan(a.id) || {};
-  var row = document.createElement("div"); row.className = "testrow";
-
-  var sel = document.createElement("select"); sel.className = "tsel tsel-test";
-  sel.setAttribute("aria-label", "Which test to run for " + a.name);
-  sel.disabled = !avail.length;
-  sel.innerHTML = '<option value="">'+(avail.length ? "No test" : "No tests yet")+'</option>' +
-    avail.map(function(t){
-      return '<option value="'+t.id+'"'+(plan.id===t.id?' selected':'')+'>'+t.name+'</option>';
-    }).join("");
-
-  var stp = document.createElement("div"); stp.className = "mspin tstep";
-  var minus = document.createElement("button"); minus.type="button"; minus.textContent="\u2212";
-  minus.setAttribute("aria-label","Run the test less often");
-  var inp = document.createElement("input");
-  inp.type="number"; inp.min="1"; inp.max="30"; inp.step="1"; inp.inputMode="numeric";
-  inp.className="tevery"; inp.value = String(plan.every || 5);
-  inp.setAttribute("aria-label","Run the test every this many sessions");
-  var plus = document.createElement("button"); plus.type="button"; plus.textContent="+";
-  plus.setAttribute("aria-label","Run the test more often");
-
-  function save(){
-    var pl = playerObj(); if(!pl) return;
-    pl.tests = pl.tests || {};
-    var id = sel.value, every = Math.max(1, Math.min(30, parseInt(inp.value,10) || 5));
-    inp.value = String(every);
-    if(!id) delete pl.tests[a.id];
-    else pl.tests[a.id] = { id:id, every:every };
-    pl.testsAt = Date.now();
-    saveEdit();
-    paintWhen();
-    renderHome();
-    renderTests();
-  }
-  function nudge(d){ inp.value = String(Math.max(1, Math.min(30, (parseInt(inp.value,10)||5) + d))); save(); }
-  minus.addEventListener("click", function(){ nudge(-1); });
-  plus.addEventListener("click", function(){ nudge(1); });
-  inp.addEventListener("change", save);
-  sel.addEventListener("change", save);
-
-  stp.appendChild(minus); stp.appendChild(inp); stp.appendChild(plus);
-  var lab = document.createElement("span"); lab.className="tlab"; lab.textContent = "every";
-  row.appendChild(sel); row.appendChild(lab); row.appendChild(stp);
-  var unit = document.createElement("span"); unit.className="tlab"; unit.textContent = "sessions";
-  row.appendChild(unit);
-  box.appendChild(row);
-
-  var when = document.createElement("p"); when.className = "note tnote";
-  function paintWhen(){
-    var plan2 = testPlan(a.id);
-    if(!avail.length){ when.textContent = "Nothing in the library for this pillar yet."; return; }
-    if(!plan2){ when.textContent = "No test set for this pillar."; return; }
-    var due = testDue(a.id), n = sinceLastTest(a.id);
-    when.textContent = due
-      ? "Due now: " + n + " sessions since the last one."
-      : n + " of " + (plan2.every||5) + " sessions done since the last test.";
-  }
-  paintWhen();
-  box.appendChild(when);
   return box;
 }
 function renderGoals(){
@@ -7716,23 +7938,31 @@ function openTest(testId, resume){
   if(ok && state.draft){
     state.draft.kind = "test";
     state.draft.testId = testId;
-    $("sessArea").textContent = "Test \u00b7 " + (area(t.area) ? area(t.area).name : "");
+    $("sessArea").textContent = (t.squad ? "Squad" : "Test") + " \u00b7 " + (area(t.area) ? area(t.area).name : "");
+    paintBack();
     saveDraft();
   }
   return ok;
 }
-function openDrill(drillId, resume){
+function openDrill(drillId, resume, exact){
   var d = drillById(drillId); if(!d) return false;
   /* An unfinished run of THIS drill is picked up rather than started beside
      itself, for the same reason a test is: openSession's own resume lookup
      only matches kind "practice". */
   if(!resume) resume = liveSessions().filter(function(x){
     return x.kind === "drill" && x.drillId === drillId; })[0] || null;
+  /* The length she last chose for this drill is the one it opens at. */
+  if(!resume && !exact && d.family && d.reps === 1){
+    var lp = drillPref(d.family);
+    if(lp.len && lp.len !== drillId && drillById(lp.len) && drillById(lp.len).family === d.family) return openDrill(lp.len);
+  }
   var ok = openSession(drillId, resume);
   if(ok && state.draft){
     state.draft.kind = "drill";
     state.draft.drillId = drillId;
-    $("sessArea").textContent = "Quick drill \u00b7 " + drillPlace(d).nm;
+    if(drillPairs(d) && !resume && state.draft.pair == null){ state.draft.pair = !!drillPref(d.family).pair; renderSessSeg(drillId); renderSession(); }
+    $("sessArea").textContent = (d.challengeOf ? "Challenge" : "Drill") + " \u00b7 " + drillPlace(d).nm;
+    paintBack();
     saveDraft();
   }
   return ok;
@@ -7790,7 +8020,7 @@ function openSession(areaId, resume){
   }
   watchDraft();
   paintTick();
-  $("sessArea").textContent = a.isDrill ? "Quick drill"
+  $("sessArea").textContent = a.isDrill ? (a.challengeOf ? "Challenge" : "Drill")
                             : a.isTest ? "Test"
                             : (a.retired ? "Earlier format" : "Pillar "+areaNo(a));
   $("sessName").textContent = a.name;
@@ -7802,8 +8032,117 @@ function openSession(areaId, resume){
 }
 /* The two days of a paired task, side by side at the top of the session, the
    way the gym shows A and B. The one done longer ago is marked due. */
+/* The 18-hole lag picks its length and its company at the top of the session,
+   the way a paired task picks its day. Both are fixed once the first putt is
+   logged: the calls are drawn from them, so changing either under logged
+   putts would change what those putts were asked to do. */
+var LAG_PREF_KEY = "lcl.lag18.v1";
+function lagPref(){ try{ return JSON.parse(localStorage.getItem(LAG_PREF_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function lagPrefSave(p){ try{ localStorage.setItem(LAG_PREF_KEY, JSON.stringify(p)); }catch(e){} }
+function lagFamily(fam){ return allDrills().filter(function(d){ return d.family === fam; }).sort(function(a, b){ return a.reps - b.reps; }); }
+function lagMinsFor(d, pair){ return Math.round(d.mins * (pair ? 4 / 3 : 1) / 5) * 5; }
+function lagStarted(){
+  var sh = (state.draft && state.draft.shots) || {};
+  return Object.keys(sh).some(function(k){ return (sh[k] || []).some(function(x){ return x && x.z != null; }); });
+}
+/* Every drill's choices, kept per drill: the length she last picked and
+   whether she had a partner. The 18-hole lag's own key is read for it, so a
+   choice made before every drill had lengths is not lost. */
+var DRILL_PREF_KEY = "lcl.drillpref.v1";
+function drillPrefs(){ try{ return JSON.parse(localStorage.getItem(DRILL_PREF_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function drillPref(fam){
+  var all = drillPrefs();
+  if(all[fam]) return all[fam];
+  return fam === "lag18" ? lagPref() : {};
+}
+function drillPrefSave(fam, p){
+  var all = drillPrefs(); all[fam] = p;
+  try{ localStorage.setItem(DRILL_PREF_KEY, JSON.stringify(all)); }catch(e){}
+}
+function drillUnit(d){ return d && d.area === 4 ? "putts" : "balls"; }
+function drillBallsN(d){
+  if(mxShape(d)) return (d.stations || []).length;
+  var n = 0; liveSets(d).forEach(function(s){ n += ballsIn(s) || 0; }); return n;
+}
+/* What she has done on a challenge, in a line: the best time if she has got
+   round, how far she has got if not. */
+function chBest(ch){
+  var runs = drillSessions(ch.id).filter(function(x){ return x.status !== "live"; });
+  if(!runs.length) return null;
+  var best = null, far = 0;
+  runs.forEach(function(r){
+    if(gtComplete(ch, r)){ var t = gtElapsed(ch, r); if(best == null || t < best) best = t; }
+    var b = gtBest(r); if(b > far) far = b;
+  });
+  return { runs:runs.length, best:best, far:far, n:gtN(ch) };
+}
+function chBestTxt(ch){
+  var b = chBest(ch);
+  if(!b) return "Not tried yet";
+  if(b.best != null) return "Best " + mmss(b.best) + " \u00b7 " + b.runs + (b.runs === 1 ? " go" : " goes");
+  return "Furthest " + b.far + " of " + b.n + " \u00b7 " + b.runs + (b.runs === 1 ? " go" : " goes");
+}
+function pairNote(base){
+  if(base.family === "lag18") return "You start on A1, your partner on B1, putting towards each other. Three putts each, then swap ends. Your partner logs on their own phone.";
+  return "Take turns, a ball each, and keep each other honest. Your partner logs the same drill on their own phone.";
+}
+function renderDrillOpts(host, a){
+  var d = state.draft, isCh = !!a.challengeOf;
+  var key = drillFamKey(a), fam = lagFamily(key), base = drillBase(a), ch = challengeFor(key);
+  if(isCh && !fam.length) fam = [];
+  var pair = !!(d && d.pair), locked = draftHasContent(d);
+  var canPair = !isCh && drillPairs(base), unit = drillUnit(base);
+  var h = "";
+  if(ch){
+    h += '<button type="button" class="chbox" data-ch="' + ch.id + '" aria-pressed="' + isCh + '"' + (locked && !isCh ? ' disabled' : '') + '>' +
+      '<span class="cheb">Challenge</span><b>' + ch.name + '</b><span class="chsub">' + ch.sub + ' \u00b7 ' + Math.round(gtLimit(ch) / 60000) + ' min</span>' +
+      '<span class="chbest">' + chBestTxt(ch) + '</span></button>';
+  }
+  if(fam.length > 1){
+    h += '<div class="lagrow" role="tablist" aria-label="How long">' + fam.map(function(x){
+      return '<button type="button" role="tab" data-len="' + x.id + '" aria-selected="' + (!isCh && x.id === a.id) + '"' + (locked && x.id !== a.id ? ' disabled' : '') + '>' +
+        '<b>' + drillBallsN(x) + ' ' + unit + '</b>about ' + lagMinsFor(x, pair) + ' min</button>';
+    }).join("") + '</div>';
+  }
+  if(canPair){
+    h += '<div class="lagrow" role="tablist" aria-label="Who with">' +
+      '<button type="button" role="tab" data-pair="0" aria-selected="' + !pair + '"' + (locked && pair ? ' disabled' : '') + '><b>On your own</b>' + (base.family === "lag18" ? "ends change every putt" : "every ball yours") + '</button>' +
+      '<button type="button" role="tab" data-pair="1" aria-selected="' + pair + '"' + (locked && !pair ? ' disabled' : '') + '><b>With a partner</b>' + (base.family === "lag18" ? "three each, then swap ends" : "a ball each, in turn") + '</button>' +
+    '</div>' + (pair ? '<p class="note lagnote">' + pairNote(base) + '</p>' : '');
+  }
+  if(isCh && fam.length) h += '<p class="note lagnote">Pick a length above to go back to the drill.</p>';
+  if(locked) h += '<p class="note lagnote">Set once the first ' + (isCh ? "station is under way" : unit === "putts" ? "putt is logged" : "ball is logged") + '.</p>';
+  if(!h){ host.hidden = true; host.innerHTML = ""; return; }
+  host.hidden = false;
+  host.className = "seg lagopts";
+  host.innerHTML = h;
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b || b.disabled || draftHasContent(state.draft)) return;
+    var p = drillPref(key);
+    if(b.hasAttribute("data-ch")){
+      if(!isCh) openDrill(b.getAttribute("data-ch"));
+      return;
+    }
+    if(b.hasAttribute("data-pair")){
+      state.draft.pair = b.getAttribute("data-pair") === "1";
+      p.pair = state.draft.pair; drillPrefSave(key, p);
+      renderSessSeg(state.draft.areaId); renderSession();
+      return;
+    }
+    var id = b.getAttribute("data-len");
+    if(id && (id !== state.draft.areaId)){
+      p.len = id; drillPrefSave(key, p);
+      var keep = !!state.draft.pair;
+      openDrill(id, null, true);
+      if(state.draft && drillPairs(drillById(id))){ state.draft.pair = keep; renderSessSeg(id); renderSession(); }
+    }
+  };
+}
 function renderSessSeg(areaId){
   var host = $("sessSeg"); if(!host) return;
+  var fa = area(areaId);
+  if(fa && fa.isDrill && (fa.family || fa.challengeOf)){ renderDrillOpts(host, fa); return; }
+  host.className = "seg";
   var p = pairOf(areaId);
   host.innerHTML = "";
   if(!p){ host.hidden = true; return; }
@@ -8431,7 +8770,7 @@ function puttSlopeStats(sessions){
     a.sets.forEach(function(st){
       var kind = trackKind(a, st), list = (sess.shots || {})[st.id];
       if(!kind || !list) return;
-      var calls = callsFor(a, st);
+      var calls = callsFor(a, st, null, sess);
       list.forEach(function(x, i){
         if(!x || x.z == null) return;
         var c = calls[i], br = breakOf(kind, sl[st.id], c);
@@ -8831,7 +9170,7 @@ function sgPuttOfShot(set, z, call){
      z === "c" here never matched, so every lag putt was priced as a miss and
      the ladder was a flat penalty however well she lagged. */
   if(set.lag){
-    var B = sgLagBands(set.pd);
+    var B = sgLagBands((call && call.pd) || set.pd);
     var got = call && call.t != null ? lagHit(call.t, z) : (z === "c" || z === "b");
     return got ? B.inV : B.outV;
   }
@@ -9461,11 +9800,12 @@ function summaryBlock(a, sess){
   }
 
   if(pool.ln){
-    var lids = LAG_ZONES.map(function(z){ return z.id; });
-    var lsvg = heatSvg(lagSvg(null, false), lids, pool.lag, pool.ln, function(id){
-      var m = lagMark(id, 0); return [LAG.x1 - 46, m[1] + 4];
+    var LN = 5; (a.sets || []).forEach(function(x){ if(x.guide === "ladder" && x.lagN) LN = x.lagN; });
+    var lids = LAG_ZONES.map(function(z){ return z.id; }).filter(function(id){ return +id.slice(1) <= LN; });
+    var lsvg = heatSvg(lagSvg(null, false, LN), lids, pool.lag, pool.ln, function(id){
+      var m = lagMark(id, 0, LN); return [LAG.x1 - 46, m[1] + 4];
     });
-    var shortN = (pool.lag.g0||0), longN = (pool.lag.g4||0) + (pool.lag.g5||0);
+    var shortN = (pool.lag.g0||0), longN = LN === 3 ? (pool.lag.g3||0) : (pool.lag.g4||0) + (pool.lag.g5||0);
     html += sumCard('The lag ladder · '+pool.ln+' putts', lsvg,
       'Inside one step ' + pctText(pool.lhit, pool.ln) + ' of the time' +
       (shortN || longN ? ' · ' + (shortN >= longN ? 'the misses run short' : 'the misses run long') : '') + '.');
@@ -10672,21 +11012,24 @@ function clockMark(zoneId, n, st){
    A point is the gap either side of the target that was called, so what gets
    tapped is the gap the ball finished in, not the target it was aimed at. */
 var LAG = { x0:74, x1:252, top:32, gap:44, base:296, n:5 };
-function lagY(i){ return LAG.base - i*LAG.gap; }   // the line for target i (1..5)
+/* five targets keep the spacing they always had; three get the same height */
+function lagGap(N){ return (LAG.base - LAG.top - LAG.gap) / (N || LAG.n); }
+function lagY(i, N){ return LAG.base - i*lagGap(N); }   // the line for target i (1..N)
 function lagHit(t, z){ var g = +String(z||"").slice(1); return g === t-1 || g === t; }
-function lagSvg(call, tappable){
+function lagSvg(call, tappable, N){
   var K = LAG, att = tappable ? ' role="button" tabindex="0"' : '', out = "";
   var t = call && call.t;
+  N = N || (call && call.n) || K.n;
   out += '<line class="lagedge" x1="'+(K.x0-24)+'" y1="18" x2="'+(K.x0-24)+'" y2="'+(K.base+12)+'"></line>';
-  for(var g=0; g<=5; g++){
-    var yb = (g === 0) ? K.base : lagY(g), yt = lagY(g+1);
-    if(g === 5) yt = K.top;
+  for(var g=0; g<=N; g++){
+    var yb = (g === 0) ? K.base : lagY(g, N), yt = lagY(g+1, N);
+    if(g === N) yt = K.top;
     var good = t != null && lagHit(t, "g"+g);
     out += '<rect class="rz lz'+(good ? " good" : "")+'" data-z="g'+g+'"'+att+
-           ' aria-label="'+LAG_LABEL["g"+g]+'" x="'+K.x0+'" y="'+yt+'" width="'+(K.x1-K.x0)+'" height="'+(yb-yt)+'"></rect>';
+           ' aria-label="'+(g === N ? "Past " + N : LAG_LABEL["g"+g])+'" x="'+K.x0+'" y="'+yt+'" width="'+(K.x1-K.x0)+'" height="'+(yb-yt)+'"></rect>';
   }
-  for(var i=1;i<=K.n;i++){
-    var y = lagY(i), on = (t === i);
+  for(var i=1;i<=N;i++){
+    var y = lagY(i, N), on = (t === i);
     out += '<line class="lagt'+(on ? " on" : "")+'" x1="'+K.x0+'" y1="'+y+'" x2="'+K.x1+'" y2="'+y+'"></line>'+
            '<circle class="lagdot'+(on ? " on" : "")+'" cx="'+(K.x0+22)+'" cy="'+y+'" r="7"></circle>'+
            '<text class="lagn'+(on ? " on" : "")+'" x="'+(K.x0-8)+'" y="'+(y+5)+'">'+i+'</text>';
@@ -10696,12 +11039,14 @@ function lagSvg(call, tappable){
   out += '<circle class="wball" cx="'+(K.x0+22)+'" cy="'+(K.base+16)+'" r="7"></circle>';
   out += '<text class="lagfrom" x="'+(K.x0+40)+'" y="'+(K.base+21)+'">'+
          (call && call.from ? "from "+call.from : "you")+'</text>';
+  if(call && call.to) out += '<text class="lagn on" x="'+(K.x1-4)+'" y="'+(lagY(call.t, N)-8)+'" text-anchor="end">'+call.to+call.t+'</text>';
   return '<svg viewBox="0 0 300 330" class="lag" role="group" aria-label="Where the putt finished on the ladder">'+
          out+'<g class="marks"></g></svg>';
 }
-function lagMark(zoneId, n){
+function lagMark(zoneId, n, N){
   var K = LAG, g = +String(zoneId||"").slice(1);
-  var yt = (g === 5) ? K.top : lagY(g+1);
+  N = N || K.n;
+  var yt = (g >= N) ? K.top : lagY(g+1, N);
   var cols = 4, slot = n % 8;
   return [K.x0 + 34 + (slot % cols)*36, yt + 13 + Math.floor(slot/cols)*20];
 }
@@ -10861,13 +11206,46 @@ function lapStation(s, store, i){
   }
   return (run % stCount(s.stn)) + 1;
 }
+/* The 18-hole lag: three targets each end, 10 paces apart, every launch target
+   to every target at the other end, both ways. On her own the ends alternate
+   every putt (A1 to B1, B1 to A1, A1 to B2...). With a partner each of you
+   plays three from your launch target, then you swap ends: the same eighteen
+   pairings, in blocks of three. Each putt is priced at its own length: the
+   ends are 30 ft apart and every target one step (about 3 ft) further out. */
+var LAG_GAP_FT = 30, LAG_STEP_FT = 3;
+var LAG30_FROM = "2026-10-11";       /* the ladder moved from 15 steps to 10 paces */
+/* written out rather than read from the two vars above: the tests table is
+   built from it at load, before those vars have their values */
+function lagFt(fromNo, t){ return 30 + (fromNo - 1) * 3 + (t - 1) * 3; }
+function lag18Seq(pair){
+  var out = [], i, j;
+  for(i = 1; i <= 3; i++){
+    if(pair){
+      for(j = 1; j <= 3; j++) out.push({ from:"A" + i, to:"B", t:j, pd:lagFt(i, j) });
+      for(j = 1; j <= 3; j++) out.push({ from:"B" + i, to:"A", t:j, pd:lagFt(i, j) });
+    } else {
+      for(j = 1; j <= 3; j++){
+        out.push({ from:"A" + i, to:"B", t:j, pd:lagFt(i, j) });
+        out.push({ from:"B" + i, to:"A", t:j, pd:lagFt(i, j) });
+      }
+    }
+  }
+  return out;
+}
 function callsFor(a, s, cfg, store){
   if(cfg && cfg.calls) return cfg.calls;
   if(s.rot) return rotCalls(a, s, store);
   var n = ballsIn(s), kind = trackKind(a, s), out = [], lat = areaShape(a) === "corridor";
   for(var i=0;i<n;i++){
-    if(kind === "lag"){
-      out.push({kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)});
+    if(kind === "lag" && s.lagN === 3){
+      var q = lag18Seq(!!(store && store.pair))[i % 18];
+      out.push({kind:"lag", t:q.t, n:3, from:q.from, to:q.to, pd:q.pd});
+    } else if(kind === "lag"){
+      var lc = {kind:"lag", t:(i%5)+1, from:lagFrom(Math.floor(i/5)+1)};
+      /* since the ends moved to 10 paces each putt is priced at its own length;
+         a session from before keeps the flat forty feet it was played at */
+      if(store && store.date && store.date >= LAG30_FROM) lc.pd = lagFt(+lc.from.slice(1), lc.t);
+      out.push(lc);
     } else if(kind === "grid"){
       /* A fade has to start left, so only the two left-hand windows are ever called. */
       var ord = s.fade ? [1,4] : gridOrder(s.guide);
@@ -10920,7 +11298,7 @@ function shotDone(s, sh, call){
   var needsWindow = call ? call.kind === "w" : !!(s && s.parts);
   return needsWindow ? (sh.w != null && sh.z != null) : (sh.z != null);
 }
-function shotScores(a, s, shots){ return tallyShots(callsFor(a, s), shots); }
+function shotScores(a, s, shots){ return tallyShots(callsFor(a, s, null, state.draft), shots); }
 function applyShots(a, s, shots){
   var sc = shotScores(a, s, shots);
   if(s.parts){
@@ -10931,6 +11309,8 @@ function applyShots(a, s, shots){
     state.draft.scores[s.id] = sc.t;
   }
   updateTotal();
+  /* the 18-hole lag's choices lock on the first putt, and say so */
+  if(a && a.family) renderSessSeg(state.draft.areaId);
 }
 
 /* One tap before the first ball. It is optional: skip it and everything still
@@ -11060,7 +11440,7 @@ function shotRow(a, s, last, cfg){
     shots.forEach(function(x, i){
       if(!x || x.z == null) return;
       var n = seen[x.z] || 0; seen[x.z] = n+1;
-      var p = lagMark(x.z, n);
+      var p = lagMark(x.z, n, (calls[i] && calls[i].n) || s.lagN);
       out += '<g class="mk'+(shotPoint(calls[i], x) ? " hit" : "")+(i===cur?" now":"")+'">'+
              '<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="10"></circle>'+
              '<text x="'+f1(p[0])+'" y="'+f1(p[1]+5)+'">'+(i+1)+'</text></g>';
@@ -11088,7 +11468,7 @@ function shotRow(a, s, last, cfg){
       ask.innerHTML = 'Ball <b>'+(cur+1)+'</b> of '+nb+' \u00b7 called at <b>'+gridLabel(gridOf(c), c.win).toLowerCase()+'</b>. '+
         (st === "w" ? 'Tap the '+word+' it came out at.' : 'Now tap where it finished.');
     } else if(c.kind === "lag"){
-      ask.innerHTML = 'Putt <b>'+(cur+1)+'</b> of '+nb+' \u00b7 from <b>'+c.from+'</b> to target <b>'+c.t+'</b>'+brk(c)+'. '+
+      ask.innerHTML = 'Putt <b>'+(cur+1)+'</b> of '+nb+' \u00b7 from <b>'+c.from+'</b> to '+(c.to ? '<b>'+c.to+c.t+'</b>' + (c.pd ? ', ' + c.pd + ' ft' : '') : 'target <b>'+c.t+'</b>')+brk(c)+'. '+
         (sh.z == null ? 'Tap the gap it finished in.' : 'Logged. Tap a ball below to change it.');
     } else if(c.st){
       ask.innerHTML = 'Putt <b>'+(cur+1)+'</b> of '+nb+' \u00b7 from station <b>'+c.st+'</b>'+brk(c)+'. '+
@@ -13318,7 +13698,7 @@ function pastShots(a, set, sess){
   if(!any) return "";
   var kind = trackKind(a, set) || (set.parts ? "grid" : "shot");
   var gkind = (set.guide === "heights" || set.guide === "drive3") ? set.guide : "windows";
-  var calls = callsFor(a, set);
+  var calls = callsFor(a, set, null, sess);
 
   function marks(list){
     var seen = {}, out = "", holed = 0, sg = isSG(a),
@@ -13328,7 +13708,7 @@ function pastShots(a, set, sess){
       if(isClock && isIn(x.z)){ holed++; return; }
       if(sg && x.z === "h"){ holed++; return; }
       var n = seen[x.z] || 0; seen[x.z] = n+1;
-      var p = kind === "lag" ? lagMark(x.z, n) : shapeMark(a, x.z, n, null);
+      var p = kind === "lag" ? lagMark(x.z, n, set.lagN) : shapeMark(a, x.z, n, null);
       var hit = kind === "lag" ? shotPoint(calls[i], x) : inFor(calls[i], x.z);
       out += '<g class="mk'+(hit ? " hit" : "")+'"><circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+
              (kind === "lag" ? 10 : markR(a))+'"></circle>'+
@@ -13353,7 +13733,7 @@ function pastShots(a, set, sess){
 
   var html = '<div class="pastrose">';
   if(kind === "grid") html += '<div>'+put(gridSvg(gkind, false), wmarks(shots))+'</div>';
-  html += '<div>'+put(kind === "lag" ? lagSvg(null, false) : shapeSvg(a, set, false), marks(shots))+'</div>';
+  html += '<div>'+put(kind === "lag" ? lagSvg(null, false, set.lagN) : shapeSvg(a, set, false), marks(shots))+'</div>';
   html += '</div>';
   return html;
 }
@@ -13650,7 +14030,7 @@ var LOG_TECH = [0.5, 1, 1.5, 2, 3];
    Reviewed 4 October with David. */
 var MINS_MAIN = { 10:55, 11:60, 2:60, 3:55, 4:40, "p-approach-short":55, "p-putt-lag":40 };
 var MINS_TEST = { "t-tee-speed":25, "t-approach-fade":30, "t-approach-depth":30, "t-wedge-number":30,
-                  "t-putt-lag":30, "t-hundred":60, "t-putt-sg18":60, "t-short-p9":45 };
+                  "t-putt-lag":30, "t-putt-lag18":30, "t-hundred":60, "t-putt-sg18":60, "t-short-p9":45 };
 function quarterUp(m){ return Math.max(15, Math.ceil(m / 15) * 15); }
 function sessMins(s){
   if(!s || s.status === "live" || s.sample) return 0;
@@ -13661,6 +14041,9 @@ function sessMins(s){
     base = isSpeed(s) || isBand(s) ? 15 : isPrep(s) ? 10 : 40;
   } else if(s.kind === "drill"){
     var d = drillById(s.drillId); base = (d && d.mins) || 20;
+    if(d && d.family && s.pair) base = base * 4 / 3;     /* taking turns */
+    /* a challenge, like the Watson matrix, counts the time on its clock and a warm-up */
+    if(d && d.shape === "gauntlet" && s.mx && +s.mx.end > 0) base = Math.min(+s.mx.end, gtLimit(d)) / 60000 + 10;
   } else if(s.kind === "test"){
     var t = testById(s.testId);
     /* the Watson matrix has its own clock: the time it actually took, plus the warm-up */
@@ -13707,7 +14090,7 @@ function renderDise(){
     '</div>' +
     '<p class="note">' + (h.perWeek ? hrs(h.perWeek) + ' hours a week over the last four weeks' +
       (h.eta ? ', which gets you to ' + DISE_TARGET + ' by ' + longDate(h.eta) + '.' : '.') : 'Nothing in the last four weeks yet.') +
-      ' Sessions count at how long each one takes, warm-up included, to the next quarter hour: most main sessions an hour, putting 45 minutes, most tests half an hour, the squad putting card an hour, the Watson matrix the time on its clock, S&amp;C 45 minutes, speed sticks and the band 15.</p>' +
+      ' Sessions count at how long each one takes, warm-up included, to the next quarter hour: most core sessions an hour, putting 45 minutes, a drill its length, the squad putting card an hour, the Watson matrix and the challenges the time on the clock plus a warm-up, S&amp;C 45 minutes, speed sticks and the band 15.</p>' +
     '<button type="button" class="setgo" id="diseLog">Log play, coaching or practice</button></div>';
   $("diseLog").onclick = function(){ openLogHours(); };
 }
@@ -13920,7 +14303,7 @@ function weekDocBody(){
   h += wPara("Next week, " + weekRange(nextWeek()), { b:true, sz:26, before:200 });
   if(nr){
     var sq = squadFor(nextWeek()), cq = coachFor(nextWeek());
-    h += wPara((sq.length ? sq.length + " squad, " : "") + (cq.length ? coachSlots(cq) + " coach, " : "") + nr.n.main + " main sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " quick drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
+    h += wPara((sq.length ? sq.length + " squad, " : "") + (cq.length ? coachSlots(cq) + " coach, " : "") + nr.n.main + " core sessions, " + nr.n.sc + " S&C, " + nr.n.drill + " drills" + (nr.set ? "" : " (not yet confirmed)") + ".", {});
     h += wPara(sq.map(function(q){ return testById(q.id).name + " (squad)"; }).concat(cq.map(function(c){ return coachName(c) + " (coach)"; })).concat(nr.items.map(function(it){ return weekItemView(it).nm; })).join(", ") + ".", {});
   } else h += wPara("Not planned yet.", {});
   h += wPara("From Longer Closer Lower, " + fmtDate(today()) + ".", { sz:16, before:240 });
@@ -13966,7 +14349,7 @@ function hashPick(list, id){
 }
 function sessTitle(s){
   if(s.kind === "log") return logLabel(s);
-  if(s.kind === "drill"){ var d = drillById(s.drillId); return d ? d.name : "Quick drill"; }
+  if(s.kind === "drill"){ var d = drillById(s.drillId); return d ? d.name : "Drill"; }
   if(s.kind === "test"){ var t = testById(s.testId); return t ? t.name : "Test"; }
   if(s.kind === "gym") return stripTags(sessLabel(s));
   var sk = TILE[typeOf(s.areaId)]; return sk ? sk.nm : areaTitle(area(s.areaId));
@@ -14186,16 +14569,20 @@ function openPillars(){
 }
 
 var NEWS = [
+  { id:"2026-10-11-drills", date:"2026-10-11", title:"New tabs: Core, Squad and Drills",
+    body:"Practice is now Core, the five core sessions. Tests is now Squad: the Regional Squad SGx18, the Perfect 9 and the Watson matrix, which your coach can now switch on. Drills are grouped by pillar, every one comes in three lengths, the green and short game ones on your own or with a partner, and most have a challenge at the top: one miss and you start again, against the clock. The other tests became drills and challenges, and their old runs are kept under Earlier tests on Squad." },
+  { id:"2026-10-11-lag18", date:"2026-10-11", title:"New: the 18-hole lag",
+    body:"Three targets each end, 10 paces apart, one ball, eighteen putts. Pick 18, 36 or 54, on your own or with a partner, on Drills. The 18-hole lag challenge at the top of its page is the pressure version: all eighteen inside one step in a row, inside 30 minutes. The lag ladder's ends are now 10 paces apart too." },
   { id:"2026-10-05-pillars", date:"2026-10-05", title:"England Golf's Five Pillars of Performance",
     body:"The pillars now follow England Golf's numbering, 1 World Class Holing Out to 5 Strategy and Tactical Awareness, with the Regional Girls targets on Goals. Tap The five pillars on Practice or Goals to see the whole sheet. Tee shots now end with the three driver shots: stock, fairway finder and bomb." },
   { id:"2026-10-04-coach", date:"2026-10-04", title:"New: Coach sessions and messages",
-    body:"Your coach now sets compulsory sessions, shown under Squad on This week, every week. Quick drills are yours to choose: none by default, add some in Settings if you want to work on something. Messages from your coach arrive as a push and stay here on the bell." },
+    body:"Your coach now sets compulsory sessions, shown under Squad on This week, every week. Drills are yours to choose: none by default, add some in Settings if you want to work on something. Messages from your coach arrive as a push and stay here on the bell." },
   { id:"2026-10-04-dise", date:"2026-10-04", title:"New: DiSE hours",
     body:"Your running total towards 200 hours of practice, play and S&C is at the top of Progress. Every session already logged counts. Log rounds and coaching with Log play or coaching on This week." },
   { id:"2026-10-03-ott", date:"2026-10-03", title:"Tee shots: distance now counts your speed",
     body:"Off the tee, distance is priced from your club head speed at the LPGA rate: 94 mph carries 218 yards. The range balls make no difference, because club speed is the club, not the ball. Get faster and it shows. Your past tee sessions have been priced the same way." },
   { id:"2026-10-01-week", date:"2026-10-01", title:"New: This week",
-    body:"The first tab. Set how many main sessions, S&C and quick drills in Settings; the app picks which. Change or remove any of them." },
+    body:"The first tab. Set how many core sessions, S&C and drills in Settings; the app picks which. Change or remove any of them." },
   { id:"2026-10-01-bank", date:"2026-10-01", title:"New: Save as it is",
     body:"An unfinished session you are not going back to can be kept with what you scored, instead of deleted." },
   { id:"2026-10-01-bell", date:"2026-10-01", title:"New: kudos and records",
@@ -14206,7 +14593,7 @@ function catalogue(){
   var out = [];
   PRACTICE.forEach(function(p){ if(!p.paired) out.push({ id:"p:"+p.id, what:"session", nm:p.name }); });
   TESTS.forEach(function(t){ if(!t.retired) out.push({ id:"t:"+t.id, what:"test", nm:t.name }); });
-  allDrills().forEach(function(d){ if(/^d-/.test(d.id)) out.push({ id:"d:"+d.id, what:"quick drill", nm:d.name }); });
+  allDrills().forEach(function(d){ if(/^d-/.test(d.id) && !d.hidden) out.push({ id:"d:"+d.id, what:"drill", nm:d.name }); });
   GYM.forEach(function(g){ out.push({ id:"g:"+g.id, what:"S&C session", nm:stripTags(g.name) }); });
   return out;
 }
@@ -14221,7 +14608,7 @@ function catalogueNews(){
   if(changed){ try{ localStorage.setItem(KNOWN_KEY, JSON.stringify(k)); }catch(e){} }
   return cat.filter(function(c){ var d = k.seen[c.id]; return d && d !== "0" && daysBetween(d) <= 30; })
     .map(function(c){ return { key:"cat:"+c.id, kind:"news", title:"New " + c.what + ": " + c.nm,
-      body:"Added to the app. " + (c.what === "test" ? "It is on the Tests tab." : c.what === "quick drill" ? "It is on Quick Drills." :
+      body:"Added to the app. " + (c.what === "test" ? "It is on the Tests tab." : c.what === "drill" ? "It is on Drills." :
            c.what === "S&C session" ? "It is on the S&C tab." : "Your coach can put it in your programme."), date:k.seen[c.id] }; });
 }
 function feedItems(){
@@ -14389,7 +14776,7 @@ function remindBlock(){
     '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>'+
     '<button type="button" class="rmtest" id="rmTest"'+(r.on ? '' : ' hidden')+'>Send a test</button>';
   return '<div class="wkgh"><h2>Reminders</h2><span>this phone</span></div>'+body+
-    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a quick drill or ten minutes on the mat. On Sunday at 8.15pm there is one more: review the week and plan the next, unless next week is already set.</p>';
+    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a drill or ten minutes on the mat. On Sunday at 8.15pm there is one more: review the week and plan the next, unless next week is already set.</p>';
 }
 function urlB64(s){
   var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
@@ -14494,11 +14881,11 @@ function wireRemind(){
    than the goals' mv, so a coach editing focus areas can never wipe a week a
    girl set on her phone, and an auto-drawn week never beats one she chose. */
 var WEEK_KINDS = ["main", "sc", "drill"];
-var WEEK_WORD  = { main:"Main sessions", sc:"S&C", drill:"Quick drills", squad:"Squad", coach:"Coach" };
-var WEEK_ONE   = { main:"main session", sc:"S&C session", drill:"quick drill", squad:"squad test", coach:"coach session" };
+var WEEK_WORD  = { main:"Core sessions", sc:"S&C", drill:"Drills", squad:"Squad", coach:"Coach" };
+var WEEK_ONE   = { main:"core session", sc:"S&C session", drill:"drill", squad:"squad test", coach:"coach session" };
 /* the order the week is shown and counted in: what the coaches set, then hers */
 var WEEK_GROUPS = ["squad", "coach", "main", "sc", "drill"];
-function weekShort(k){ return k === "sc" ? "S&C" : k === "main" ? "main" : k === "squad" ? "squad" : k === "coach" ? "coach" : "drills"; }
+function weekShort(k){ return k === "sc" ? "S&C" : k === "main" ? "core" : k === "squad" ? "squad" : k === "coach" ? "coach" : "drills"; }
 /* What the coach has made compulsory, every week from the week it was set:
    [{id, from}]. A week before it was set is never judged on it. */
 /* Perfect 9 arrived after the putting card was already switched on, and it is
@@ -14620,14 +15007,18 @@ function drillRef(id){
   var d = drillById(id); if(!d) return null;
   return { id:id, name:d.name, drill:d, area:d.area };
 }
+/* The challenges, for the coach to set: never drawn for her week by the app. */
+function challengeChoices(){
+  return allDrills().filter(function(d){ return d.challengeOf; }).map(function(d){ return d.id; });
+}
 function drillChoices(){
-  return allDrills().filter(function(d){ return /^d-/.test(d.id); }).map(function(d){ return d.id; })
+  return allDrills().filter(function(d){ return /^d-/.test(d.id) && !d.hidden; }).map(function(d){ return d.id; })
     .concat(["gym:4", "gym:5"]);
 }
 function drillLast(id){
   var r = drillRef(id); if(!r) return null;
   var ss = r.gym ? mine().filter(function(s){ return s.kind === "gym" && s.gymId === r.gym; })
-                 : mine().filter(function(s){ return s.kind === "drill" && s.drillId === id; });
+                 : mine().filter(function(s){ return s.kind === "drill" && drillKey(s.drillId) === id; });
   var d = planHist(ss).map(function(s){ return s.date; }).sort().pop();
   return d || null;
 }
@@ -14841,7 +15232,7 @@ function sessRef(s){
   if(k === "squad") return s.testId;
   if(k === "main") return typeOf(s.testId || s.areaId);
   if(k === "sc") return s.gymId;
-  if(k === "drill") return s.kind === "gym" ? "gym:" + s.gymId : s.drillId;
+  if(k === "drill") return s.kind === "gym" ? "gym:" + s.gymId : drillKey(s.drillId);
   return null;
 }
 function weekSessions(wk){
@@ -15045,7 +15436,7 @@ function weekItemView(it){
   var ts = TILE[r.area] || TILE[10];
   var why = it.why || "";
   if(it.carried) why = "Moved on from last week" + (why ? " · " + why : "");
-  return { nm:r.name, sub:why || (r.gym ? "Optional S&C" : "Quick drill"), tint:r.gym ? "var(--surface-2)" : ts.tint,
+  return { nm:r.name, sub:why || (r.gym ? "Optional S&C" : "Drill"), tint:r.gym ? "var(--surface-2)" : ts.tint,
            ic:r.gym ? (r.gym === 4 ? TICON.bolt : TICON.band) : TICON[ts.ic] };
 }
 function weekOpen(it){
@@ -15174,7 +15565,7 @@ function renderWeek(){
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
     html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
   var n = st.rec ? st.rec.n : defaultNums();
-  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + (st.coach.length ? st.coach.length + ' coach \u00b7 ' : '') + n.main + ' main · ' + n.sc + ' S&amp;C · ' + n.drill + ' quick drills. Your numbers.</span>' +
+  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + (st.coach.length ? st.coach.length + ' coach \u00b7 ' : '') + n.main + ' core · ' + n.sc + ' S&amp;C · ' + n.drill + ' drills. Your numbers.</span>' +
           '<button type="button" id="wkSet">Change in Settings</button>' +
           '<button type="button" id="wkLog">Log play, coaching or practice</button></div>';
   host.innerHTML = html;
@@ -16054,7 +16445,13 @@ $("benchBack").addEventListener("click", function(){ renderGoals(); show("goals"
 $("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
 $("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
 $("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
-$("sessionBack").addEventListener("click", function(){ show(state.fromWeek ? "week" : "home"); });
+$("sessionBack").addEventListener("click", function(){
+  var bk = state.draft ? state.draft.kind : null;
+  if(state.fromWeek) show("week");
+  else if(bk === "drill"){ renderDrills(); show("drills"); }
+  else if(bk === "test"){ renderTests(); show("tests"); }
+  else show("home");
+});
 $("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx-1); });
 $("navNext").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx+1); });
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
@@ -16323,9 +16720,9 @@ function coachWeekLine(p){
 function coachChoices(){
   var esc = function(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
   var g = [];
-  g.push(["Main sessions", liveAreas().map(function(a){ return ["main|" + a.id, ((TILE[a.id] || {}).nm || a.name) + " session"]; })]);
-  g.push(["Tests", allTests().filter(function(t){ return !t.retired && !t.squad; }).map(function(t){ return ["test|" + t.id, t.name]; })]);
-  g.push(["Quick drills", drillChoices().map(function(id){ return ["drill|" + id, drillRef(id).name]; })]);
+  g.push(["Core sessions", liveAreas().map(function(a){ return ["main|" + a.id, ((TILE[a.id] || {}).nm || a.name) + " session"]; })]);
+  g.push(["Drills", drillChoices().map(function(id){ return ["drill|" + id, drillRef(id).name]; })]);
+  g.push(["Challenges", challengeChoices().map(function(id){ return ["drill|" + id, drillRef(id).name + " (" + drillBase(drillById(id)).name + ")"]; })]);
   g.push(["S&C", GYM.filter(function(x){ return !x.extra && !x.retired; }).map(function(x){ return ["sc|" + x.id, "S&C · " + stripTags(x.name)]; })]);
   return { groups:g, esc:esc };
 }
@@ -16402,8 +16799,8 @@ function renderProg(){
   host.innerHTML = "";
 
   var g1 = document.createElement("div"); g1.className = "setgrp";
-  g1.innerHTML = '<div class="wkgh"><h2>Main sessions and tests</h2></div>' +
-    '<p class="note">The session she does in each pillar, and the test that comes round every so many sessions.</p>';
+  g1.innerHTML = '<div class="wkgh"><h2>Core sessions</h2></div>' +
+    '<p class="note">The session she does in each pillar.</p>';
   liveAreas().forEach(function(a){
     var sk = TILE[a.id] || {};
     var hd = document.createElement("div"); hd.className = "proghd";
