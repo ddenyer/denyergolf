@@ -411,6 +411,10 @@
   .wkopt.cur{opacity:.55}
   .wkoh{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:10px 0 0}
   .wkoh.wkcoachh{margin:16px 0 0}
+  .pgswitch{display:flex; gap:4px; padding:3px; margin:4px 0 14px; background:var(--surface-2); border-radius:12px}
+  .pgswitch button{flex:1; border:0; background:transparent; border-radius:9px; padding:8px 10px; font:inherit; font-size:14px;
+    font-weight:600; color:var(--muted); cursor:pointer}
+  .pgswitch button[aria-selected="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--card)}
   .wkrmall{width:100%; margin-top:14px; border:1px solid var(--line-strong); background:var(--surface); color:var(--accent);
     border-radius:10px; padding:11px; font:inherit; font-size:14px; font-weight:600; cursor:pointer}
   /* ---------- settings ---------- */
@@ -2245,7 +2249,7 @@
     <nav class="lookrow" role="tablist" aria-label="Look back">
       <button id="tabSessions" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.6 12a8.4 8.4 0 1 0 2.5-6"></path><path d="M3.4 3.6v4.6H8"></path><path d="M12 7.6v4.6l3 1.9"></path></svg><span>Sessions</span></button>
       <button id="tabHistory" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" font-family="Figtree, Helvetica Neue, Arial, sans-serif" font-size="7.4" font-weight="700"><text x="2" y="8.2">1</text><text x="2" y="14.6">2</text><text x="2" y="21">3</text></g><g stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M9.6 6h11.4"></path><path d="M9.6 12.4h11.4"></path><path d="M9.6 18.8h11.4"></path></g></svg><span>Progress</span></button>
-      <button id="tabGoals" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.94 6.06 6.66.92-4.83 4.63 1.17 6.58L12 17.5l-5.94 3.09 1.17-6.58L2.4 9.38l6.66-.92z"></path></svg><span>Goals</span></button>
+      <button id="tabCalendar" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="4.8" width="17.2" height="15.8" rx="2.6"></rect><path d="M3.4 9.6h17.2"></path><path d="M8 2.8v4"></path><path d="M16 2.8v4"></path><path d="M7.6 13.4h2.2"></path><path d="M14.2 13.4h2.2"></path><path d="M7.6 17h2.2"></path></svg><span>Calendar</span></button>
       <button id="tabSettings" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.7 6.3a5.6 5.6 0 0 1-7.4 6.9l-7 7a2.1 2.1 0 0 1-3-3l7-7a5.6 5.6 0 0 1 6.9-7.4l-3.4 3.4.6 2.9 2.9.6z"></path></svg><span>Settings</span></button>
       <button id="tabReview" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.4"></rect><path d="M9 2.8h6v3H9z"></path><path d="m8.8 13.2 2.2 2.2 4.4-4.6"></path></svg><span>Review</span></button>
     </nav></div>
@@ -2424,6 +2428,7 @@
   </section>
 
   <section id="viewHistory" hidden>
+    <div class="pgswitch" role="tablist" aria-label="Goals or progress"><button type="button" role="tab" data-pg="goals">Goals</button><button type="button" role="tab" data-pg="progress">Progress</button></div>
     <h1>Progress</h1>
     <p class="lede">What the practice says about the goals, where the misses lean, and how each pillar is moving.</p>
 
@@ -2468,6 +2473,7 @@
 
   <!-- GOALS -->
   <section id="viewGoals" hidden>
+    <div class="pgswitch" role="tablist" aria-label="Goals or progress"><button type="button" role="tab" data-pg="goals">Goals</button><button type="button" role="tab" data-pg="progress">Progress</button></div>
     <div class="eyebrow" id="goalsWho"></div>
     <h1 id="goalsProject" hidden></h1>
     <p class="lede">Outcome, then what has to improve to get there, then what you do in the week.</p>
@@ -2509,12 +2515,12 @@
   <!-- SEASON -->
   <section id="viewSeason" hidden>
     <button class="backbtn" id="seasonBack" type="button">← Back</button>
-    <h1>Season</h1>
+    <h1>Calendar</h1>
     <p class="lede">Tournaments, entries and the checklist for each one, squad days and lessons. Shared with everyone who coaches or manages the girls.</p>
     <div id="seasonBody"></div>
   </section>
   <section id="viewEvent" hidden>
-    <button class="backbtn" id="eventBack" type="button">← Season</button>
+    <button class="backbtn" id="eventBack" type="button">← Calendar</button>
     <div class="eyebrow" id="eventWhen"></div>
     <h1 id="eventName"></h1>
     <div id="eventBody"></div>
@@ -6595,9 +6601,11 @@ function show(view){
   $("tabTests").setAttribute("aria-selected", (view==="tests"||view==="test"||sk==="test")?"true":"false");
   $("tabDrills").setAttribute("aria-selected", (view==="drills"||sk==="drill")?"true":"false");
   $("tabSC").setAttribute("aria-selected", (view==="sc"||view==="gym")?"true":"false");
-  $("tabHistory").setAttribute("aria-selected", view==="history"?"true":"false");
+  $("tabHistory").setAttribute("aria-selected", (view==="history"||view==="goals"||view==="bench")?"true":"false");
+  if($("tabCalendar")) $("tabCalendar").setAttribute("aria-selected", (view==="season"||view==="event")?"true":"false");
+  paintProgSwitch(view);
   $("tabSessions").setAttribute("aria-selected", (view==="sessions"||view==="past")?"true":"false");
-  $("tabGoals").setAttribute("aria-selected", (view==="goals"||view==="bench")?"true":"false");
+  if($("tabGoals")) $("tabGoals").setAttribute("aria-selected", (view==="goals"||view==="bench")?"true":"false");
   $("totalBar").hidden = !(view==="session" || view==="gym");
   /* Only a golf area owns a colour. The gym, the tests and the lists keep the
      neutral, or five tints would be competing on a screen that is about none
@@ -16603,9 +16611,28 @@ $("dueLater").addEventListener("click", function(){
   var id = state.dueArea; closeDue(); if(id != null) openSession(id);
 });
 $("benchBack").addEventListener("click", function(){ renderGoals(); show("goals"); });
-$("tabHistory").addEventListener("click", function(){ renderProgress(); show("history"); });
+/* Progress holds Goals and Progress, with a switch at the top of each; the
+   button opens whichever she used last. */
+var PROG_TAB_KEY = "lcl.progtab";
+function openProgTab(which){
+  try{ localStorage.setItem(PROG_TAB_KEY, which); }catch(e){}
+  if(which === "goals"){ renderGoals(); show("goals"); } else { renderProgress(); show("history"); }
+}
+function paintProgSwitch(view){
+  [].forEach.call(document.querySelectorAll(".pgswitch button"), function(b){
+    b.setAttribute("aria-selected", (b.getAttribute("data-pg") === "goals") === (view === "goals") ? "true" : "false");
+  });
+}
+$("tabHistory").addEventListener("click", function(){
+  var w = "progress"; try{ w = localStorage.getItem(PROG_TAB_KEY) || "progress"; }catch(e){}
+  openProgTab(w);
+});
+[].forEach.call(document.querySelectorAll(".pgswitch"), function(sw){
+  sw.addEventListener("click", function(e){ var b = e.target.closest ? e.target.closest("[data-pg]") : null; if(b) openProgTab(b.getAttribute("data-pg")); });
+});
+if($("tabCalendar")) $("tabCalendar").addEventListener("click", function(){ state.seasonFrom = "week"; openSeason(); });
 $("tabSessions").addEventListener("click", function(){ renderSessions(); show("sessions"); });
-$("tabGoals").addEventListener("click", function(){ renderGoals(); show("goals"); });
+if($("tabGoals")) $("tabGoals").addEventListener("click", function(){ openProgTab("goals"); });
 $("sessionBack").addEventListener("click", function(){
   var bk = state.draft ? state.draft.kind : null;
   if(state.fromWeek) show("week");
@@ -17402,8 +17429,8 @@ function seasonWeekHtml(){
   var next = SEASON.events.filter(function(ev){
     var st = entryOf(ev.id, k).status; return ev.start && ev.start >= today() && (ev.players || []).indexOf(k) > -1 && /considering|entered|ballot|confirmed|reserve/.test(st);
   }).sort(function(a, b){ return a.start < b.start ? -1 : 1; })[0];
-  if(!todo.length && !days.length && !next) return '<div class="wkseason"><button type="button" class="wkseasonlink" data-season="open">Season and tournaments</button></div>';
-  html += '<div class="wkgrp wkseason"><div class="wkgh"><h2>Tournaments</h2><button type="button" class="wkseasonlink" data-season="open">Season</button></div>';
+  if(!todo.length && !days.length && !next) return '<div class="wkseason"><button type="button" class="wkseasonlink" data-season="open">Calendar</button></div>';
+  html += '<div class="wkgrp wkseason"><div class="wkgh"><h2>Tournaments</h2><button type="button" class="wkseasonlink" data-season="open">Calendar</button></div>';
   if(next){
     var en = entryOf(next.id, k);
     html += '<button type="button" class="wknext" data-season="ev:' + next.id + '"><b>' + seasonEsc(next.name) + '</b><span>' +
@@ -17437,12 +17464,12 @@ function seasonWeekChange(e){
 function seasonTodoBox(){
   var el = document.createElement("div"); el.className = "pcardc stodo";
   var todo = seasonTodo(myOwnerRoles().filter(function(r){ return r !== "player"; }));
-  el.innerHTML = '<div class="hd"><span class="who">Season</span><span class="when">' + (todo.length ? todo.length + ' to do' : 'nothing due') + '</span></div>' +
+  el.innerHTML = '<div class="hd"><span class="who">Calendar</span><span class="when">' + (todo.length ? todo.length + ' to do' : 'nothing due') + '</span></div>' +
     (todo.length ? todo.slice(0, 8).map(function(t){
       return '<label class="wkcheck' + (t.c.state === "overdue" ? " late" : "") + '"><input type="checkbox" data-tick="' + t.ev.id + '|' + t.k + '|' + t.c.it.id + '"> ' +
         '<span><b>' + seasonEsc(t.c.it.label) + '</b><small>' + seasonEsc(keyName(t.k)) + ' · ' + seasonEsc(t.ev.name) + ' · ' + dueWords(t.c) + '</small></span></label>';
     }).join("") : '<p class="cnote">Nothing due in the next week for you.</p>') +
-    '<div class="acts"><button type="button" data-season="open">Season, entries and calendar</button></div>';
+    '<div class="acts"><button type="button" data-season="open">Open the calendar</button></div>';
   el.onclick = function(e){ var b = e.target.closest ? e.target.closest("[data-season]") : null; if(b) seasonWeekClick(b); };
   el.onchange = function(e){ seasonWeekChange(e); };
   return el;
