@@ -2203,6 +2203,17 @@
   .schk select{font:inherit; font-size:11.5px; padding:3px 6px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-2); flex:none}
   .sown{font-size:11px; color:var(--muted); flex:none; padding-top:3px}
   #eventBody a{color:var(--accent); font-weight:600}
+  .sprops{border:1.5px solid var(--heritage)}
+  .sprop{padding:10px 0; border-top:1px solid var(--line)}
+  .sprop b{display:block; font-size:14.5px}
+  .sprop span{display:block; font-size:13px; color:var(--ink-2); margin:2px 0 4px}
+  .sprop a{font-size:12.5px; color:var(--accent); font-weight:600}
+  .wkprops{border-color:var(--heritage)}
+  .calguide{margin-top:12px; font-size:13.5px; color:var(--ink-2)}
+  .calguide summary{cursor:pointer; font-weight:700; color:var(--ink)}
+  .calguide h3{font-size:14px; margin:12px 0 4px; color:var(--ink)}
+  .calguide ol{margin:0; padding-left:20px; display:grid; gap:4px}
+  .calguide p{margin:8px 0 0}
   .sdanger{margin-top:24px}
   .sdanger button{color:var(--flag)}
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
@@ -14936,7 +14947,7 @@ function remindBlock(){
     '<p class="note" id="rmMsg">'+(r.on ? "On for this phone. One nudge at most, never after nine." : "Tie it to something you already do. “After dinner” works better than a time on its own.")+'</p>'+
     '<button type="button" class="rmtest" id="rmTest"'+(r.on ? '' : ' hidden')+'>Send a test</button>';
   return '<div class="wkgh"><h2>Reminders</h2><span>this phone</span></div>'+body+
-    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a drill or ten minutes on the mat. On Sunday at 8.15pm there is one more: review the week and plan the next, unless next week is already set.</p>';
+    '<p class="note">One push a day at most, and only one of these: a session left unfinished yesterday; your coach changing your programme; every 25 DiSE hours; from Thursday, a squad or coach session still to do; a pillar left two weeks; or, if nothing is logged that day, a drill or ten minutes on the mat. On Sunday at 8.15pm there is one more: review the week and plan the next, unless next week is already set. Around a tournament the day’s push is its checklist instead, and news (a place confirmed, a tee time, dates confirmed, updates to confirm) comes when it happens, never after nine.</p>';
 }
 function urlB64(s){
   var pad = "=".repeat((4 - s.length % 4) % 4), b = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/"));
@@ -16017,6 +16028,8 @@ function handleGo(search){
   else if(go === "review") openReview();
   else if(go === "settings") openSettings(null);
   else if(go === "week") show("week");
+  else if(go === "calendar" && typeof openSeason === "function"){ state.seasonFrom = "week"; openSeason(); }
+  else if(go === "event" && q.get("id") && typeof openEvent === "function"){ state.seasonFrom = "week"; seasonLoad(); openEvent(q.get("id")); seasonPull(); }
 }
 
 /* ---------- diagram lightbox ---------- */
@@ -17244,7 +17257,7 @@ function coachImport(text){
    comes due when its date arrives (entries open, the place is confirmed, so
    many days before round one) and each item has an owner, the player, the
    parent/manager or the coach, which can be changed per event. */
-var SEASON = { events:[], entries:[], dates:[], at:0, busy:false };
+var SEASON = { events:[], entries:[], dates:[], proposals:[], at:0, busy:false };
 var SEASON_KEY = "lcl.season.v1";
 var EV_OPEN = null;     /* the event on the event page */
 var ST_WORD = { none:"Not planning", considering:"Considering", entered:"Entered", ballot:"In the ballot",
@@ -17282,11 +17295,11 @@ function seasonEsc(t){ return String(t == null ? "" : t).replace(/&/g, "&amp;").
 function seasonLoad(){
   try{
     var x = JSON.parse(localStorage.getItem(SEASON_KEY) || "null");
-    if(x && x.code === cloudCode()){ SEASON.events = x.events || []; SEASON.entries = x.entries || []; SEASON.dates = x.dates || []; SEASON.at = x.at || 0; }
+    if(x && x.code === cloudCode()){ SEASON.events = x.events || []; SEASON.entries = x.entries || []; SEASON.dates = x.dates || []; SEASON.proposals = x.proposals || []; SEASON.at = x.at || 0; }
   }catch(e){}
 }
 function seasonKeep(){
-  try{ localStorage.setItem(SEASON_KEY, JSON.stringify({ code:cloudCode(), events:SEASON.events, entries:SEASON.entries, dates:SEASON.dates, at:SEASON.at })); }catch(e){}
+  try{ localStorage.setItem(SEASON_KEY, JSON.stringify({ code:cloudCode(), events:SEASON.events, entries:SEASON.entries, dates:SEASON.dates, proposals:SEASON.proposals, at:SEASON.at })); }catch(e){}
 }
 function seasonPost(body){ body.code = cloudCode(); return cloudPost("/api/dg-season", body); }
 function seasonPull(){
@@ -17295,7 +17308,7 @@ function seasonPull(){
   return seasonPost({ action:"get" }).then(function(res){
     SEASON.busy = false;
     if(!res.ok || !res.d || !res.d.ok) return false;
-    SEASON.events = res.d.events || []; SEASON.entries = res.d.entries || []; SEASON.dates = res.d.dates || [];
+    SEASON.events = res.d.events || []; SEASON.entries = res.d.entries || []; SEASON.dates = res.d.dates || []; SEASON.proposals = res.d.proposals || [];
     SEASON.at = Date.now(); seasonKeep(); seasonRepaint();
     return true;
   }, function(){ SEASON.busy = false; return false; });
@@ -17312,7 +17325,7 @@ function seasonSay(t){ var el = $("seasonStatus"); if(el) el.textContent = t || 
 function myKeys(){ return state.players.map(function(p){ return playerKey(p.id); }).filter(Boolean); }
 function keyName(k){ var p = state.players.filter(function(x){ return playerKey(x.id) === k; })[0]; return p ? p.name : (k.charAt(0).toUpperCase() + k.slice(1)); }
 function evById(id){ return SEASON.events.filter(function(e){ return e.id === id; })[0] || null; }
-function entryOf(evId, k){ return SEASON.entries.filter(function(x){ return x.event === evId && x.player === k; })[0] || { event:evId, player:k, status:"none", check:{}, owners:{}, tees:[] }; }
+function entryOf(evId, k){ return SEASON.entries.filter(function(x){ return x.event === evId && x.player === k; })[0] || { event:evId, player:k, status:"considering", check:{}, owners:{}, tees:[] }; }
 function evPlayers(ev){ var mine = myKeys(); return (ev.players || []).filter(function(k){ return mine.indexOf(k) > -1; }); }
 function seasonStaff(){ return !meNow() ? true : meStaff(); }
 
@@ -17323,8 +17336,9 @@ function dDays(a, b){ return Math.round((new Date(b + "T12:00:00") - new Date(a 
 function evWhen(ev){
   if(ev.start){
     var a = new Date(ev.start + "T12:00:00"), b = new Date((ev.end || ev.start) + "T12:00:00");
-    if(ev.start === (ev.end || ev.start)) return dNice(ev.start) + " " + a.getFullYear();
-    return (a.getMonth() === b.getMonth() ? a.getDate() : dNice(ev.start)) + " to " + dNice(ev.end) + " " + b.getFullYear();
+    var pv = ev.confirmed ? "" : " (provisional)";
+    if(ev.start === (ev.end || ev.start)) return dNice(ev.start) + " " + a.getFullYear() + pv;
+    return (a.getMonth() === b.getMonth() ? a.getDate() : dNice(ev.start)) + " to " + dNice(ev.end) + " " + b.getFullYear() + pv;
   }
   return (ev.month ? MON[ev.month - 1] : "Date") + ", dates to be confirmed";
 }
@@ -17429,8 +17443,10 @@ function seasonWeekHtml(){
   var next = SEASON.events.filter(function(ev){
     var st = entryOf(ev.id, k).status; return ev.start && ev.start >= today() && (ev.players || []).indexOf(k) > -1 && /considering|entered|ballot|confirmed|reserve/.test(st);
   }).sort(function(a, b){ return a.start < b.start ? -1 : 1; })[0];
-  if(!todo.length && !days.length && !next) return '<div class="wkseason"><button type="button" class="wkseasonlink" data-season="open">Calendar</button></div>';
+  var prN = (SEASON.proposals || []).length;
+  if(!todo.length && !days.length && !next && !prN) return '<div class="wkseason"><button type="button" class="wkseasonlink" data-season="open">Calendar</button></div>';
   html += '<div class="wkgrp wkseason"><div class="wkgh"><h2>Tournaments</h2><button type="button" class="wkseasonlink" data-season="open">Calendar</button></div>';
+  if(prN) html += '<button type="button" class="wknext wkprops" data-season="open"><b>' + prN + (prN === 1 ? ' update' : ' updates') + ' to confirm</b><span>Found by the Monday search. Tap to check.</span></button>';
   if(next){
     var en = entryOf(next.id, k);
     html += '<button type="button" class="wknext" data-season="ev:' + next.id + '"><b>' + seasonEsc(next.name) + '</b><span>' +
@@ -17485,11 +17501,13 @@ function openSeason(){
 function renderSeason(){
   var host = $("seasonBody"); if(!host) return;
   var staff = seasonStaff(), keys = myKeys(), html = "";
-  if(!SEASON.events.length && !SEASON.at) html += '<p class="note">Loading the season…</p>';
+  if(!SEASON.events.length && !SEASON.at) html += '<p class="note">Loading the season\u2026</p>';
+  html += proposalsHtml();
   if(staff){
     html += '<div class="setgrp scal"><div class="wkgh"><h2>DenyerGolf calendar</h2></div>' +
       '<p class="note">Tournaments the girls are going for, entry deadlines, practice rounds, tee times, squad days and lessons, in Calendar on your phone. Subscribe once and it keeps itself up to date.</p>' +
-      '<div id="calOut"></div><div class="tools"><button type="button" id="calGet">Get the calendar link</button></div></div>';
+      '<div id="calOut"></div><div class="tools"><button type="button" id="calGet">Get the calendar link</button></div>' + calGuideHtml() + '</div>';
+    html += staffAlertsHtml();
   }
   /* squad days and lessons */
   var up = SEASON.dates.filter(function(d){ return d.start && d.start.slice(0, 10) >= today(); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
@@ -17507,9 +17525,10 @@ function renderSeason(){
   evs.forEach(function(ev){
     var m = ev.start ? +ev.start.slice(5, 7) : (ev.month || 0);
     if(m !== lastM){ html += '<div class="smonth">' + (m ? ["January","February","March","April","May","June","July","August","September","October","November","December"][m - 1] : "Month to be confirmed") + '</div>'; lastM = m; }
+    /* everything on the list starts as Considering, so that is the one left unsaid */
     var chips = evPlayers(ev).map(function(k){
-      var st = entryOf(ev.id, k).status || "none";
-      return st === "none" ? "" : '<span class="schip st-' + st + '">' + seasonEsc(keyName(k)) + ': ' + ST_WORD[st] + '</span>';
+      var st = entryOf(ev.id, k).status || "considering";
+      return st === "considering" ? "" : '<span class="schip st-' + st + '">' + seasonEsc(keyName(k)) + ': ' + ST_WORD[st] + '</span>';
     }).join("");
     var todoN = evPlayers(ev).reduce(function(a, k){ return a + checkFor(ev, entryOf(ev.id, k)).filter(function(c){ return !c.done && (c.state === "due" || c.state === "overdue"); }).length; }, 0);
     html += '<button type="button" class="sev' + (ev.confirmed ? " conf" : "") + '" data-ev="' + ev.id + '"><b>' + seasonEsc(ev.name) + '</b>' +
@@ -17520,8 +17539,10 @@ function renderSeason(){
   html += '<p class="status" id="seasonStatus"></p>';
   host.innerHTML = html;
 
+  wireStaffAlerts();
   host.onclick = function(e){
     var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    if(b.hasAttribute("data-pr")){ decideProposal(b.getAttribute("data-pr"), b.getAttribute("data-do")); return; }
     if(b.hasAttribute("data-ev")){ openEvent(b.getAttribute("data-ev")); return; }
     if(b.id === "evAdd"){ EV_OPEN = "new"; renderEvent(); show("event"); return; }
     if(b.id === "dtAdd"){ dateForm(); return; }
@@ -17542,8 +17563,7 @@ function renderSeason(){
         $("calOut").innerHTML = '<p class="calurl"><span>' + seasonEsc(res.d.url) + '</span></p>' +
           '<div class="tools"><button type="button" id="calCopy">Copy the link</button><a class="calsub" href="' + seasonEsc(res.d.webcal) + '">Subscribe on this phone</a>' +
           '<button type="button" id="calNew">Make a new link</button></div>' +
-          '<p class="note">On a Mac: Calendar, File, New Calendar Subscription, paste the link, and choose iCloud as the location so it reaches every Apple device. ' +
-          'Keep the link to the family: anyone who has it can see the dates.</p>';
+          '<p class="note">Keep the link to the family: anyone who has it can see the dates. Follow the steps below to add it.</p>';
         var cb = $("calCopy"); if(cb) cb.onclick = function(){
           var done = function(){ cb.textContent = "Copied"; };
           try{ navigator.clipboard.writeText(res.d.url).then(done, function(){ fallbackCopy(res.d.url, "The link"); }); }catch(err){ fallbackCopy(res.d.url, "The link"); }
@@ -17553,6 +17573,123 @@ function renderSeason(){
     }
   };
 }
+/* ---- what the Monday search found ----
+   Everyone sees it and anyone can decide it: the girls, the coaches, the
+   parents. Accepting changes the tournament and tells everyone at once. */
+var PR_WORD = { dates:"Dates", venue:"Venue", open:"Entries open", close:"Entries close", link:"Organiser\u2019s page", note:"Note", new_event:"New tournament" };
+function proposalsHtml(){
+  var list = SEASON.proposals || [];
+  if(!list.length) return "";
+  return '<div class="setgrp sprops"><div class="wkgh"><h2>Updates to confirm</h2><span class="num">' + list.length + '</span></div>' +
+    '<p class="note">Found by the Monday search. Check the source, then accept or ignore. Accepting updates the calendar and tells everyone.</p>' +
+    list.map(function(p){
+      var ev = evById(p.event_id);
+      var head = p.field === "new_event" ? "New tournament" : (ev ? ev.name : "A tournament");
+      return '<div class="sprop"><b>' + seasonEsc(head) + '</b><span>' + seasonEsc((PR_WORD[p.field] || p.field) + ": " + (p.note || p.value || "")) + '</span>' +
+        (p.source ? '<a href="' + seasonEsc(p.source) + '" target="_blank" rel="noopener">Source</a>' : '') +
+        '<div class="tools"><button type="button" data-pr="' + seasonEsc(p.id) + '" data-do="accept">Accept</button>' +
+        '<button type="button" data-pr="' + seasonEsc(p.id) + '" data-do="ignore">Ignore</button></div></div>';
+    }).join("") + '</div>';
+}
+function decideProposal(id, what){
+  seasonSay(what === "accept" ? "Accepting\u2026" : "Ignoring\u2026");
+  seasonPost({ action:what === "accept" ? "accept" : "ignore", id:id }).then(function(res){
+    if(!res.ok || !res.d || !res.d.ok){ seasonSay("Not done: " + ((res.d && res.d.reason) || res.status) + "."); return; }
+    SEASON.proposals = SEASON.proposals.filter(function(p){ return p.id !== id; }); seasonKeep(); renderSeason();
+    seasonSay(what === "accept" ? "Accepted. Everyone is being told." : "Ignored.");
+    seasonPull();
+  }, function(){ seasonSay("Not done: no connection."); });
+}
+
+/* ---- alerts on a coach's or a parent/manager's phone ----
+   The same push as the girls' reminders, but following every player the code
+   opens: news as it happens, and one summary a day of what is due. */
+var STAFF_ALERT_KEY = "lcl.staffalert";
+function staffAlertPrefs(){ try{ return JSON.parse(localStorage.getItem(STAFF_ALERT_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function staffAlertSave(o){ try{ localStorage.setItem(STAFF_ALERT_KEY, JSON.stringify(o)); }catch(e){} }
+function staffAlertsHtml(){
+  var r = staffAlertPrefs(), t = r.time || "08:00", times = [];
+  for(var mm = 7 * 60; mm <= 21 * 60; mm += 30) times.push(String(Math.floor(mm / 60)).padStart(2, "0") + ":" + String(mm % 60).padStart(2, "0"));
+  var body;
+  if(iosNotInstalled()) body = '<p class="note">On iPhone, alerts only work from the Home Screen app. In Safari tap Share, then Add to Home Screen, and open it from there.</p>';
+  else if(!pushCan()) body = '<p class="note">This browser cannot receive alerts.</p>';
+  else body = '<label class="bwpause"><input type="checkbox" id="saOn"' + (r.on ? " checked" : "") + '> Alerts on this phone</label>' +
+    '<div class="bwrow"><span>Daily summary at</span><select id="saTime" aria-label="Summary time">' +
+      times.map(function(x){ return '<option' + (x === t ? " selected" : "") + '>' + x + '</option>'; }).join("") + '</select></div>' +
+    '<p class="note" id="saMsg">' + (r.on ? "On for this phone." : "News as it happens (a place confirmed, a tee time, dates confirmed, updates found), and one summary a day of what is due, for both girls.") + '</p>' +
+    '<button type="button" class="rmtest" id="saTest"' + (r.on ? '' : ' hidden') + '>Send a test</button>';
+  return '<div class="setgrp salerts"><div class="wkgh"><h2>Alerts</h2><span>this phone</span></div>' + body + '</div>';
+}
+function staffAlertSay(t){ var m = $("saMsg"); if(m) m.textContent = t; }
+function staffAlertSend(sub, test){
+  var r = staffAlertPrefs();
+  return cloudPost("/api/dg-push", { action:"sub", staff:true, code:cloudCode(), sub:sub.toJSON ? sub.toJSON() : sub, time:r.time || "08:00",
+    tz:(Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London"), test:!!test });
+}
+function staffSub(){
+  return Promise.resolve(Notification.requestPermission()).then(function(perm){
+    if(perm !== "granted") throw new Error("Notifications are switched off for this app in the phone's settings.");
+    return Promise.all([navigator.serviceWorker.register("/sw.js").then(function(){ return navigator.serviceWorker.ready; }), cloudPost("/api/dg-push", { action:"key" })]);
+  }).then(function(x){
+    var reg = x[0], k = x[1];
+    if(!k.ok || !k.d || !k.d.key) throw new Error("The server is not set up for alerts yet.");
+    return reg.pushManager.getSubscription().then(function(old){ return old || reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64(k.d.key) }); });
+  });
+}
+function wireStaffAlerts(){
+  var on = $("saOn"); if(!on) return;
+  on.onchange = function(){
+    var want = on.checked;
+    staffAlertSay(want ? "Turning on\u2026" : "Turning off\u2026");
+    var p = want
+      ? staffSub().then(function(sub){ return staffAlertSend(sub, true).then(function(res){
+          if(!res.ok) throw new Error("The server said no (" + ((res.d && res.d.reason) || res.status) + ").");
+          var r = staffAlertPrefs(); r.on = true; r.endpoint = sub.endpoint; staffAlertSave(r);
+          staffAlertSay("On. " + testWords(res.d && res.d.sent, res.d && res.d.why)); if($("saTest")) $("saTest").hidden = false; }); })
+      : navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(sub){
+          var r = staffAlertPrefs(), ep = (sub && sub.endpoint) || r.endpoint;
+          return (sub ? sub.unsubscribe() : Promise.resolve()).then(function(){ if(ep) return cloudPost("/api/dg-push", { action:"off", staff:true, code:cloudCode(), endpoint:ep }); })
+            .then(function(){ r.on = false; staffAlertSave(r); staffAlertSay("Off."); if($("saTest")) $("saTest").hidden = true; });
+        });
+    p.catch(function(e){ on.checked = !want; staffAlertSay(e && e.message ? e.message : "That did not work. Try again in a moment."); });
+  };
+  $("saTime").onchange = function(){
+    var r = staffAlertPrefs(); r.time = $("saTime").value; staffAlertSave(r);
+    if(!r.on) return;
+    navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); })
+      .then(function(sub){ if(sub) return staffAlertSend(sub, false); })
+      .then(function(){ staffAlertSay("Saved. Summary at " + r.time + "."); }, function(){ staffAlertSay("Saved on this phone; the server will catch up next time."); });
+  };
+  if($("saTest")) $("saTest").onclick = function(){
+    staffAlertSay("Sending a test\u2026");
+    navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(sub){
+      if(!sub) throw new Error("This phone is not signed up. Untick the box and tick it again.");
+      return staffAlertSend(sub, true);
+    }).then(function(res){ staffAlertSay(testWords(res.d && res.d.sent, res.d && res.d.why)); }, function(e){ staffAlertSay(e && e.message ? e.message : "That did not work."); });
+  };
+}
+
+/* How to add the DenyerGolf calendar, for a Mac and for an iPhone. Done once on
+   a Mac with iCloud as the location, it reaches that person's iPhone and iPad
+   too. Someone without a Mac does it on the iPhone, where it stays on that phone. */
+function calGuideHtml(){
+  return '<details class="calguide"><summary>How to add it: Mac and iPhone</summary>' +
+    '<h3>On a Mac (best: it then reaches your iPhone and iPad too)</h3><ol>' +
+      '<li>Tap Get the calendar link above, then Copy the link, and get it to the Mac (AirDrop, Notes or email it to yourself).</li>' +
+      '<li>Open Calendar. From the menu bar choose File, then New Calendar Subscription.</li>' +
+      '<li>Paste the link and click Subscribe.</li>' +
+      '<li>Name: DenyerGolf. Location: iCloud (not On My Mac). Auto-refresh: every 15 minutes. Click OK.</li>' +
+      '<li>Give it a colour. In a few minutes it appears on your iPhone and iPad under the same Apple ID.</li></ol>' +
+    '<h3>On an iPhone (for anyone without a Mac)</h3><ol>' +
+      '<li>Open this page on the phone and tap Get the calendar link, then Subscribe on this phone, then Subscribe.</li>' +
+      '<li>Or, with the link copied or sent to you: Settings, Apps, Calendar, Calendar Accounts, Add Account, Other, Add Subscribed Calendar. Paste the link, tap Next, then Save.</li>' +
+      '<li>In Calendar, tap Calendars at the bottom to check DenyerGolf is ticked.</li>' +
+      '<li>To keep it fresh: Settings, Apps, Calendar, Calendar Accounts, Fetch New Data, and set Fetch to Every 15 Minutes.</li></ol>' +
+    '<h3>For the girls</h3><p>Copy the link and send it to them; they follow the iPhone steps. If the link is ever passed on, tap Make a new link and send the new one round: the old one stops working.</p>' +
+    '<p>The calendar shows every tournament with dates that someone is considering or has entered, entries open and close, practice rounds, tee times, squad days and lessons. It is read only: changes are made here in the app and reach everyone on the next refresh.</p>' +
+    '</details>';
+}
+
 function dateForm(){
   var host = $("dtForm"); if(!host) return;
   var keys = myKeys();
