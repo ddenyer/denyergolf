@@ -13,11 +13,15 @@
 //   -> { ok:true, results:{ charlotte:{ phones:1, sent:1 }, ... } }
 //   a message from the coach, to every phone each player has signed up. It
 //   does not count as her one reminder for the day.
+// POST { action:"sub", staff:true, code, sub, time, tz, test }
+//   a coach's or a parent/manager's phone: calendar news at once and one
+//   summary a day of what is due, for every player the code opens.
+// POST { action:"off", staff:true, code, endpoint }
 //
 // The same rule as every other dg-* endpoint: the code decides which players
 // it may touch, and a phone can only be signed up for one of those.
 
-import { authorise, sbHeaders, timedFetch, safeLabel, whoIs } from './dg-load.js';
+import { authorise, sbHeaders, timedFetch, safeLabel, whoIs, isStaff, safeKeys } from './dg-load.js';
 import { sendPush, lastPush } from './_webpush.js';
 
 const PUSH_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(push\.apple\.com|fcm\.googleapis\.com|push\.services\.mozilla\.com|notify\.windows\.com|push\.mozilla\.com|googleapis\.com)\//i;
@@ -100,8 +104,12 @@ export default async function handler(req, res) {
     }
   }
 
-  const player = String(body.player || '').trim().toLowerCase();
-  if (!player || auth.players.indexOf(player) === -1) {
+  const me = whoIs(auth.row);
+  const staffSub = !!body.staff;
+  if (staffSub && !isStaff(me)) return res.status(403).json({ ok: false, reason: 'staff_only' });
+  const player = staffSub ? 'staff:' + (me.key || safeLabel(me.name).toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'staff')
+                          : String(body.player || '').trim().toLowerCase();
+  if (!staffSub && (!player || auth.players.indexOf(player) === -1)) {
     return res.status(403).json({ ok: false, reason: 'not_your_player' });
   }
 
@@ -123,6 +131,8 @@ export default async function handler(req, res) {
       if (!V.pub || !V.priv) return res.status(500).json({ ok: false, reason: 'push_not_configured' });
       const row = {
         endpoint: s.endpoint, player,
+        kind: staffSub ? 'staff' : 'player', person: me.key || null,
+        players: staffSub ? safeKeys(auth.players) : [player],
         p256dh: String(keys.p256dh), auth: String(keys.auth),
         remind_at: cleanTime(body.time), tz: cleanTz(body.tz),
         cue: safeLabel(body.cue || '').slice(0, 40) || null,
@@ -137,7 +147,11 @@ export default async function handler(req, res) {
 
       let sent = null;
       if (body.test) {
-        sent = await sendPush({ endpoint: s.endpoint, keys }, {
+        sent = await sendPush({ endpoint: s.endpoint, keys }, staffSub ? {
+          title: 'Calendar alerts are on',
+          body: 'News as it happens, and at ' + row.remind_at + ' a summary of what is due, when anything is.',
+          url: '/?go=calendar',
+        } : {
           title: 'Reminders are on',
           body: 'If nothing is logged by ' + row.remind_at + ', you will get one nudge. Never more than one a day.',
           url: '/?go=bell',

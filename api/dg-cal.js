@@ -94,11 +94,14 @@ export function buildIcs({ name, events, entries, dates, nm, now }) {
   };
 
   events.forEach((ev) => {
-    const rows = entries.filter((x) => x.event === ev.id && ACTIVE[x.status] && ev.players.indexOf(x.player) > -1);
+    // a player with no row yet is Considering: everything on the list starts there
+    const rows = ev.players.map((p) => entries.find((x) => x.event === ev.id && x.player === p) || { event: ev.id, player: p, status: 'considering' })
+      .filter((x) => ACTIVE[x.status]);
     if (!rows.length) return;
     const who = whoLine(rows, nm);
     const desc = [ev.venue, ev.entry, ev.close ? 'Entries close ' + ev.close : '', ev.flag, ev.notes, ev.link].filter(Boolean).join('\n');
-    if (ev.start) allDay(ev.id + '@denyergolf', ev.start, ev.end, ev.name + ': ' + who, desc, ev.venue, ev.link);
+    // dates the organiser has not confirmed yet are typed in as a guide, and say so
+    if (ev.start) allDay(ev.id + '@denyergolf', ev.start, ev.end, ev.name + (ev.confirmed ? '' : ' (provisional)') + ': ' + who, desc, ev.venue, ev.link);
     const live = rows.filter((r) => r.status !== 'played');
     if (live.length && ev.open) allDay(ev.id + '-open@denyergolf', ev.open, ev.open, 'Entries open: ' + ev.name, desc, '', ev.link);
     if (live.length && ev.close) allDay(ev.id + '-close@denyergolf', ev.close, ev.close, 'Entries close: ' + ev.name, desc, '', ev.link);

@@ -14,6 +14,7 @@
 import { sbHeaders, timedFetch } from './dg-load.js';
 import { sendPush, lastPush } from './_webpush.js';
 import { vapid } from './dg-push.js';
+import { summary, addNews, playerNames } from './_season.js';
 
 const WINDOW = 15;   // minutes, the cron interval
 const LAST = 21 * 60;
@@ -317,6 +318,72 @@ export function message(row, L, week, target, today, extra = {}) {
            url: `/?go=drill&id=${d.id}` };
 }
 
+// ---- the season, every run ----
+// News is sent between 7am and 9pm in the phone's own time; one that arrives at
+// night waits for the morning. A phone follows the players on its row: a girl
+// her own, a coach or a parent/manager everyone their code opens.
+const NEWS_FROM = 7 * 60, NEWS_TO = 21 * 60;
+export function follows(row, players) {
+  const mine = Array.isArray(row.players) && row.players.length ? row.players : [row.player];
+  return players.some((p) => mine.indexOf(p) > -1);
+}
+export function newsHours(row) { const L = localNow(row.tz || 'Europe/London'); return L.mins >= NEWS_FROM && L.mins < NEWS_TO; }
+// What the Monday search found and nobody has been told about yet becomes one
+// piece of news per group of players.
+export function foundNews(props) {
+  const by = {};
+  props.forEach((p) => { const k = (p.players || []).slice().sort().join(','); (by[k] = by[k] || []).push(p); });
+  return Object.keys(by).filter(Boolean).map((k) => {
+    const list = by[k];
+    const what = list.slice(0, 3).map((p) => p.note || p.field).join('; ');
+    return { players: k.split(','), ids: list.map((p) => p.id),
+             title: list.length === 1 ? 'Season update to confirm' : `${list.length} season updates to confirm`,
+             body: (what.length > 180 ? what.slice(0, 175).replace(/\s+\S*$/, '') + '\u2026' : what) + (list.length > 3 ? ` and ${list.length - 3} more` : '') + '. Tap to check.' };
+  });
+}
+async function seasonNews(SUPABASE_URL, H, rows, V, out) {
+  // 1. what the search found, turned into news once
+  const pr = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_proposals?status=eq.pending&notified=eq.false&select=id,players,field,note&limit=200`, { headers: H });
+  const props = pr.ok ? await pr.json() : [];
+  for (const g of foundNews(props)) {
+    if (await addNews(g.players, g.title, g.body, '/?go=calendar', 'found')) {
+      await timedFetch(`${SUPABASE_URL}/rest/v1/dg_proposals?id=in.(${g.ids.map((x) => `"${x}"`).join(',')})`,
+        { method: 'PATCH', headers: { ...H, Prefer: 'return=minimal' }, body: JSON.stringify({ notified: true }) });
+    }
+  }
+  // 2. news to every phone that follows those players
+  const nr = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_news?done=eq.false&select=*&order=id.asc&limit=100`, { headers: H });
+  const news = nr.ok ? await nr.json() : [];
+  for (const n of news) {
+    const targets = rows.filter((row) => follows(row, n.players || []));
+    const reached = new Set(n.sent_to || []);
+    for (const row of targets) {
+      if (reached.has(row.endpoint) || !newsHours(row)) continue;
+      const st = await sendPush({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
+        { title: n.title, body: n.body, url: n.url || '/?go=calendar' }, V);
+      if (st >= 200 && st < 300) { reached.add(row.endpoint); out.news = (out.news || 0) + 1; }
+      else if (st === 404 || st === 410) {
+        reached.add(row.endpoint);
+        await timedFetch(`${SUPABASE_URL}/rest/v1/dg_push?endpoint=eq.${encodeURIComponent(row.endpoint)}`, { method: 'DELETE', headers: H });
+      }
+    }
+    const old = Date.now() - Date.parse(n.created) > 36 * 3600 * 1000;
+    const done = old || targets.every((row) => reached.has(row.endpoint));
+    await timedFetch(`${SUPABASE_URL}/rest/v1/dg_news?id=eq.${n.id}`, { method: 'PATCH', headers: { ...H, Prefer: 'return=minimal' },
+      body: JSON.stringify({ sent_to: [...reached], done }) });
+  }
+}
+async function seasonData(SUPABASE_URL, H) {
+  const [ev, en] = await Promise.all([
+    timedFetch(`${SUPABASE_URL}/rest/v1/dg_events?select=id,players,body&limit=1000`, { headers: H }),
+    timedFetch(`${SUPABASE_URL}/rest/v1/dg_entries?select=event_id,player,body&limit=5000`, { headers: H }),
+  ]);
+  return {
+    events: ev.ok ? (await ev.json()).map((r) => ({ ...r.body, id: r.id, players: r.players })) : [],
+    entries: en.ok ? (await en.json()).map((r) => ({ ...r.body, event: r.event_id, player: r.player })) : [],
+  };
+}
+
 export default async function handler(req, res) {
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.authorization !== `Bearer ${secret}`) {
@@ -332,11 +399,39 @@ export default async function handler(req, res) {
     const r = await timedFetch(`${SUPABASE_URL}/rest/v1/dg_push?enabled=eq.true&select=*`, { headers: H });
     const rows = r.ok ? await r.json() : [];
     const metaCache = {}, sessCache = {};
+    try { await seasonNews(SUPABASE_URL, H, rows, V, out); } catch (e) { console.error('dg-push-cron season news:', e.message); }
+    let season = null, nm = null;
+    const seasonFor = async () => {
+      if (!season) {
+        season = await seasonData(SUPABASE_URL, H);
+        const keys = [...new Set(season.events.flatMap((e) => e.players || []))].filter((k) => /^[a-z0-9-]{1,40}$/.test(k));
+        nm = keys.length ? await playerNames(keys) : ((p) => p);
+      }
+      return season;
+    };
     for (const row of rows) {
       out.checked++;
       const L = localNow(row.tz || 'Europe/London');
-      const sunday = sundayDue(row, L);
+      const sunday = row.kind === 'staff' ? false : sundayDue(row, L);
       if (!sunday && !dueNow(row, L)) { out.skipped++; continue; }
+
+      // A coach's or a parent/manager's phone: the day's tournament summary, and nothing else.
+      if (row.kind === 'staff') {
+        let sm = null;
+        try { const S = await seasonFor(); sm = summary({ players: row.players || [], events: S.events, entries: S.entries, today: L.date, nm, staff: true }); }
+        catch (e) { console.error('dg-push-cron staff summary:', e.message); }
+        if (!sm) { out.skipped++; continue; }
+        const st = await sendPush({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, sm, V);
+        if (st === 404 || st === 410) {
+          await timedFetch(`${SUPABASE_URL}/rest/v1/dg_push?endpoint=eq.${encodeURIComponent(row.endpoint)}`, { method: 'DELETE', headers: H });
+          out.dropped++; continue;
+        }
+        const sentS = { ...((row.sent && typeof row.sent === 'object') ? row.sent : {}), last: { status: st, reason: lastPush.reason, at: L.date } };
+        await timedFetch(`${SUPABASE_URL}/rest/v1/dg_push?endpoint=eq.${encodeURIComponent(row.endpoint)}`, { method: 'PATCH',
+          headers: { ...H, Prefer: 'return=minimal' }, body: JSON.stringify(st >= 200 && st < 300 ? { sent: sentS, last_sent: L.date } : { sent: sentS }) });
+        if (st >= 200 && st < 300) out.sent++; else out.failed = (out.failed || 0) + 1;
+        continue;
+      }
 
       const p = encodeURIComponent(row.player);
       if (!(row.player in metaCache)) {
@@ -369,7 +464,14 @@ export default async function handler(req, res) {
       const paused = isPaused(pl, monday);
 
       let msg = null, sentKey = { last_sent: L.date };
-      if (sunday) {
+      // in a tournament fortnight her checklist comes first: it is the day's one push
+      let tour = null;
+      if (!sunday) {
+        try { const S = await seasonFor(); tour = summary({ players: [row.player], events: S.events, entries: S.entries, today: L.date, nm, staff: false }); }
+        catch (e) { console.error('dg-push-cron player summary:', e.message); }
+      }
+      if (tour) msg = tour;
+      else if (sunday) {
         // the 8.15 one: sent unless next week is already set, paused or not
         next.sun = L.date; sentKey = {};
         if (!nextSet(pl, monday)) msg = message(row, L, 0, 0, 0, { plan: true });
