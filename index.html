@@ -2128,6 +2128,13 @@
      like something to tap on the way past. */
   .pcardc .acts button.danger{margin-left:auto; color:var(--muted); border-style:dashed}
   .pcardc .acts button.danger:hover{color:var(--flag); border-color:var(--flag); border-style:solid}
+  .cteaml{list-style:none; margin:4px 0 0; padding:0; display:grid; gap:6px}
+  .cteaml li{display:flex; flex-direction:column; gap:1px; font-size:13px}
+  .cteaml li b{font-size:14px}
+  .cteaml li b small{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-left:4px}
+  .cteaml li span{color:var(--muted); font-size:12.5px}
+  .cflist li.ro{opacity:.92}
+  .cfro{font-size:12.5px; color:var(--muted)}
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
     margin-top:6px; background:var(--surface-2)}
   .cimport p{margin:0 0 10px; font-size:13px; color:var(--ink-2); line-height:1.5}
@@ -2419,7 +2426,7 @@
   <!-- COACH -->
   <section id="viewCoach" hidden>
     <div class="coachbar">
-      <span>Coach view</span>
+      <span id="coachBarWho">Coach view</span>
       <button id="coachOut" type="button">Leave coach view</button>
     </div>
     <h1>Players on this device</h1>
@@ -5655,6 +5662,66 @@ function ensurePlayer(key, display){
 }
 function cloudReady(){ return !!cloudCode(); }
 
+/* ============ who is signed in ============
+   A code belongs to a player, a coach, a parent/manager, or a mix: the server
+   says which on every load (dg-load "me"), with the names of everyone else who
+   coaches or manages the same players ("staff"). Kept on the device so the
+   coach view works offline. Until a load has said, the device behaves as it
+   always has: the coach view behind its password, everything editable. */
+var ME_KEY = "lcl.me.v1";
+function meSave(me, staff){
+  try{ localStorage.setItem(ME_KEY, JSON.stringify({ code:cloudCode(), me:me, staff:Array.isArray(staff) ? staff : [] })); }catch(e){}
+  paintCoachLink();
+}
+function meStore(){
+  try{
+    var x = JSON.parse(localStorage.getItem(ME_KEY) || "null");
+    return x && x.me && x.code === cloudCode() ? x : null;
+  }catch(e){ return null; }
+}
+function meNow(){ var x = meStore(); return x ? x.me : null; }
+function staffAll(){ var x = meStore(); return x ? x.staff : []; }
+function meRole(r){ var m = meNow(); return !!(m && m.roles && m.roles.indexOf(r) > -1); }
+function meStaff(){ return meRole("coach") || meRole("manager"); }
+/* the head coach, or a device that has not been told otherwise */
+function meHead(){ var m = meNow(); return !m || (meRole("coach") && (m.speciality === "head" || !m.speciality)); }
+function meKey(){ var m = meNow(); return m ? (m.key || (m.name ? "n:" + m.name.toLowerCase() : null)) : null; }
+/* "Sarah (putting)", "David", or nothing for an unknown */
+function whoWord(name, spec){
+  if(!name) return "";
+  return name + (spec && spec !== "head" ? " (" + spec + ")" : "");
+}
+function roleWords(m){
+  if(!m) return "";
+  var bits = [];
+  if(m.roles.indexOf("coach") > -1) bits.push(m.speciality && m.speciality !== "head" ? m.speciality + " coach" : m.speciality === "head" ? "head coach" : "coach");
+  if(m.roles.indexOf("manager") > -1) bits.push("parent/manager");
+  if(m.roles.indexOf("player") > -1 && !bits.length) bits.push("player");
+  return bits.join(" and ");
+}
+/* what the signed-in person may do in the coach view */
+var CAN = {
+  message:  function(){ return !meNow() || meRole("coach"); },
+  practice: function(){ return !meNow() || meRole("coach"); },
+  core:     function(){ return meHead(); },
+  sc:       function(){ var m = meNow(); return meHead() || !!(m && meRole("coach") && /^s&c|strength/.test(m.speciality || "")); },
+  squad:    function(){ var m = meNow(); return !m || meHead() || meRole("manager") || /regional|national/.test(m.speciality || ""); },
+  addCoach: function(){ return !meNow() || meRole("coach"); },
+  editCoach:function(c){
+    if(!meNow()) return true;
+    if(!meRole("coach")) return false;
+    if(meHead()) return true;
+    return !!(c && c.by && c.by === meKey());
+  }
+};
+function paintCoachLink(){
+  var b = $("coachLink"); if(!b) return;
+  var m = meNow();
+  if(!m){ b.hidden = false; b.textContent = "Coach"; return; }
+  b.hidden = !meStaff();
+  b.textContent = meRole("coach") ? "Coach" : "Manager";
+}
+
 /* A request that never comes back is worse than one that fails: the queue stays
    busy and nothing else is allowed to go up. Anything not answered inside
    twenty seconds is treated as a failure and retried like any other. */
@@ -6236,6 +6303,8 @@ function cloudPull(){
        this again and asks for the password, so this is only about not showing
        a button that would always be refused. */
     CLOUD.canDelete = !!d.canDelete;
+    /* who this code belongs to, and who coaches and manages these players */
+    if(d.me) meSave(d.me, d.staff);
 
     if(!Array.isArray(d.sessions)) return;
 
@@ -14644,7 +14713,7 @@ function bellItems(){
   var out = [], wk = weekOf();
   coachNotes().forEach(function(n){
     var d = new Date(+n.at);
-    out.push({ key:"cn:" + n.at, kind:"coach", title:"From your coach \u00b7 " + d.getDate() + " " + MON[d.getMonth()],
+    out.push({ key:"cn:" + n.at, kind:"coach", title:"From " + (whoWord(n.byName, n.bySpec) || "your coach") + " \u00b7 " + d.getDate() + " " + MON[d.getMonth()],
                body:String(n.text).replace(/[<>]/g, "") });
   });
   var dow = (new Date().getDay() + 6) % 7;
@@ -14946,7 +15015,7 @@ function coachView(c){
   var v;
   if(c.k === "test"){ var t = testById(c.id), sk = TILE[t.area] || TILE[10]; v = { nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }; }
   else v = weekItemView({ k:c.k, id:c.k === "drill" ? c.id : +c.id });
-  v.sub = "Set by your coach \u00b7 " + (c.why ? c.why : "every week");
+  v.sub = "Set by " + (whoWord(c.byName, c.bySpec) || "your coach") + " \u00b7 " + (c.why ? c.why : "every week");
   return v;
 }
 function coachOpen(c){
@@ -15513,8 +15582,13 @@ function renderWeek(){
       var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
       html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic], pil:pillarNo(t.area) }, x, null, true);
     });
-    if(st.coach.length) html += '<div class="wkoh wkcoachh">Coach</div>';
+    /* one heading per coach: with a putting coach and a swing coach both
+       setting sessions, she can see whose each one is */
+    var lastBy = null;
     st.coach.forEach(function(q, qi){
+      var by = whoWord(q.c.byName, q.c.bySpec);
+      if(qi === 0 || by !== lastBy) html += '<div class="wkoh wkcoachh">Coach' + (by ? ' \u00b7 ' + by.replace(/</g, "&lt;") : '') + '</div>';
+      lastBy = by;
       var v = coachView(q.c); v.pil = pillarOfCoach(q.c);
       if(q.of > 1) v.sub += " \u00b7 " + (q.i + 1) + " of " + q.of;
       if(q.done){ html += doneRow(v, q.done, null, false); return; }
@@ -16491,6 +16565,7 @@ $("exportJson").addEventListener("click", function(){
   else setStatus("The download did not start in this browser.");
 });
 $("coachLink").addEventListener("click", openCoach);
+paintCoachLink();
 $("progBack").addEventListener("click", function(){ renderCoach(); show("coach"); });
 $("coachOut").addEventListener("click", function(){ coachSet(false); show("week"); });
 $("coachFile").addEventListener("change", function(){
@@ -16610,9 +16685,11 @@ function coachMsgBox(){
       return;
     }
     send.disabled = true; say.textContent = "Sending\u2026";
-    var at = Date.now();
+    var at = Date.now(), me = meNow();
     to.forEach(function(p){
-      p.coachNotes = [{ at:at, text:text }].concat(p.coachNotes || []).slice(0, 10);
+      var note = { at:at, text:text };
+      if(me && me.name){ note.by = meKey(); note.byName = me.name; note.bySpec = me.speciality || ""; }
+      p.coachNotes = [note].concat(p.coachNotes || []).slice(0, 10);
       p.coachNotesAt = at;
       asPlayer(p, function(){ try{ cloudMeta(); }catch(e){} });
     });
@@ -16636,7 +16713,11 @@ function coachMsgBox(){
 function renderCoach(){
   var host = $("coachList"); if(!host) return;
   host.innerHTML = "";
-  host.appendChild(coachMsgBox());
+  var me = meNow();
+  var bar = $("coachBarWho");
+  if(bar) bar.textContent = me && me.name ? me.name + " \u00b7 " + roleWords(me) : "Coach view";
+  if(me) host.appendChild(staffBox(me));
+  if(CAN.message()) host.appendChild(coachMsgBox());
 
   var real = state.sessions.filter(function(s){ return !s.sample; }).length;
   $("coachLede").textContent = real
@@ -16668,9 +16749,10 @@ function renderCoach(){
       (p.checks ? '<p class="cnote"><em>Their check list</em>'+String(p.checks).replace(/</g,"&lt;")+'</p>' : '')+
       '<div class="acts">'+
         '<button type="button" data-go="prog">Programme</button>'+
+        '<button type="button" data-go="review">Week review</button>'+
         '<button type="button" data-go="sessions">Sessions</button>'+
         '<button type="button" data-go="bench">Tour</button>'+
-        '<button type="button" data-go="home">Practice</button>'+
+        (CAN.practice() ? '<button type="button" data-go="home">Practice</button>' : '')+
         (CLOUD.canDelete ? '<button type="button" class="danger" data-drop="1">Remove player</button>' : '')+
       '</div>';
 
@@ -16687,11 +16769,29 @@ function renderCoach(){
         if(to === "prog"){ renderProg(); show("prog"); }
         else if(to === "sessions"){ renderSessions(); show("sessions"); }
         else if(to === "bench"){ renderBench(); show("bench"); }
+        else if(to === "review"){ openReview(); }
         else show("home");
       });
     });
     host.appendChild(card);
   });
+}
+
+/* ---- the team: everyone who coaches or manages these players ----
+   Names and roles only. Codes are made by whoever runs the app; this is so a
+   coach can see who else is working with the same girl. */
+function staffBox(me){
+  var el = document.createElement("div"); el.className = "pcardc cteam";
+  var esc = function(t){ return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  var nm = function(k){ var p = state.players.filter(function(x){ return playerKey(x.id) === k; })[0]; return p ? p.name : k; };
+  var list = staffAll();
+  el.innerHTML = '<div class="hd"><span class="who">The team</span><span class="when">' + list.length + (list.length === 1 ? ' person' : ' people') + '</span></div>' +
+    (list.length ? '<ul class="cteaml">' + list.map(function(w){
+      return '<li><b>' + esc(w.name || "Unnamed") + (w.key && w.key === me.key ? ' <small>you</small>' : '') + '</b>' +
+        '<span>' + esc(roleWords(w)) + (w.pillars && w.pillars.length ? ' \u00b7 pillar ' + w.pillars.join(", ") : '') +
+        (w.players && w.players.length ? ' \u00b7 ' + w.players.map(function(k){ return esc(nm(k)); }).join(", ") : '') + '</span></li>';
+    }).join("") + '</ul>' : '<p class="cnote">Only you so far.</p>');
+  return el;
 }
 
 /* ---- her week, and the sessions the coach makes compulsory ----
@@ -16720,6 +16820,14 @@ function coachWeekLine(p){
 function coachChoices(){
   var esc = function(t){ return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
   var g = [];
+  var me = meNow(), mine = me && me.pillars && me.pillars.length ? me.pillars : null;
+  if(mine){
+    var own = [];
+    liveAreas().forEach(function(a){ if(mine.indexOf(pillarNo(a.id)) > -1) own.push(["main|" + a.id, ((TILE[a.id] || {}).nm || a.name) + " session"]); });
+    drillChoices().forEach(function(id){ var r = drillRef(id); if(r && !r.gym && mine.indexOf(pillarNo(r.area)) > -1) own.push(["drill|" + id, r.name]); });
+    challengeChoices().forEach(function(id){ var r = drillRef(id); if(r && mine.indexOf(pillarNo(r.area)) > -1) own.push(["drill|" + id, r.name + " (challenge)"]); });
+    g.push(["Your pillars", own]);
+  }
   g.push(["Core sessions", liveAreas().map(function(a){ return ["main|" + a.id, ((TILE[a.id] || {}).nm || a.name) + " session"]; })]);
   g.push(["Drills", drillChoices().map(function(id){ return ["drill|" + id, drillRef(id).name]; })]);
   g.push(["Challenges", challengeChoices().map(function(id){ return ["drill|" + id, drillRef(id).name + " (" + drillBase(drillById(id)).name + ")"]; })]);
@@ -16739,22 +16847,27 @@ function coachSetBox(p){
   function draw(){
     var list = cur(), ch = coachChoices(), esc = ch.esc;
     var have = {}; list.forEach(function(c){ have[c.k + "|" + c.id] = 1; });
+    var shown = {};
     var opts = '<option value="">Add a session…</option>' + ch.groups.map(function(gr){
-      var o = gr[1].filter(function(x){ return !have[x[0]]; });
+      var o = gr[1].filter(function(x){ if(have[x[0]] || shown[gr[0] + x[0]]) return false; shown[gr[0] + x[0]] = 1; return true; });
       return o.length ? '<optgroup label="' + esc(gr[0]) + '">' + o.map(function(x){ return '<option value="' + esc(x[0]) + '">' + esc(x[1]) + '</option>'; }).join("") + '</optgroup>' : '';
     }).join("");
-    box.innerHTML = '<p class="cnote"><em>Coach</em>Your own compulsory sessions. Every week from the week you add one, on top of her numbers. Her week is not done until they are.</p>' +
+    box.innerHTML = '<p class="cnote"><em>Coach</em>' + (CAN.addCoach()
+        ? 'Compulsory sessions from each coach. Every week from the week one is added, on top of her numbers. Her week is not done until they are.' + (meHead() ? '' : ' You can change your own.')
+        : 'Compulsory sessions from her coaches, every week, on top of her numbers.') + '</p>' +
       (list.length ? '<ul class="cflist">' + list.map(function(c, i){
         var v = asPlayer(p, function(){ return coachView(c); });
-        var n = coachN(c);
-        return '<li><b>' + esc(v.nm) + (c.from ? '<small>since ' + esc(fmtDate(c.from)) + '</small>' : '') + '</b>' +
-          '<span class="cfn"><button type="button" data-dn="' + i + '" aria-label="Fewer a week"' + (n <= 1 ? ' disabled' : '') + '>\u2212</button>' +
-            '<span><b class="num">' + n + '</b>a week</span>' +
-            '<button type="button" data-upn="' + i + '" aria-label="More a week"' + (n >= COACH_MAXN ? ' disabled' : '') + '>+</button></span>' +
-          '<button type="button" data-del="' + i + '" aria-label="Remove">\u00d7</button>' +
-          '<input data-why="' + i + '" value="' + String(c.why || "").replace(/"/g, "&quot;") + '" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why"></li>';
+        var n = coachN(c), ed = CAN.editCoach(c), who = whoWord(c.byName, c.bySpec);
+        return '<li' + (ed ? '' : ' class="ro"') + '><b>' + esc(v.nm) + '<small>' + (who ? esc(who) + (c.from ? ' \u00b7 ' : '') : '') + (c.from ? 'since ' + esc(fmtDate(c.from)) : '') + '</small></b>' +
+          (ed
+            ? '<span class="cfn"><button type="button" data-dn="' + i + '" aria-label="Fewer a week"' + (n <= 1 ? ' disabled' : '') + '>\u2212</button>' +
+                '<span><b class="num">' + n + '</b>a week</span>' +
+                '<button type="button" data-upn="' + i + '" aria-label="More a week"' + (n >= COACH_MAXN ? ' disabled' : '') + '>+</button></span>' +
+              '<button type="button" data-del="' + i + '" aria-label="Remove">\u00d7</button>' +
+              '<input data-why="' + i + '" value="' + String(c.why || "").replace(/"/g, "&quot;") + '" placeholder="why, e.g. Distance" maxlength="24" aria-label="Why">'
+            : '<span class="cfro">' + n + ' a week' + (c.why ? ' \u00b7 ' + esc(c.why) : '') + '</span>') + '</li>';
       }).join("") + '</ul>' : '<p class="cnote">None set.</p>') +
-      '<div class="cfadd"><select aria-label="Add a coach session">' + opts + '</select><button type="button" data-add="1">Add</button></div>';
+      (CAN.addCoach() ? '<div class="cfadd"><select aria-label="Add a coach session">' + opts + '</select><button type="button" data-add="1">Add</button></div>' : '');
     box.querySelectorAll("[data-why]").forEach(function(inp){
       inp.onchange = function(){ var l = cur(); var i = +inp.getAttribute("data-why");
         l[i] = Object.assign({}, l[i], { why:inp.value.trim() }); save(l); };
@@ -16769,11 +16882,14 @@ function coachSetBox(p){
     box.querySelectorAll("[data-del]").forEach(function(b){
       b.onclick = function(){ var l = cur(); l.splice(+b.getAttribute("data-del"), 1); save(l); };
     });
-    box.querySelector("[data-add]").onclick = function(){
+    var addB = box.querySelector("[data-add]");
+    if(addB) addB.onclick = function(){
       var v = box.querySelector("select").value; if(!v) return;
       var k = v.slice(0, v.indexOf("|")), id = v.slice(v.indexOf("|") + 1);
       if(k === "main" || k === "sc") id = +id;
-      var l = cur(); l.push({ k:k, id:id, from:weekOf(), why:"" }); save(l);
+      var it = { k:k, id:id, from:weekOf(), why:"" }, me = meNow();
+      if(me && me.name){ it.by = meKey(); it.byName = me.name; it.bySpec = me.speciality || ""; }
+      var l = cur(); l.push(it); save(l);
     };
   }
   draw();
@@ -16806,7 +16922,9 @@ function renderProg(){
     var hd = document.createElement("div"); hd.className = "proghd";
     hd.innerHTML = '<span class="wkic" style="--tint:' + sk.tint + '">' + TICON[sk.ic](18) + '</span><b>' + (sk.nm || a.name) + '</b>';
     g1.appendChild(hd);
-    g1.appendChild(testBox(a));
+    var tb = testBox(a);
+    if(!CAN.core()) tb.querySelectorAll("select,button,input").forEach(function(x){ x.disabled = true; });
+    g1.appendChild(tb);
   });
   host.appendChild(g1);
 
@@ -16819,6 +16937,7 @@ function renderProg(){
         sp.ids.map(function(id){ return stripTags(gymOf(id).name); }).join(", ") + '</small></button>';
     }).join("") + '</div><p class="note">' + scProg(p).turn + '. Her week picks from these.</p>';
   g2.querySelectorAll("[data-sc]").forEach(function(b){
+    if(!CAN.sc()){ b.disabled = true; return; }
     b.onclick = function(){
       p.scProg = b.getAttribute("data-sc"); p.scProgAt = Date.now();
       markRedraw(p); saveEdit(); renderProg();
@@ -16836,6 +16955,7 @@ function renderProg(){
         '<span><b>' + t.name + '</b>, every week' + (on[t.id] && on[t.id].from ? ' (since the week of ' + fmtDate(on[t.id].from) + ')' : '') + '</span></label>';
     }).join("");
   g0.querySelectorAll("[data-sq]").forEach(function(c){
+    if(!CAN.squad()){ c.disabled = true; return; }
     c.onchange = function(){
       var id = c.getAttribute("data-sq");
       var list = (p.squad || []).filter(function(x){ return x && x.id !== id; });
@@ -16923,7 +17043,9 @@ function removePlayer(p){
 }
 
 function openCoach(){
-  if(!coachOn()){
+  var me = meNow();
+  if(me && !meStaff()) return;
+  if(!me && !coachOn()){
     var pass = window.prompt("Coach password");
     if(pass === null) return;
     if(pass !== COACH_PASS){ window.alert("That password was not recognised."); return; }
