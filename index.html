@@ -2175,6 +2175,12 @@
   .schip.st-confirmed, .schip.st-played{background:var(--heritage); color:#fff}
   .schip.st-entered, .schip.st-ballot, .schip.st-reserve{background:var(--accent-wash); color:var(--accent)}
   .schip.todo{background:var(--pick); color:var(--pick-ink)}
+  .sev.opt{border-style:dashed; border-color:var(--gold); background:var(--bg)}
+  .sev.opt b{font-weight:600}
+  .schip.st-option{background:transparent; border:1px solid var(--gold); color:var(--gold); padding:1px 7px}
+  .shols li{border-left-color:var(--gold)}
+  .wkday.hol{border-left-color:var(--gold)}
+  .scal .calh{font-size:14px; margin:14px 0 4px}
   .sdl{display:grid; grid-template-columns:max-content 1fr; gap:6px 12px; margin:10px 0; font-size:13.5px}
   .sdl dt{color:var(--muted); font-weight:600}
   .sdl dd{margin:0}
@@ -17260,9 +17266,9 @@ function coachImport(text){
 var SEASON = { events:[], entries:[], dates:[], proposals:[], at:0, busy:false };
 var SEASON_KEY = "lcl.season.v1";
 var EV_OPEN = null;     /* the event on the event page */
-var ST_WORD = { none:"Not planning", considering:"Considering", entered:"Entered", ballot:"In the ballot",
+var ST_WORD = { none:"Not planning", option:"Option", considering:"Considering", entered:"Entered", ballot:"In the ballot",
                 confirmed:"Confirmed", reserve:"Reserve", withdrawn:"Withdrawn", played:"Played" };
-var ST_ORDER = ["none", "considering", "entered", "ballot", "confirmed", "reserve", "withdrawn", "played"];
+var ST_ORDER = ["none", "option", "considering", "entered", "ballot", "confirmed", "reserve", "withdrawn", "played"];
 var OWN_WORD = { player:"Player", manager:"Parent/manager", coach:"Coach" };
 
 /* The checklist. anchor: open, close, entered, confirmed, start, end. off: days
@@ -17340,9 +17346,22 @@ function evWhen(ev){
     if(ev.start === (ev.end || ev.start)) return dNice(ev.start) + " " + a.getFullYear() + pv;
     return (a.getMonth() === b.getMonth() ? a.getDate() : dNice(ev.start)) + " to " + dNice(ev.end) + " " + b.getFullYear() + pv;
   }
-  return (ev.month ? MON[ev.month - 1] : "Date") + ", dates to be confirmed";
+  return (ev.month ? MON[ev.month - 1] : "Date") + (+ev.year > 2027 ? " " + ev.year : "") + ", dates to be confirmed";
 }
-function evSortKey(ev){ return ev.start || ("2027-" + String(ev.month || 12).padStart(2, "0") + "-99"); }
+/* a squad day or lesson has times; a school holiday is whole days */
+function dtWhen(d){
+  if(d.kind === "holiday"){
+    var a = d.start.slice(0, 10), b = (d.end || d.start).slice(0, 10);
+    return a === b ? whenNice(a) : whenNice(a) + " to " + whenNice(b);
+  }
+  return whenNice(d.start) + (d.end ? " to " + d.end.slice(11, 16) : "");
+}
+function dtLast(d){ return (d.kind === "holiday" ? (d.end || d.start) : d.start).slice(0, 10); }
+function evAllOption(ev){
+  var ks = evPlayers(ev); if(!ks.length) return false;
+  return ks.every(function(k){ return entryOf(ev.id, k).status === "option"; });
+}
+function evSortKey(ev){ return ev.start || ((+ev.year || 2027) + "-" + String(ev.month || 12).padStart(2, "0") + "-99"); }
 function whenNice(s){
   if(!s) return "";
   var d = new Date(s.slice(0, 10) + "T12:00:00");
@@ -17362,7 +17381,8 @@ function anchorDate(a, ev, en){
 }
 function checkFor(ev, en){
   var st = en.status || "none", t = today(), out = [];
-  if(st === "none" || st === "withdrawn") return out;
+  /* an option is on the list to look at, nothing more: no checklist, no reminders */
+  if(st === "none" || st === "withdrawn" || st === "option") return out;
   CHECK.forEach(function(it){
     var applies = it.on ? !!it.on[st] || (it.done && it.done(en) && st !== "considering")
                         : !!LIVE_ST[st] && (it.anchor !== "confirmed" || /confirmed|played/.test(st));
@@ -17438,7 +17458,7 @@ function seasonWeekHtml(){
   var k = playerKey(p.id); if(!k) return "";
   var wk = weekOf(), end = dPlus(wk, 6), html = "";
   var todo = seasonTodo(["player"], [k]);
-  var days = SEASON.dates.filter(function(d){ return d.start && d.players.indexOf(k) > -1 && d.start.slice(0, 10) >= wk && d.start.slice(0, 10) <= end; })
+  var days = SEASON.dates.filter(function(d){ return d.start && d.players.indexOf(k) > -1 && dtLast(d) >= wk && d.start.slice(0, 10) <= end; })
     .sort(function(a, b){ return a.start < b.start ? -1 : 1; });
   var next = SEASON.events.filter(function(ev){
     var st = entryOf(ev.id, k).status; return ev.start && ev.start >= today() && (ev.players || []).indexOf(k) > -1 && /considering|entered|ballot|confirmed|reserve/.test(st);
@@ -17454,7 +17474,7 @@ function seasonWeekHtml(){
       ' · ' + dDays(today(), next.start) + ' days</span></button>';
   }
   days.forEach(function(d){
-    html += '<div class="wkday"><b>' + seasonEsc(d.title) + '</b><span>' + whenNice(d.start) + (d.end ? " to " + d.end.slice(11, 16) : "") +
+    html += '<div class="wkday' + (d.kind === "holiday" ? ' hol' : '') + '"><b>' + seasonEsc(d.title) + '</b><span>' + dtWhen(d) +
       (d.venue ? ' · ' + seasonEsc(d.venue) : '') + (d.with ? ' · with ' + seasonEsc(d.with) : '') + '</span></div>';
   });
   todo.forEach(function(t){
@@ -17510,14 +17530,19 @@ function renderSeason(){
     html += staffAlertsHtml();
   }
   /* squad days and lessons */
-  var up = SEASON.dates.filter(function(d){ return d.start && d.start.slice(0, 10) >= today(); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
+  var up = SEASON.dates.filter(function(d){ return d.start && d.kind !== "holiday" && d.start.slice(0, 10) >= today(); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
+  var hols = SEASON.dates.filter(function(d){ return d.start && d.kind === "holiday" && dtLast(d) >= today(); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
   html += '<div class="setgrp"><div class="wkgh"><h2>Squad days and lessons</h2>' + (staff ? '<button type="button" class="wkseasonlink" id="dtAdd">Add</button>' : '') + '</div>' +
     '<div id="dtForm"></div>' +
     (up.length ? '<ul class="sdays">' + up.slice(0, 12).map(function(d){
-      return '<li><b>' + seasonEsc(d.title) + '</b><span>' + whenNice(d.start) + (d.end ? " to " + d.end.slice(11, 16) : "") + (d.venue ? ' · ' + seasonEsc(d.venue) : '') +
+      return '<li><b>' + seasonEsc(d.title) + '</b><span>' + dtWhen(d) + (d.venue ? ' · ' + seasonEsc(d.venue) : '') +
         (d.with ? ' · ' + seasonEsc(d.with) : '') + ' · ' + seasonEsc(d.players.map(keyName).join(", ")) + '</span>' +
         (staff ? '<button type="button" class="sdel" data-dtdel="' + d.id + '" aria-label="Remove">×</button>' : '') + '</li>';
     }).join("") + '</ul>' : '<p class="note">None coming up.</p>') + '</div>';
+  if(hols.length) html += '<div class="setgrp"><div class="wkgh"><h2>College holidays</h2></div><ul class="sdays shols">' + hols.map(function(d){
+      return '<li><b>' + seasonEsc(d.title) + '</b><span>' + dtWhen(d) + '</span>' +
+        (staff ? '<button type="button" class="sdel" data-dtdel="' + d.id + '" aria-label="Remove">×</button>' : '') + '</li>';
+    }).join("") + '</ul></div>';
   /* the tournaments, by month */
   var evs = SEASON.events.slice().sort(function(a, b){ var x = evSortKey(a), y = evSortKey(b); return x < y ? -1 : x > y ? 1 : 0; });
   html += '<div class="wkgh sevhd"><h2>Tournaments</h2>' + (staff ? '<button type="button" class="wkseasonlink" id="evAdd">Add</button>' : '') + '</div>';
@@ -17531,7 +17556,9 @@ function renderSeason(){
       return st === "considering" ? "" : '<span class="schip st-' + st + '">' + seasonEsc(keyName(k)) + ': ' + ST_WORD[st] + '</span>';
     }).join("");
     var todoN = evPlayers(ev).reduce(function(a, k){ return a + checkFor(ev, entryOf(ev.id, k)).filter(function(c){ return !c.done && (c.state === "due" || c.state === "overdue"); }).length; }, 0);
-    html += '<button type="button" class="sev' + (ev.confirmed ? " conf" : "") + '" data-ev="' + ev.id + '"><b>' + seasonEsc(ev.name) + '</b>' +
+    var opt = evAllOption(ev);
+    if(opt) chips = '<span class="schip st-option">Option</span>';
+    html += '<button type="button" class="sev' + (ev.confirmed ? " conf" : "") + (opt ? " opt" : "") + '" data-ev="' + ev.id + '"><b>' + seasonEsc(ev.name) + '</b>' +
       '<span>' + seasonEsc(evWhen(ev)) + (ev.venue ? ' · ' + seasonEsc(ev.venue) : '') + (ev.confirmed ? ' · <i>confirmed</i>' : '') + '</span>' +
       (chips || todoN ? '<span class="schips">' + chips + (todoN ? '<span class="schip todo">' + todoN + ' to do</span>' : '') + '</span>' : '') + '</button>';
   });
@@ -17560,13 +17587,16 @@ function renderSeason(){
       seasonPost({ action:fresh ? "cal_new" : "cal" }).then(function(res){
         if(!res.ok || !res.d || !res.d.ok){ seasonSay("Could not get the link: " + ((res.d && res.d.reason) || res.status) + "."); return; }
         seasonSay("");
-        $("calOut").innerHTML = '<p class="calurl"><span>' + seasonEsc(res.d.url) + '</span></p>' +
+        /* the webcal form: opened or pasted anywhere, Calendar treats it as a
+           subscription. The https form opened in a browser gets imported as a
+           one-off copy into whichever calendar is the default, which is not it. */
+        $("calOut").innerHTML = '<p class="calurl"><span>' + seasonEsc(res.d.webcal) + '</span></p>' +
           '<div class="tools"><button type="button" id="calCopy">Copy the link</button><a class="calsub" href="' + seasonEsc(res.d.webcal) + '">Subscribe on this phone</a>' +
           '<button type="button" id="calNew">Make a new link</button></div>' +
           '<p class="note">Keep the link to the family: anyone who has it can see the dates. Follow the steps below to add it.</p>';
         var cb = $("calCopy"); if(cb) cb.onclick = function(){
           var done = function(){ cb.textContent = "Copied"; };
-          try{ navigator.clipboard.writeText(res.d.url).then(done, function(){ fallbackCopy(res.d.url, "The link"); }); }catch(err){ fallbackCopy(res.d.url, "The link"); }
+          try{ navigator.clipboard.writeText(res.d.webcal).then(done, function(){ fallbackCopy(res.d.webcal, "The link"); }); }catch(err){ fallbackCopy(res.d.webcal, "The link"); }
         };
         b.hidden = true;
       }, function(){ seasonSay("Could not get the link: no connection."); });
@@ -17676,7 +17706,7 @@ function calGuideHtml(){
   return '<details class="calguide"><summary>How to add it: Mac and iPhone</summary>' +
     '<h3>On a Mac (best: it then reaches your iPhone and iPad too)</h3><ol>' +
       '<li>Tap Get the calendar link above, then Copy the link, and get it to the Mac (AirDrop, Notes or email it to yourself).</li>' +
-      '<li>Open Calendar. From the menu bar choose File, then New Calendar Subscription.</li>' +
+      '<li>Open Calendar. From the menu bar choose File, then New Calendar Subscription. Do not open the link in Safari or Chrome: that imports a one-off copy into your default calendar instead of subscribing.</li>' +
       '<li>Paste the link and click Subscribe.</li>' +
       '<li>Name: DenyerGolf. Location: iCloud (not On My Mac). Auto-refresh: every 15 minutes. Click OK.</li>' +
       '<li>Give it a colour. In a few minutes it appears on your iPhone and iPad under the same Apple ID.</li></ol>' +
@@ -17685,8 +17715,10 @@ function calGuideHtml(){
       '<li>Or, with the link copied or sent to you: Settings, Apps, Calendar, Calendar Accounts, Add Account, Other, Add Subscribed Calendar. Paste the link, tap Next, then Save.</li>' +
       '<li>In Calendar, tap Calendars at the bottom to check DenyerGolf is ticked.</li>' +
       '<li>To keep it fresh: Settings, Apps, Calendar, Calendar Accounts, Fetch New Data, and set Fetch to Every 15 Minutes.</li></ol>' +
+    '<h3>If the dates landed in the wrong calendar</h3><p>That is an import, not a subscription, and it will never update. In Calendar, search for considering, click one result, press Cmd A to select them all, delete them, then subscribe as above.</p>' +
+    '<h3>Sharing it</h3><p>Apple and Google do not let a subscription sit inside a shared calendar. Instead everyone subscribes to the same link, and they all see the same DenyerGolf calendar, kept in step by the app.</p>' +
     '<h3>For the girls</h3><p>Copy the link and send it to them; they follow the iPhone steps. If the link is ever passed on, tap Make a new link and send the new one round: the old one stops working.</p>' +
-    '<p>The calendar shows every tournament with dates that someone is considering or has entered, entries open and close, practice rounds, tee times, squad days and lessons. It is read only: changes are made here in the app and reach everyone on the next refresh.</p>' +
+    '<p>The calendar shows every tournament with dates that someone is considering or has entered, entries open and close, practice rounds, tee times, squad days, lessons and college holidays. Tournaments still marked Option are in it too, with (option) after the name. It is read only: changes are made here in the app and reach everyone on the next refresh.</p>' +
     '</details>';
 }
 
@@ -17773,7 +17805,7 @@ function entryHtml(ev, k, staff){
     if(en.practice) h += '<p class="note">Practice round: ' + whenNice(en.practice) + '</p>';
     (en.tees || []).forEach(function(t){ h += '<p class="note">Round ' + t.r + ' tee time: ' + whenNice(t.at) + '</p>'; });
   }
-  if(!list.length) return h + '<p class="note">' + (st === "none" ? "Not planning to play. Choose a status to start the checklist." : st === "withdrawn" ? "Withdrawn." : "") + '</p></div>';
+  if(!list.length) return h + '<p class="note">' + (st === "none" ? "Not planning to play. Choose a status to start the checklist." : st === "withdrawn" ? "Withdrawn." : st === "option" ? "An option to look at: in the calendar marked (option), with no checklist or reminders. Choose Considering to bring it into the plan." : "") + '</p></div>';
   h += '<ul class="schk">' + list.map(function(c){
     var auto = c.it.done && c.it.done(en) && !c.tick;
     return '<li class="' + c.state + '"><label><input type="checkbox" data-tick="' + ev.id + '|' + k + '|' + c.it.id + '"' + (c.done ? " checked" : "") + (auto ? " disabled" : "") + '> ' +
