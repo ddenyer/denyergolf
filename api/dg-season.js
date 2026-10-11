@@ -55,6 +55,7 @@ export function cleanEvent(e) {
     confirmed: !!e.confirmed,
     guide: txt(e.guide, 240), entry: txt(e.entry, 240), flag: txt(e.flag, 240),
     link: link(e.link), notes: txt(e.notes, 500),
+    year: Math.round(+e.year) >= 2025 && Math.round(+e.year) <= 2040 ? Math.round(+e.year) : (day(e.start) ? +String(e.start).slice(0, 4) : 2027),
   };
 }
 export function cleanEntry(x, keep) {

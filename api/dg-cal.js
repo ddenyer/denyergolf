@@ -102,6 +102,12 @@ export function buildIcs({ name, events, entries, dates, nm, now }) {
     const desc = [ev.venue, ev.entry, ev.close ? 'Entries close ' + ev.close : '', ev.flag, ev.notes, ev.link].filter(Boolean).join('\n');
     // dates the organiser has not confirmed yet are typed in as a guide, and say so
     if (ev.start) allDay(ev.id + '@denyergolf', ev.start, ev.end, ev.name + (ev.confirmed ? '' : ' (provisional)') + ': ' + who, desc, ev.venue, ev.link);
+    // no dates even as a guide: a note on the 1st of its month, so the month is held in mind
+    if (!ev.start && ev.month) {
+      const y = +ev.year || 2027, d1 = y + '-' + String(ev.month).padStart(2, '0') + '-01';
+      const mon = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][ev.month - 1];
+      allDay(ev.id + '-month@denyergolf', d1, d1, ev.name + ': ' + mon + ', dates TBC (' + who + ')', desc, '', ev.link);
+    }
     const live = rows.filter((r) => r.status !== 'played');
     if (live.length && ev.open) allDay(ev.id + '-open@denyergolf', ev.open, ev.open, 'Entries open: ' + ev.name, desc, '', ev.link);
     if (live.length && ev.close) allDay(ev.id + '-close@denyergolf', ev.close, ev.close, 'Entries close: ' + ev.name, desc, '', ev.link);
