@@ -128,7 +128,7 @@ export async function couponValid(code) {
 export async function codeRow(code) {
   const url = process.env.SUPABASE_URL;
   const r = await timedFetch(
-    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete,claimable&limit=1`,
+    `${url}/rest/v1/dg_codes?code=eq.${encodeURIComponent(code)}&select=code,players,label,claimed_at,can_delete,claimable,is_coach,roles,person,person_name,speciality,pillars&limit=1`,
     { headers: sbHeaders() }
   );
   if (!r.ok) throw new Error('code lookup failed: ' + (await r.text()));
@@ -158,6 +158,25 @@ export function safeLabel(s) {
     .trim()
     .slice(0, 40);
 }
+
+// Who the code belongs to: a player, a coach, a parent/manager, or a mix.
+// Codes made before roles existed say so through is_coach. Nothing here is
+// the code itself, so it is safe to hand to the page and to other people.
+const ROLES = new Set(['player', 'coach', 'manager']);
+export function whoIs(row) {
+  const r = row || {};
+  let roles = (Array.isArray(r.roles) ? r.roles : []).filter((x) => ROLES.has(x));
+  if (!roles.length || (roles.length === 1 && roles[0] === 'player' && r.is_coach)) roles = r.is_coach ? ['coach', 'manager'] : ['player'];
+  const spec = r.speciality ? safeLabel(r.speciality).toLowerCase() : (roles.indexOf('coach') > -1 && r.is_coach ? 'head' : null);
+  return {
+    roles,
+    key: r.person && KEY_OK.test(r.person) ? r.person : null,
+    name: safeLabel(r.person_name || r.label || ''),
+    speciality: spec,
+    pillars: (Array.isArray(r.pillars) ? r.pillars : []).map(Number).filter((n) => n >= 1 && n <= 4),
+  };
+}
+export function isStaff(me) { return !!me && (me.roles.indexOf('coach') > -1 || me.roles.indexOf('manager') > -1); }
 
 // The one gate every dg-* endpoint goes through.
 //   { ok:true, code, players, row }        allowed
@@ -304,7 +323,32 @@ export default async function handler(req, res) {
     // control itself: the endpoint checks this again, along with the password.
     const canDelete = !!(auth.row && auth.row.can_delete);
 
-    return res.status(200).json({ ok: true, players: keys, display, sessions, meta, canDelete,
+    // Who is signed in, and everyone else who coaches or manages these
+    // players: a player sees who her coaches are, a coach sees the others.
+    // Names, roles and specialities only, never a code.
+    const me = whoIs(auth.row);
+    const staff = [];
+    try {
+      const st = await timedFetch(
+        `${SUPABASE_URL}/rest/v1/dg_codes?players=ov.{${list}}&roles=ov.{coach,manager}` +
+        `&select=person,person_name,label,roles,speciality,pillars,players,is_coach&limit=100`,
+        { headers }
+      );
+      if (st.ok) {
+        const seenKey = {};
+        (await st.json()).forEach((r) => {
+          const w = whoIs(r);
+          if (!isStaff(w)) return;
+          const k = w.key || ('n:' + w.name);
+          if (seenKey[k]) return;
+          seenKey[k] = 1;
+          w.players = safeKeys(r.players).filter((p) => keys.indexOf(p) > -1);
+          staff.push(w);
+        });
+      }
+    } catch (e) { /* who coaches whom is a nicety on this call; the sessions are what matter */ }
+
+    return res.status(200).json({ ok: true, players: keys, display, sessions, meta, canDelete, me, staff,
                                   degraded: !!auth.degraded });
   } catch (err) {
     console.error('dg-load error:', err);

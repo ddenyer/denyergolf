@@ -17,7 +17,7 @@
 // The same rule as every other dg-* endpoint: the code decides which players
 // it may touch, and a phone can only be signed up for one of those.
 
-import { authorise, sbHeaders, timedFetch, safeLabel } from './dg-load.js';
+import { authorise, sbHeaders, timedFetch, safeLabel, whoIs } from './dg-load.js';
 import { sendPush, lastPush } from './_webpush.js';
 
 const PUSH_HOSTS = /^https:\/\/([a-z0-9-]+\.)*(push\.apple\.com|fcm\.googleapis\.com|push\.services\.mozilla\.com|notify\.windows\.com|push\.mozilla\.com|googleapis\.com)\//i;
@@ -61,6 +61,11 @@ export default async function handler(req, res) {
   if (!auth.ok) return res.status(auth.status).json({ ok: false, reason: auth.reason });
   if (auth.unclaimed) return res.status(409).json({ ok: false, reason: 'needs_name' });
   if (body.action === 'msg') {
+    // Only a coach sends these, and the message says which one.
+    const me = whoIs(auth.row);
+    if (me.roles.indexOf('coach') < 0) return res.status(403).json({ ok: false, reason: 'not_a_coach' });
+    const spec = me.speciality && me.speciality !== 'head' ? ` (${me.speciality} coach)` : '';
+    const title = me.name ? `From ${me.name}${spec}` : 'From your coach';
     const text = String(body.text == null ? '' : body.text)
       // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
@@ -78,7 +83,7 @@ export default async function handler(req, res) {
         const out = { phones: rows.length, sent: 0, status: [] };
         for (const row of rows) {
           const st = await sendPush({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
-            { title: 'From your coach', body: text, url: '/?go=bell' }, V);
+            { title, body: text, url: '/?go=bell' }, V);
           out.status.push(st);
           if (st >= 200 && st < 300) out.sent++;
           else if (st === 404 || st === 410) {
@@ -88,7 +93,7 @@ export default async function handler(req, res) {
         }
         results[pl] = out;
       }
-      return res.status(200).json({ ok: true, results });
+      return res.status(200).json({ ok: true, results, from: { key: me.key, name: me.name, speciality: me.speciality } });
     } catch (err) {
       console.error('dg-push msg error:', err);
       return res.status(500).json({ ok: false, reason: err.message, results });
