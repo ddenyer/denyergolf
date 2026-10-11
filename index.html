@@ -2135,6 +2135,72 @@
   .cteaml li span{color:var(--muted); font-size:12.5px}
   .cflist li.ro{opacity:.92}
   .cfro{font-size:12.5px; color:var(--muted)}
+  /* ---- season ---- */
+  .wkseason .wkgh{display:flex; align-items:center; justify-content:space-between}
+  .wkseasonlink{border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:999px;
+    padding:5px 12px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer}
+  div.wkseason:not(.wkgrp){margin:4px 0 12px; text-align:right}
+  .wknext{display:block; width:100%; text-align:left; border:1px solid var(--line); background:var(--surface); border-radius:12px;
+    padding:10px 12px; margin:8px 0; font:inherit; color:var(--ink); cursor:pointer}
+  .wknext b, .wkday b{display:block; font-size:15px}
+  .wknext span, .wkday span{font-size:12.5px; color:var(--muted)}
+  .wkday{border-left:3px solid var(--heritage); padding:6px 10px; margin:8px 0}
+  .wkcheck{display:flex; gap:10px; align-items:flex-start; padding:8px 2px; border-top:1px solid var(--line); cursor:pointer}
+  .wkcheck input{margin-top:3px; width:18px; height:18px; flex:none}
+  .wkcheck b{display:block; font-size:14px; font-weight:600}
+  .wkcheck small{display:block; font-size:12px; color:var(--muted)}
+  .wkcheck.late small{color:var(--flag)}
+  .stodo .acts{margin-top:8px}
+  .scal .calurl{word-break:break-all; font-size:12.5px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 10px; user-select:all}
+  .scal .calsub{display:inline-flex; align-items:center; padding:7px 12px; border:1px solid var(--line-strong); border-radius:7px; font-size:12.5px; color:var(--ink); text-decoration:none}
+  .sdays{list-style:none; margin:8px 0 0; padding:0; display:grid; gap:6px}
+  .sdays li{position:relative; padding:6px 30px 6px 10px; border-left:3px solid var(--heritage); background:var(--surface); border-radius:0 8px 8px 0}
+  .sdays li b{display:block; font-size:14px}
+  .sdays li span{font-size:12.5px; color:var(--muted)}
+  .sdel{position:absolute; right:6px; top:6px; border:0; background:none; color:var(--muted); font-size:18px; cursor:pointer}
+  .sevhd{display:flex; align-items:center; justify-content:space-between; margin-top:20px}
+  .smonth{font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:16px 0 6px}
+  .sev{display:block; width:100%; text-align:left; border:1px solid var(--line); background:var(--surface); border-radius:12px;
+    padding:10px 12px; margin:0 0 8px; font:inherit; color:var(--ink); cursor:pointer}
+  .sev.conf{border-color:var(--heritage)}
+  .sev b{display:block; font-size:15px}
+  .sev > span{display:block; font-size:12.5px; color:var(--muted)}
+  .sev i{font-style:normal; color:var(--heritage); font-weight:600}
+  .sev .schips{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px}
+  .schip{display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-2)}
+  .schip.st-confirmed, .schip.st-played{background:var(--heritage); color:#fff}
+  .schip.st-entered, .schip.st-ballot, .schip.st-reserve{background:var(--accent-wash); color:var(--accent)}
+  .schip.todo{background:var(--pick); color:var(--pick-ink)}
+  .sdl{display:grid; grid-template-columns:max-content 1fr; gap:6px 12px; margin:10px 0; font-size:13.5px}
+  .sdl dt{color:var(--muted); font-weight:600}
+  .sdl dd{margin:0}
+  .sform{display:grid; gap:8px; margin:10px 0}
+  .sform label{display:grid; gap:3px; font-size:12px; color:var(--muted); font-weight:600}
+  .sform label.bwpause{display:flex}
+  .sform input, .sform select, .sform textarea, .sentry input[type=datetime-local]{font:inherit; font-size:14px; color:var(--ink); padding:8px 10px;
+    border:1px solid var(--line-strong); border-radius:8px; background:var(--surface); min-width:0; width:100%; box-sizing:border-box}
+  .sform input[type=checkbox]{width:auto}
+  .srow2{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0}
+  .srow2 label{display:grid; gap:3px; font-size:12px; color:var(--muted); font-weight:600; min-width:0}
+  .sppl{display:flex; gap:14px; flex-wrap:wrap}
+  .sentry .wkgh{display:flex; align-items:center; justify-content:space-between}
+  .sstat{display:flex; flex-wrap:wrap; gap:5px; margin:8px 0}
+  .sstat button{font:inherit; font-size:12px; padding:5px 10px; border-radius:999px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-2); cursor:pointer}
+  .sstat button[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+  .schk{list-style:none; margin:10px 0 0; padding:0}
+  .schk li{display:flex; gap:8px; align-items:flex-start; justify-content:space-between; padding:8px 0; border-top:1px solid var(--line)}
+  .schk li label{display:flex; gap:10px; align-items:flex-start; flex:1; min-width:0; cursor:pointer}
+  .schk li input{margin-top:3px; width:18px; height:18px; flex:none}
+  .schk li b{display:block; font-size:14px; font-weight:600}
+  .schk li small{display:block; font-size:12px; color:var(--muted)}
+  .schk li.overdue small{color:var(--flag)}
+  .schk li.done b{text-decoration:line-through; color:var(--muted)}
+  .schk li.waiting, .schk li.later{opacity:.8}
+  .schk select{font:inherit; font-size:11.5px; padding:3px 6px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-2); flex:none}
+  .sown{font-size:11px; color:var(--muted); flex:none; padding-top:3px}
+  #eventBody a{color:var(--accent); font-weight:600}
+  .sdanger{margin-top:24px}
+  .sdanger button{color:var(--flag)}
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
     margin-top:6px; background:var(--surface-2)}
   .cimport p{margin:0 0 10px; font-size:13px; color:var(--ink-2); line-height:1.5}
@@ -2438,6 +2504,20 @@
       <input type="file" id="coachFile" accept="application/json,.json">
     </div>
     <p class="status" id="coachStatus"></p>
+  </section>
+
+  <!-- SEASON -->
+  <section id="viewSeason" hidden>
+    <button class="backbtn" id="seasonBack" type="button">← Back</button>
+    <h1>Season</h1>
+    <p class="lede">Tournaments, entries and the checklist for each one, squad days and lessons. Shared with everyone who coaches or manages the girls.</p>
+    <div id="seasonBody"></div>
+  </section>
+  <section id="viewEvent" hidden>
+    <button class="backbtn" id="eventBack" type="button">← Season</button>
+    <div class="eyebrow" id="eventWhen"></div>
+    <h1 id="eventName"></h1>
+    <div id="eventBody"></div>
   </section>
 
   <!-- COACH: ONE PLAYER'S PROGRAMME -->
@@ -6305,6 +6385,7 @@ function cloudPull(){
     CLOUD.canDelete = !!d.canDelete;
     /* who this code belongs to, and who coaches and manages these players */
     if(d.me) meSave(d.me, d.staff);
+    if(typeof seasonPull === "function") setTimeout(seasonPull, 0);
 
     if(!Array.isArray(d.sessions)) return;
 
@@ -6497,6 +6578,8 @@ function show(view){
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
   $("viewProg").hidden = view!=="prog";
+  $("viewSeason").hidden = view!=="season";
+  $("viewEvent").hidden = view!=="event";
   $("viewSessions").hidden = view!=="sessions";
   if(view==="home"){ renderHello(); homePage(state.homePage || 0); }
   $("viewPast").hidden = view!=="past";
@@ -15563,6 +15646,8 @@ function renderWeek(){
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
   if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
+  /* tournaments: the next one, squad days and lessons this week, and the checklist items that are hers */
+  if(typeof seasonWeekHtml === "function") html += seasonWeekHtml();
   /* The squad's tests and the coach's own sessions sit together under Squad:
      both set for her, both every week, neither hers to change. */
   if(st.squad.length || st.squadExtra.length || st.coach.length){
@@ -15650,12 +15735,14 @@ function renderWeek(){
     if(b.id === "wkUndo"){ weekUndo(); renderWeek(); paintBell(); return; }
     if(b.id === "wkSet"){ openSettings(); return; }
     if(b.id === "wkLog"){ openLogHours(); return; }
+    if(typeof seasonWeekClick === "function" && seasonWeekClick(b)) return;
     if(b.hasAttribute("data-squad")){ state.fromWeek = true; openTest(b.getAttribute("data-squad")); return; }
     if(b.hasAttribute("data-coach")){ var cq = st.coach[+b.getAttribute("data-coach")]; if(cq) coachOpen(cq.c); return; }
     if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
     if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
     if(b.hasAttribute("data-chg")){ openWeekChange(wk, +b.getAttribute("data-chg")); return; }
   };
+  host.onchange = function(e){ if(typeof seasonWeekChange === "function") seasonWeekChange(e); };
 }
 /* A finished row: washed out, no button, and a word of credit. The words
    rotate by session so the page does not say the same thing five times. */
@@ -16566,6 +16653,9 @@ $("exportJson").addEventListener("click", function(){
 });
 $("coachLink").addEventListener("click", openCoach);
 paintCoachLink();
+seasonLoad();
+$("seasonBack").addEventListener("click", function(){ if(state.seasonFrom === "coach"){ renderCoach(); show("coach"); } else { renderWeek(); show("week"); } });
+$("eventBack").addEventListener("click", function(){ renderSeason(); show("season"); });
 $("progBack").addEventListener("click", function(){ renderCoach(); show("coach"); });
 $("coachOut").addEventListener("click", function(){ coachSet(false); show("week"); });
 $("coachFile").addEventListener("change", function(){
@@ -16716,6 +16806,7 @@ function renderCoach(){
   var me = meNow();
   var bar = $("coachBarWho");
   if(bar) bar.textContent = me && me.name ? me.name + " \u00b7 " + roleWords(me) : "Coach view";
+  if(typeof seasonTodoBox === "function" && (!me || meStaff())) host.appendChild(seasonTodoBox());
   if(me) host.appendChild(staffBox(me));
   if(CAN.message()) host.appendChild(coachMsgBox());
 
@@ -17113,6 +17204,470 @@ function coachImport(text){
   return (incoming.name||"That player") + ": " + added + " new " +
          (added===1 ? "session" : "sessions") + " added" +
          (added ? "." : ", everything was already here.");
+}
+
+/* ============ the season ============
+   Tournaments, each girl's entry and checklist, squad days and lessons, and the
+   DenyerGolf calendar. Kept on the server (dg_events, dg_entries, dg_dates) and
+   shared by everyone whose code opens the same players, so Jenny ticking
+   "accommodation booked" is ticked on everyone's phone. A copy is kept on the
+   device so the pages open offline.
+
+   The checklist is tied to the organiser's dates, not to fixed weeks: an item
+   comes due when its date arrives (entries open, the place is confirmed, so
+   many days before round one) and each item has an owner, the player, the
+   parent/manager or the coach, which can be changed per event. */
+var SEASON = { events:[], entries:[], dates:[], at:0, busy:false };
+var SEASON_KEY = "lcl.season.v1";
+var EV_OPEN = null;     /* the event on the event page */
+var ST_WORD = { none:"Not planning", considering:"Considering", entered:"Entered", ballot:"In the ballot",
+                confirmed:"Confirmed", reserve:"Reserve", withdrawn:"Withdrawn", played:"Played" };
+var ST_ORDER = ["none", "considering", "entered", "ballot", "confirmed", "reserve", "withdrawn", "played"];
+var OWN_WORD = { player:"Player", manager:"Parent/manager", coach:"Coach" };
+
+/* The checklist. anchor: open, close, entered, confirmed, start, end. off: days
+   from it. on: the statuses it applies in. done: ticked by itself when the
+   status says so. */
+var LIVE_ST = { entered:1, ballot:1, confirmed:1, reserve:1, played:1 };
+var CHECK = [
+  { id:"enter",    label:"Enter",                                             owner:"manager", anchor:"open",      off:0,  on:{ considering:1 }, done:function(en){ return !!LIVE_ST[en.status]; } },
+  { id:"accom",    label:"Book accommodation, free cancellation",              owner:"manager", anchor:"entered",   off:0 },
+  { id:"result",   label:"Check the ballot or the entry list",                 owner:"manager", anchor:"close",     off:1,  on:{ entered:1, ballot:1 }, done:function(en){ return /confirmed|reserve|withdrawn|played/.test(en.status); } },
+  { id:"practice", label:"Book the practice round",                           owner:"manager", anchor:"confirmed", off:0,  done:function(en){ return !!en.practice; } },
+  { id:"travel",   label:"Plan travel",                                       owner:"manager", anchor:"confirmed", off:0 },
+  { id:"yardage",  label:"Order the yardage book and green maps",             owner:"manager", anchor:"confirmed", off:0 },
+  { id:"rules",    label:"Check caddie and distance device rules",            owner:"manager", anchor:"start",     off:-21 },
+  { id:"course",   label:"Practise the shots this course asks for",           owner:"player",  anchor:"start",     off:-21 },
+  { id:"freeze",   label:"Equipment freeze: clubs and balls on the conforming lists", owner:"player", anchor:"start", off:-21 },
+  { id:"plan",     label:"Course plan with your coach",                       owner:"coach",   anchor:"start",     off:-7 },
+  { id:"tees",     label:"Add the tee times when the draw is out",            owner:"manager", anchor:"start",     off:-7,  done:function(en){ return !!(en.tees && en.tees.length); } },
+  { id:"local",    label:"Read the Local Rules and the draw",                 owner:"player",  anchor:"start",     off:-5 },
+  { id:"pack",     label:"Pack: the full list",                               owner:"player",  anchor:"start",     off:-2 },
+  { id:"weather",  label:"Weather and course planner",                        owner:"player",  anchor:"start",     off:-2 },
+  { id:"food",     label:"Food and drink for the round",                      owner:"manager", anchor:"start",     off:-1 },
+  { id:"morning",  label:"Morning of: the timeline back from the tee time",   owner:"player",  anchor:"start",     off:0 },
+  { id:"card",     label:"Scorecard checked and signed, every round",         owner:"player",  anchor:"start",     off:0 },
+  { id:"review",   label:"Review: what went well, one thing to fix",          owner:"player",  anchor:"end",       off:1 },
+  { id:"debrief",  label:"Debrief with your coach",                           owner:"coach",   anchor:"end",       off:3 }
+];
+
+function seasonEsc(t){ return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+function seasonLoad(){
+  try{
+    var x = JSON.parse(localStorage.getItem(SEASON_KEY) || "null");
+    if(x && x.code === cloudCode()){ SEASON.events = x.events || []; SEASON.entries = x.entries || []; SEASON.dates = x.dates || []; SEASON.at = x.at || 0; }
+  }catch(e){}
+}
+function seasonKeep(){
+  try{ localStorage.setItem(SEASON_KEY, JSON.stringify({ code:cloudCode(), events:SEASON.events, entries:SEASON.entries, dates:SEASON.dates, at:SEASON.at })); }catch(e){}
+}
+function seasonPost(body){ body.code = cloudCode(); return cloudPost("/api/dg-season", body); }
+function seasonPull(){
+  if(!cloudReady() || SEASON.busy) return Promise.resolve(false);
+  SEASON.busy = true;
+  return seasonPost({ action:"get" }).then(function(res){
+    SEASON.busy = false;
+    if(!res.ok || !res.d || !res.d.ok) return false;
+    SEASON.events = res.d.events || []; SEASON.entries = res.d.entries || []; SEASON.dates = res.d.dates || [];
+    SEASON.at = Date.now(); seasonKeep(); seasonRepaint();
+    return true;
+  }, function(){ SEASON.busy = false; return false; });
+}
+function seasonRepaint(){
+  try{ if(!$("viewSeason").hidden) renderSeason(); }catch(e){}
+  try{ if(!$("viewEvent").hidden) renderEvent(); }catch(e){}
+  try{ if(!$("viewWeek").hidden) renderWeek(); }catch(e){}
+  try{ if(!$("viewCoach").hidden) renderCoach(); }catch(e){}
+}
+function seasonSay(t){ var el = $("seasonStatus"); if(el) el.textContent = t || ""; var e2 = $("eventStatus"); if(e2) e2.textContent = t || ""; }
+
+/* ---- who and what this device sees ---- */
+function myKeys(){ return state.players.map(function(p){ return playerKey(p.id); }).filter(Boolean); }
+function keyName(k){ var p = state.players.filter(function(x){ return playerKey(x.id) === k; })[0]; return p ? p.name : (k.charAt(0).toUpperCase() + k.slice(1)); }
+function evById(id){ return SEASON.events.filter(function(e){ return e.id === id; })[0] || null; }
+function entryOf(evId, k){ return SEASON.entries.filter(function(x){ return x.event === evId && x.player === k; })[0] || { event:evId, player:k, status:"none", check:{}, owners:{}, tees:[] }; }
+function evPlayers(ev){ var mine = myKeys(); return (ev.players || []).filter(function(k){ return mine.indexOf(k) > -1; }); }
+function seasonStaff(){ return !meNow() ? true : meStaff(); }
+
+/* ---- dates ---- */
+function dPlus(iso, n){ var d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function dNice(iso){ if(!iso) return ""; var d = new Date(iso + "T12:00:00"); return d.getDate() + " " + MON[d.getMonth()]; }
+function dDays(a, b){ return Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000); }
+function evWhen(ev){
+  if(ev.start){
+    var a = new Date(ev.start + "T12:00:00"), b = new Date((ev.end || ev.start) + "T12:00:00");
+    if(ev.start === (ev.end || ev.start)) return dNice(ev.start) + " " + a.getFullYear();
+    return (a.getMonth() === b.getMonth() ? a.getDate() : dNice(ev.start)) + " to " + dNice(ev.end) + " " + b.getFullYear();
+  }
+  return (ev.month ? MON[ev.month - 1] : "Date") + ", dates to be confirmed";
+}
+function evSortKey(ev){ return ev.start || ("2027-" + String(ev.month || 12).padStart(2, "0") + "-99"); }
+function whenNice(s){
+  if(!s) return "";
+  var d = new Date(s.slice(0, 10) + "T12:00:00");
+  return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()] + " " + dNice(s.slice(0, 10)) + (s.length > 10 ? ", " + s.slice(11, 16) : "");
+}
+
+/* ---- the checklist for one entry ---- */
+function anchorDate(a, ev, en){
+  var at = en.statusAt || {};
+  if(a === "open") return ev.open || null;
+  if(a === "close") return ev.close || null;
+  if(a === "entered") return at.entered || at.ballot || at.confirmed || at.reserve || null;
+  if(a === "confirmed") return at.confirmed || null;
+  if(a === "start") return ev.start || null;
+  if(a === "end") return ev.end || ev.start || null;
+  return null;
+}
+function checkFor(ev, en){
+  var st = en.status || "none", t = today(), out = [];
+  if(st === "none" || st === "withdrawn") return out;
+  CHECK.forEach(function(it){
+    var applies = it.on ? !!it.on[st] || (it.done && it.done(en) && st !== "considering")
+                        : !!LIVE_ST[st] && (it.anchor !== "confirmed" || /confirmed|played/.test(st));
+    if(it.id === "enter") applies = true;
+    if(!applies) return;
+    var base = anchorDate(it.anchor, ev, en), due = base ? dPlus(base, it.off) : null;
+    var tick = (en.check || {})[it.id];
+    var done = !!tick || !!(it.done && it.done(en));
+    var owner = (en.owners || {})[it.id] || it.owner;
+    var state_ = done ? "done" : !due ? "waiting" : due < t ? "overdue" : dDays(t, due) <= 7 ? "due" : "later";
+    out.push({ it:it, due:due, done:done, tick:tick, owner:owner, state:state_ });
+  });
+  return out;
+}
+function dueWords(c){
+  if(c.done) return c.tick && c.tick.by ? "Done · " + c.tick.by : "Done";
+  if(!c.due) return { open:"When entries open", close:"When entries close", entered:"Once entered", confirmed:"Once the place is confirmed",
+                      start:"Once the dates are set", end:"After the event" }[c.it.anchor] || "Later";
+  var n = dDays(today(), c.due);
+  if(n < 0) return "Overdue · was due " + dNice(c.due);
+  if(n === 0) return "Due today";
+  if(n === 1) return "Due tomorrow";
+  return "Due " + dNice(c.due) + (n <= 7 ? " · " + n + " days" : "");
+}
+/* Everything due within a week, or overdue, owned by one of these roles,
+   across every event and every player this device can see. */
+function seasonTodo(owners, keys){
+  var out = [];
+  SEASON.events.forEach(function(ev){
+    evPlayers(ev).forEach(function(k){
+      if(keys && keys.indexOf(k) < 0) return;
+      var en = entryOf(ev.id, k);
+      checkFor(ev, en).forEach(function(c){
+        if(c.done || (c.state !== "due" && c.state !== "overdue")) return;
+        if(owners.indexOf(c.owner) < 0) return;
+        out.push({ ev:ev, en:en, k:k, c:c });
+      });
+    });
+  });
+  return out.sort(function(a, b){ return a.c.due < b.c.due ? -1 : a.c.due > b.c.due ? 1 : 0; });
+}
+function myOwnerRoles(){
+  var m = meNow(); if(!m) return ["player", "manager", "coach"];
+  return m.roles.filter(function(r){ return r === "player" || r === "manager" || r === "coach"; });
+}
+function seasonTick(evId, k, item, done){
+  var en = entryOf(evId, k), was = Object.assign({}, en.check || {});
+  en.check = Object.assign({}, en.check || {});
+  if(done) en.check[item] = { at:Date.now(), by:(meNow() && meNow().name) || keyName(k) }; else delete en.check[item];
+  if(SEASON.entries.indexOf(en) < 0) SEASON.entries.push(en);
+  seasonKeep(); seasonRepaint();
+  return seasonPost({ action:"tick", event:evId, player:k, item:item, done:!!done }).then(function(res){
+    if(!res.ok || !res.d || !res.d.ok){ en.check = was; seasonKeep(); seasonRepaint(); seasonSay("Not saved: " + ((res.d && res.d.reason) || res.status) + "."); }
+  }, function(){ en.check = was; seasonKeep(); seasonRepaint(); seasonSay("Not saved: no connection."); });
+}
+function seasonSaveEntry(evId, k, patch){
+  var en = entryOf(evId, k), keep = JSON.parse(JSON.stringify(en));
+  Object.assign(en, patch);
+  if(patch.status && patch.status !== keep.status){ en.statusAt = Object.assign({}, en.statusAt || {}); en.statusAt[patch.status] = today(); }
+  if(SEASON.entries.indexOf(en) < 0) SEASON.entries.push(en);
+  seasonKeep(); seasonRepaint();
+  return seasonPost({ action:"entry", event:evId, player:k, entry:{ status:en.status, practice:en.practice || null, tees:en.tees || [], owners:en.owners || {}, notes:en.notes || "" } })
+    .then(function(res){
+      if(res.ok && res.d && res.d.ok && res.d.entry){ Object.assign(en, res.d.entry); seasonKeep(); seasonSay("Saved."); return true; }
+      Object.keys(en).forEach(function(x){ delete en[x]; }); Object.assign(en, keep); seasonKeep(); seasonRepaint();
+      seasonSay("Not saved: " + ((res.d && res.d.reason) || res.status) + "."); return false;
+    }, function(){ Object.keys(en).forEach(function(x){ delete en[x]; }); Object.assign(en, keep); seasonKeep(); seasonRepaint(); seasonSay("Not saved: no connection."); return false; });
+}
+
+/* ---- This week: the tournament items that are hers, and squad days and lessons ---- */
+function seasonWeekHtml(){
+  var p = playerObj(); if(!p) return "";
+  var k = playerKey(p.id); if(!k) return "";
+  var wk = weekOf(), end = dPlus(wk, 6), html = "";
+  var todo = seasonTodo(["player"], [k]);
+  var days = SEASON.dates.filter(function(d){ return d.start && d.players.indexOf(k) > -1 && d.start.slice(0, 10) >= wk && d.start.slice(0, 10) <= end; })
+    .sort(function(a, b){ return a.start < b.start ? -1 : 1; });
+  var next = SEASON.events.filter(function(ev){
+    var st = entryOf(ev.id, k).status; return ev.start && ev.start >= today() && (ev.players || []).indexOf(k) > -1 && /considering|entered|ballot|confirmed|reserve/.test(st);
+  }).sort(function(a, b){ return a.start < b.start ? -1 : 1; })[0];
+  if(!todo.length && !days.length && !next) return '<div class="wkseason"><button type="button" class="wkseasonlink" data-season="open">Season and tournaments</button></div>';
+  html += '<div class="wkgrp wkseason"><div class="wkgh"><h2>Tournaments</h2><button type="button" class="wkseasonlink" data-season="open">Season</button></div>';
+  if(next){
+    var en = entryOf(next.id, k);
+    html += '<button type="button" class="wknext" data-season="ev:' + next.id + '"><b>' + seasonEsc(next.name) + '</b><span>' +
+      seasonEsc(evWhen(next)) + (next.venue ? ' · ' + seasonEsc(next.venue) : '') + ' · ' + ST_WORD[en.status] +
+      ' · ' + dDays(today(), next.start) + ' days</span></button>';
+  }
+  days.forEach(function(d){
+    html += '<div class="wkday"><b>' + seasonEsc(d.title) + '</b><span>' + whenNice(d.start) + (d.end ? " to " + d.end.slice(11, 16) : "") +
+      (d.venue ? ' · ' + seasonEsc(d.venue) : '') + (d.with ? ' · with ' + seasonEsc(d.with) : '') + '</span></div>';
+  });
+  todo.forEach(function(t){
+    html += '<label class="wkcheck' + (t.c.state === "overdue" ? " late" : "") + '"><input type="checkbox" data-tick="' + t.ev.id + '|' + t.k + '|' + t.c.it.id + '"> ' +
+      '<span><b>' + seasonEsc(t.c.it.label) + '</b><small>' + seasonEsc(t.ev.name) + ' · ' + dueWords(t.c) + '</small></span></label>';
+  });
+  return html + '</div>';
+}
+function seasonWeekClick(b){
+  var v = b.getAttribute("data-season"); if(!v) return false;
+  if(v === "open"){ openSeason(); return true; }
+  if(v.indexOf("ev:") === 0){ openEvent(v.slice(3)); return true; }
+  return false;
+}
+function seasonWeekChange(e){
+  var c = e.target; if(!c || !c.hasAttribute || !c.hasAttribute("data-tick")) return false;
+  var p = c.getAttribute("data-tick").split("|");
+  seasonTick(p[0], p[1], p[2], c.checked);
+  return true;
+}
+
+/* ---- the coach and manager view: what is theirs to do ---- */
+function seasonTodoBox(){
+  var el = document.createElement("div"); el.className = "pcardc stodo";
+  var todo = seasonTodo(myOwnerRoles().filter(function(r){ return r !== "player"; }));
+  el.innerHTML = '<div class="hd"><span class="who">Season</span><span class="when">' + (todo.length ? todo.length + ' to do' : 'nothing due') + '</span></div>' +
+    (todo.length ? todo.slice(0, 8).map(function(t){
+      return '<label class="wkcheck' + (t.c.state === "overdue" ? " late" : "") + '"><input type="checkbox" data-tick="' + t.ev.id + '|' + t.k + '|' + t.c.it.id + '"> ' +
+        '<span><b>' + seasonEsc(t.c.it.label) + '</b><small>' + seasonEsc(keyName(t.k)) + ' · ' + seasonEsc(t.ev.name) + ' · ' + dueWords(t.c) + '</small></span></label>';
+    }).join("") : '<p class="cnote">Nothing due in the next week for you.</p>') +
+    '<div class="acts"><button type="button" data-season="open">Season, entries and calendar</button></div>';
+  el.onclick = function(e){ var b = e.target.closest ? e.target.closest("[data-season]") : null; if(b) seasonWeekClick(b); };
+  el.onchange = function(e){ seasonWeekChange(e); };
+  return el;
+}
+
+/* ---- the Season page ---- */
+function openSeason(){
+  /* Back goes to the coach view if that is where she came from */
+  if(!$("viewCoach").hidden || !$("viewProg").hidden) state.seasonFrom = "coach";
+  else if($("viewEvent").hidden && $("viewSeason").hidden) state.seasonFrom = "week";
+  seasonLoad(); renderSeason(); show("season"); seasonPull();
+}
+function renderSeason(){
+  var host = $("seasonBody"); if(!host) return;
+  var staff = seasonStaff(), keys = myKeys(), html = "";
+  if(!SEASON.events.length && !SEASON.at) html += '<p class="note">Loading the season…</p>';
+  if(staff){
+    html += '<div class="setgrp scal"><div class="wkgh"><h2>DenyerGolf calendar</h2></div>' +
+      '<p class="note">Tournaments the girls are going for, entry deadlines, practice rounds, tee times, squad days and lessons, in Calendar on your phone. Subscribe once and it keeps itself up to date.</p>' +
+      '<div id="calOut"></div><div class="tools"><button type="button" id="calGet">Get the calendar link</button></div></div>';
+  }
+  /* squad days and lessons */
+  var up = SEASON.dates.filter(function(d){ return d.start && d.start.slice(0, 10) >= today(); }).sort(function(a, b){ return a.start < b.start ? -1 : 1; });
+  html += '<div class="setgrp"><div class="wkgh"><h2>Squad days and lessons</h2>' + (staff ? '<button type="button" class="wkseasonlink" id="dtAdd">Add</button>' : '') + '</div>' +
+    '<div id="dtForm"></div>' +
+    (up.length ? '<ul class="sdays">' + up.slice(0, 12).map(function(d){
+      return '<li><b>' + seasonEsc(d.title) + '</b><span>' + whenNice(d.start) + (d.end ? " to " + d.end.slice(11, 16) : "") + (d.venue ? ' · ' + seasonEsc(d.venue) : '') +
+        (d.with ? ' · ' + seasonEsc(d.with) : '') + ' · ' + seasonEsc(d.players.map(keyName).join(", ")) + '</span>' +
+        (staff ? '<button type="button" class="sdel" data-dtdel="' + d.id + '" aria-label="Remove">×</button>' : '') + '</li>';
+    }).join("") + '</ul>' : '<p class="note">None coming up.</p>') + '</div>';
+  /* the tournaments, by month */
+  var evs = SEASON.events.slice().sort(function(a, b){ var x = evSortKey(a), y = evSortKey(b); return x < y ? -1 : x > y ? 1 : 0; });
+  html += '<div class="wkgh sevhd"><h2>Tournaments</h2>' + (staff ? '<button type="button" class="wkseasonlink" id="evAdd">Add</button>' : '') + '</div>';
+  var lastM = null;
+  evs.forEach(function(ev){
+    var m = ev.start ? +ev.start.slice(5, 7) : (ev.month || 0);
+    if(m !== lastM){ html += '<div class="smonth">' + (m ? ["January","February","March","April","May","June","July","August","September","October","November","December"][m - 1] : "Month to be confirmed") + '</div>'; lastM = m; }
+    var chips = evPlayers(ev).map(function(k){
+      var st = entryOf(ev.id, k).status || "none";
+      return st === "none" ? "" : '<span class="schip st-' + st + '">' + seasonEsc(keyName(k)) + ': ' + ST_WORD[st] + '</span>';
+    }).join("");
+    var todoN = evPlayers(ev).reduce(function(a, k){ return a + checkFor(ev, entryOf(ev.id, k)).filter(function(c){ return !c.done && (c.state === "due" || c.state === "overdue"); }).length; }, 0);
+    html += '<button type="button" class="sev' + (ev.confirmed ? " conf" : "") + '" data-ev="' + ev.id + '"><b>' + seasonEsc(ev.name) + '</b>' +
+      '<span>' + seasonEsc(evWhen(ev)) + (ev.venue ? ' · ' + seasonEsc(ev.venue) : '') + (ev.confirmed ? ' · <i>confirmed</i>' : '') + '</span>' +
+      (chips || todoN ? '<span class="schips">' + chips + (todoN ? '<span class="schip todo">' + todoN + ' to do</span>' : '') + '</span>' : '') + '</button>';
+  });
+  if(SEASON.at && !evs.length) html += '<p class="note">No tournaments yet.</p>';
+  html += '<p class="status" id="seasonStatus"></p>';
+  host.innerHTML = html;
+
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    if(b.hasAttribute("data-ev")){ openEvent(b.getAttribute("data-ev")); return; }
+    if(b.id === "evAdd"){ EV_OPEN = "new"; renderEvent(); show("event"); return; }
+    if(b.id === "dtAdd"){ dateForm(); return; }
+    if(b.hasAttribute("data-dtdel")){
+      var id = b.getAttribute("data-dtdel");
+      if(!confirm("Remove this from the calendar?")) return;
+      SEASON.dates = SEASON.dates.filter(function(d){ return d.id !== id; }); seasonKeep(); renderSeason();
+      seasonPost({ action:"date_del", id:id }).then(function(res){ if(!res.ok) seasonPull(); });
+      return;
+    }
+    if(b.id === "calGet" || b.id === "calNew"){
+      var fresh = b.id === "calNew";
+      if(fresh && !confirm("Make a new link? The old one stops working, so everyone subscribed will need the new one.")) return;
+      seasonSay("Getting the link…");
+      seasonPost({ action:fresh ? "cal_new" : "cal" }).then(function(res){
+        if(!res.ok || !res.d || !res.d.ok){ seasonSay("Could not get the link: " + ((res.d && res.d.reason) || res.status) + "."); return; }
+        seasonSay("");
+        $("calOut").innerHTML = '<p class="calurl"><span>' + seasonEsc(res.d.url) + '</span></p>' +
+          '<div class="tools"><button type="button" id="calCopy">Copy the link</button><a class="calsub" href="' + seasonEsc(res.d.webcal) + '">Subscribe on this phone</a>' +
+          '<button type="button" id="calNew">Make a new link</button></div>' +
+          '<p class="note">On a Mac: Calendar, File, New Calendar Subscription, paste the link, and choose iCloud as the location so it reaches every Apple device. ' +
+          'Keep the link to the family: anyone who has it can see the dates.</p>';
+        var cb = $("calCopy"); if(cb) cb.onclick = function(){
+          var done = function(){ cb.textContent = "Copied"; };
+          try{ navigator.clipboard.writeText(res.d.url).then(done, function(){ fallbackCopy(res.d.url, "The link"); }); }catch(err){ fallbackCopy(res.d.url, "The link"); }
+        };
+        b.hidden = true;
+      }, function(){ seasonSay("Could not get the link: no connection."); });
+    }
+  };
+}
+function dateForm(){
+  var host = $("dtForm"); if(!host) return;
+  var keys = myKeys();
+  host.innerHTML = '<div class="sform">' +
+    '<label>What<select id="dtKind"><option value="squad">Squad day</option><option value="lesson">Lesson</option><option value="other">Other</option></select></label>' +
+    '<label>Title<input id="dtTitle" maxlength="80" placeholder="e.g. Regional squad day"></label>' +
+    '<label>Date<input id="dtDay" type="date"></label>' +
+    '<div class="srow2"><label>From<input id="dtFrom" type="time" value="10:00"></label><label>To<input id="dtTo" type="time"></label></div>' +
+    '<label>Where<input id="dtVenue" maxlength="80"></label>' +
+    '<label>With<input id="dtWith" maxlength="40" placeholder="e.g. Sarah, putting coach"></label>' +
+    '<div class="sppl">' + keys.map(function(k){ return '<label class="bwpause"><input type="checkbox" data-dtp="' + k + '" checked> ' + seasonEsc(keyName(k)) + '</label>'; }).join("") + '</div>' +
+    '<div class="tools"><button type="button" id="dtSave">Save</button><button type="button" id="dtCancel">Cancel</button></div></div>';
+  $("dtCancel").onclick = function(){ host.innerHTML = ""; };
+  $("dtSave").onclick = function(){
+    var day = $("dtDay").value, from = $("dtFrom").value || "10:00", to = $("dtTo").value;
+    if(!day){ seasonSay("Pick a date."); return; }
+    var ps = [].slice.call(host.querySelectorAll("[data-dtp]")).filter(function(c){ return c.checked; }).map(function(c){ return c.getAttribute("data-dtp"); });
+    if(!ps.length){ seasonSay("Tick at least one player."); return; }
+    var d = { kind:$("dtKind").value, title:$("dtTitle").value, start:day + "T" + from, end:to ? day + "T" + to : null,
+              venue:$("dtVenue").value, with:$("dtWith").value, players:ps };
+    seasonSay("Saving…");
+    seasonPost({ action:"date", date:d }).then(function(res){
+      if(!res.ok || !res.d || !res.d.ok){ seasonSay("Not saved: " + ((res.d && res.d.reason) || res.status) + "."); return; }
+      seasonSay("Saved."); host.innerHTML = ""; seasonPull();
+    }, function(){ seasonSay("Not saved: no connection."); });
+  };
+}
+
+/* ---- one tournament ---- */
+function openEvent(id){ EV_OPEN = id; renderEvent(); show("event"); }
+function renderEvent(){
+  var host = $("eventBody"); if(!host) return;
+  var staff = seasonStaff();
+  var ev = EV_OPEN === "new" ? { id:"", name:"", players:myKeys() } : evById(EV_OPEN);
+  if(!ev){ host.innerHTML = '<p class="note">This tournament is not on this device.</p>'; return; }
+  $("eventName").textContent = ev.name || "New tournament";
+  $("eventWhen").textContent = EV_OPEN === "new" ? "" : evWhen(ev) + (ev.venue ? " · " + ev.venue : "");
+  var html = "";
+  if(EV_OPEN === "new") html += eventForm(ev);
+  else {
+    var rows = [["Dates", ev.start ? evWhen(ev) + (ev.confirmed ? " (confirmed)" : "") : evWhen(ev)], ["Venue", ev.venue], ["Entries open", ev.open ? dNice(ev.open) + " " + ev.open.slice(0, 4) : ""],
+                ["Entries close", ev.close ? dNice(ev.close) + " " + ev.close.slice(0, 4) : ""], ["Entry and eligibility", ev.entry], ["Last time", ev.guide], ["Watch out", ev.flag], ["Notes", ev.notes]];
+    html += '<dl class="sdl">' + rows.filter(function(r){ return r[1]; }).map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + seasonEsc(r[1]) + '</dd>'; }).join("") + '</dl>' +
+      (ev.link ? '<p class="note"><a href="' + seasonEsc(ev.link) + '" target="_blank" rel="noopener">The organiser’s page</a></p>' : '') +
+      (staff ? '<div class="tools"><button type="button" id="evEdit">Edit the details</button></div><div id="evForm"></div>' : '');
+    evPlayers(ev).forEach(function(k){ html += entryHtml(ev, k, staff); });
+    if(staff) html += '<div class="tools sdanger"><button type="button" id="evDel">Remove this tournament</button></div>';
+  }
+  html += '<p class="status" id="eventStatus"></p>';
+  host.innerHTML = html;
+  wireEvent(ev, staff);
+}
+function eventForm(ev){
+  var v = function(x){ return seasonEsc(x == null ? "" : x); };
+  return '<div class="sform">' +
+    '<label>Name<input id="efName" maxlength="80" value="' + v(ev.name) + '"></label>' +
+    '<label>Venue<input id="efVenue" maxlength="80" value="' + v(ev.venue) + '"></label>' +
+    '<div class="srow2"><label>First day<input id="efStart" type="date" value="' + v(ev.start) + '"></label><label>Last day<input id="efEnd" type="date" value="' + v(ev.end) + '"></label></div>' +
+    '<label class="bwpause"><input type="checkbox" id="efConf"' + (ev.confirmed ? " checked" : "") + '> Dates confirmed by the organiser</label>' +
+    '<label>Month, if the dates are not out yet<select id="efMonth"><option value="">Not set</option>' + MON.map(function(m, i){ return '<option value="' + (i + 1) + '"' + (ev.month === i + 1 ? " selected" : "") + '>' + m + '</option>'; }).join("") + '</select></label>' +
+    '<div class="srow2"><label>Entries open<input id="efOpen" type="date" value="' + v(ev.open) + '"></label><label>Entries close<input id="efClose" type="date" value="' + v(ev.close) + '"></label></div>' +
+    '<label>Entry and eligibility<input id="efEntry" maxlength="240" value="' + v(ev.entry) + '"></label>' +
+    '<label>Organiser’s page<input id="efLink" maxlength="300" placeholder="https://" value="' + v(ev.link) + '"></label>' +
+    '<label>Watch out<input id="efFlag" maxlength="240" value="' + v(ev.flag) + '"></label>' +
+    '<label>Notes<textarea id="efNotes" maxlength="500" rows="2">' + v(ev.notes) + '</textarea></label>' +
+    '<div class="tools"><button type="button" id="efSave">Save</button>' + (EV_OPEN === "new" ? '' : '<button type="button" id="efCancel">Cancel</button>') + '</div></div>';
+}
+function entryHtml(ev, k, staff){
+  var en = entryOf(ev.id, k), st = en.status || "none", list = checkFor(ev, en);
+  var h = '<div class="setgrp sentry"><div class="wkgh"><h2>' + seasonEsc(keyName(k)) + '</h2><span class="schip st-' + st + '">' + ST_WORD[st] + '</span></div>';
+  if(staff){
+    h += '<div class="sstat">' + ST_ORDER.map(function(s){ return '<button type="button" data-st="' + k + '|' + s + '" aria-pressed="' + (s === st) + '">' + ST_WORD[s] + '</button>'; }).join("") + '</div>';
+    if(/confirmed|reserve|played/.test(st)){
+      var tees = en.tees || [];
+      h += '<div class="srow2"><label>Practice round<input type="datetime-local" data-pr="' + k + '" value="' + seasonEsc(en.practice || "") + '"></label>' +
+        '<label>Round 1 tee time<input type="datetime-local" data-tee="' + k + '|1" value="' + seasonEsc((tees.filter(function(t){ return t.r === 1; })[0] || {}).at || "") + '"></label></div>' +
+        '<div class="srow2"><label>Round 2<input type="datetime-local" data-tee="' + k + '|2" value="' + seasonEsc((tees.filter(function(t){ return t.r === 2; })[0] || {}).at || "") + '"></label>' +
+        '<label>Round 3<input type="datetime-local" data-tee="' + k + '|3" value="' + seasonEsc((tees.filter(function(t){ return t.r === 3; })[0] || {}).at || "") + '"></label></div>';
+    }
+  } else {
+    if(en.practice) h += '<p class="note">Practice round: ' + whenNice(en.practice) + '</p>';
+    (en.tees || []).forEach(function(t){ h += '<p class="note">Round ' + t.r + ' tee time: ' + whenNice(t.at) + '</p>'; });
+  }
+  if(!list.length) return h + '<p class="note">' + (st === "none" ? "Not planning to play. Choose a status to start the checklist." : st === "withdrawn" ? "Withdrawn." : "") + '</p></div>';
+  h += '<ul class="schk">' + list.map(function(c){
+    var auto = c.it.done && c.it.done(en) && !c.tick;
+    return '<li class="' + c.state + '"><label><input type="checkbox" data-tick="' + ev.id + '|' + k + '|' + c.it.id + '"' + (c.done ? " checked" : "") + (auto ? " disabled" : "") + '> ' +
+      '<span><b>' + seasonEsc(c.it.label) + '</b><small>' + dueWords(c) + '</small></span></label>' +
+      (staff ? '<select data-own="' + k + '|' + c.it.id + '" aria-label="Whose job">' + ["player", "manager", "coach"].map(function(o){ return '<option value="' + o + '"' + (o === c.owner ? " selected" : "") + '>' + OWN_WORD[o] + '</option>'; }).join("") + '</select>'
+             : '<span class="sown">' + OWN_WORD[c.owner] + '</span>') + '</li>';
+  }).join("") + '</ul></div>';
+  return h;
+}
+function wireEvent(ev, staff){
+  var host = $("eventBody");
+  host.onchange = function(e){
+    if(seasonWeekChange(e)) return;
+    var t = e.target;
+    if(t.hasAttribute("data-own")){
+      var p = t.getAttribute("data-own").split("|"), en = entryOf(ev.id, p[0]);
+      var owners = Object.assign({}, en.owners || {}); owners[p[1]] = t.value;
+      seasonSaveEntry(ev.id, p[0], { owners:owners });
+    } else if(t.hasAttribute("data-pr")){
+      seasonSaveEntry(ev.id, t.getAttribute("data-pr"), { practice:t.value || null });
+    } else if(t.hasAttribute("data-tee")){
+      var q = t.getAttribute("data-tee").split("|"), en2 = entryOf(ev.id, q[0]), r = +q[1];
+      var tees = (en2.tees || []).filter(function(x){ return x.r !== r; });
+      if(t.value) tees.push({ r:r, at:t.value });
+      tees.sort(function(a, b){ return a.r - b.r; });
+      seasonSaveEntry(ev.id, q[0], { tees:tees });
+    }
+  };
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("button") : null; if(!b) return;
+    if(b.hasAttribute("data-st")){ var p = b.getAttribute("data-st").split("|"); seasonSaveEntry(ev.id, p[0], { status:p[1] }); return; }
+    if(b.id === "evEdit"){ $("evForm").innerHTML = eventForm(ev); b.hidden = true; return; }
+    if(b.id === "efCancel"){ renderEvent(); return; }
+    if(b.id === "efSave"){
+      var g = function(id){ var el = $(id); return el ? el.value : ""; };
+      var body = { id:ev.id || undefined, players:ev.players, name:g("efName"), venue:g("efVenue"), start:g("efStart") || null, end:g("efEnd") || g("efStart") || null,
+        confirmed:!!($("efConf") && $("efConf").checked), month:+g("efMonth") || null, open:g("efOpen") || null, close:g("efClose") || null,
+        entry:g("efEntry"), link:g("efLink"), flag:g("efFlag"), notes:g("efNotes") };
+      if(!body.name.trim()){ seasonSay("Give it a name."); return; }
+      seasonSay("Saving…");
+      seasonPost({ action:"event", event:body }).then(function(res){
+        if(!res.ok || !res.d || !res.d.ok){ seasonSay("Not saved: " + ((res.d && res.d.reason) || res.status) + "."); return; }
+        EV_OPEN = res.d.id;
+        var keep = evById(res.d.id);
+        var merged = Object.assign({}, keep || {}, body, { id:res.d.id });
+        if(keep) SEASON.events[SEASON.events.indexOf(keep)] = merged; else SEASON.events.push(merged);
+        seasonKeep(); renderEvent(); seasonSay("Saved."); seasonPull();
+      }, function(){ seasonSay("Not saved: no connection."); });
+      return;
+    }
+    if(b.id === "evDel"){
+      if(!confirm("Remove " + ev.name + " and every entry and checklist on it? This cannot be undone.")) return;
+      seasonPost({ action:"event_del", id:ev.id }).then(function(res){
+        if(!res.ok || !res.d || !res.d.ok){ seasonSay("Not removed: " + ((res.d && res.d.reason) || res.status) + "."); return; }
+        SEASON.events = SEASON.events.filter(function(x){ return x.id !== ev.id; }); seasonKeep(); openSeason();
+      }, function(){ seasonSay("Not removed: no connection."); });
+    }
+  };
 }
 
 /* ---------- boot ---------- */
