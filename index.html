@@ -2235,7 +2235,29 @@
   body.rangeset #viewSession .rinfo[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
   body.rangeset #viewSession{--muted:var(--ink); --ink-2:var(--ink)}
   body.rangeset:not(.showinfo) #viewSession .shead,
-  body.rangeset:not(.showinfo) #viewSession .pcardhd b{display:none}
+  body.rangeset:not(.showinfo) #viewSession .pcardhd,
+  body.rangeset:not(.showinfo) #viewSession .set > div:not(.focushd):not(.shotdiag):not(.slopebox),
+  body.rangeset:not(.showinfo) #viewSession .shotask,
+  body.rangeset:not(.showinfo) #viewSession .balls,
+  body.rangeset:not(.showinfo) #viewSession .shottally,
+  body.rangeset:not(.showinfo) #viewSession .shotacts,
+  body.rangeset:not(.showinfo) #viewSession .banner,
+  body.rangeset:not(.showinfo) #viewSession #runBar,
+  body.rangeset:not(.showinfo) #viewSession #sessProg,
+  body.rangeset:not(.showinfo) #viewSession #saveTick,
+  body.rangeset #navBack, body.rangeset #totalBar .tot{display:none}
+  body.rangeset:not(.showinfo) #viewSession #sessSeg{display:none}
+  .homehd{display:flex; flex-direction:column; gap:2px; margin:26px 0 8px; padding-top:16px; border-top:2px solid var(--line-strong)}
+  .homehd h2{margin:0; font-size:20px; font-weight:800}
+  .homehd span{font-size:13px; color:var(--ink-2)}
+  body.rangeset.showinfo #viewSession .focushd{display:none}
+  .focushd{display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; margin:0 0 6px}
+  .focushd .fdist{flex:1 1 100%; font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.05; color:var(--ink)}
+  .focushd .fshot{font-size:26px; font-weight:700; color:var(--ink)}
+  .focushd .fscope{margin-left:auto}
+  .focushd .fscope .vid{font-size:15px; padding:8px 14px}
+  .nav.undo{background:var(--surface); border:1px solid var(--line-strong); color:var(--ink); font-weight:700}
+  body.rangeset #totalBar .totalin{justify-content:space-between}
   body.rangeset #viewSession .pcard .set .tgt{font-size:15px; font-weight:500}
   body.rangeset #viewSession .set .lbl .vid{font-size:14px; letter-spacing:0; vertical-align:middle}
   body.rangeset #viewSession .pcardhd{font-size:15px; font-weight:800}
@@ -2775,6 +2797,7 @@
       <span class="fig" id="totFig">0</span><span class="of" id="totOf">/ 55</span>
       <span class="vs" id="totVs"></span>
     </div>
+    <button class="nav undo" id="navUndo" hidden>Undo</button>
     <button class="nav next" id="navNext">Next →</button>
     <button class="save" id="saveBtn">Finish and save</button>
   </div>
@@ -2873,7 +2896,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume; S&C A and B in five parts, one page per exercise with drawings that need no signal; a matrix for each pillar, its clock adjustable, with the UpGame score at the end; club drills shelved, their history kept" };
+var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume; S&C A and B in five parts, one page per exercise with drawings that need no signal; a matrix for each pillar, its clock adjustable, with the UpGame score at the end; club drills shelved, their history kept; one shot per screen (distance, shot, Scope, Undo, Next); home drills in their own section" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -7350,12 +7373,18 @@ function renderDrills(){
 
   /* By pillar, the way the squad sheet is laid out. Inside a pillar the club
      drills come first and the ones she can do at home after them, tagged. */
-  [1, 2, 3, 4].forEach(function(pn){
-    var mine = allDrills().filter(function(x){ return !x.hidden && pillarNo(x.area) === pn; })
-      .sort(function(a, b){ return drillPlace(a).zone - drillPlace(b).zone; });
+  /* The matrices by pillar, then the drills at home in a section of their own
+     below them (28 Oct). */
+  [1, 2, 3, 4, "home"].forEach(function(pn){
+    var mine = allDrills().filter(function(x){
+      if(x.hidden) return false;
+      return pn === "home" ? drillPlace(x).zone === 1 : drillPlace(x).zone === 0 && pillarNo(x.area) === pn;
+    });
     if(!mine.length) return;
     var hd = document.createElement("div");
-    hd.innerHTML = pillarHead(pn, mine.length + (mine.length === 1 ? " drill" : " drills"));
+    hd.innerHTML = pn === "home"
+      ? '<div class="homehd"><h2>At home</h2><span>Putting on the mat and the garden green \u00b7 ' + mine.length + ' drills</span></div>'
+      : pillarHead(pn, mine.length + (mine.length === 1 ? " drill" : " drills"));
     host.appendChild(hd.firstChild);
 
     mine.forEach(function(d){
@@ -8049,12 +8078,64 @@ function deckShow(i){
 /* Range mode (28 Oct): on a page where she is hitting balls, the page carries
    the shot, the target and the count, in large type, and nothing else. The
    title, the date, the run boxes and the instructions are one tap away. */
+/* ---- one shot per screen (28 Oct) ----
+   On a hitting page the screen carries four things: the distance, which shot
+   it is, the Scope, and Undo and Next. Everything else (the set heading, the
+   instructions, the ball chips, the tally, the run boxes and the score) is one
+   tap away behind the i. The picture and the way a ball is scored do not
+   change. A tap on the picture records the shot and the counter moves on. */
+var FOCUS_OBS = null;
+function focusText(set){
+  var lbl = set.querySelector(".lbl"), ask = set.querySelector(".shotask");
+  var raw = lbl ? Array.prototype.map.call(lbl.childNodes, function(n){ return n.nodeType === 3 ? n.textContent : ""; }).join("").trim() : "";
+  var parts = raw.split(/\s*·\s*/), keep = parts.filter(function(x){
+    return /\d\s*(y|yd|yds|yards|ft|feet|paces|°)\b|\d+°|driver|wood|hybrid|iron/i.test(x) && !/balls?$|putts?$|sets? of/i.test(x);
+  });
+  var dist = (keep.length ? keep : parts.slice(0, 1)).join(" · ").replace(/(\d)y\b/g, "$1 y");
+  var shot = "";
+  if(ask){
+    var club = ask.querySelector(".callclub"), num = ask.querySelector(".callnum"), win = ask.querySelector(".callwin");
+    var t = (num ? num.textContent : ask.textContent).replace(/\s+/g, " ");
+    var m = /(Ball|Putt|Shot)\s+(\d+)\s+of\s+(\d+)/i.exec(t);
+    if(club) dist = club.textContent.replace(/(\d)\s*yards\b/, "$1 y");
+    if(m) shot = (/putt/i.test(m[1]) ? "Putt " : "Shot ") + m[2] + "/" + m[3];
+    var full = ask.textContent.replace(/\s+/g, " ");
+    var c = /called at ([^.]+?)\./i.exec(full), st = /from station (\d+)/i.exec(full);
+    if(c) shot += " · " + c[1];
+    else if(st) shot += " · station " + st[1];
+    else if(win && !/find the target/i.test(win.textContent)) shot += " · " + win.textContent;
+    if(!m) shot = full.replace(/\.\s*Tap[^.]*\.?$/i, "").trim();
+  }
+  return { dist:dist, shot:shot };
+}
+function focusPaint(){
+  var on = document.body.classList.contains("rangeset");
+  var card = state.deck ? state.deck.cards[state.deck.idx] : null;
+  if(FOCUS_OBS) FOCUS_OBS.disconnect();
+  if(on && card){
+    Array.prototype.forEach.call(card.querySelectorAll(".set.shotset, .set"), function(set){
+      if(!set.querySelector(".shotask")) return;
+      var hd = set.querySelector(".focushd");
+      if(!hd){ hd = document.createElement("div"); hd.className = "focushd"; set.insertBefore(hd, set.firstChild); }
+      var f = focusText(set);
+      var scope = set.querySelector(".aimc");
+      hd.innerHTML = '<div class="fdist">' + f.dist + '</div><div class="fshot">' + f.shot + '</div>';
+      if(scope){ var sw = document.createElement("div"); sw.className = "fscope"; sw.appendChild(scope); hd.appendChild(sw); }
+    });
+    var u = card.querySelector(".shotacts button");
+    if($("navUndo")) $("navUndo").hidden = !u;
+  } else if($("navUndo")) $("navUndo").hidden = true;
+  if(!FOCUS_OBS && window.MutationObserver) FOCUS_OBS = new MutationObserver(function(){ requestAnimationFrame(focusPaint); });
+  if(FOCUS_OBS && $("sessCards")) FOCUS_OBS.observe($("sessCards"), { childList:true, subtree:true, characterData:true });
+}
+
 function rangeMark(c){
   var on = state.view === "session" && !!(c && c.querySelector(".set"));
   document.body.classList.toggle("rangeset", on);
   document.body.classList.toggle("gymset", state.view === "gym" && !!(c && c.querySelector(".expg")));
   document.body.classList.remove("showinfo");
   var b = $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
+  focusPaint();
 }
 function updateNav(){
   var d = state.deck, last = d ? (d.idx === d.cards.length-1) : true;
@@ -8510,6 +8591,7 @@ function renderSessSeg(areaId){
 function renderSession(){
   var a = area(state.draft.areaId);
   document.body.classList.remove("rangeset", "showinfo");
+  if($("navUndo")) $("navUndo").hidden = true;
   /* The two matrices own their whole page: no set list, no paging, no running
      total in the bar, because none of those say anything about a gauntlet or a
      card. Everything they do need is drawn by their own builder. */
@@ -11917,7 +11999,8 @@ function shotRow(a, s, last, cfg){
       var lead = anyWindow
         ? '<span>'+parts[0].label+' <b>'+sc.w+'</b>/'+parts[0].max+'</span>'
         : '<span>'+(fsk ? "Inside "+fsPaces(fsScoreFt(fsk))+" paces"
-                        : "Inside two clubs")+' <b>'+nIn+'</b>/'+nLog+'</span>';
+                        : areaShape(a) === "corridor" ? "In the corridor"
+                        : areaShape(a) === "clock" ? "Holed" : "Inside two clubs")+' <b>'+nIn+'</b>/'+nLog+'</span>';
       tally.innerHTML = lead + '<span>Strokes <b>'+fmtSG2(r ? r.sg : 0)+'</b></span>';
     } else
     tally.innerHTML = cfg
@@ -16971,6 +17054,11 @@ $("sessMode").addEventListener("click", function(){ state.cardMode = !state.card
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
 $("gymBack").addEventListener("click", function(){ if(state.fromWeek){ show("week"); return; } renderSC(); show("sc"); });
 $("saveBtn").addEventListener("click", saveCurrent);
+$("navUndo").addEventListener("click", function(){
+  var card = state.deck ? state.deck.cards[state.deck.idx] : null;
+  var u = card ? card.querySelector(".shotacts button") : null;
+  if(u) u.click();
+});
 $("rangeInfo").addEventListener("click", function(){
   var on = document.body.classList.toggle("showinfo");
   this.setAttribute("aria-pressed", on ? "true" : "false");
