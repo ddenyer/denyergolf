@@ -17098,7 +17098,20 @@ function shotStep(dir){
   return true;
 }
 $("navBack").addEventListener("click", function(){ if(shotStep(-1)) return; if(state.deck) deckShow(state.deck.idx-1); });
-$("navNext").addEventListener("click", function(){ if(shotStep(1)) return; if(state.deck) deckShow(state.deck.idx+1); });
+/* Next with nothing recorded for the shot on screen is usually a slip, so it
+   asks first (28 Oct). */
+function shotUnlogged(){
+  if(!document.body.classList.contains("rangeset") || !state.deck) return null;
+  var card = state.deck.cards[state.deck.idx];
+  var now = card ? card.querySelector(".ballchip.now") : null;
+  if(!now || !/not logged/.test(now.getAttribute("aria-label") || "")) return null;
+  return now.textContent.trim();
+}
+$("navNext").addEventListener("click", function(){
+  var n = shotUnlogged();
+  if(n && !confirm("No shot recorded for shot " + n + ".\n\nMove on without it?")) return;
+  if(shotStep(1)) return; if(state.deck) deckShow(state.deck.idx+1);
+});
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
 $("gymBack").addEventListener("click", function(){ if(state.fromWeek){ show("week"); return; } renderSC(); show("sc"); });
