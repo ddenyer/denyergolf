@@ -2245,6 +2245,14 @@
   body.rangeset #viewSession .shottally{font-size:18px; font-weight:600}
   body.rangeset #viewSession .ballchip{width:48px; height:48px; font-size:19px; font-weight:700}
   body.rangeset #viewSession .progtxt{font-size:15px; font-weight:600}
+  /* ---- This week: suggested, then done ---- */
+  .wkdonerow .wkgo{cursor:default}
+  .wkdonerow .wktx > span{color:var(--ink-2)}
+  .wked,.wkres{flex:none; font:inherit; font-size:13px; font-weight:700; border-radius:999px; padding:7px 14px; margin-left:6px}
+  .wked{background:var(--surface); border:1px solid var(--line-strong); color:var(--ink)}
+  .wkres{background:var(--accent-fill); border:1px solid var(--accent-fill); color:#fff}
+  .wkdonerow.live{border-color:var(--accent)}
+  .streakpanel{margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -2830,7 +2838,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger, darker type on the hitting pages" };
+var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -7977,7 +7985,7 @@ function saveDraft(){
   var d = state.draft || state.gymDraft;
   if(!d || !draftHasContent(d)) return;
   stashNotes();
-  d.status = "live";
+  d.status = d.editing ? "done" : "live";
   d.at = Date.now();
   d.pos = state.deck ? state.deck.idx : 0;
   d.cardMode = state.cardMode;
@@ -12837,7 +12845,7 @@ function saveCurrent(){
   var at = sessAt(s.id);
   s.status = "done";
   markPartial(s);
-  delete s.pos; delete s.cardMode; delete s.at;
+  delete s.pos; delete s.cardMode; delete s.at; delete s.editing;
   var saved = JSON.parse(JSON.stringify(s));
   if(at >= 0) state.sessions[at] = saved; else { state.sessions.push(saved); at = state.sessions.length-1; }
   var ok = saveLocal();
@@ -14302,7 +14310,12 @@ function longDate(iso){ var d = new Date(iso + "T12:00:00"); return d.getDate() 
 function renderDise(){
   var host = $("diseCard"); if(!host) return;
   var h = diseHours(), pc = Math.min(100, h.total / DISE_TARGET * 100);
+  /* the streak moved here from This week (28 Oct) */
+  var ws = weekStreakNow();
   host.innerHTML =
+    '<div class="panel streakpanel"><div class="wkgh"><h2>Weeks in a row</h2><span>' +
+      (ws.st.paused ? 'this week is paused' : ws.st.met ? 'this week done' : 'this week not done yet') + '</span></div>' +
+    '<div class="disebig"><b class="num">' + ws.n + '</b><span>' + (ws.n === 1 ? 'week' : 'weeks') + ' with everything planned done</span></div></div>' +
     '<div class="panel disepanel"><div class="wkgh"><h2>DiSE hours</h2><span>' +
       (h.total >= DISE_TARGET ? "done" : hrs(DISE_TARGET - h.total) + " h to go") + '</span></div>' +
     '<div class="disebig"><b class="num">' + hrs(h.total) + '</b><span>of ' + DISE_TARGET + ' hours</span></div>' +
@@ -15706,101 +15719,114 @@ function weekStreakNow(){
   return { n:n, st:st };
 }
 
+/* This week (28 Oct): two lists and nothing else. What to do, then what is
+   done. The streak and the hours live on Progress; the numbers she plans by
+   live in Settings. Every completed session can be opened again to fix it, and
+   an unfinished one is picked up from where she stopped. */
+var DOW3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function weekDoneList(wk){
+  var end = addDays(wk, 6);
+  return mineAll().filter(function(s){ return s.date >= wk && s.date <= end && !s.sample; })
+    .sort(function(a, b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : ((b.at || 0) - (a.at || 0)); });
+}
+function weekDoneView(s){
+  var k = sessKind(Object.assign({}, s, { status:"done" }));
+  var v = k ? weekItemView({ k:k, id:sessRef(Object.assign({}, s, { status:"done" })) })
+            : { nm:sessLabel(s), tint:"var(--surface-2)", ic:TICON.gym };
+  if(s.kind === "test" && testById(s.testId)){ var t = testById(s.testId), sk = TILE[t.area] || TILE[10]; v = { nm:t.name, tint:sk.tint, ic:TICON[sk.ic] }; }
+  if(s.kind === "log") v.nm = sessLabel(s);
+  return v;
+}
+/* Can it be opened again and changed? A timed matrix cannot: its clock is the
+   score. A logged round or lesson has no screen to open. */
+function canEditDone(s){
+  if(!s || s.kind === "log") return false;
+  if(s.kind === "gym") return !!gymOf(s.gymId);
+  var a = area(s.areaId);
+  return !!a && !isMatrix(a);
+}
+function editDone(s){
+  if(!canEditDone(s)) return;
+  state.fromWeek = true;
+  s.editing = true;           // saved as it changes, and stays done throughout
+  if(s.kind === "gym") openGym(s.gymId, s);
+  else if(s.kind === "drill") openDrill(s.drillId || s.areaId, s);
+  else if(s.kind === "test") openTest(s.testId, s);
+  else openSession(s.areaId, s);
+}
 function renderWeek(){
   var host = $("wkBody"); if(!host) return;
-  var wk = weekOf(), ss = weekStreakNow(), st = ss.st;
+  var wk = weekOf(), st = weekState(wk);
+  var esc = function(t){ return String(t).replace(/&(?!amp;)/g, "&amp;").replace(/</g, "&lt;"); };
   $("wkDates").textContent = weekRange(wk);
   var bar = $("weekHello");
   if(bar){ var tx = state.praise || ""; bar.textContent = tx; bar.hidden = !tx; }
-  renderWeekResume();
-  $("wkStreak").innerHTML = st.paused ? '<b>Paused</b><span>the streak waits</span>'
-    : ss.n ? '<b class="num">' + ss.n + '</b><span>' + (ss.n === 1 ? "week" : "weeks") + ' in a row</span>'
-    : '<b>Week 1</b><span>a fresh start</span>';
+  if($("weekResume")) $("weekResume").hidden = true;      // unfinished ones are in the Done list
+  $("wkStreak").innerHTML = "";
 
-  var html = "";
-  if(st.paused) html += '<p class="wknote">This week is paused. Nothing here breaks the streak. Unpause it in Settings.</p>';
-  if(st.met) html += '<p class="wkdone">Week done. Everything you set yourself, done.</p>';
-  /* tournaments: the next one, squad days and lessons this week, and the checklist items that are hers */
-  if(typeof seasonWeekHtml === "function") html += seasonWeekHtml();
-  /* The squad's tests and the coach's own sessions sit together under Squad:
-     both set for her, both every week, neither hers to change. */
-  if(st.squad.length || st.squadExtra.length || st.coach.length){
-    var sp = { want:st.per.squad.want + st.per.coach.want, got:st.per.squad.got + st.per.coach.got }, spips = "";
-    for(var si = 0; si < Math.max(sp.want, sp.got); si++) spips += '<i class="' + (si < sp.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp wksquad"><div class="wkgh"><h2>Squad</h2><span class="num">' + sp.got + ' of ' + sp.want + '</span></div>' +
-            '<div class="wkpips">' + spips + '</div>';
-    st.squad.forEach(function(q){
-      var t = testById(q.id), sk = TILE[t.area] || TILE[10];
-      var v = { nm:t.name, sub:"Set by your squad coach · every week", tint:sk.tint, ic:TICON[sk.ic], pil:pillarNo(t.area) };
-      if(q.done){ html += doneRow(v, q.done, null, false); return; }
-      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-squad="' + q.id + '"><span class="wkic">' + v.ic(22) + '</span>' +
-        '<span class="wktx"><b>' + v.nm + '</b>' + pillarTag(v.pil) + '<span>' + v.sub + '</span></span><span class="wkstart">Start</span></button></div>';
-    });
-    st.squadExtra.forEach(function(x){
-      var t = testById(x.testId), sk = TILE[t.area] || TILE[10];
-      html += doneRow({ nm:t.name, tint:sk.tint, ic:TICON[sk.ic], pil:pillarNo(t.area) }, x, null, true);
-    });
-    /* one heading per coach: with a putting coach and a swing coach both
-       setting sessions, she can see whose each one is */
-    var lastBy = null;
-    st.coach.forEach(function(q, qi){
-      var by = whoWord(q.c.byName, q.c.bySpec);
-      if(qi === 0 || by !== lastBy) html += '<div class="wkoh wkcoachh">Coach' + (by ? ' \u00b7 ' + by.replace(/</g, "&lt;") : '') + '</div>';
-      lastBy = by;
-      var v = coachView(q.c); v.pil = pillarOfCoach(q.c);
-      if(q.of > 1) v.sub += " \u00b7 " + (q.i + 1) + " of " + q.of;
-      if(q.done){ html += doneRow(v, q.done, null, false); return; }
-      html += '<div class="wkrow" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-coach="' + qi + '"><span class="wkic">' + v.ic(22) + '</span>' +
-        '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b>' + pillarTag(v.pil) + '<span>' + String(v.sub).replace(/&(?!amp;)/g, "&amp;").replace(/</g, "&lt;") + '</span></span><span class="wkstart">Start</span></button></div>';
-    });
-    html += '</div>';
+  function todoRow(attr, v, acts){
+    return '<div class="wkrow" style="--tint:' + v.tint + '">' +
+      '<button type="button" class="wkgo" ' + attr + '><span class="wkic">' + v.ic(22) + '</span>' +
+      '<span class="wktx"><b>' + esc(v.nm) + '</b>' + (v.sub ? '<span>' + esc(v.sub) + '</span>' : '') + '</span>' +
+      '<span class="wkstart">Start</span></button>' + (acts || '') + '</div>';
   }
-  WEEK_KINDS.forEach(function(k){
-    var pk = st.per[k], rows = st.rows.filter(function(x){ return x.it.k === k; });
-    if(!pk.want && !st.extra.some(function(s){ return sessKind(s) === k; })) return;
-    var pips = "";
-    for(var i = 0; i < Math.max(pk.want, pk.got); i++) pips += '<i class="' + (i < pk.got ? "on" : "") + '"></i>';
-    html += '<div class="wkgrp"><div class="wkgh"><h2>' + WEEK_WORD[k].replace("&", "&amp;") + '</h2>' +
-            '<span class="num">' + (pk.got > pk.want ? pk.got + ' done \u00b7 ' + pk.want + ' planned' : pk.got + ' of ' + pk.want) +
-            '</span></div><div class="wkpips">' + pips + '</div>';
-    rows.forEach(function(x){
-      var v = weekItemView(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
-      v.pil = pillarOfItem(x.swapped ? { k:x.it.k, id:sessRef(x.done) } : x.it);
-      if(x.swapped){
-        var was = weekItemView(x.it).nm;
-        v.swap = "In place of " + was + (x.moved ? ", which moves to next week" : "");
-      }
-      var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
-      if(x.done){ html += doneRow(v, x.done, v.swap, false); return; }
-      html += '<div class="wkrow' + (x.done ? " done" : "") + '" style="--tint:' + v.tint + '">' +
-        '<button type="button" class="wkgo" data-go="' + x.i + '"' + (x.done ? ' disabled' : '') + '>' +
-          '<span class="wkic">' + v.ic(22) + '</span>' +
-          '<span class="wktx"><b>' + String(v.nm).replace(/&(?!amp;)/g, "&amp;") + '</b>' + pillarTag(v.pil) + '<span>' + (x.done ? doneWords(x.done) : v.sub) + '</span>' +
-            (v.swap ? '<span class="wkswap">' + v.swap.replace(/&(?!amp;)/g, "&amp;") + '</span>' : '') + '</span>' +
-          (x.done ? '<span class="wktick" aria-label="Done">✓</span>' : '<span class="wkstart">Start</span>') +
-        '</button>' +
-        (x.done ? '' : '<span class="wkacts">' +
-          (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
-          '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + String(v.nm).replace(/"/g, "") + ' from this week">×</button></span>') +
-      '</div>';
-    });
-    /* everything she did is on the page, not only what she planned: a fourth
-       session in a week of three is a row of its own */
-    st.extra.filter(function(s){ return sessKind(s) === k; }).forEach(function(s){
-      var ve = weekItemView({ k:k, id:sessRef(s) }); ve.pil = pillarOfItem({ k:k, id:sessRef(s) });
-      html += doneRow(ve, s, null, true);
-    });
-    html += '</div>';
+  var html = "";
+  if(st.paused) html += '<p class="wknote">This week is paused. Unpause it in Settings.</p>';
+
+  /* ---- suggested ---- */
+  var todo = "";
+  st.squad.forEach(function(q){
+    if(q.done) return;
+    var t = testById(q.id), sk = TILE[t.area] || TILE[10];
+    todo += todoRow('data-squad="' + q.id + '"', { nm:t.name, sub:"Squad test, every week", tint:sk.tint, ic:TICON[sk.ic] });
   });
-  if(!st.planned) html += '<p class="wknote">Nothing planned this week. Set your numbers in Settings.</p>';
+  st.coach.forEach(function(q, qi){
+    if(q.done) return;
+    var v = coachView(q.c), by = whoWord(q.c.byName, q.c.bySpec);
+    v.sub = "From your coach" + (by ? ", " + by : "");
+    todo += todoRow('data-coach="' + qi + '"', v);
+  });
+  st.rows.forEach(function(x){
+    if(x.done) return;
+    var v = weekItemView(x.it);
+    var canChange = !(x.it.k === "sc" && itemsOf(st.rec, "sc").length >= scIds().length);
+    var sub = x.it.k === "sc" ? "S&C" : x.it.k === "drill" ? "Drill" : "Core session";
+    if(x.it.carried) sub += ", moved on from last week";
+    v.sub = sub;
+    todo += todoRow('data-go="' + x.i + '"', v,
+      '<span class="wkacts">' + (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
+      '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + esc(v.nm).replace(/"/g, "") + ' from this week">×</button></span>');
+  });
+  html += '<div class="wkgrp"><div class="wkgh"><h2>Suggested</h2></div>' +
+    (todo || '<p class="wknote">' + (st.planned ? 'Everything suggested this week is done.' : 'Nothing planned this week. Set your numbers in Settings.') + '</p>') + '</div>';
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
-    html += '<p class="wkundo">Removed ' + weekItemView(WEEK_UNDO.it).nm.replace(/&/g, "&amp;") + '. <button type="button" id="wkUndo">Undo</button></p>';
-  var n = st.rec ? st.rec.n : defaultNums();
-  html += '<div class="wkfoot"><span>' + (st.squad.length ? st.squad.length + ' squad \u00b7 ' : '') + (st.coach.length ? st.coach.length + ' coach \u00b7 ' : '') + n.main + ' core · ' + n.sc + ' S&amp;C · ' + n.drill + ' drills. Your numbers.</span>' +
-          '<button type="button" id="wkSet">Change in Settings</button>' +
-          '<button type="button" id="wkLog">Log play, coaching or practice</button></div>';
+    html += '<p class="wkundo">Removed ' + esc(weekItemView(WEEK_UNDO.it).nm) + '. <button type="button" id="wkUndo">Undo</button></p>';
+
+  /* ---- done ---- */
+  var list = weekDoneList(wk), done = "";
+  list.forEach(function(s){
+    var v = weekDoneView(s), live = s.status === "live";
+    var day = DOW3[new Date(s.date + "T12:00:00").getDay()];
+    var what = doneWords(s).replace(/^Done [^\u00b7]*(\u00b7 )?/, "");
+    if(live){
+      var la = area(s.areaId), got = la ? sgBallsLogged(s) : 0, want = la ? sgAreaBalls(la) : 0;
+      what = "Unfinished" + (got && want ? ", " + got + " of " + want + " balls" : "");
+    }
+    if(s.kind === "log") what = hrs(s.hours || 0) + " h";
+    var btn = live ? '<button type="button" class="wkres" data-resume="' + esc(s.id) + '">Resume</button>'
+            : canEditDone(s) ? '<button type="button" class="wked" data-edit="' + esc(s.id) + '">Edit</button>' : '';
+    done += '<div class="wkrow wkdonerow' + (live ? ' live' : '') + '" style="--tint:' + v.tint + '">' +
+      '<div class="wkgo"><span class="wkic">' + v.ic(22) + '</span>' +
+      '<span class="wktx"><b>' + esc(v.nm) + '</b><span>' + day + (what ? ' · ' + esc(what) : '') + '</span></span>' +
+      btn + '</div></div>';
+  });
+  html += '<div class="wkgrp"><div class="wkgh"><h2>Done this week</h2><span class="num">' + list.filter(function(s){ return s.status !== "live"; }).length + '</span></div>' +
+    (done || '<p class="wknote">Nothing yet.</p>') + '</div>';
+
+  /* tournaments, squad days and lessons this week */
+  if(typeof seasonWeekHtml === "function") html += seasonWeekHtml();
+  html += '<div class="wkfoot"><button type="button" id="wkLog">Log play, coaching or practice</button>' +
+          '<button type="button" id="wkSet">Change what is suggested</button></div>';
   host.innerHTML = html;
 
   host.onclick = function(e){
@@ -15815,9 +15841,16 @@ function renderWeek(){
     if(b.hasAttribute("data-go")){ var it = r.items[+b.getAttribute("data-go")]; if(it) weekOpen(it); return; }
     if(b.hasAttribute("data-rm")){ weekRemove(wk, +b.getAttribute("data-rm")); renderWeek(); paintBell(); return; }
     if(b.hasAttribute("data-chg")){ openWeekChange(wk, +b.getAttribute("data-chg")); return; }
+    var sid = b.getAttribute("data-resume") || b.getAttribute("data-edit");
+    if(sid){
+      var s = null; state.sessions.forEach(function(x){ if(x.id === sid) s = x; });
+      if(!s) return;
+      if(b.hasAttribute("data-resume")){ state.fromWeek = true; resumeDraft(s); } else editDone(s);
+    }
   };
   host.onchange = function(e){ if(typeof seasonWeekChange === "function") seasonWeekChange(e); };
 }
+
 /* A finished row: washed out, no button, and a word of credit. The words
    rotate by session so the page does not say the same thing five times. */
 var WELL_DONE = ["Completed. Well done!", "Done. Good work.", "In the bank. Nice one.", "Completed. That counts."];
