@@ -2244,7 +2244,9 @@
   body.rangeset:not(.showinfo) #viewSession .banner,
   body.rangeset:not(.showinfo) #viewSession #sessProg,
   body.rangeset:not(.showinfo) #viewSession #saveTick,
-  body.rangeset #navBack, body.rangeset #totalBar .tot{display:none}
+  body.rangeset #totalBar .tot{display:none}
+  body.rangeset #totalBar .nav{flex:1 1 0; justify-content:center; text-align:center}
+  body.rangeset #totalBar .totalin{gap:10px}
   body.rangeset:not(.showinfo) #viewSession #sessSeg{display:none}
   .homehd{display:flex; flex-direction:column; gap:2px; margin:26px 0 8px; padding-top:16px; border-top:2px solid var(--line-strong)}
   .homehd h2{margin:0; font-size:20px; font-weight:800}
@@ -2257,11 +2259,12 @@
   body.rangeset #viewSession #runBar{margin-top:14px}
   .focushd{display:flex; align-items:flex-start; gap:12px; margin:0 0 6px}
   .focushd .ftx{flex:1; min-width:0}
-  .focushd .fdist{font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.05; color:var(--ink)}
-  .focushd .fshot{font-size:26px; font-weight:700; color:var(--ink); margin-top:4px}
-  .focushd .fside{display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex:none}
+  .focushd .ftgt{font-size:22px; font-weight:700; letter-spacing:0; color:var(--ink-2); white-space:nowrap; margin-left:4px; vertical-align:middle}
+  .focushd .fdist{font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1.05; color:var(--ink)}
+  .focushd .fshot{font-size:23px; font-weight:700; color:var(--ink); margin-top:4px}
+  .focushd .fside{display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex:none; max-width:96px}
   .focushd .fside .rinfo{float:none !important; margin:0 !important}
-  .focushd .fside .vid{font-size:15px; padding:8px 14px}
+  .focushd .fside .vid{font-size:13px; padding:7px 10px}
   .nav.undo{background:var(--surface); border:1px solid var(--line-strong); color:var(--ink); font-weight:700}
   body.rangeset #totalBar .totalin{justify-content:space-between}
   body.rangeset #viewSession .pcard .set .tgt{font-size:15px; font-weight:500}
@@ -8112,7 +8115,21 @@ function focusText(set){
     else if(win && !/find the target/i.test(win.textContent)) shot += " · " + win.textContent;
     if(!m) shot = full.replace(/\.\s*Tap[^.]*\.?$/i, "").trim();
   }
-  return { dist:dist, shot:shot };
+  /* the target, in the units the picture's ruler uses */
+  var tgt = "", tl = set.querySelector(".shottally span"), tt = tl ? tl.textContent : "";
+  var tx = set.querySelector(".tgt") ? set.querySelector(".tgt").textContent : "";
+  var mp = /Inside (\d+) paces/i.exec(tt), mc = /(\d+)-?\s*yd corridor/i.exec(tx);
+  if(mp) tgt = "<" + mp[1] + " y";
+  else if(/corridor/i.test(tt)) tgt = mc ? mc[1] + " y wide" : "in the corridor";
+  else if(/two clubs/i.test(tt)) tgt = "<2 clubs";
+  else if(/one club/i.test(tt)) tgt = "<1 club";
+  if(!tgt && state.draft){
+    /* a windows or heights set counts the window first, but the ring it then
+       has to finish in is the area's own */
+    var fa = area(state.draft.areaId), fk = fa ? fsKind(fa) : null;
+    if(fk) tgt = "<" + fsPaces(fsScoreFt(fk)) + " y";
+  }
+  return { dist:dist, shot:shot, tgt:tgt };
 }
 function focusPaint(){
   var on = document.body.classList.contains("rangeset");
@@ -8126,7 +8143,7 @@ function focusPaint(){
       if(!hd){ hd = document.createElement("div"); hd.className = "focushd"; set.insertBefore(hd, set.firstChild); }
       var f = focusText(set);
       var scope = set.querySelector(".aimc");
-      hd.innerHTML = '<div class="ftx"><div class="fdist">' + f.dist + '</div><div class="fshot">' + f.shot + '</div></div><div class="fside"></div>';
+      hd.innerHTML = '<div class="ftx"><div class="fdist">' + f.dist + (f.tgt ? ' <span class="ftgt">' + f.tgt.replace(/</g, "&lt;") + '</span>' : '') + '</div><div class="fshot">' + f.shot + '</div></div><div class="fside"></div>';
       var side = hd.querySelector(".fside");
       if(RINFO) side.appendChild(RINFO);
       if(scope) side.appendChild(scope);
@@ -17065,8 +17082,23 @@ $("sessionBack").addEventListener("click", function(){
   else if(bk === "test"){ renderTests(); show("tests"); }
   else show("home");
 });
-$("navBack").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx-1); });
-$("navNext").addEventListener("click", function(){ if(state.deck) deckShow(state.deck.idx+1); });
+/* On a hitting page Back and Next step a shot at a time (28 Oct): Next to the
+   next shot, Back to the one before, and only past the last or first shot of
+   the set to the next or previous page. */
+function shotStep(dir){
+  if(!document.body.classList.contains("rangeset") || !state.deck) return false;
+  var card = state.deck.cards[state.deck.idx];
+  var chips = card ? card.querySelectorAll(".ballchip") : [];
+  if(!chips.length) return false;
+  var at = -1;
+  for(var i = 0; i < chips.length; i++) if(chips[i].classList.contains("now")) at = i;
+  var to = at + dir;
+  if(at < 0 || to < 0 || to >= chips.length) return false;
+  chips[to].click();
+  return true;
+}
+$("navBack").addEventListener("click", function(){ if(shotStep(-1)) return; if(state.deck) deckShow(state.deck.idx-1); });
+$("navNext").addEventListener("click", function(){ if(shotStep(1)) return; if(state.deck) deckShow(state.deck.idx+1); });
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
 $("gymBack").addEventListener("click", function(){ if(state.fromWeek){ show("week"); return; } renderSC(); show("sc"); });
