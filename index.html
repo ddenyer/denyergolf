@@ -2225,6 +2225,26 @@
   .cimport{border:1px dashed var(--line-strong); border-radius:10px; padding:14px;
     margin-top:6px; background:var(--surface-2)}
   .cimport p{margin:0 0 10px; font-size:13px; color:var(--ink-2); line-height:1.5}
+  /* ---- one set per page, always ---- */
+  .modebar{display:none !important}
+  /* ---- range mode: bright sun and fading light ---- */
+  .rinfo{display:none}
+  body.rangeset #viewSession .rinfo{display:flex; align-items:center; justify-content:center; float:right;
+    width:40px; height:40px; border-radius:50%; border:2px solid var(--ink); background:var(--surface);
+    color:var(--ink); font:800 20px/1 Georgia, serif; font-style:italic; margin:-6px 0 0 8px}
+  body.rangeset #viewSession .rinfo[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+  body.rangeset #viewSession{--muted:var(--ink); --ink-2:var(--ink)}
+  body.rangeset:not(.showinfo) #viewSession .shead,
+  body.rangeset:not(.showinfo) #viewSession .pcardhd b{display:none}
+  body.rangeset #viewSession .pcard .set .tgt{font-size:15px; font-weight:500}
+  body.rangeset #viewSession .set .lbl .vid{font-size:14px; letter-spacing:0; vertical-align:middle}
+  body.rangeset #viewSession .pcardhd{font-size:15px; font-weight:800}
+  body.rangeset #viewSession .pcard .set .lbl{font-size:34px; font-weight:800; line-height:1.05; letter-spacing:-.02em}
+  body.rangeset #viewSession .shotask{font-size:19px; font-weight:600; min-height:0; margin:8px 0 6px}
+  body.rangeset #viewSession .shotask b{font-weight:800}
+  body.rangeset #viewSession .shottally{font-size:18px; font-weight:600}
+  body.rangeset #viewSession .ballchip{width:48px; height:48px; font-size:19px; font-weight:700}
+  body.rangeset #viewSession .progtxt{font-size:15px; font-weight:600}
 </style>
 </head>
 <body>
@@ -2296,7 +2316,7 @@
     <div class="banner resume" id="weekResume" hidden>
       <span id="weekResumeText"></span>
       <span class="resacts">
-        <button id="weekResumeGo">Carry on</button>
+        <button id="weekResumeGo">Resume</button>
         <button id="weekResumeBank" class="ghost">Save as it is</button>
         <button id="weekResumeDrop" class="ghost">Discard</button>
       </span>
@@ -2316,7 +2336,7 @@
     <div class="banner resume" id="resumeBar" hidden>
       <span id="resumeText"></span>
       <span class="resacts">
-        <button id="resumeGo">Carry on</button>
+        <button id="resumeGo">Resume</button>
         <button id="resumeBank" class="ghost">Save as it is</button>
         <button id="resumeDrop" class="ghost">Discard</button>
       </span>
@@ -2329,6 +2349,7 @@
 
   <!-- SESSION -->
   <section id="viewSession" hidden>
+    <button type="button" class="rinfo" id="rangeInfo" aria-pressed="false" aria-label="Show the session title and date">i</button>
     <button class="backbtn" id="sessionBack">← All pillars</button>
     <div class="shead">
       <div>
@@ -2712,7 +2733,7 @@
       <span class="vs" id="totVs"></span>
     </div>
     <button class="nav next" id="navNext">Next →</button>
-    <button class="save" id="saveBtn">Save session</button>
+    <button class="save" id="saveBtn">Finish and save</button>
   </div>
 </div>
 
@@ -2809,7 +2830,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-11", note:"Core, Squad and Drills tabs; drills by pillar in three lengths, on your own or with a partner, each with a challenge" };
+var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger, darker type on the hitting pages" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -5634,7 +5655,7 @@ function loadLocal(){
        from another tab; the way in from disk did not. */
     if(o && Array.isArray(o.sessions)) state.sessions = o.sessions;
     else if(o && o.sessions) throw new Error("the stored history is not a list");
-    if(o && typeof o.cardMode === "boolean") state.cardMode = o.cardMode;
+    state.cardMode = true;   /* one set per page, always (28 Oct): the list mode stacked sets and kept Save on screen */
     if(o && o.drillPlace != null) state.drillPlace = +o.drillPlace;
     if(o && o.lib) state.lib = { practice:(o.lib.practice||[]), tests:(o.lib.tests||[]) };
     if(o && o.gone) state.gone = tombPrune(o.gone);
@@ -7871,6 +7892,7 @@ function deckShow(i){
   clearRest();
   var c = d.cards[d.idx];
   if(c._refresh) c._refresh();
+  rangeMark(c);
   var host = $(d.progId);
   /* The bar used to fill with the card she was looking at, so walking to the
      back of the deck without hitting anything read as nearly finished. It fills
@@ -7884,6 +7906,15 @@ function deckShow(i){
      dropped her on the areas, which reads as the button being broken rather
      than as a design decision. */
   pushCard(d.idx);
+}
+/* Range mode (28 Oct): on a page where she is hitting balls, the page carries
+   the shot, the target and the count, in large type, and nothing else. The
+   title, the date, the run boxes and the instructions are one tap away. */
+function rangeMark(c){
+  var on = state.view === "session" && !!(c && c.querySelector(".set"));
+  document.body.classList.toggle("rangeset", on);
+  document.body.classList.remove("showinfo");
+  var b = $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
 }
 function updateNav(){
   var d = state.deck, last = d ? (d.idx === d.cards.length-1) : true;
@@ -8089,7 +8120,7 @@ function resumeDraft(d){
      and she was always put back at the start. Twenty balls in, on a thirteen
      card deck, that is a lot of swiping to get back to where she stopped. */
   var wasAt = d.pos || 0;
-  if(typeof d.cardMode === "boolean") state.cardMode = d.cardMode;
+  state.cardMode = true;
   if(d.kind === "gym") openGym(d.gymId, d);
   else if(d.kind === "drill") openDrill(d.drillId || d.areaId, d);
   else openSession(d.areaId, d);
@@ -8338,6 +8369,7 @@ function renderSessSeg(areaId){
 }
 function renderSession(){
   var a = area(state.draft.areaId);
+  document.body.classList.remove("rangeset", "showinfo");
   /* The two matrices own their whole page: no set list, no paging, no running
      total in the bar, because none of those say anything about a gauntlet or a
      card. Everything they do need is drawn by their own builder. */
@@ -12230,7 +12262,7 @@ function updateTotal(){
     /* Saving half a matrix would put a meaningless row in her history, so the
        button stays shut until the thing is actually over. Forty five minutes
        saves a gauntlet by itself; a card is over when the last shot is in. */
-    $("saveBtn").textContent = fin ? "Save session" : "Not finished yet";
+    $("saveBtn").textContent = fin ? "Finish and save" : "Not finished yet";
     $("saveBtn").disabled = !fin;
     saveDraft();
     return;
@@ -12241,7 +12273,7 @@ function updateTotal(){
     $("totFig").textContent = String(p9.total);
     $("totOf").textContent = "attempts";
     $("totVs").innerHTML = p9.made + "/9 done";
-    $("saveBtn").textContent = "Save session";
+    $("saveBtn").textContent = "Finish and save";
     $("saveBtn").disabled = false;
     saveDraft();
     return;
@@ -12270,7 +12302,7 @@ function updateTotal(){
     $("totVs").innerHTML = "";
   }
   renderRun();
-  $("saveBtn").textContent = "Save session";
+  $("saveBtn").textContent = "Finish and save";
   $("saveBtn").disabled = false;
   saveDraft();
 }
@@ -12731,7 +12763,7 @@ function updateGym(){
   $("totVs").innerHTML = ready
     ? '<b style="color:var(--up)">'+ready+' at the top of the range</b><br>add load next time'
     : (anyLoad ? "set the weight, then complete" : "complete each one as you go");
-  $("saveBtn").textContent = "Save session";
+  $("saveBtn").textContent = "Finish and save";
   $("saveBtn").disabled = false;
   saveDraft();
 }
@@ -12758,8 +12790,25 @@ var RSTATS = [
   {id:"x3",    label:"Three putts",          note:"Or worse",                    max:6}
 ];
 /* ---------- save ---------- */
+/* A session with no pages (Perfect 9, putting SGx18) has the save button on
+   screen the whole time, so a stray tap must not end it. The first tap only
+   asks; a second within four seconds saves. */
+var saveArmT = null;
+function saveArmed(){
+  if(state.view !== "session" || state.deck) return true;
+  var a = area(state.draft && state.draft.areaId);
+  if(isMatrix(a)) return true;          // its button stays shut until it is over
+  var b = $("saveBtn");
+  if(b.dataset.armed === "1"){ b.dataset.armed = ""; clearTimeout(saveArmT); return true; }
+  b.dataset.armed = "1"; var was = b.textContent;
+  b.textContent = "Tap again to finish";
+  clearTimeout(saveArmT);
+  saveArmT = setTimeout(function(){ b.dataset.armed = ""; if(b.textContent === "Tap again to finish") b.textContent = was; }, 4000);
+  return false;
+}
 function saveCurrent(){
   var s;
+  if(!saveArmed()) return;
   if(state.view==="session"){
     s = state.draft;
     // an empty session is almost always a mis-tap on save, not a real session
@@ -16665,6 +16714,10 @@ $("sessMode").addEventListener("click", function(){ state.cardMode = !state.card
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
 $("gymBack").addEventListener("click", function(){ if(state.fromWeek){ show("week"); return; } renderSC(); show("sc"); });
 $("saveBtn").addEventListener("click", saveCurrent);
+$("rangeInfo").addEventListener("click", function(){
+  var on = document.body.classList.toggle("showinfo");
+  this.setAttribute("aria-pressed", on ? "true" : "false");
+});
 $("playerName").addEventListener("change", function(){
   var p = state.players.filter(function(x){ return x.id===state.activePlayer; })[0];
   if(p){ p.name = $("playerName").value.trim() || "Player"; seedByName(p); saveEdit(); render(); }
