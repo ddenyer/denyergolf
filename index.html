@@ -2253,6 +2253,41 @@
   .wkres{background:var(--accent-fill); border:1px solid var(--accent-fill); color:#fff}
   .wkdonerow.live{border-color:var(--accent)}
   .streakpanel{margin-bottom:14px}
+  /* ---- S&C: one page per exercise ---- */
+  body.gymset #viewGym .shead, body.gymset #viewGym #gymSeg{display:none}
+  .expg{display:flex; flex-direction:column; align-items:center; gap:9px; text-align:center; padding:4px 0 6px}
+  .expgpic{width:132px; height:132px; color:var(--ink)}
+  .expgpic svg, .expgmini svg{width:100%; height:100%; display:block}
+  .expgnm{font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.1; margin:0}
+  .expgjob{font-size:19px; font-weight:600; margin:0; color:var(--ink)}
+  .expgnote{font-size:14px; color:var(--ink-2); margin:0; max-width:34ch}
+  .expgitems{display:flex; flex-direction:column; gap:6px; width:100%; text-align:left}
+  .expgitems div{display:grid; grid-template-columns:64px 1fr; grid-template-rows:auto auto; column-gap:12px; align-items:center;
+    border:1px solid var(--line); border-radius:12px; padding:6px 10px}
+  .expgmini{grid-row:1 / 3; width:64px; height:64px; color:var(--ink)}
+  .expgitems b{font-size:17px; font-weight:700; align-self:end}
+  .expgitems em{font-style:normal; font-size:15px; color:var(--ink-2); align-self:start}
+  .expgstep{display:flex; flex-direction:column; align-items:center; gap:6px}
+  .expgstep .lab{font-size:12.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-2)}
+  .expgstep .row{display:flex; align-items:center; gap:16px}
+  .expgstep button{width:54px; height:54px; border-radius:14px; border:2px solid var(--ink); background:var(--surface);
+    color:var(--ink); font-size:30px; font-weight:700; line-height:1}
+  .expgstep b{font-size:32px; font-weight:800; min-width:120px; font-variant-numeric:tabular-nums}
+  .expglast{font-size:14px; color:var(--ink-2); margin:0}
+  .expgdone{width:100%; padding:16px; border-radius:14px; font:inherit; font-size:20px; font-weight:800;
+    background:var(--accent-fill); color:#fff; border:2px solid var(--accent-fill); margin-top:4px}
+  .expgdone[data-done="1"]{background:var(--surface-2); color:var(--ink); border-color:var(--ink)}
+  .expgvid{margin:0; font-size:13px}
+  /* ---- matrix clock and the UpGame score ---- */
+  .mxclockset{display:flex; flex-direction:column; align-items:center; gap:6px; margin:6px 0 12px}
+  .mxclockset .lab{font-size:12.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-2)}
+  .mxclockset .row{display:flex; align-items:center; gap:16px}
+  .mxclockset button{width:50px; height:50px; border-radius:12px; border:2px solid var(--ink); background:var(--surface); color:var(--ink); font-size:26px; font-weight:700}
+  .mxclockset b{font-size:28px; font-weight:800; min-width:110px; text-align:center; font-variant-numeric:tabular-nums}
+  .mxclockset .note{font-size:12.5px; color:var(--ink-2)}
+  .ugscore{margin:10px 0 0; padding:10px 12px; border:2px solid var(--ink); border-radius:12px; font-size:15px; font-weight:600; color:var(--ink)}
+  .ugscore b{font-size:26px; font-weight:800; margin:0 6px}
+  .ugscore span{color:var(--ink-2); font-weight:500}
 </style>
 </head>
 <body>
@@ -2412,7 +2447,7 @@
        question is where to go rather than what to do. -->
   <section id="viewDrills" hidden>
     <h1>Drills</h1>
-    <p class="lede">Drills by pillar, on top of the core sessions. Each comes in three lengths, and most have a challenge, the pressure version, at the top.</p>
+    <p class="lede">One matrix for each pillar, on the Watson matrix rules: five in a row, one miss and you start again, against the clock. Then the drills you can do at home.</p>
     <div id="drillWhere"></div>
     <div id="drillList"></div>
   </section>
@@ -2838,7 +2873,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume" };
+var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume; S&C A and B in five parts, one page per exercise with drawings that need no signal; a matrix for each pillar, its clock adjustable, with the UpGame score at the end; club drills shelved, their history kept" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -3337,59 +3372,69 @@ var GOLFPREP = [
   ["First tee only: countermovement jump, a minute before the opening drive","3","3u1uz8ghdk0"]
 ];
 var NEW_INTRO = "Two sessions a week, A and B, the same two every week: only the weights change. "+
-  "Warm up 7 min, power 7, strength 19, finisher 7. Every set stops one or two reps short of failure. "+
-  "When every set of a lift reaches 8 reps, add weight next time and work back up from 6.";
-var NEW_TIP = "Short on time: drop the fourth lower-body set first, then the finisher. The warm up, the power pairs "+
+  "Five parts, about 35 minutes: a. cardio warm up 4 min, b. dynamic stretches 4 min, c. jumps and med ball 6 min, d. weights 18 min, e. a hold 3 min. "+
+  "Every set stops one or two reps short of failure. When every set of a lift reaches 8 reps, add weight next time and work back up from 6.";
+var NEW_TIP = "Short on time: drop the fourth set of the first lift, then the split squats or RDLs. The warm up, the jumps and throws "+
   "and three rounds of the circuit always stay. Tournament or exam week: two rounds of the circuit, or one session "+
   "if only one fits. Not the evening after a hard squash match.";
 
+/* Line drawings for the S&C pages, drawn in currentColor so they follow the theme
+   and need no signal: they are part of the page, not a download. */
+var GYMPIC = {"bike": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><path d=\"M60 180 L175 180\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><circle cx=\"150\" cy=\"150\" r=\"26\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" opacity=\".6\"/><path d=\"M88 122 L98 180\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M150 150 L142 92\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M78 120 L98 120\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"127\" cy=\"40\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M90 114 L118 60\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M90 114 L128 120 L136 160 L150 162\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M118 64 L134 82 L146 92\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "hip9090": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"100\" cy=\"58\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M100 76 L100 150\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 152 L150 176 L126 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 152 L52 176 L38 150\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 90 L124 122 L140 160\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 90 L76 122 L62 160\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "slreach": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"150\" cy=\"84\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M136 94 L98 112\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M98 112 L104 150 L100 186 L118 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M98 112 L62 120 L28 126\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M134 98 L166 108 L194 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "pogo": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"100\" cy=\"30\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M100 48 L100 108\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 108 L97 144 L98 174 L112 176\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 108 L104 144 L103 174 L117 176\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 62 L90 88 L86 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 62 L110 88 L114 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M58 170 L58 138\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M62.8 146.8 L58 138 L53.2 146.8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M142 170 L142 138\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M146.8 146.8 L142 138 L137.2 146.8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/></svg>", "deadbug": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"30\" cy=\"158\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M48 162 L124 162\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M60 160 L64 128 L66 98\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M60 160 L44 128 L22 114\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M124 162 L124 120 L156 120\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M124 162 L160 160 L192 164\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "birddog": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"156\" cy=\"94\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M136 104 L72 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M134 106 L132 140 L132 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M136 104 L164 104 L190 100\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M72 110 L72 170 L40 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M72 110 L42 108 L12 104\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "cmj": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"100\" cy=\"34\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M100 52 L100 108\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 108 L96 146 L100 170 L114 172\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 108 L106 146 L108 170 L122 172\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 58 L124 40 L128 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 58 L76 40 L72 14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M150 176 L150 130\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M154.8 138.8 L150 130 L145.2 138.8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/></svg>", "scoop": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"110\" cy=\"40\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M106 58 L94 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M94 110 L126 148 L142 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M94 110 L72 148 L56 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M104 66 L128 94 L150 102\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M104 66 L122 98 L146 104\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"164\" cy=\"100\" r=\"12\" fill=\"currentColor\" opacity=\".85\"/><path d=\"M150 76 L186 52\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M181.4 60.9 L186 52 L176.0 52.9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/></svg>", "latbound": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"118\" cy=\"38\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M114 56 L102 106\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102 106 L120 146 L122 186 L138 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M102 106 L74 128 L56 152\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M112 64 L136 84 L146 102\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M112 64 L88 80 L76 98\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M30 40 L74 40\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M65.2 44.8 L74 40 L65.2 35.2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/></svg>", "chestpass": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"98\" cy=\"40\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M96 58 L90 110\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M90 110 L116 148 L126 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M90 110 L70 148 L58 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M96 66 L124 72 L148 70\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M96 66 L122 78 L148 74\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"170\" cy=\"70\" r=\"12\" fill=\"currentColor\" opacity=\".85\"/><path d=\"M150 48 L190 48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/><path d=\"M181.2 52.8 L190 48 L181.2 43.2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".6\"/></svg>", "trapbar": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"150\" cy=\"70\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M134 82 L84 118\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M84 118 L116 144 L106 186 L126 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M128 88 L128 120 L126 150\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M60 152 L180 152\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"54\" y=\"132\" width=\"12\" height=\"40\" rx=\"3\" fill=\"currentColor\" opacity=\".85\"/><rect x=\"174\" y=\"132\" width=\"12\" height=\"40\" rx=\"3\" fill=\"currentColor\" opacity=\".85\"/></svg>", "bench": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><rect x=\"36\" y=\"140\" width=\"128\" height=\"10\" rx=\"3\" fill=\"currentColor\" opacity=\".45\"/><path d=\"M60 150 L60 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><path d=\"M140 150 L140 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><circle cx=\"34\" cy=\"124\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M52 132 L126 134\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M126 134 L150 118 L160 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M58 132 L52 104 L60 74\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"46\" y=\"63\" width=\"28\" height=\"10\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/></svg>", "row": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><path d=\"M50 180 L150 104\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><path d=\"M92 148 L92 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><circle cx=\"156\" cy=\"92\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M138 104 L80 146\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80 146 L62 168 L44 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M132 108 L110 96 L120 140\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"106\" y=\"141\" width=\"28\" height=\"10\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/></svg>", "splitsquat": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><rect x=\"16\" y=\"138\" width=\"46\" height=\"10\" rx=\"3\" fill=\"currentColor\" opacity=\".45\"/><path d=\"M26 148 L26 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><path d=\"M52 148 L52 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".45\"/><circle cx=\"100\" cy=\"46\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M98 64 L96 118\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M96 118 L132 140 L128 186 L146 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M96 118 L86 168 L50 136\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M98 72 L102 98 L104 122\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"99\" y=\"118\" width=\"10\" height=\"28\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/></svg>", "goblet": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"112\" cy=\"42\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M108 60 L88 124\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M88 124 L140 132 L130 186 L152 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M106 72 L132 96 L124 78\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"121\" y=\"58\" width=\"10\" height=\"28\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/></svg>", "press": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"98\" cy=\"60\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M96 78 L94 130\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M94 130 L132 132 L132 186 L148 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M94 130 L86 186 L50 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M98 84 L122 64 L122 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"108\" y=\"21\" width=\"28\" height=\"10\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/><path d=\"M96 86 L84 108 L80 130\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "chinup": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M40 18 L160 18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"50\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M100 68 L100 128\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 128 L108 160 L90 176\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 128 L96 162 L80 174\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 72 L76 52 L86 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 72 L124 52 L114 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 18 L100 40\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-dasharray=\"6 6\" opacity=\".6\"/><path d=\"M100 128 L104 160\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-dasharray=\"6 6\" opacity=\".6\"/></svg>", "rdl": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"166\" cy=\"94\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M150 104 L92 126\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M92 126 L102 158 L96 186 L120 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M146 108 L144 164\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"130\" y=\"165\" width=\"28\" height=\"10\" rx=\"4\" fill=\"currentColor\" opacity=\".85\"/></svg>", "sideplank": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><circle cx=\"30\" cy=\"138\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M46 146 L118 166 L186 184\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M46 148 L44 186 L70 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 146 L50 112 L54 84\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "pallof": "<svg viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path d=\"M10 188 L190 188\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\".5\"/><rect x=\"14\" y=\"30\" width=\"10\" height=\"158\" rx=\"3\" fill=\"currentColor\" opacity=\".45\"/><path d=\"M24 96 L176 100\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-dasharray=\"8 6\" opacity=\".6\"/><circle cx=\"100\" cy=\"40\" r=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\"/><path d=\"M100 58 L100 124\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 124 L86 158 L80 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 124 L116 158 L124 186\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M100 72 L140 98 L180 100\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>"};
 var GYM = [
 { id:9, name:"Session A", lift:"Trap bar · bench · row", grp:"new",
-  intro:NEW_INTRO, tip:NEW_TIP, prep:NEWPREP, blocks:[
-  {name:"Power", note:"7 min. Jump, then throw, then 60 s. Three rounds. Stick every landing for 2 s", ex:[
-    {id:"p1", name:"Countermovement jump", vid:"3u1uz8ghdk0", pre:"3 × 3", tgt:3, sets:3,
-     cue:"Maximum height, land and hold 2 s, knees over toes", rest:"straight into the throw"},
-    {id:"p2", name:"MB rotational scoop throw", vid:"mxf1D3NtxMo", pre:"3 × 3 / side", tgt:3, sets:3,
-     load:true, unit:"kg", kit:"ball", cue:"3 kg, maximum intent", rest:"60 s",
-     alt:"Band rotational chop, fast", altVid:"0AHBdvW5iaM"}]},
-  {name:"Strength", note:"19 min. A circuit: trap bar, bench, row, 45–60 s between each. Three rounds, then the fourth trap bar set on its own", ex:[
-    {id:"c", name:"Trap-bar deadlift", vid:"ZnIMOgVCOKI", pre:"4 × 6–8", tgt:8, top:8, sets:4,
-     load:true, unit:"kg", kit:"bar", ramp:[[0.6,5],[0.8,3]], cue:"Stop one or two reps short of failure", rest:"45–60 s, then the bench",
-     prog:true, key:true, alt:"DB Romanian deadlift, until the empty bar is manageable for 8", altVid:"IJdUtnxAmNo"},
-    {id:"s1", name:"DB bench press", vid:"WLTU1j7Ur8M", pre:"3 × 6–8", tgt:8, top:8, sets:3,
-     load:true, unit:"kg", kit:"db", cue:"Stop one or two reps short of failure", rest:"45–60 s, then the row", prog:true},
-    {id:"s2", name:"Chest-supported row", vid:"LuWGKt8B_7o", pre:"3 × 6–8", tgt:8, top:8, sets:3,
-     load:true, unit:"kg", kit:"db", cue:"Pause at the chest", rest:"45–60 s, then back to the trap bar", prog:true}]},
-  {name:"Finisher", note:"7 min. Split squat, then Nordics, then 60 s. Two rounds", ex:[
-    {id:"f1", name:"Rear-foot elevated split squat", vid:"tcEAeBjSkHI", pre:"2 × 6–8 / side", tgt:8, top:8, sets:2,
-     load:true, unit:"kg", kit:"db", cue:"Dumbbells, front knee over the toes", rest:"straight into the Nordics", prog:true},
-    {id:"f2", name:"Nordic curl (eccentric only)", vid:"F-AaE8mw_pY", pre:"2 × 3–5", tgt:5, top:5, sets:2,
-     cue:"Slowest lower possible", rest:"60 s", prog:true,
-     alt:"Towel or slider hamstring curl", altVid:"p-V7uBUHeLc"}]}
+  intro:NEW_INTRO, tip:NEW_TIP, blocks:[
+  {name:"a. Cardio warm up", ex:[
+    {id:"wc", name:"Bike or rower", pic:"bike", job:"4 minutes, easy building to brisk", sets:0, warm:true}]},
+  {name:"b. Dynamic stretches", ex:[
+    {id:"ws", name:"Dynamic stretches", job:"4 minutes, keep moving", sets:0, warm:true, items:[
+      ["90/90 hip switch", "5 each side", "hip9090"],
+      ["Single-leg reach", "3 each way, each leg", "slreach"],
+      ["Pogo jumps", "2 × 10, small and quick", "pogo"],
+      ["Dead bug", "2 × 8 each side", "deadbug"]]}]},
+  {name:"c. Jumps and med ball", note:"Jump, then throw, then 60 s rest. Three rounds. Hold every landing 2 s.", ex:[
+    {id:"p1", name:"Countermovement jump", pic:"cmj", vid:"3u1uz8ghdk0", pre:"3 × 3", job:"3 sets of 3", tgt:3, sets:3},
+    {id:"p2", name:"Med ball rotational throw", pic:"scoop", vid:"mxf1D3NtxMo", pre:"3 × 3 / side", job:"3 sets of 3 each side", tgt:3, sets:3,
+     load:true, unit:"kg", kit:"ball"}]},
+  {name:"d. Weights", note:"Trap bar, bench, row as a circuit, 45 to 60 s between each. Three rounds, then the split squats.", ex:[
+    {id:"c", name:"Trap-bar deadlift", pic:"trapbar", vid:"ZnIMOgVCOKI", pre:"4 × 6–8", job:"4 sets of 6 to 8", tgt:8, top:8, sets:4,
+     load:true, unit:"kg", kit:"bar", prog:true, key:true},
+    {id:"s1", name:"Dumbbell bench press", pic:"bench", vid:"WLTU1j7Ur8M", pre:"3 × 6–8", job:"3 sets of 6 to 8", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", prog:true},
+    {id:"s2", name:"Chest-supported row", pic:"row", vid:"LuWGKt8B_7o", pre:"3 × 6–8", job:"3 sets of 6 to 8", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", prog:true},
+    {id:"f1", name:"Rear-foot elevated split squat", pic:"splitsquat", vid:"tcEAeBjSkHI", pre:"2 × 6–8 / side", job:"2 sets of 6 to 8 each leg", tgt:8, top:8, sets:2,
+     load:true, unit:"kg", kit:"db", prog:true}]},
+  {name:"e. A hold", ex:[
+    {id:"h1", name:"Side plank hold", pic:"sideplank", pre:"2 × 30 s / side", job:"2 holds of 30 s each side", tgt:30, sets:2, rep:"sec"}]}
 ] },
 
 { id:10, name:"Session B", lift:"Goblet squat · press · chin-up", grp:"new",
   intro:NEW_INTRO, tip:NEW_TIP+" When goblet squats with the heaviest dumbbell reach 8 comfortably, move to the bar or make the split squat the main lift.",
-  prep:NEWPREP, blocks:[
-  {name:"Power", note:"7 min. Bound, then throw, then 60 s. Three rounds. Stick every landing for 2 s", ex:[
-    {id:"p1", name:"Lateral bound, stick the landing", vid:"ofNjMK1Qf90", pre:"3 × 3 / side", tgt:3, sets:3,
-     cue:"Maximum distance, hold 2 s, knee over the toes", rest:"straight into the throw"},
-    {id:"p2", name:"MB chest pass", vid:"pJ8amgzbZMM", pre:"3 × 3", tgt:3, sets:3,
-     load:true, unit:"kg", kit:"ball", cue:"3–4 kg, as hard as you can from the chest", rest:"60 s"}]},
-  {name:"Strength", note:"19 min. A circuit: squat, press, chin-up, 45–60 s between each. Three rounds, then the fourth squat set on its own", ex:[
-    {id:"c", name:"Goblet squat", vid:"lRYBbchqxtI", pre:"4 × 6–8", tgt:8, top:8, sets:4,
-     load:true, unit:"kg", kit:"db", ramp:[[0.6,5]], cue:"Chest up, elbows inside the knees. Stop one or two short of failure", rest:"45–60 s, then the press",
-     prog:true, key:true},
-    {id:"s1", name:"Half-kneeling 1-arm DB press", vid:"7oeFpnRCJkY", pre:"3 × 6–8 / side", tgt:8, top:8, sets:3,
-     load:true, unit:"kg", kit:"db", cue:"Do not let the body twist", rest:"45–60 s, then the chin-up", prog:true},
-    {id:"s2", name:"Chin-up (banded assist)", vid:"6NoWVtcSUyI", pre:"3 × 6–8", tgt:8, top:8, sets:3,
-     load:true, unit:"kg", kit:"plate", cue:"Less band as you get stronger", rest:"45–60 s, then back to the squat", prog:true,
-     alt:"Single-arm DB row", altVid:"wi1k4tFbNUU"}]},
-  {name:"Finisher", note:"7 min. RDL, then Pallof, then 60 s. Two rounds", ex:[
-    {id:"f1", name:"Single-leg RDL", vid:"iS7atZhcRnw", pre:"2 × 6–8 / side", tgt:8, top:8, sets:2,
-     load:true, unit:"kg", kit:"db", cue:"One dumbbell, hips square", rest:"straight into the Pallof", prog:true},
-    {id:"f2", name:"Pallof press hold", vid:"HXrLaqNIkTs", pre:"2 × 30 s / side", tgt:30, sets:2, rep:"sec",
-     cue:"Hardest band, held still", rest:"60 s", alt:"Bring a band"}]}
+  blocks:[
+  {name:"a. Cardio warm up", ex:[
+    {id:"wc", name:"Bike or rower", pic:"bike", job:"4 minutes, easy building to brisk", sets:0, warm:true}]},
+  {name:"b. Dynamic stretches", ex:[
+    {id:"ws", name:"Dynamic stretches", job:"4 minutes, keep moving", sets:0, warm:true, items:[
+      ["90/90 hip switch", "5 each side", "hip9090"],
+      ["Single-leg reach", "3 each way, each leg", "slreach"],
+      ["Pogo jumps", "2 × 10, small and quick", "pogo"],
+      ["Bird dog", "2 × 8 each side", "birddog"]]}]},
+  {name:"c. Jumps and med ball", note:"Bound, then throw, then 60 s rest. Three rounds. Hold every landing 2 s.", ex:[
+    {id:"p1", name:"Lateral bound", pic:"latbound", vid:"ofNjMK1Qf90", pre:"3 × 3 / side", job:"3 sets of 3 each side", tgt:3, sets:3},
+    {id:"p2", name:"Med ball chest pass", pic:"chestpass", vid:"pJ8amgzbZMM", pre:"3 × 3", job:"3 sets of 3", tgt:3, sets:3,
+     load:true, unit:"kg", kit:"ball"}]},
+  {name:"d. Weights", note:"Squat, press, chin-up as a circuit, 45 to 60 s between each. Three rounds, then the RDLs.", ex:[
+    {id:"c", name:"Goblet squat", pic:"goblet", vid:"lRYBbchqxtI", pre:"4 × 6–8", job:"4 sets of 6 to 8", tgt:8, top:8, sets:4,
+     load:true, unit:"kg", kit:"db", prog:true, key:true},
+    {id:"s1", name:"Half-kneeling 1-arm press", pic:"press", vid:"7oeFpnRCJkY", pre:"3 × 6–8 / side", job:"3 sets of 6 to 8 each arm", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", prog:true},
+    {id:"s2", name:"Chin-up, band assisted", pic:"chinup", vid:"6NoWVtcSUyI", pre:"3 × 6–8", job:"3 sets of 6 to 8, less band as you get stronger", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"plate", loadWord:"Band or assist", prog:true},
+    {id:"r1", name:"Dumbbell Romanian deadlift", pic:"rdl", vid:"IJdUtnxAmNo", pre:"3 × 8", job:"3 sets of 8, both legs", tgt:8, top:8, sets:3,
+     load:true, unit:"kg", kit:"db", prog:true}]},
+  {name:"e. A hold", ex:[
+    {id:"f2", name:"Pallof press hold", pic:"pallof", vid:"HXrLaqNIkTs", pre:"2 × 30 s / side", job:"2 holds of 30 s each side", tgt:30, sets:2, rep:"sec"}]}
 ] },
 
 { id:1, name:"Session 1", lift:"Squat", blocks:[
@@ -4045,7 +4090,7 @@ var TESTS = [
    score; The Hundred produces a score and no time. Sharing a screen between
    them would have compromised both. */
 
-{ id:"t-watson", area:3, isTest:true, track:true, squad:true, shape:"gauntlet",
+{ id:"t-watson", area:3, isTest:true, track:true, squad:true, shape:"gauntlet", upgame:true,
   name:"The Watson matrix", sub:"Five in a row, one miss and you start again",
   why:"Set by John Watson to the England squad. Five short game shots that have to come off consecutively: miss any one of them and you go back to the first. Forty five minutes on the clock. It is the only test here that can be failed outright, and that is the point of it.",
   where:"Short game area", balls:0, target:10,
@@ -4463,6 +4508,48 @@ var DRILLS = [
   ],
   sets:[] },
 
+/* ============ the matrices (28 Oct) ============
+   One for each pillar, on the Watson matrix's rules: five stations in order,
+   one ball each unless the station says so, any miss back to station one, a
+   clock that counts down from 45 minutes and can be set from 15 to 60. What is
+   kept is the time, the attempts and how far each attempt got, so the station
+   that keeps breaking her shows. The putting one is David's, tried on 27 Oct. */
+MX("d-mx-putt", 4, 2, "Putting matrix", "Five putts in a row, one miss and you start again",
+   "Five putts that have to come off one after another: a holing putt, a long lag, a two-putt, four short ones, and a long two-putt across a big slope. Miss any one and you go back to the first.",
+   [["Eight foot putt", "Hole it."],
+    ["Long lag, about 20 paces", "Finish inside the marked square, about a putter length each side of the hole."],
+    ["Medium two-putt, about 25 feet", "Some break. Down in two."],
+    ["Four from three feet", "Four spots round the hole. All four holed in a row."],
+    ["Long two-putt, big slope", "40 feet or more across the biggest slope you can find. Down in two."]]),
+MX("d-mx-drive", 10, 0, "Driving matrix", "Five tee shots in a row, one miss and you start again",
+   "Driver and 3-wood into the same corridors as the tee shot session, then the shape called, then a narrower fairway. Miss any one and you go back to the first.",
+   [["Stock driver", "Into the 26 yard corridor, 13 yards each side of the line."],
+    ["3-wood", "Into the 23 yard corridor."],
+    ["Driver, called fade", "Starts on the left edge, finishes in the corridor."],
+    ["Driver, called draw", "Starts on the right edge, finishes in the corridor."],
+    ["Fairway finder", "Driver into an 18 yard corridor, 9 yards each side."]], {needs:"height"}),
+MX("d-mx-app", 11, 0, "Approach matrix", "Five irons in a row, one miss and you start again",
+   "Four distances and a number called at random, each with its own target from the approach session. Miss any one and you go back to the first.",
+   [["145 yards, stock", "On the green: inside 13 paces of the flag."],
+    ["165 yards, low", "Under your stock flight. Inside 13 paces."],
+    ["125 yards", "Inside 7 paces."],
+    ["185 yards", "Inside 13 paces."],
+    ["Called number", "The number is called, anything from 125 to 185. Inside 7 paces."]]),
+MX("d-mx-wedge", 2, 0, "Wedge matrix", "Five wedges in a row, one miss and you start again",
+   "Distance and height control from 30 to 90 yards, finishing on a called number. Miss any one and you go back to the first.",
+   [["70 yards, stock", "Inside 7 paces."],
+    ["50 yards, low", "Inside 7 paces."],
+    ["90 yards", "Inside 7 paces."],
+    ["30 yards, high", "Over the front edge. Inside 3 paces."],
+    ["Called number", "The number is called, anything from 30 to 90. Inside 4 paces."]]),
+MX("d-mx-short", 3, 1, "Short game matrix", "Five short game shots in a row, bunkers included",
+   "Sand, rough, a pitch over a bunker and an up and down, each inside two clubs (about 6 feet). Different from the Watson matrix, which has no bunker shot. Miss any one and you go back to the first.",
+   [["Bunker, good lie, 15 paces", "Out and inside two clubs."],
+    ["Chip from the rough, 15 paces", "Inside two clubs."],
+    ["Pitch over a bunker, 20 paces", "Short side. Inside two clubs."],
+    ["Bunker up and down, 20 paces", "Splash out, then hole the putt. Both, or it does not count."],
+    ["Downhill bunker lie, 10 paces", "On the green and inside three clubs."]]),
+
 /* ============ the challenges ============
    The pressure version of a drill: a run of stations that all have to come
    off in a row, against a clock, one miss and it starts again. They are
@@ -4532,6 +4619,15 @@ CH("c-app-number", "d-app-number", 11, 0, 20, "Five numbers, approach", "Five ir
     ["125 yards", "Level with the flag."], ["165 yards", "Level with the flag."], ["145 yards", "Level with the flag."]])
 ];
 
+/* A matrix, in one line: listed on its own, its clock set before the start. */
+function MX(id, ar, place, name, sub, why, st, extra){
+  var c = { id:id, area:ar, place:place, mins:45, shape:"gauntlet", matrix:true, upgame:true, clockSet:true,
+    name:name, sub:sub, why:why, where:DRILL_PLACES[place].nm, limit:45*60, balls:0, target:st.length,
+    ruleText:"All " + st.length + " in a row before the clock runs out: 45 minutes unless you change it. Any miss sends you back to station one. Recorded: the time, the number of attempts, and how far each attempt got.",
+    stations:st.map(function(x, i){ return { id:"s" + (i + 1), name:x[0], detail:x[1] }; }), sets:[] };
+  for(var k in (extra || {})) c[k] = extra[k];
+  return c;
+}
 /* A challenge, in one line. `of` is the family it belongs to. */
 function CH(id, of, ar, place, mins, name, sub, why, st, extra){
   var c = { id:id, area:ar, place:place, mins:mins, shape:"gauntlet", hidden:true, challengeOf:of,
@@ -4591,6 +4687,14 @@ function drillVariant(d, k){
   });
   return v;
 }
+/* Retired 28 Oct: the drills at the club, range, short game area and green,
+   gave way to one matrix for each pillar. They leave the lists and the week's
+   suggestions; every session run on them stays in her history and her hours,
+   and opens as it always did. The drills at home stay. */
+DRILLS.forEach(function(d){
+  if(d.matrix || d.hidden || d.challengeOf || drillPlace(d).zone !== 0) return;
+  d.hidden = true; d.shelved = true;   /* not "retired": that word marks an old scoring format */
+});
 DRILLS.slice().forEach(function(d){
   if(d.hidden || d.family || mxShape(d)) return;
   d.family = d.id; d.reps = 1;
@@ -4696,7 +4800,12 @@ function mmss(ms){
 
 /* ---- the gauntlet ---- */
 function gtN(a){ return (a.stations || []).length; }
-function gtLimit(a){ return (a.limit || 45*60) * 1000; }
+function gtLimit(a, d){
+  /* a matrix whose clock she set carries its own limit, so a run against 30
+     minutes reads as 30 minutes on the day and in her history */
+  var m = d && d.mx ? +d.mx.lim : 0;
+  return (m > 0 ? m : (a.limit || 45*60)) * 1000;
+}
 function gtDone(d){ return !!(d && d.mx && d.mx.end); }
 function gtComplete(a, d){
   var n = gtN(a), laps = (d && d.mx && d.mx.laps) || [];
@@ -4711,7 +4820,7 @@ function gtElapsed(a, d){
   if(mx.end) return mx.end;
   var ms = (mx.acc || 0) + (mx.since ? Date.now() - mx.since : 0);
   if(!(ms >= 0)) ms = 0;
-  return Math.min(ms, gtLimit(a));
+  return Math.min(ms, gtLimit(a, d));
 }
 function gtStarted(d){ return !!(d && d.mx && d.mx.first); }
 function gtRunning(d){ return !!(d && d.mx && d.mx.since && !d.mx.end); }
@@ -4854,7 +4963,7 @@ function mxTick(){
   var d = state.draft;
   var a = d ? area(d.areaId) : null;
   if(state.view !== "session" || !a || a.shape !== "gauntlet" || !gtRunning(d)){ mxStop(); return; }
-  var ms = gtElapsed(a, d), lim = gtLimit(a);
+  var ms = gtElapsed(a, d), lim = gtLimit(a, d);
   var el = $("mxClock");
   if(el){
     el.textContent = mmss(ms);
@@ -4870,13 +4979,13 @@ function mxTick(){
    one is a live session she can delete. */
 function gtTimeUp(a, d){
   if(!d || !d.mx || gtDone(d)) return;
-  d.mx.end = gtLimit(a);
+  d.mx.end = gtLimit(a, d);
   d.mx.endWall = Date.now();
   d.mx.since = 0;
   d.total = gtBest(d); d.max = gtN(a);
   try{ renderSession(); }catch(e){}
   try{ saveCurrent(); }catch(e){}
-  try{ setStatus(Math.round(gtLimit(a) / 60000) + " minutes. " + (a.isDrill ? "The challenge" : "The matrix") + " was saved as it stood."); }catch(e){}
+  try{ setStatus(Math.round(gtLimit(a, d) / 60000) + " minutes. " + (a.isDrill ? "The challenge" : "The matrix") + " was saved as it stood."); }catch(e){}
 }
 
 /* ---- the gauntlet page ---- */
@@ -4962,7 +5071,7 @@ function buildGauntlet(a){
     host.appendChild(pic);
   }
   var n = gtN(a), done = gtDone(d), won = gtComplete(a, d);
-  var ms = gtElapsed(a, d), lim = gtLimit(a);
+  var ms = gtElapsed(a, d), lim = gtLimit(a, d);
 
   /* The running clock is the whole top of the page while it is running, and
      gone once it stops: the result block below carries the final time, and two
@@ -5007,12 +5116,23 @@ function buildGauntlet(a){
   if(!done){
     var acts = document.createElement("div"); acts.className = "mxacts";
     if(!gtStarted(d)){
+      if(a.clockSet){
+        var cs = document.createElement("div"); cs.className = "mxclockset";
+        var cm = Math.round(gtLimit(a, d) / 60000);
+        cs.innerHTML = '<span class="lab">Clock</span><div class="row"><button type="button" id="mxLess" aria-label="Five minutes less">\u2212</button>' +
+          '<b>' + cm + ' min</b><button type="button" id="mxMore" aria-label="Five minutes more">+</button></div>' +
+          '<span class="note">Keep it at 45 for anything you enter in UpGame.</span>';
+        host.appendChild(cs);
+        var setLim = function(m){ d.mx.lim = Math.max(15, Math.min(60, m)) * 60; buildGauntlet(a); };
+        cs.querySelector("#mxLess").addEventListener("click", function(){ setLim(cm - 5); });
+        cs.querySelector("#mxMore").addEventListener("click", function(){ setLim(cm + 5); });
+      }
       acts.innerHTML = '<button type="button" class="mxgo wide" id="mxBegin">Start the clock</button>';
       host.appendChild(acts);
       var hint = document.createElement("p"); hint.className = "note mxpace";
       /* The wording used to say forty five whatever the limit was, which was true
          of the only matrix there was and a lie on the two that came after it. */
-      var mins = Math.round(gtLimit(a) / 60000);
+      var mins = Math.round(gtLimit(a, d) / 60000);
       hint.textContent = mins + " minutes from the moment you tap it, so stand over the "
         + "first " + (a.shape === "gauntlet" && a.home ? "putt" : "shot") + " before you do. "
         + "It keeps running if you lock the phone.";
@@ -5355,7 +5475,7 @@ function mxPastHtml(a, s){
 /* The result block, shared by the live page and the history view so a run
    cannot read one way on the day and another way a week later. */
 function gtResultHtml(a, d){
-  var n = gtN(a), won = gtComplete(a, d), ms = gtElapsed(a, d), lim = gtLimit(a);
+  var n = gtN(a), won = gtComplete(a, d), ms = gtElapsed(a, d), lim = gtLimit(a, d);
   var tries = gtLaps(d), prev = gtBestEver(a, d);
   var heldMs = gtPausedMs(a, d);
   /* Said on the result, not buried: a finish with twelve minutes of pauses in
@@ -5364,10 +5484,10 @@ function gtResultHtml(a, d){
   var heldLine = heldMs ? ' <span class="mxheld">Paused for '+mmss(heldMs)+'.</span>' : '';
   var h = '<div class="mxres '+(won ? "won" : "out")+'">';
   if(won){
-    h += '<p class="eyebrow">'+(a.isDrill ? "Challenge complete" : "Matrix complete")+'</p><div class="mxbig">'+mmss(ms)+'</div>'+
+    h += '<p class="eyebrow">'+(a.isDrill && !a.matrix ? "Challenge complete" : "Matrix complete")+'</p><div class="mxbig">'+mmss(ms)+'</div>'+
       '<p>'+tries+' '+(tries===1?"attempt":"attempts")+', and '+mmss(lim-ms)+' to spare.'+heldLine+'</p>'+
       '<p>'+(prev == null
-        ? (a.isDrill ? 'The first time she has got round. That time is the one to beat now.'
+        ? (a.isDrill || a.matrix ? 'The first time she has got round. That time is the one to beat now.'
                      : 'The first time she has finished it. Two current England players never have.')
         : (ms < prev ? 'A new best by '+mmss(prev-ms)+'. '+mmss(ms)+' is the time to beat now.'
                      : mmss(prev)+' is still the one to beat.'))+'</p>';
@@ -5377,7 +5497,12 @@ function gtResultHtml(a, d){
       tries+' '+(tries===1?"attempt":"attempts")+'.'+heldLine+'</p>'+
       '<p class="mxread">'+gtHonest(a, d)+'</p>';
   }
-  return h + '</div>';
+  h += '</div>';
+  if(a.upgame){
+    var ug = won ? Math.max(1, Math.ceil(ms / 60000)) : Math.round(lim / 60000);
+    h += '<p class="ugscore">UpGame score <b>' + ug + '</b> <span>minutes' + (won ? ' to pass' : ', the full clock, as it was not passed') + '</span></p>';
+  }
+  return h;
 }
 /* Not finishing this is the normal outcome and needs saying, or a test set to
    an England squad reads as a personal failure every time she runs it. */
@@ -7201,6 +7326,12 @@ function drillBest(d){
   }
   if(best === null) return null;
   var at = best.d.reps > 1 ? " at " + drillBallsN(best.d) + " " + drillUnit(best.d) : "";
+  if(d.matrix){
+    var bt = null;
+    runs.forEach(function(r){ if(gtComplete(d, r) && r.mx && r.mx.end && (bt == null || r.mx.end < bt)) bt = r.mx.end; });
+    if(bt != null) return { big:mmss(bt), small:"best time to pass" };
+    return { big:String(best.v) + " of " + gtN(d), small:"furthest so far" };
+  }
   if(isMatrix(d)) return { big:String(best.v), small:"best lap" };
   if(isSG(d)) return { big:fmtSG(best.v), small:"strokes, your best" + at };
   return { big:best.v + " of " + (best.s.max || areaMax(best.d)), small:"your best" };
@@ -7921,6 +8052,7 @@ function deckShow(i){
 function rangeMark(c){
   var on = state.view === "session" && !!(c && c.querySelector(".set"));
   document.body.classList.toggle("rangeset", on);
+  document.body.classList.toggle("gymset", state.view === "gym" && !!(c && c.querySelector(".expg")));
   document.body.classList.remove("showinfo");
   var b = $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
 }
@@ -8226,8 +8358,8 @@ function openSession(areaId, resume){
        back to a session reading nine hours. Close it out where it actually
        ended instead of pretending it is still live. */
     if(a.shape === "gauntlet" && !gtDone(state.draft) && gtStarted(state.draft) &&
-       gtElapsed(a, state.draft) >= gtLimit(a)){
-      state.draft.mx.end = gtLimit(a);
+       gtElapsed(a, state.draft) >= gtLimit(a, state.draft)){
+      state.draft.mx.end = gtLimit(a, state.draft);
       state.draft.mx.endWall = Date.now();
       state.draft.mx.since = 0;
       state.draft.total = gtBest(state.draft);
@@ -9832,8 +9964,9 @@ function placingBlock(a, sess){
         ' (' + (gap > 0 ? '+' : '') + gap.toFixed(1) + ').</p>';
     }
   }
+  var ugLine = '<p class="ugscore">UpGame score <b>'+t.in_+'</b> <span>'+(full ? 'of '+t.n : 'so far, of '+spec.n)+' on target</span></p>';
   return '<div class="placing">'+
-    '<span class="eyebrow">The test</span>'+
+    '<span class="eyebrow">The test</span>'+ ugLine +
     '<div class="plbig"><b>'+t.in_+'</b><span>of '+t.n+' '+
       (spec.bullP ? 'inside two clubs' : (areaShape(a) === 'clock' ? 'holed on the clock' : 'inside the circle'))+'</span></div>'+
     (full
@@ -12399,7 +12532,7 @@ function hideRunBar(){ if($("runBar")) $("runBar").hidden = true; }
 function renderGym(){
   hideRunBar();
   var g = gym(state.gymDraft.gymId);
-  var last = gymSessions(g.id).slice(-1)[0];
+  var last = gymSessions(g.id).filter(function(x){ return x.id !== state.gymDraft.id; }).slice(-1)[0];
   stashNotes();
   $("gymMode").textContent = state.cardMode ? "Show all exercises" : "One at a time";
   if(state.cardMode) buildGymCards(g, last); else buildGymList(g, last);
@@ -12424,9 +12557,7 @@ function gymIntro(){
   if(g.grp === "new"){
     d.innerHTML =
       '<div class="targets" style="margin-top:0"><span class="eyebrow">How it runs</span><span>'+g.intro+'</span></div>'+
-      '<details class="prepbox" id="prepBox" open><summary>Warm up <span>every session \u00b7 7 min</span></summary>'+
-      '<p class="note" style="margin:8px 0 0">Warm first, then land. Knee over the second toe on every landing and every stop. Move through the range, do not hold a stretch.</p>'+
-      '<div id="prepList"></div></details>'+
+      '<p class="note" style="margin-top:12px">One page for each exercise: the weight, how many, then Done. Knee over the second toe on every landing.</p>'+
       (g.tip ? '<p class="note" style="margin-top:12px"><b>'+g.tip+'</b></p>' : '');
     return d;
   }
@@ -12453,6 +12584,89 @@ function gymIntro(){
     (gym(state.gymDraft.gymId).tip ? '<p class="note" style="margin-top:12px"><b>'+gym(state.gymDraft.gymId).tip+'</b></p>' : '');
   return d;
 }
+/* ---- S&C, one page per exercise (28 Oct) ----
+   The picture, the job, the weight, how many, Done. The weight starts at
+   last time's and steps along the kit she actually has; how many starts at the
+   target and only moves if she fell short. It saves one line per exercise. */
+function exPage(e, last, note){
+  var d = state.gymDraft.ex[e.id];
+  var lv = last && last.ex ? last.ex[e.id] : null;
+  var row = document.createElement("div"); row.className = "expg";
+  var pic = GYMPIC[e.pic] ? '<div class="expgpic">' + GYMPIC[e.pic] + '</div>' : '';
+  var items = "";
+  if(e.items){
+    items = '<div class="expgitems">' + e.items.map(function(x){
+      return '<div><span class="expgmini">' + (GYMPIC[x[2]] || '') + '</span><b>' + x[0] + '</b><em>' + x[1] + '</em></div>';
+    }).join("") + '</div>';
+  }
+  row.innerHTML = pic + '<h3 class="expgnm">' + e.name + '</h3>' +
+    '<p class="expgjob">' + (e.job || e.pre || "") + '</p>' + items +
+    (note ? '<p class="expgnote">' + note + '</p>' : '');
+
+  var ladder = KIT[e.kit] || KIT.db;
+  function loadNow(){ return d.load != null ? d.load : (lv && lv.load != null ? lv.load : null); }
+  function repsNow(){ return d.reps != null ? d.reps : e.tgt; }
+  function stepper(label, get, minus, plus, fmt){
+    var w = document.createElement("div"); w.className = "expgstep";
+    w.innerHTML = '<span class="lab">' + label + '</span><div class="row">' +
+      '<button type="button" aria-label="Less">−</button><b></b><button type="button" aria-label="More">+</button></div>';
+    var bs = w.querySelectorAll("button"), out = w.querySelector("b");
+    function paint(){ out.textContent = fmt(get()); }
+    bs[0].addEventListener("click", function(){ minus(); paint(); updateGym(); });
+    bs[1].addEventListener("click", function(){ plus(); paint(); updateGym(); });
+    paint();
+    return w;
+  }
+  if(e.load){
+    row.appendChild(stepper(e.loadWord || "Weight", loadNow, function(){
+      var v = loadNow(); if(v == null) return;
+      var i = nearestIx(ladder, v); d.load = i > 0 ? ladder[i - 1] : ladder[0];
+    }, function(){
+      var v = loadNow(); if(v == null){ d.load = ladder[0]; return; }
+      var i = nearestIx(ladder, v); d.load = ladder[Math.min(ladder.length - 1, ladder[i] > v ? i : i + 1)];
+    }, function(v){ return v == null ? "– " + (e.unit || "kg") : kgText(v) + " " + (e.unit || "kg"); }));
+  }
+  if(!e.warm && e.tgt){
+    var unit = e.rep === "sec" ? " s" : "", step = e.rep === "sec" ? 5 : 1;
+    var each = /\/ side/.test(e.pre || "") ? " each side" : "";
+    row.appendChild(stepper("How many" + (e.rep === "sec" ? ", seconds" : "") + each, repsNow,
+      function(){ d.reps = Math.max(0, repsNow() - step); },
+      function(){ d.reps = repsNow() + step; },
+      function(v){ return v + unit; }));
+  }
+  if(lv && (lv.load || lv.done) && !e.warm){
+    var lt = document.createElement("p"); lt.className = "expglast";
+    lt.textContent = "Last time: " + (lv.load ? kgText(lv.load) + " " + (e.unit || "kg") : "") +
+      (lv.reps != null ? (lv.load ? " × " : "") + lv.reps + (e.rep === "sec" ? " s" : "") : "") +
+      (!lv.load && lv.reps == null ? (lv.done ? "done" : "not done") : "");
+    row.appendChild(lt);
+  }
+  var done = document.createElement("button"); done.type = "button"; done.className = "expgdone";
+  function paintDone(){ done.setAttribute("data-done", d.done ? "1" : "0"); done.textContent = d.done ? "✓ Done" : "Done"; }
+  done.addEventListener("click", function(){
+    d.done = !d.done;
+    if(d.done){
+      if(e.load && d.load == null && loadNow() != null) d.load = loadNow();
+      if(!e.warm && e.tgt && d.reps == null) d.reps = repsNow();
+    }
+    paintDone(); updateGym();
+    if(d.done && state.deck) deckShow(state.deck.idx + 1);
+  });
+  paintDone();
+  row.appendChild(done);
+  if(e.vid){
+    var vw = document.createElement("p"); vw.className = "expgvid";
+    vw.innerHTML = vidChip(e.vid, e.name, "Watch the video (needs signal)");
+    row.appendChild(vw);
+  }
+  return row;
+}
+function nearestIx(lad, v){
+  var best = 0, bd = Infinity;
+  for(var i = 0; i < lad.length; i++){ var dd = Math.abs(lad[i] - v); if(dd < bd - 1e-9){ bd = dd; best = i; } }
+  return best;
+}
+
 function buildGymCards(g, last){
   var host = $("gymCards"); host.innerHTML = "";
   var cards = [], flat = [];
@@ -12460,7 +12674,14 @@ function buildGymCards(g, last){
 
   cards.push(pcard('Before you start<b>'+g.name+' · '+g.lift+'</b>', gymIntro()));
 
-  flat.forEach(function(x, i){
+  if(g.grp === "new"){
+    flat.forEach(function(x){
+      var k = x.b.ex.indexOf(x.e);
+      var body = document.createElement("div");
+      body.appendChild(exPage(x.e, last, k === 0 ? x.b.note : ""));
+      cards.push(pcard(x.b.name + (x.b.ex.length > 1 ? ' · ' + (k + 1) + ' of ' + x.b.ex.length : ''), body));
+    });
+  } else flat.forEach(function(x, i){
     var body = document.createElement("div");
     body.appendChild(exRow(x.e, last));
     if(x.b.note){
@@ -12486,7 +12707,7 @@ function renderGymReview(host, g, flat){
   flat.forEach(function(x, i){
     var v = d.ex[x.e.id] || {};
     rows += '<div class="rvrow'+(v.done?'':' miss')+'" data-go="'+(i+1)+'">'+
-            '<span>'+x.e.name+'</span><b>'+(v.load ? v.load+" kg · " : "")+
+            '<span>'+x.e.name+'</span><b>'+(v.load ? kgText(v.load)+" kg"+(v.reps != null ? " \u00d7 "+v.reps : "")+" · " : (v.reps != null ? v.reps+(x.e.rep === "sec" ? " s" : "")+" · " : ""))+
             (v.done ? "done" : "not done")+'</b></div>';
   });
   var ready = [];
@@ -12729,7 +12950,8 @@ function exRow(e, last){
 function isReady(e){
   if(!e.prog) return false;
   var d = state.gymDraft.ex[e.id];
-  return !!(d && d.done);
+  if(!(d && d.done)) return false;
+  return d.reps == null || d.reps >= (e.top || e.tgt || 0);
 }
 function markReady(scope, e){
   var host = scope.querySelector ? scope.querySelector('[data-flag]') : null;
@@ -12770,7 +12992,7 @@ function updateGym(){
   g.blocks.forEach(function(b){ b.ex.forEach(function(e){ if(e.load) anyLoad = true; }); });
   $("totVs").innerHTML = ready
     ? '<b style="color:var(--up)">'+ready+' at the top of the range</b><br>add load next time'
-    : (anyLoad ? "set the weight, then complete" : "complete each one as you go");
+    : (g.grp === "new" ? "tap Done on each one" : anyLoad ? "set the weight, then complete" : "complete each one as you go");
   $("saveBtn").textContent = "Finish and save";
   $("saveBtn").disabled = false;
   saveDraft();
@@ -14277,7 +14499,7 @@ function sessMins(s){
     var d = drillById(s.drillId); base = (d && d.mins) || 20;
     if(d && d.family && s.pair) base = base * 4 / 3;     /* taking turns */
     /* a challenge, like the Watson matrix, counts the time on its clock and a warm-up */
-    if(d && d.shape === "gauntlet" && s.mx && +s.mx.end > 0) base = Math.min(+s.mx.end, gtLimit(d)) / 60000 + 10;
+    if(d && d.shape === "gauntlet" && s.mx && +s.mx.end > 0) base = Math.min(+s.mx.end, gtLimit(d, s)) / 60000 + 10;
   } else if(s.kind === "test"){
     var t = testById(s.testId);
     /* the Watson matrix has its own clock: the time it actually took, plus the warm-up */
@@ -15221,7 +15443,7 @@ var WEEK_FROM  = "2026-09-28";
 var SC_IDS     = [9, 10];
 /* The coach picks the S&C programme: the new two (A and B) or the extended
    three (Sessions 1, 2 and 3). Either way they take turns. */
-var SC_PROGS = { "new":{ ids:[9, 10], nm:"New S&C", sub:"about 40 minutes", turn:"A and B take turns, never the same one twice running" },
+var SC_PROGS = { "new":{ ids:[9, 10], nm:"New S&C", sub:"about 35 minutes", turn:"A and B take turns, never the same one twice running" },
                  "ext":{ ids:[1, 2, 3], nm:"Extended S&C", sub:"the longer programme", turn:"Sessions 1, 2 and 3 take turns, in order" } };
 function scProg(p){ p = p || playerObj(); return SC_PROGS[(p && p.scProg) || "new"] || SC_PROGS["new"]; }
 function scIds(){ return scProg().ids; }
@@ -15741,7 +15963,9 @@ function weekDoneView(s){
    score. A logged round or lesson has no screen to open. */
 function canEditDone(s){
   if(!s || s.kind === "log") return false;
-  if(s.kind === "gym") return !!gymOf(s.gymId);
+  /* an S&C session scored against an older layout of A or B would be
+     re-counted against the new one, so it is not reopened */
+  if(s.kind === "gym") return !!gymOf(s.gymId) && s.max === gymSets(gymOf(s.gymId));
   var a = area(s.areaId);
   return !!a && !isMatrix(a);
 }
