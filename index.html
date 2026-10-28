@@ -2242,7 +2242,6 @@
   body.rangeset:not(.showinfo) #viewSession .shottally,
   body.rangeset:not(.showinfo) #viewSession .shotacts,
   body.rangeset:not(.showinfo) #viewSession .banner,
-  body.rangeset:not(.showinfo) #viewSession #runBar,
   body.rangeset:not(.showinfo) #viewSession #sessProg,
   body.rangeset:not(.showinfo) #viewSession #saveTick,
   body.rangeset #navBack, body.rangeset #totalBar .tot{display:none}
@@ -2250,12 +2249,19 @@
   .homehd{display:flex; flex-direction:column; gap:2px; margin:26px 0 8px; padding-top:16px; border-top:2px solid var(--line-strong)}
   .homehd h2{margin:0; font-size:20px; font-weight:800}
   .homehd span{font-size:13px; color:var(--ink-2)}
-  body.rangeset.showinfo #viewSession .focushd{display:none}
-  .focushd{display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; margin:0 0 6px}
-  .focushd .fdist{flex:1 1 100%; font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.05; color:var(--ink)}
-  .focushd .fshot{font-size:26px; font-weight:700; color:var(--ink)}
-  .focushd .fscope{margin-left:auto}
-  .focushd .fscope .vid{font-size:15px; padding:8px 14px}
+  body.rangeset:not(.showinfo) #viewSession .rose .fsfoot,
+  body.rangeset:not(.showinfo) #viewSession .rose .fsmiss,
+  body.rangeset:not(.showinfo) #viewSession .rose .sgmiss,
+  body.rangeset:not(.showinfo) #viewSession .rose .lpgalab,
+  body.rangeset:not(.showinfo) #viewSession .rose line.sgfield{display:none}
+  body.rangeset #viewSession #runBar{margin-top:14px}
+  .focushd{display:flex; align-items:flex-start; gap:12px; margin:0 0 6px}
+  .focushd .ftx{flex:1; min-width:0}
+  .focushd .fdist{font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.05; color:var(--ink)}
+  .focushd .fshot{font-size:26px; font-weight:700; color:var(--ink); margin-top:4px}
+  .focushd .fside{display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex:none}
+  .focushd .fside .rinfo{float:none !important; margin:0 !important}
+  .focushd .fside .vid{font-size:15px; padding:8px 14px}
   .nav.undo{background:var(--surface); border:1px solid var(--line-strong); color:var(--ink); font-weight:700}
   body.rangeset #totalBar .totalin{justify-content:space-between}
   body.rangeset #viewSession .pcard .set .tgt{font-size:15px; font-weight:500}
@@ -8084,7 +8090,7 @@ function deckShow(i){
    instructions, the ball chips, the tally, the run boxes and the score) is one
    tap away behind the i. The picture and the way a ball is scored do not
    change. A tap on the picture records the shot and the counter moves on. */
-var FOCUS_OBS = null;
+var FOCUS_OBS = null, RINFO = null;
 function focusText(set){
   var lbl = set.querySelector(".lbl"), ask = set.querySelector(".shotask");
   var raw = lbl ? Array.prototype.map.call(lbl.childNodes, function(n){ return n.nodeType === 3 ? n.textContent : ""; }).join("").trim() : "";
@@ -8112,6 +8118,7 @@ function focusPaint(){
   var on = document.body.classList.contains("rangeset");
   var card = state.deck ? state.deck.cards[state.deck.idx] : null;
   if(FOCUS_OBS) FOCUS_OBS.disconnect();
+  if(!RINFO) RINFO = $("rangeInfo");     // held here: a repaint detaches it from the page
   if(on && card){
     Array.prototype.forEach.call(card.querySelectorAll(".set.shotset, .set"), function(set){
       if(!set.querySelector(".shotask")) return;
@@ -8119,12 +8126,22 @@ function focusPaint(){
       if(!hd){ hd = document.createElement("div"); hd.className = "focushd"; set.insertBefore(hd, set.firstChild); }
       var f = focusText(set);
       var scope = set.querySelector(".aimc");
-      hd.innerHTML = '<div class="fdist">' + f.dist + '</div><div class="fshot">' + f.shot + '</div>';
-      if(scope){ var sw = document.createElement("div"); sw.className = "fscope"; sw.appendChild(scope); hd.appendChild(sw); }
+      hd.innerHTML = '<div class="ftx"><div class="fdist">' + f.dist + '</div><div class="fshot">' + f.shot + '</div></div><div class="fside"></div>';
+      var side = hd.querySelector(".fside");
+      if(RINFO) side.appendChild(RINFO);
+      if(scope) side.appendChild(scope);
     });
     var u = card.querySelector(".shotacts button");
     if($("navUndo")) $("navUndo").hidden = !u;
   } else if($("navUndo")) $("navUndo").hidden = true;
+  /* the three run boxes: under the card on a hitting page, at the top otherwise */
+  var rb = $("runBar"), sc = $("sessCards");
+  if(rb && sc){
+    if(on && rb.nextElementSibling !== sc.nextElementSibling && sc.nextSibling !== rb) sc.parentNode.insertBefore(rb, sc.nextSibling);
+    if(!on && rb.nextElementSibling !== sc) sc.parentNode.insertBefore(rb, sc);
+  }
+  if(!on && RINFO && $("sessionBack") && RINFO.parentNode !== $("sessionBack").parentNode)
+    $("sessionBack").parentNode.insertBefore(RINFO, $("sessionBack"));
   if(!FOCUS_OBS && window.MutationObserver) FOCUS_OBS = new MutationObserver(function(){ requestAnimationFrame(focusPaint); });
   if(FOCUS_OBS && $("sessCards")) FOCUS_OBS.observe($("sessCards"), { childList:true, subtree:true, characterData:true });
 }
@@ -8134,7 +8151,7 @@ function rangeMark(c){
   document.body.classList.toggle("rangeset", on);
   document.body.classList.toggle("gymset", state.view === "gym" && !!(c && c.querySelector(".expg")));
   document.body.classList.remove("showinfo");
-  var b = $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
+  var b = RINFO || $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
   focusPaint();
 }
 function updateNav(){
@@ -10664,8 +10681,8 @@ function roseSvg(centreLabel, tappable, bull, quads, dist, sgSet, fs){
     if(fr){
       var ly = CY + fr;
       out += '<line class="sgfield" x1="'+CX+'" y1="'+f1(ly)+'" x2="'+SGC.endX+'" y2="'+f1(ly)+'"></line>'+
-             '<text x="'+SGC.tx+'" y="'+f1(ly-3)+'">LPGA</text>'+
-             '<text class="up" x="'+SGC.tx+'" y="'+f1(ly+10)+'">average</text>';
+             '<text class="lpgalab" x="'+SGC.tx+'" y="'+f1(ly-3)+'">LPGA</text>'+
+             '<text class="up lpgalab" x="'+SGC.tx+'" y="'+f1(ly+10)+'">average</text>';
     }
     /* The feet, once, at the bottom. They are not on the rings because the column
        has no room for them, but she needs them: the string she measures with is
