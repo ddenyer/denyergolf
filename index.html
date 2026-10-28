@@ -2319,6 +2319,110 @@
   .ugscore{margin:10px 0 0; padding:10px 12px; border:2px solid var(--ink); border-radius:12px; font-size:15px; font-weight:600; color:var(--ink)}
   .ugscore b{font-size:26px; font-weight:800; margin:0 6px}
   .ugscore span{color:var(--ink-2); font-weight:500}
+  /* ---- one menu, a slim header (28 Oct) ---- */
+  nav.lookrow{display:none !important}
+  #tabTests, #tabDrills{display:none !important}
+  .brand{font-size:14px; color:var(--ink-2)}
+  .brandrow{align-items:center; flex-wrap:nowrap}
+  .topin{padding:8px 16px 8px}
+  .mebtn{width:34px; height:34px; border-radius:999px; border:0; background:var(--ink); color:var(--bg);
+    font:700 15px/1 Figtree, "Helvetica Neue", Arial, sans-serif; display:grid; place-items:center; padding:0}
+  .memenu{position:absolute; right:12px; top:52px; z-index:70; background:var(--surface); border:1px solid var(--line-strong);
+    border-radius:14px; padding:10px; box-shadow:0 14px 34px rgba(0,0,0,.18); display:flex; flex-direction:column; gap:6px; min-width:240px}
+  .memenu .player{border:1px solid var(--line-strong)}
+  .meitem{font:inherit; font-size:15px; font-weight:600; text-align:left; background:var(--surface-2); color:var(--ink);
+    border:0; border-radius:10px; padding:12px 12px; min-height:44px}
+  .savedot{font:inherit; font-size:12px; font-weight:700; color:#fff; background:var(--flag); border:0; border-radius:999px; padding:6px 10px}
+  .segnav{display:flex; gap:4px; background:var(--surface-2); border-radius:12px; padding:4px; margin:0 0 14px}
+  .segnav button{flex:1 1 0; font:inherit; font-size:14px; font-weight:600; color:var(--ink-2); background:transparent;
+    border:0; border-radius:9px; padding:9px 4px; min-height:40px}
+  .segnav button[aria-selected="true"]{background:var(--surface); color:var(--ink); font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  #viewHistory .pgswitch, #viewGoals .pgswitch{display:none}
+  #yourData{margin-top:18px}
+  /* ---- green for go, red only for problems (28 Oct) ---- */
+  :root{--accent:#1f6b45; --accent-fill:#1f6b45; --accent-wash:#e8f1ec}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--accent:#5cc28a; --accent-fill:#3fa56f; --accent-wash:#16291f} }
+  :root[data-theme="dark"]{--accent:#5cc28a; --accent-fill:#3fa56f; --accent-wash:#16291f}
+  /* ---- the praise: a strip at the top, clear of the target ---- */
+  .runflash{top:calc(env(safe-area-inset-top, 0px) + 10px); left:12px; right:12px; transform:none; max-width:none !important;
+    text-align:left; padding:10px 14px; border-radius:12px}
+  .runflash b{display:inline; font-size:18px !important}
+  .runflash .star{display:inline; font-size:18px; margin-right:6px}
+  .runflash .sub{display:block; font-size:13px}
+  .runflash.go{animation:stripin .25s ease-out both}
+  @keyframes stripin{ from{ transform:translateY(-12px); opacity:0 } to{ transform:none; opacity:1 } }
+  /* ---- the run boxes, one line on a hitting page ---- */
+  body.rangeset #viewSession #runBar{display:flex; gap:6px; margin-top:10px}
+  body.rangeset #viewSession #runBar .runbox{flex:1; display:flex; flex-direction:row; align-items:baseline; justify-content:center; gap:6px; padding:8px 6px; min-height:0}
+  body.rangeset #viewSession #runBar .runbox b{font-size:20px}
+  body.rangeset #viewSession #runBar .runbox span{font-size:11px}
+  /* ---- the session card heading says the pillar once, in the title ---- */
+  #viewSession .pcardhd b, #viewGym .pcardhd b{display:none}
+  /* ---- tap targets ---- */
+  .wkacts button{min-height:44px; min-width:44px}
+  /* ---- Ready and Finish ---- */
+  body.sessready #viewSession #runBar, body.sessready #viewSession #sessProg, body.sessready #totalBar{display:none}
+  body.sessdeep #viewSession #sessDate{display:none}
+  .readypg{display:flex; flex-direction:column; gap:14px}
+  .rdmeta{margin:0; font-size:17px; font-weight:600; color:var(--ink-2)}
+  .rdcond{border:1px solid var(--line-strong); border-radius:14px; padding:12px 14px}
+  .rdcondhd{display:flex; justify-content:space-between; align-items:center}
+  .rdcondhd b{font-size:16px; color:var(--ink)}
+  .rdlink{font:inherit; font-size:15px; font-weight:700; color:var(--accent); background:none; border:0; padding:8px 4px; min-height:40px}
+  .rdcondsum{margin:4px 0 0; font-size:15px; color:var(--ink)}
+  .rdstart{font:inherit; font-size:20px; font-weight:800; color:#fff; background:var(--accent-fill); border:0; border-radius:14px; padding:16px; min-height:56px}
+  details.fold{margin-top:12px; border-top:1px solid var(--line); padding-top:6px}
+  details.fold > summary{cursor:pointer; list-style:none; font-size:14px; font-weight:700; color:var(--ink-2); padding:10px 0}
+  details.fold > summary::-webkit-details-marker{display:none}
+  details.fold > summary::before{content:"\25b8  "; color:var(--muted)}
+  details.fold[open] > summary::before{content:"\25be  "}
+  .finish .fnkicker{margin:0; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2)}
+  .finish .fnbig{font-size:64px; font-weight:800; letter-spacing:-.03em; line-height:1; margin-top:8px; color:var(--ink)}
+  .finish .fnsub{margin:2px 0 8px; font-size:15px; color:var(--ink-2)}
+  .finish .fnline{margin:4px 0; font-size:17px; color:var(--ink)}
+  .finish .fnbest{margin:10px 0 0; display:inline-block; font-size:15px; font-weight:800; color:var(--accent); background:var(--accent-wash); border-radius:999px; padding:6px 12px}
+  .finish .notes{margin-top:16px !important}
+  .finish details .ugscore{display:none}
+  /* ---- This week: up next and a count ---- */
+  .wkcount{margin:6px 0 12px}
+  .wkcount span{font-size:14px; color:var(--ink-2)}
+  .wkcount b{color:var(--ink)}
+  .wkbar{height:8px; border-radius:4px; background:var(--surface-2); margin-top:6px; overflow:hidden}
+  .wkbar i{display:block; height:100%; background:var(--accent-fill); border-radius:4px}
+  .wkplan{display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; font:inherit; text-align:left;
+    background:var(--surface); border:2px solid var(--ink); border-radius:14px; padding:12px 14px; margin:0 0 12px; color:var(--ink)}
+  .wkplan b{font-size:16px} .wkplan span{font-size:13px; color:var(--ink-2)}
+  .wkupnext{border:2px solid var(--accent-fill); background:var(--accent-wash); border-radius:16px; padding:12px 14px 14px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px}
+  .wkupl{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--accent)}
+  .wkuprow{display:flex; align-items:center; gap:12px}
+  .wkuprow .wktx b{font-size:20px}
+  .wkupgo{font:inherit; font-size:18px; font-weight:800; color:#fff; background:var(--accent-fill); border:0; border-radius:12px; padding:13px; min-height:50px}
+  .wkmore{flex:none; font:inherit; font-size:20px; line-height:1; color:var(--ink-2); background:transparent; border:0; min-width:44px; min-height:44px}
+  .wkrow:not(.open) .wkacts, .wkupnext:not(.open) .wkacts{display:none !important}
+  .wkupacts{display:flex; gap:8px; border:0 !important}
+  /* ---- Progress headline and pillar cards ---- */
+  .phnums{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:6px 0 12px}
+  .phnums div{background:var(--surface-2); border-radius:12px; padding:12px 10px; display:flex; flex-direction:column; gap:2px}
+  .phnums b{font-size:26px; font-weight:800; letter-spacing:-.02em; color:var(--ink)}
+  .phnums span{font-size:12.5px; color:var(--ink-2); line-height:1.25}
+  .pcards{display:flex; flex-direction:column; gap:8px}
+  .pcardp{display:grid; grid-template-columns:1fr 92px; grid-template-rows:auto auto; align-items:center; column-gap:10px;
+    font:inherit; text-align:left; background:var(--surface); color:var(--ink); border:1px solid var(--line-strong); border-radius:14px; padding:12px 14px; min-height:60px}
+  .pcardp .pcn{font-size:16px; font-weight:700}
+  .pcardp .pcp{grid-row:2; font-size:14px; color:var(--ink-2)}
+  .pcardp .pcp b{color:var(--ink)}
+  .pcardp svg{grid-row:1 / 3; grid-column:2; width:90px; height:30px; color:var(--accent)}
+  .phnote{font-size:12.5px; color:var(--ink-2); margin:8px 0 16px}
+  /* ---- S&C more ---- */
+  details.scmore{margin-top:18px}
+  /* ---- the app's own question ---- */
+  .asksheet{position:fixed; inset:0; z-index:90; background:rgba(0,0,0,.42); display:flex; align-items:flex-end; justify-content:center; padding:16px}
+  .askbox{width:100%; max-width:480px; background:var(--surface); color:var(--ink); border-radius:18px; padding:20px 18px calc(16px + env(safe-area-inset-bottom, 0px)); box-shadow:0 20px 50px rgba(0,0,0,.3)}
+  .askbox p{margin:0 0 16px; font-size:19px; font-weight:700; line-height:1.3}
+  .askacts{display:flex; gap:10px}
+  .askacts button{flex:1; font:inherit; font-size:17px; font-weight:800; border-radius:12px; padding:14px; min-height:52px}
+  .askno{background:var(--surface); color:var(--ink); border:2px solid var(--ink)}
+  .askyes{background:var(--accent-fill); color:#fff; border:2px solid var(--accent-fill)}
 </style>
 </head>
 <body>
@@ -2349,10 +2453,16 @@
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6c-3.6 0-6.2 2.8-6.2 6.4v3.6L4 15.9v1.3h16v-1.3l-1.8-3.3V9c0-3.6-2.6-6.4-6.2-6.4zM9.6 18.6a2.4 2.4 0 0 0 4.8 0z"/></svg>
           <span class="belldot" id="bellDot" hidden>0</span>
         </button>
-        <div class="player">
-          <input id="playerName" aria-label="Player name" value="Player 1" autocomplete="off">
-          <button id="playerSwitch" title="Switch player" aria-label="Switch player">⇄</button>
-          <button class="coachlink" id="coachLink" type="button">Coach</button>
+        <button type="button" id="saveDot" class="savedot" hidden aria-label="Not saved: open Your data in Settings">Not saved</button>
+        <button type="button" id="meBtn" class="mebtn" aria-label="Your menu: name, settings, coach view" aria-haspopup="true">?</button>
+        <div class="memenu" id="meMenu" hidden>
+          <div class="player">
+            <input id="playerName" aria-label="Player name" value="Player 1" autocomplete="off">
+            <button id="playerSwitch" title="Switch player" aria-label="Switch player">⇄</button>
+            <button class="coachlink" id="coachLink" type="button">Coach</button>
+          </div>
+          <button type="button" class="meitem" id="meSettings">Settings</button>
+          <button type="button" class="meitem" id="meData">Your data: back up and export</button>
         </div>
       </div>
     </div>
@@ -2370,11 +2480,13 @@
      is the only part one hand reaches without shifting grip, and Practice,
      S&C and Tests are what she came to do several times a week. -->
 <nav class="tabs" role="tablist" aria-label="Practise">
-  <button id="tabWeek" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path><path d="m8.4 15.6 2.4 2.3 4.8-4.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>This week</span></button>
-  <button id="tabPractice" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Core</span></button>
+  <button id="tabWeek" role="tab" aria-selected="true"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.2" width="18" height="15.8" rx="2.7" fill="none" stroke="currentColor" stroke-width="2.1"></rect><path d="M3.8 9.4h16.4v2.4H3.8z" fill="currentColor"></path><path d="M7.1 2.6h2.2v4.2H7.1zM14.7 2.6h2.2v4.2h-2.2z" fill="currentColor"></path><path d="m8.4 15.6 2.4 2.3 4.8-4.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Today</span></button>
+  <button id="tabPractice" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.9"></rect><rect x="13" y="3" width="8" height="8" rx="1.9"></rect><rect x="3" y="13" width="8" height="8" rx="1.9"></rect><rect x="13" y="13" width="8" height="8" rx="1.9"></rect></svg><span>Practice</span></button>
   <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Squad</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
   <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Drills</span></button>
+  <button id="tabProg" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"></path><path d="M6 17v-5"></path><path d="M11 17V8"></path><path d="M16 17v-7"></path><path d="m5 8.5 5-4 5 3 5-4"></path></svg><span>Progress</span></button>
+  <button id="tabCal" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="4.8" width="17.2" height="15.8" rx="2.6"></rect><path d="M3.4 9.6h17.2"></path><path d="M8 2.8v4"></path><path d="M16 2.8v4"></path></svg><span>Calendar</span></button>
 </nav>
 
 
@@ -2488,8 +2600,8 @@
     <p class="lede">The gym and everything that goes with it. Two sessions a week, a warm up before every one, and the same warm up before squash.</p>
     <div class="grouphd"><b>The programme</b><span>twice a week</span></div>
     <div class="tilegrid" id="scTiles"></div>
-    <div class="grouphd"><b>Alongside it</b><span>as and when</span></div>
-    <div class="arealist" id="scList"></div>
+    <details class="fold scmore"><summary>More sessions: warm-ups, speed sticks, band, older programmes</summary>
+    <div class="arealist" id="scList"></div></details>
   </section>
 
   <section id="viewBench" hidden>
@@ -2527,23 +2639,16 @@
 
   <!-- HISTORY -->
   <section id="viewSessions" hidden>
-    <h1>Sessions</h1>
-    <p class="lede">Every session she has logged. Tap one to open it.</p>
-    <div id="storeLine"></div>
+    <h1>History</h1>
+    <p class="lede">Every session she has logged, week by week. Tap one to open it.</p>
     <div id="histList"></div>
-    <div class="tools">
-      <button id="exportCsv">Export CSV</button>
-      <button id="exportJson">Export my data</button>
-      <button id="copySummary">Copy summary</button>
-    </div>
     <p class="status" id="status"></p>
   </section>
 
   <section id="viewHistory" hidden>
     <div class="pgswitch" role="tablist" aria-label="Goals or progress"><button type="button" role="tab" data-pg="goals">Goals</button><button type="button" role="tab" data-pg="progress">Progress</button></div>
     <h1>Progress</h1>
-    <p class="lede">What the practice says about the goals, where the misses lean, and how each pillar is moving.</p>
-
+    <div id="progHead"></div>
     <div id="diseCard"></div>
     <div id="goalProg"></div>
 
@@ -2605,6 +2710,13 @@
     <div class="eyebrow" id="setWho"></div>
     <h1>Settings</h1>
     <div id="setBody"></div>
+    <div class="panel" id="yourData"><h2>Your data</h2><div id="storeLine"></div>
+      <div class="tools">
+        <button id="exportCsv">Export CSV</button>
+        <button id="exportJson">Export my data</button>
+        <button id="copySummary">Copy summary</button>
+      </div>
+    </div>
   </section>
 
   <!-- COACH -->
@@ -2905,7 +3017,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-28", note:"One set per page always; Finish and save only on the last page; larger type on the hitting pages; This week is a suggested list then what is done, with Edit and Resume; S&C A and B in five parts, one page per exercise with drawings that need no signal; a matrix for each pillar, its clock adjustable, with the UpGame score at the end; club drills shelved, their history kept; one shot per screen (distance, shot, Scope, Undo, Next); home drills in their own section" };
+var BUILD = { on:"2026-10-28", note:"Design review: one menu of five tabs, slim header, green for go and red for problems, a Ready screen and a Finish screen, Up next on Today, Progress by pillar, History by week, long text behind How this works, swipe between shots" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -6825,10 +6937,11 @@ function show(view){
      back to half strength so a glance says which way she moved last. */
   var inDo = ["tabWeek","tabPractice","tabSC","tabTests","tabDrills"].some(function(id){
     return $(id) && $(id).getAttribute("aria-selected") === "true"; });
-  if(barEl) barEl.classList.toggle("dim", !inDo);
+  if(barEl) barEl.classList.toggle("dim", false);
   if(lookEl) lookEl.classList.toggle("dim", inDo);
   if(lookEl) lookEl.hidden = (view==="session" || view==="gym");
   renderTestPip();
+  segPaint(view);
   pushView(view);
   if(view!=="session" && view!=="gym"){
     state.deck = null; clearRest();
@@ -6836,6 +6949,8 @@ function show(view){
     if(fl && !fl.hidden){ clearTimeout(fl.__t); fl.hidden = true; }   // the star does not follow you out
   }
   updateNav();
+  /* the page classes for the card on screen, now that the view is set */
+  if((view === "session" || view === "gym") && state.deck) rangeMark(state.deck.cards[state.deck.idx]);
   window.scrollTo(0,0);
 }
 
@@ -7300,6 +7415,8 @@ function renderTests(){
     (t.squad ? host : fold).appendChild(card);
   });
   if(!allTests().length) host.innerHTML = '<div class="empty">No tests in the library yet.</div>';
+  /* coach tools: the coach view only (28 Oct) */
+  if(!meStaff()) return;
   var tools = document.createElement("div"); tools.className = "tools";
   tools.innerHTML = '<button id="addTest">Add a test</button><button id="addPractice">Add a practice session</button>';
   host.appendChild(tools);
@@ -7907,7 +8024,7 @@ function renderSC(){
   /* New S&C is the programme; the three ramped sessions it replaced sit at the
      foot of the list as Extended S&C, for a day with an hour to spare. */
   var PROG = [
-    {nm:"New S&amp;C", sub:"Sessions A and B \u00b7 twice a week \u00b7 40 min with the warm up",
+    {nm:"New S&amp;C", sub:"Sessions A and B \u00b7 twice a week \u00b7 about 35 minutes",
      ic:"gym", ss:mine().filter(isNewSC),
      go:function(){ openGym(newDue()); }}
   ];
@@ -8167,6 +8284,8 @@ function rangeMark(c){
   var on = state.view === "session" && !!(c && c.querySelector(".set"));
   document.body.classList.toggle("rangeset", on);
   document.body.classList.toggle("gymset", state.view === "gym" && !!(c && c.querySelector(".expg")));
+  document.body.classList.toggle("sessready", state.view === "session" && !!(c && c.querySelector(".readypg")));
+  document.body.classList.toggle("sessdeep", state.view === "session" && !!state.deck && state.deck.idx > 0);
   document.body.classList.remove("showinfo");
   var b = RINFO || $("rangeInfo"); if(b) b.setAttribute("aria-pressed", "false");
   focusPaint();
@@ -8232,6 +8351,7 @@ function saveDraft(){
   var d = state.draft || state.gymDraft;
   if(!d || !draftHasContent(d)) return;
   stashNotes();
+  d.lay = 2;     // one page before the sets since 28 Oct
   d.status = d.editing ? "done" : "live";
   d.at = Date.now();
   d.pos = state.deck ? state.deck.idx : 0;
@@ -8375,6 +8495,7 @@ function resumeDraft(d){
      and she was always put back at the start. Twenty balls in, on a thirteen
      card deck, that is a lot of swiping to get back to where she stopped. */
   var wasAt = d.pos || 0;
+  if(!d.lay && wasAt > 1 && d.kind !== "gym") wasAt--;   // saved before the Ready page replaced two
   state.cardMode = true;
   if(d.kind === "gym") openGym(d.gymId, d);
   else if(d.kind === "drill") openDrill(d.drillId || d.areaId, d);
@@ -8486,7 +8607,7 @@ function openSession(areaId, resume){
   $("sessArea").textContent = a.isDrill ? (a.challengeOf ? "Challenge" : "Drill")
                             : a.isTest ? "Test"
                             : (a.retired ? "Earlier format" : "Pillar "+areaNo(a));
-  $("sessName").textContent = a.name;
+  $("sessName").textContent = String(a.name).replace(/\s*\([^)]*\)\s*$/, "");
   $("sessDate").value = state.draft.date;
   renderSessSeg(areaId);
   renderSession();
@@ -8842,6 +8963,100 @@ function condPage(){
 }
 
 
+/* ---- the Ready screen (28 Oct) ----
+   One page before the first ball: what the session is, the conditions filled
+   in from last time with one tap to change them, and Start. The targets and
+   swing checks are folded underneath. Nothing is written until she starts,
+   so opening a session and walking away still leaves nothing behind. */
+function lastCond(kind){
+  if(!kind) return null;
+  var ss = mine().filter(function(s){
+    if(!s.cond || condKind(s.areaId, s.kind) !== kind) return false;
+    for(var k in s.cond) if(s.cond[k]) return true;
+    return false;
+  }).sort(function(a, b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+  return ss.length ? ss[0].cond : null;
+}
+function condWords(kind, cond){
+  var spec = COND[kind] || [], out = [];
+  spec.forEach(function(f){ if(cond && cond[f.id]) out.push(condLabel(kind, f.id, cond[f.id])); });
+  return out.join(", ");
+}
+function readyPage(a){
+  var d = state.draft, kind = condKind(a.id, "practice");
+  var balls = 0; liveSets(a).forEach(function(s){ balls += ballsIn(s) || 0; });
+  var mins = MINS_MAIN[a.id] || a.mins || null;
+  var box = document.createElement("div"); box.className = "readypg";
+  box.innerHTML =
+    '<p class="rdmeta">' + (balls ? balls + " balls" : "") + (balls && mins ? " · " : "") + (mins ? "about " + mins + " min" : "") + '</p>' +
+    (kind ? '<div class="rdcond"><div class="rdcondhd"><b>Conditions</b><button type="button" class="rdlink" id="rdCondChange">Change</button></div>' +
+            '<p class="rdcondsum" id="rdCondSum"></p><div id="sessCond" hidden></div></div>' : '') +
+    '<button type="button" class="rdstart" id="rdStart">Start</button>' +
+    '<details class="fold rdfold"><summary>Targets, swing checks and the plan</summary>' +
+      '<div id="sessTargetBox"></div><div id="sessChecks"></div><p class="planline" id="sessHour"></p></details>';
+  function paintSum(){
+    var el = box.querySelector("#rdCondSum"); if(!el) return;
+    var has = false; for(var k in (d.cond || {})) if(d.cond[k]) has = true;
+    var sug = has ? null : lastCond(kind);
+    el.textContent = has ? condWords(kind, d.cond)
+                   : sug ? "Same as last time: " + condWords(kind, sug)
+                   : "Not logged yet. Tap Change to add them.";
+  }
+  setTimeout(paintSum, 0);
+  var ch = box.querySelector("#rdCondChange");
+  if(ch) ch.addEventListener("click", function(){
+    var host = box.querySelector("#sessCond");
+    var open = host.hidden;
+    if(open){
+      var has = false; for(var k in (d.cond || {})) if(d.cond[k]) has = true;
+      if(!has){ var sug = lastCond(kind); if(sug) d.cond = JSON.parse(JSON.stringify(sug)); }
+      renderCond("sessCond", d, kind);
+    }
+    host.hidden = !open;
+    ch.textContent = open ? "Done" : "Change";
+    paintSum();
+  });
+  box.querySelector("#rdStart").addEventListener("click", function(){
+    var has = false; for(var k in (d.cond || {})) if(d.cond[k]) has = true;
+    if(!has && kind){ var sug = lastCond(kind); if(sug){ d.cond = JSON.parse(JSON.stringify(sug)); saveDraft(); } }
+    deckShow(1);
+  });
+  return box;
+}
+/* ---- the Finish screen (28 Oct) ----
+   The result large, where it places her, a best if it is one, the UpGame
+   score, a line for a note, then Finish in the bar. The set by set table and
+   the tour numbers are folded underneath. */
+function renderFinish(host, a){
+  var d = state.draft; if(!d) return;
+  var sg = isSG(a), html = "";
+  var spec = placingFor(a, d), t = spec ? testSplit(a, d) : null;
+  var balls = sg ? sgBallsLogged(d) : 0;
+  html += '<p class="fnkicker">' + String(a.name).replace(/\s*\([^)]*\)\s*$/, "") + ' · ' + (balls ? "done" : "nothing logged yet") + '</p>';
+  if(sg){
+    html += '<div class="fnbig">' + (balls ? fmtSG(d.total) : "–") + '</div><p class="fnsub">strokes on the field</p>';
+  } else {
+    html += '<div class="fnbig">' + (d.total || 0) + '</div><p class="fnsub">of ' + d.max + '</p>';
+  }
+  if(t && t.n){
+    var word = spec.bullP ? "inside two clubs" : (areaShape(a) === "clock" ? "holed" : areaShape(a) === "corridor" ? "in the corridor" : "on target");
+    html += '<p class="fnline"><b>' + t.in_ + ' of ' + t.n + '</b> ' + word + '</p>';
+    var pl = sessionPlacing(a, d);
+    if(pl != null) html += '<p class="fnline">' + ordinalPlace(pl) + ' of 100 ' + (spec.field || "LPGA Tour players") + '</p>';
+  }
+  if(sg && balls){
+    var prev = null;
+    sessionsFor(a.id).forEach(function(s){
+      if(s.id === d.id || s.sgUnknown || thinSession(s) || s.total == null) return;
+      if(prev == null || s.total > prev) prev = s.total;
+    });
+    var full = sgAreaBalls(a) ? balls >= 0.6 * sgAreaBalls(a) : true;
+    if(prev != null && full && d.total > prev) html += '<p class="fnbest">New best on ' + areaWord(a) + '</p>';
+  }
+  if(t && t.n) html += '<p class="ugscore">UpGame score <b>' + t.in_ + '</b> <span>' + (t.n >= spec.n ? 'of ' + t.n : 'so far, of ' + spec.n) + '</span></p>';
+  host.innerHTML = html;
+}
+
 function fillIntro(a){
   renderTargets("sessTargetBox", a.id);
   renderChecks("sessChecks", a.id);
@@ -8923,8 +9138,7 @@ function buildSessionCards(a, last){
   var live = liveSets(a);
   var cards = [], n = live.length;
 
-  cards.push(pcard('Before you start<b>'+a.name+'</b>', sessionIntro()));
-  cards.push(pcard('Conditions<b>'+a.name+'</b>', condPage()));
+  cards.push(pcard('Ready', readyPage(a)));
 
   live.forEach(function(s, i){
     var body = document.createElement("div");
@@ -8950,15 +9164,18 @@ function buildSessionCards(a, last){
 
   if(a.compete) cards.push(pcard(a.compete.label, competeBlock(a)));
 
-  var nb = document.createElement("div");
-  nb.appendChild(notesBlock("sessNotes", "What worked \u00b7 one thing to fix"));
+  /* the finish: the result, a note, and the detail folded away */
+  var fin = document.createElement("div"); fin.className = "finish";
+  var ftop = document.createElement("div"); fin.appendChild(ftop);
+  fin.appendChild(notesBlock("sessNotes", "A note for next time"));
+  var more = document.createElement("details"); more.className = "fold";
+  more.innerHTML = '<summary>Set by set, swing checks and the tour numbers</summary>';
+  var rv = document.createElement("div"); more.appendChild(rv);
   var cw = document.createElement("div"); cw.id = "sessChecksEnd"; cw.style.marginTop = "16px";
-  nb.appendChild(cw);
-  cards.push(pcard('Session notes', nb));
-
-  var rv = document.createElement("div");
-  var rvc = pcard('Review and save<b>'+a.name+'</b>', rv);
-  rvc._refresh = function(){ renderReview(rv, a); };
+  more.appendChild(cw);
+  fin.appendChild(more);
+  var rvc = pcard('Finish', fin);
+  rvc._refresh = function(){ renderFinish(ftop, a); renderReview(rv, a); };
   cards.push(rvc);
 
   cards.forEach(function(c){ host.appendChild(c); });
@@ -9068,7 +9285,8 @@ function flashMsg(html, ms){
   void el.offsetWidth;                 // restart the animation
   el.classList.add("go");
   clearTimeout(el.__t);
-  el.__t = setTimeout(function(){ el.hidden = true; }, ms || 2400);
+  /* a strip at the top for a second and a half, clear of the target (28 Oct) */
+  el.__t = setTimeout(function(){ el.hidden = true; }, Math.min(ms || 1600, 2000));
 }
 /* ---- what a shot was worth ----
    Praise only when it is earned, and always with the number that earns it. A message
@@ -9157,9 +9375,11 @@ function renderRun(){
   var r = runStats(a, d);
   d.bestRun = r.best;
   var ever = bestRunEver(a.id, d.id);
-  $("runNow").textContent = String(r.cur);
-  $("runToday").textContent = String(r.best);
-  $("runEver").textContent = String(Math.max(ever, r.best));
+  /* a dash until there is something to count (28 Oct) */
+  var anyBall = sessionLog(a, d).length > 0;
+  $("runNow").textContent = anyBall ? String(r.cur) : "\u2013";
+  $("runToday").textContent = anyBall ? String(r.best) : "\u2013";
+  $("runEver").textContent = Math.max(ever, r.best) ? String(Math.max(ever, r.best)) : "\u2013";
   $("runEverLab").textContent = "Best on " + areaWord(a);
   $("runBar").hidden = !a.track;
   $("runBar").classList.toggle("hot", r.cur >= 3);
@@ -12520,8 +12740,9 @@ function updateTotal(){
     /* Saving half a matrix would put a meaningless row in her history, so the
        button stays shut until the thing is actually over. Forty five minutes
        saves a gauntlet by itself; a card is over when the last shot is in. */
-    $("saveBtn").textContent = fin ? "Finish and save" : "Not finished yet";
+    $("saveBtn").textContent = "Finish and save";
     $("saveBtn").disabled = !fin;
+    $("saveBtn").hidden = !fin;
     saveDraft();
     return;
   }
@@ -12548,7 +12769,7 @@ function updateTotal(){
     d.total = Math.round(sgr.sg*100)/100;
     d.max = sgAreaCeil(a);
     d.balls = sgr.balls;
-    $("totFig").textContent = a.shape === "sg18" ? sq18Fmt(sgr.sg) : fmtSG(sgr.sg);
+    $("totFig").textContent = !sgr.balls ? "\u2013" : a.shape === "sg18" ? sq18Fmt(sgr.sg) : fmtSG(sgr.sg);
     $("totOf").textContent = "strokes";
     /* The bar is one line on a phone. Anything longer than a count wraps into
        four lines and shoves the Next button off the screen, which is how it
@@ -14058,6 +14279,7 @@ function renderStrengths(){
 }
 
 function renderProgress(){
+  renderProgHead();
   renderDise();
   renderGoalProgress();
   renderStrengths();
@@ -14067,7 +14289,7 @@ function renderProgress(){
   /* the same charts, filed under England Golf's pillars, S&C last */
   var PB = {};
   function bucket(k){
-    if(!PB[k]){ PB[k] = document.createElement("div"); PB[k].className = "pilsec"; }
+    if(!PB[k]){ PB[k] = document.createElement("div"); PB[k].className = "pilsec"; PB[k].setAttribute("data-pil", String(k)); }
     return PB[k];
   }
   var host = { appendChild:function(el){ bucket(el.__pil == null ? "sc" : el.__pil).appendChild(el); },
@@ -14173,20 +14395,20 @@ function renderSessions(){
     return a.date<b.date?1:a.date>b.date?-1:0;
   });
   if(!all.length){ list.innerHTML = '<div class="empty">Nothing logged.</div>'; return; }
-  /* Unfinished ones first, on their own; then the rest under England Golf's
-     pillars, then S&C, then play and coaching, newest first in each. */
+  /* A diary (28 Oct): unfinished ones first, then week by week, newest first. */
   var groups = [{ key:"open", list:all.filter(function(x){ return sessStatus(x).key !== "done"; }) }];
   var doneList = all.filter(function(x){ return sessStatus(x).key === "done"; });
-  PILLAR_ORDER.forEach(function(k){
-    var l = doneList.filter(function(x){ var p = pillarOfSession(x); return (p == null ? null : p) === k; });
-    if(l.length) groups.push({ key:k, list:l });
-  });
+  var byWeek = {};
+  doneList.forEach(function(x){ var w = weekOf(x.date); (byWeek[w] = byWeek[w] || []).push(x); });
+  Object.keys(byWeek).sort().reverse().forEach(function(w){ groups.push({ key:"wk", wk:w, list:byWeek[w] }); });
   groups.forEach(function(g){
     if(!g.list.length) return;
     var mins = g.list.reduce(function(t, x){ return t + sessMins(x); }, 0);
     var sec = document.createElement("div"); sec.className = "hsec";
     sec.innerHTML = g.key === "open"
       ? '<div class="pilhd"><span class="pn sc"></span><h2>Unfinished</h2><span class="pr">' + g.list.length + '</span></div>'
+      : g.key === "wk"
+      ? '<div class="pilhd"><h2>' + weekLabel(g.wk) + '</h2><span class="pr">' + g.list.length + (g.list.length === 1 ? ' session' : ' sessions') + (mins ? ' \u00b7 ' + fmtMins(mins) : '') + '</span></div>'
       : pillarHead(g.key, g.list.length + (g.list.length === 1 ? ' session' : ' sessions') + (mins ? ' \u00b7 ' + fmtMins(mins) : ''));
     var wrapEl = document.createElement("div"); wrapEl.className="hlist";
     sec.appendChild(wrapEl);
@@ -14209,7 +14431,7 @@ function histRow(x, wrapEl){
     var note = x.notes ? x.notes.replace(/</g,"&lt;") : "";
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
-      '<span class="s">'+(x.kind==="log" ? hrs(x.hours||0)+" h" : x.kind==="gym" ? x.total+"/"+x.max+" sets"
+      '<span class="s">'+(mxWord(x) ? mxWord(x) : x.kind==="log" ? hrs(x.hours||0)+" h" : x.kind==="gym" ? x.total+"/"+x.max+" sets"
                           : area(x.areaId) && area(x.areaId).shape === "p9" ? x.total+" att."
                           : x.sgUnknown ? "\u2013"
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
@@ -14652,9 +14874,6 @@ function renderDise(){
   /* the streak moved here from This week (28 Oct) */
   var ws = weekStreakNow();
   host.innerHTML =
-    '<div class="panel streakpanel"><div class="wkgh"><h2>Weeks in a row</h2><span>' +
-      (ws.st.paused ? 'this week is paused' : ws.st.met ? 'this week done' : 'this week not done yet') + '</span></div>' +
-    '<div class="disebig"><b class="num">' + ws.n + '</b><span>' + (ws.n === 1 ? 'week' : 'weeks') + ' with everything planned done</span></div></div>' +
     '<div class="panel disepanel"><div class="wkgh"><h2>DiSE hours</h2><span>' +
       (h.total >= DISE_TARGET ? "done" : hrs(DISE_TARGET - h.total) + " h to go") + '</span></div>' +
     '<div class="disebig"><b class="num">' + hrs(h.total) + '</b><span>of ' + DISE_TARGET + ' hours</span></div>' +
@@ -16029,8 +16248,16 @@ function weekOpen(it){
     if(r.gym) openGym(r.gym); else openDrill(it.id);
   }
 }
+/* A matrix is scored by its clock: the time it took, or how far she got. */
+function mxWord(s){
+  var a = s ? area(s.areaId) : null;
+  if(!a || a.shape !== "gauntlet" || !s.mx || !s.mx.end) return null;
+  return gtComplete(a, s) ? mmss(s.mx.end).replace(/^(\d+):(\d\d)$/, function(m, mm, ss){ return mm + " min " + (+ss ? ss + " s" : ""); }).trim()
+                          : "reached " + gtBest(s) + " of " + gtN(a);
+}
 function doneWords(s){
   if(!s) return "";
+  if(mxWord(s)) return "Done " + shortDate(s.date) + " \u00b7 " + mxWord(s);
   if(s.kind === "gym") return "Done " + shortDate(s.date);
   var a = area(s.areaId);
   if(s.total != null && a && a.shape === "p9") return "Done " + shortDate(s.date) + " · " + s.total + " attempts, " + p9Total(s, a).made + "/9";
@@ -16105,11 +16332,18 @@ function renderWeek(){
   if($("weekResume")) $("weekResume").hidden = true;      // unfinished ones are in the Done list
   $("wkStreak").innerHTML = "";
 
+  var nTodo = 0;
   function todoRow(attr, v, acts){
+    var first = nTodo++ === 0;
+    if(first) return '<div class="wkupnext" style="--tint:' + v.tint + '"><span class="wkupl">Up next</span>' +
+      '<div class="wkuprow"><span class="wkic">' + v.ic(26) + '</span><span class="wktx"><b>' + esc(v.nm) + '</b>' +
+      (v.sub ? '<span>' + esc(v.sub) + '</span>' : '') + '</span>' + (acts ? '<button type="button" class="wkmore" aria-label="More">\u22ef</button>' : '') + '</div>' +
+      (acts ? acts.replace('class="wkacts"', 'class="wkacts wkupacts"') : '') +
+      '<button type="button" class="wkupgo" ' + attr + '>Start</button></div>';
     return '<div class="wkrow" style="--tint:' + v.tint + '">' +
       '<button type="button" class="wkgo" ' + attr + '><span class="wkic">' + v.ic(22) + '</span>' +
       '<span class="wktx"><b>' + esc(v.nm) + '</b>' + (v.sub ? '<span>' + esc(v.sub) + '</span>' : '') + '</span>' +
-      '<span class="wkstart">Start</span></button>' + (acts || '') + '</div>';
+      '<span class="wkstart">Start</span></button>' + (acts ? '<button type="button" class="wkmore" aria-label="More">\u22ef</button>' + acts : '') + '</div>';
   }
   var html = "";
   if(st.paused) html += '<p class="wknote">This week is paused. Unpause it in Settings.</p>';
@@ -16138,6 +16372,13 @@ function renderWeek(){
       '<span class="wkacts">' + (canChange ? '<button type="button" data-chg="' + x.i + '">Change</button>' : '') +
       '<button type="button" class="wkx" data-rm="' + x.i + '" aria-label="Remove ' + esc(v.nm).replace(/"/g, "") + ' from this week">×</button></span>');
   });
+  /* the week in one line, and planning the next from Friday */
+  var nDone = weekDoneList(wk).filter(function(s){ return s.status !== "live"; }).length, nAll = nDone + nTodo;
+  var head = "";
+  if(nAll) head += '<div class="wkcount"><span><b>' + nDone + ' of ' + nAll + '</b> done this week</span><div class="wkbar"><i style="width:' + Math.round(100 * nDone / nAll) + '%"></i></div></div>';
+  var dow = new Date().getDay();
+  if(dow === 5 || dow === 6 || dow === 0) head += '<button type="button" class="wkplan" id="wkPlan"><b>Plan next week</b><span>Look back at this one, then set the next</span></button>';
+  html = head + html;
   html += '<div class="wkgrp"><div class="wkgh"><h2>Suggested</h2></div>' +
     (todo || '<p class="wknote">' + (st.planned ? 'Everything suggested this week is done.' : 'Nothing planned this week. Set your numbers in Settings.') + '</p>') + '</div>';
   if(WEEK_UNDO && WEEK_UNDO.wk === wk)
@@ -16175,6 +16416,8 @@ function renderWeek(){
     var r = weekRec(wk, true);
     if(b.id === "wkUndo"){ weekUndo(); renderWeek(); paintBell(); return; }
     if(b.id === "wkSet"){ openSettings(); return; }
+    if(b.id === "wkPlan"){ openReview(); return; }
+    if(b.classList.contains("wkmore")){ var rw = b.closest(".wkrow, .wkupnext"); if(rw) rw.classList.toggle("open"); return; }
     if(b.id === "wkLog"){ openLogHours(); return; }
     if(typeof seasonWeekClick === "function" && seasonWeekClick(b)) return;
     if(b.hasAttribute("data-squad")){ state.fromWeek = true; openTest(b.getAttribute("data-squad")); return; }
@@ -17031,6 +17274,178 @@ $("lightbox").addEventListener("click", function(e){ if(e.target === this) close
 document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("lightbox").hidden) closeGuide(); });
 
 /* ---------- wiring ---------- */
+/* ---- one menu (28 Oct) ----
+   Five tabs at the foot: Today, Practice, S&C, Progress, Calendar. Practice
+   holds Core, Squad and Drills; Progress holds Progress, Goals, History and
+   Review, each switched by a row of segments at the top of the page. Settings,
+   the player and the coach view sit behind her initial at the top right. The
+   old buttons stay in the page, out of sight, because everything else in the
+   app already knows how to drive them. */
+var SEGS = {
+  practice:{ views:["home", "tests", "drills"], items:[["Core", "tabPractice", ["home"]], ["Squad", "tabTests", ["tests"]], ["Drills", "tabDrills", ["drills"]]] },
+  progress:{ views:["history", "goals", "sessions", "review", "past"], items:[["Progress", "segProgress", ["history"]], ["Goals", "segGoals", ["goals"]], ["History", "tabSessions", ["sessions", "past"]], ["Review", "tabReview", ["review"]]] }
+};
+var VIEW_SECTION = { home:"viewHome", tests:"viewTests", drills:"viewDrills", history:"viewHistory", goals:"viewGoals", sessions:"viewSessions", review:"viewReview" };
+function segInit(){
+  Object.keys(SEGS).forEach(function(g){
+    SEGS[g].views.forEach(function(v){
+      var sec = $(VIEW_SECTION[v]); if(!sec || sec.querySelector(".segnav")) return;
+      var nav = document.createElement("div"); nav.className = "segnav"; nav.setAttribute("role", "tablist");
+      nav.innerHTML = SEGS[g].items.map(function(it){
+        return '<button type="button" role="tab" data-seg="' + it[1] + '" data-views="' + it[2].join(" ") + '">' + it[0] + '</button>';
+      }).join("");
+      nav.addEventListener("click", function(e){
+        var b = e.target.closest ? e.target.closest("[data-seg]") : null; if(!b) return;
+        var id = b.getAttribute("data-seg");
+        if(id === "segProgress") openProgTab("progress");
+        else if(id === "segGoals") openProgTab("goals");
+        else if($(id)) $(id).click();
+      });
+      sec.insertBefore(nav, sec.firstChild);
+    });
+  });
+}
+function segPaint(view){
+  [].forEach.call(document.querySelectorAll(".segnav button"), function(b){
+    b.setAttribute("aria-selected", (" " + b.getAttribute("data-views") + " ").indexOf(" " + view + " ") > -1 ? "true" : "false");
+  });
+  var sk = view === "session" && state.draft ? state.draft.kind : null;
+  var on = {
+    tabWeek: view === "week",
+    tabPractice: ["home", "tests", "drills", "test"].indexOf(view) > -1 || view === "session",
+    tabSC: view === "sc" || view === "gym",
+    tabProg: ["history", "goals", "sessions", "review", "past", "bench", "prog"].indexOf(view) > -1,
+    tabCal: view === "season" || view === "event"
+  };
+  Object.keys(on).forEach(function(id){ if($(id)) $(id).setAttribute("aria-selected", on[id] ? "true" : "false"); });
+  if($("meBtn")){
+    var nm = ($("playerName") ? $("playerName").value : "") || "";
+    $("meBtn").textContent = (nm.trim().charAt(0) || "?").toUpperCase();
+  }
+  /* saving: quiet when it is fine, red only when it is not */
+  var bad = (typeof STORE !== "undefined" && STORE.ok === false) || (typeof CLOUD !== "undefined" && CLOUD.stuck);
+  if($("saveDot")) $("saveDot").hidden = !bad;
+  if(view === "settings" && typeof renderStoreLine === "function") renderStoreLine();
+}
+function meMenu(open){
+  var m = $("meMenu"); if(!m) return;
+  m.hidden = open === undefined ? !m.hidden : !open;
+}
+
+segInit();
+/* ---- long explanations wait behind "How this works" (28 Oct) ----
+   Any paragraph of explanation over a couple of lines is folded under one
+   line she can open. Neighbouring ones share a fold. The writing is kept. */
+var FOLD_SEL = "p.note, p.lede, p.plnote";
+var FOLD_MIN = 150;
+var FOLD_SKIP = "details, .finish, .readypg, .expg, .mxres, .ugscore, .wkrow, .wkupnext, #gate, .memenu, #wkSheet, .focushd, .pastnotes, .tdet";
+function foldLong(root){
+  if(!root) return;
+  [].forEach.call(root.querySelectorAll(FOLD_SEL), function(p){
+    if(p.closest(FOLD_SKIP)) return;
+    if((p.textContent || "").trim().length < FOLD_MIN) return;
+    var prev = p.previousElementSibling;
+    if(prev && prev.matches && prev.matches("details.fold.auto")){ prev.appendChild(p); return; }
+    var d = document.createElement("details"); d.className = "fold auto";
+    d.innerHTML = "<summary>How this works</summary>";
+    p.parentNode.insertBefore(d, p);
+    d.appendChild(p);
+  });
+}
+var FOLD_T = null;
+function foldSoon(){
+  if(FOLD_T) return;
+  FOLD_T = requestAnimationFrame(function(){ FOLD_T = null; foldLong(document.querySelector("main.wrap")); });
+}
+if(window.MutationObserver && document.querySelector("main.wrap"))
+  new MutationObserver(foldSoon).observe(document.querySelector("main.wrap"), { childList:true, subtree:true });
+
+/* ---- Progress: three numbers and a card for each pillar (28 Oct) ---- */
+var PCARD_AREAS = [[4, "Holing out"], [3, "Short game"], [2, "Wedges"], [11, "Approach"], [10, "Tee shots"]];
+function renderProgHead(){
+  var host = $("progHead"); if(!host) return;
+  var h = diseHours(), ws = weekStreakNow();
+  var month = today().slice(0, 7);
+  var nMonth = mine().filter(function(s){ return s.date && s.date.slice(0, 7) === month && s.kind !== "log"; }).length;
+  var html = '<div class="phnums">' +
+    '<div><b class="num">' + hrs(h.total) + '</b><span>hours of ' + DISE_TARGET + '</span></div>' +
+    '<div><b class="num">' + ws.n + '</b><span>' + (ws.n === 1 ? "week" : "weeks") + ' in a row</span></div>' +
+    '<div><b class="num">' + nMonth + '</b><span>sessions this month</span></div></div>';
+  var cards = "";
+  PCARD_AREAS.forEach(function(x){
+    var ser = placingSeries(x[0]);
+    if(!ser.length) return;
+    var last = ser[ser.length - 1].place, prev = ser.slice(-4, -1).map(function(r){ return r.place; });
+    var move = "";
+    if(prev.length){
+      var m = Math.round(prev.reduce(function(t, v){ return t + v; }, 0) / prev.length - last);   // lower place is better
+      move = m > 0 ? "up " + m : m < 0 ? "down " + (-m) : "level";
+    }
+    var pts = ser.slice(-8), W = 90, H = 30, pl = "";
+    if(pts.length > 1) pl = pts.map(function(r, i){ return (i * W / (pts.length - 1)).toFixed(1) + "," + (H - (100 - r.place) / 100 * H).toFixed(1); }).join(" ");
+    cards += '<button type="button" class="pcardp" data-pil="' + pillarNo(x[0]) + '"><span class="pcn">' + x[1] + '</span>' +
+      '<span class="pcp"><b>' + ordinalPlace(last) + '</b> of 100' + (move ? ' · ' + move : '') + '</span>' +
+      (pl ? '<svg viewBox="0 0 90 30" aria-hidden="true"><polyline points="' + pl + '" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>' : '') + '</button>';
+  });
+  html += cards ? '<div class="pcards">' + cards + '</div><p class="phnote">Your place out of 100 LPGA players in each pillar, latest session, and how it has moved against the three before. Tap one for the detail.</p>'
+                : '<p class="phnote">Your place out of 100 LPGA players shows here once you have finished a full core session.</p>';
+  host.innerHTML = html;
+  host.onclick = function(e){
+    var b = e.target.closest ? e.target.closest("[data-pil]") : null; if(!b) return;
+    var t = document.querySelector('#charts .pilsec[data-pil="' + b.getAttribute("data-pil") + '"]') || $("charts");
+    if(t) t.scrollIntoView({ behavior:"smooth", block:"start" });
+  };
+}
+
+/* ---- History: a diary by week (28 Oct) ---- */
+function weekLabel(wk){
+  var thisWk = weekOf();
+  if(wk === thisWk) return "This week";
+  if(wk === addDays(thisWk, -7)) return "Last week";
+  return "Week of " + weekRange(wk);
+}
+
+/* ---- swipe between shots (28 Oct) ---- */
+(function(){
+  var x0 = null, y0 = null;
+  document.addEventListener("touchstart", function(e){
+    if(!document.body.classList.contains("rangeset") || e.touches.length !== 1){ x0 = null; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive:true });
+  document.addEventListener("touchend", function(e){
+    if(x0 == null || !document.body.classList.contains("rangeset")) return;
+    var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    if(Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    if(dx < 0) $("navNext").click(); else $("navBack").click();
+  }, { passive:true });
+})();
+
+/* ---- a question in the app's own style (28 Oct) ---- */
+function appAsk(text, yes, no, done){
+  var bg = document.createElement("div"); bg.className = "asksheet";
+  bg.innerHTML = '<div class="askbox" role="dialog" aria-modal="true"><p></p><div class="askacts">' +
+    '<button type="button" class="askno"></button><button type="button" class="askyes"></button></div></div>';
+  bg.querySelector("p").textContent = text;
+  bg.querySelector(".askyes").textContent = yes;
+  bg.querySelector(".askno").textContent = no;
+  function close(v){ bg.remove(); done(v); }
+  bg.querySelector(".askyes").addEventListener("click", function(){ close(true); });
+  bg.querySelector(".askno").addEventListener("click", function(){ close(false); });
+  bg.addEventListener("click", function(e){ if(e.target === bg) close(false); });
+  document.body.appendChild(bg);
+  bg.querySelector(".askno").focus();
+}
+
+$("tabProg").addEventListener("click", function(){ $("tabHistory").click(); });
+$("tabCal").addEventListener("click", function(){ $("tabCalendar").click(); });
+$("meBtn").addEventListener("click", function(e){ e.stopPropagation(); meMenu(); });
+$("meMenu").addEventListener("click", function(e){ e.stopPropagation(); });
+document.addEventListener("click", function(){ meMenu(false); });
+$("meSettings").addEventListener("click", function(){ meMenu(false); openSettings("this"); });
+$("meData").addEventListener("click", function(){ meMenu(false); openSettings("this"); setTimeout(function(){ if($("yourData")) $("yourData").scrollIntoView({block:"start"}); }, 60); });
+$("saveDot").addEventListener("click", function(){ openSettings("this"); setTimeout(function(){ if($("yourData")) $("yourData").scrollIntoView({block:"start"}); }, 60); });
+$("coachLink").addEventListener("click", function(){ meMenu(false); });
 $("tabWeek").addEventListener("click", function(){ show("week"); });
 $("tabSettings").addEventListener("click", function(){ openSettings("this"); });
 $("tabReview").addEventListener("click", openReview);
@@ -17109,8 +17524,9 @@ function shotUnlogged(){
 }
 $("navNext").addEventListener("click", function(){
   var n = shotUnlogged();
-  if(n && !confirm("No shot recorded for shot " + n + ".\n\nMove on without it?")) return;
-  if(shotStep(1)) return; if(state.deck) deckShow(state.deck.idx+1);
+  function go(){ if(shotStep(1)) return; if(state.deck) deckShow(state.deck.idx+1); }
+  if(n) appAsk("No shot recorded for shot " + n + ". Move on without it?", "Move on", "Stay", function(ok){ if(ok) go(); });
+  else go();
 });
 $("sessMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderSession(); });
 $("gymMode").addEventListener("click", function(){ state.cardMode = !state.cardMode; saveLocal(); renderGym(); });
