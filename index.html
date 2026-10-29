@@ -2423,6 +2423,14 @@
   .askacts button{flex:1; font:inherit; font-size:17px; font-weight:800; border-radius:12px; padding:14px; min-height:52px}
   .askno{background:var(--surface); color:var(--ink); border:2px solid var(--ink)}
   .askyes{background:var(--accent-fill); color:#fff; border:2px solid var(--accent-fill)}
+  /* ---- a matrix entered by hand ---- */
+  .mxmanf{display:flex; flex-direction:column; gap:12px; padding:6px 0 4px}
+  .mxmanrow{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .mxmanrow > span{font-size:15px; font-weight:600}
+  .mxmanrow input, .mxmanrow select{font:inherit; font-size:18px; padding:10px; border:1px solid var(--line-strong); border-radius:10px;
+    background:var(--surface); color:var(--ink); width:84px; min-height:44px}
+  .mxmanrow select{width:auto}
+  .mxmtime{display:flex; align-items:center; gap:6px}
 </style>
 </head>
 <body>
@@ -2590,7 +2598,7 @@
        question is where to go rather than what to do. -->
   <section id="viewDrills" hidden>
     <h1>Drills</h1>
-    <p class="lede">One matrix for each pillar, on the Watson matrix rules: five in a row, one miss and you start again, against the clock. Then the drills you can do at home.</p>
+    <p class="lede">Two tests for each pillar: a matrix (five in a row against the clock) and a Perfect 9 (nine shots in as few attempts as you can). Then the drills you can do at home.</p>
     <div id="drillWhere"></div>
     <div id="drillList"></div>
   </section>
@@ -3017,7 +3025,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-28", note:"Design review: one menu of five tabs, slim header, green for go and red for problems, a Ready screen and a Finish screen, Up next on Today, Progress by pillar, History by week, long text behind How this works, swipe between shots" };
+var BUILD = { on:"2026-10-29", note:"A Perfect 9 for every pillar beside its matrix; matrix runs can be entered by hand; one menu of five tabs, Ready and Finish screens" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -4694,6 +4702,37 @@ MX("d-mx-short", 3, 1, "Short game matrix", "Five short game shots in a row, bun
     ["Bunker up and down, 20 paces", "Splash out, then hole the putt. Both, or it does not count."],
     ["Downhill bunker lie, 10 paces", "On the green and inside three clubs."]]),
 
+/* ============ Perfect 9 for every pillar (29 Oct) ============
+   The squad's chipping card, made for each pillar: nine shots, three easy,
+   three medium, three hard, and she stays on each until it finishes inside
+   its target, up to five attempts. A shot not done in five counts as five, so
+   9 is perfect and 45 is the most it can be. */
+P9D("d-p9-putt", 4, 2, 30, "Putting Perfect 9", "Practice green",
+   [["easy", "Easy", "holed", "3 ft"], ["medium", "Medium", "holed", "6 ft"], ["hard", "Hard", "inside 3 ft", "long lag"]],
+   ["3 ft, straight", "3 ft, left to right", "3 ft, right to left",
+    "6 ft, uphill", "6 ft, downhill", "6 ft, breaking",
+    "30 ft lag", "40 ft lag", "50 ft lag"]),
+P9D("d-p9-short", 3, 1, 30, "Short game Perfect 9", "Short game area",
+   [["easy", "Easy", "inside 3 ft", "one club"], ["medium", "Medium", "inside 6 ft", "two clubs"], ["hard", "Hard", "inside 9 ft", "three clubs"]],
+   ["Chip, good lie, 10 paces", "Chip, good lie, 15 paces", "Pitch, 20 paces",
+    "From the rough, 15 paces", "Bunker, good lie, 15 paces", "Downhill lie, 15 paces",
+    "Short-sided, 10 paces", "Bunker, 25 paces", "Pitch over a bunker, 30 paces"]),
+P9D("d-p9-wedge", 2, 0, 30, "Wedge Perfect 9", "Range or short game area",
+   [["easy", "Easy", "inside 7 paces", "of the flag"], ["medium", "Medium", "inside 5 paces", "of the flag"], ["hard", "Hard", "inside 3 paces", "of the flag"]],
+   ["30 yards", "50 yards", "70 yards",
+    "40 yards", "60 yards", "80 yards",
+    "50 yards, low", "70 yards, high", "90 yards"]),
+P9D("d-p9-app", 11, 0, 30, "Approach Perfect 9", "Range or simulator",
+   [["easy", "Easy", "inside 13 paces", "on the green"], ["medium", "Medium", "inside 7 paces", "of the flag"], ["hard", "Hard", "inside 7 paces", "shape called"]],
+   ["145 yards", "165 yards", "185 yards",
+    "125 yards", "145 yards", "165 yards",
+    "145 yards, fade", "165 yards, draw", "185 yards"]),
+P9D("d-p9-drive", 10, 0, 30, "Driving Perfect 9", "Range or simulator",
+   [["easy", "Easy", "in the corridor", "stock"], ["medium", "Medium", "in the corridor", "shape called"], ["hard", "Hard", "18 yard corridor", "full speed"]],
+   ["3-wood, 23 yd corridor", "Driver, 26 yd corridor", "5-wood, 22 yd corridor",
+    "Driver, fade", "Driver, draw", "Driver, low",
+    "Driver, 18 yd corridor", "Driver, 18 yd corridor", "Driver, 18 yd corridor"], {needs:"height"}),
+
 /* ============ the challenges ============
    The pressure version of a drill: a run of stations that all have to come
    off in a row, against a clock, one miss and it starts again. They are
@@ -4763,6 +4802,19 @@ CH("c-app-number", "d-app-number", 11, 0, 20, "Five numbers, approach", "Five ir
     ["125 yards", "Level with the flag."], ["165 yards", "Level with the flag."], ["145 yards", "Level with the flag."]])
 ];
 
+/* A Perfect 9 drill in one line: three tiers, nine shots, three of each. */
+function P9D(id, ar, place, mins, name, where, tiers, shots, extra){
+  var c = { id:id, area:ar, place:place, mins:mins, shape:"p9", lower:true, keep:true, p9fail5:true, upgame:true,
+    name:name, sub:"Nine shots, three easy, three medium, three hard, in as few attempts as you can", where:where, balls:9,
+    why:"The squad’s Perfect 9, made for this pillar. Stay on each shot until it finishes inside its target, up to five attempts. Nine attempts is perfect.",
+    ruleText:tiers.map(function(t){ return t[1] + " shots: " + t[2] + (t[3] ? " (" + t[3] + ")" : ""); }).join(". ") +
+      ". Stay on a shot until it is done, up to five attempts. A shot not done in five counts as five, so the score runs from 9 (perfect) to 45. Lower is better.",
+    p9tiers:tiers,
+    sets:shots.map(function(lab, i){ var t = tiers[Math.floor(i / 3)];
+      return { id:t[0].charAt(0) + (i % 3 + 1), label:lab, short:lab, tier:t[0], tierNm:t[1], balls:1, max:1 }; }) };
+  for(var k in (extra || {})) c[k] = extra[k];
+  return c;
+}
 /* A matrix, in one line: listed on its own, its clock set before the start. */
 function MX(id, ar, place, name, sub, why, st, extra){
   var c = { id:id, area:ar, place:place, mins:45, shape:"gauntlet", matrix:true, upgame:true, clockSet:true,
@@ -4836,11 +4888,11 @@ function drillVariant(d, k){
    suggestions; every session run on them stays in her history and her hours,
    and opens as it always did. The drills at home stay. */
 DRILLS.forEach(function(d){
-  if(d.matrix || d.hidden || d.challengeOf || drillPlace(d).zone !== 0) return;
+  if(d.matrix || d.keep || d.hidden || d.challengeOf || drillPlace(d).zone !== 0) return;
   d.hidden = true; d.shelved = true;   /* not "retired": that word marks an old scoring format */
 });
 DRILLS.slice().forEach(function(d){
-  if(d.hidden || d.family || mxShape(d)) return;
+  if(d.hidden || d.family || mxShape(d) || d.shape === "p9") return;
   d.family = d.id; d.reps = 1;
   DRILL_LENS.slice(1).forEach(function(k){ DRILLS.push(drillVariant(d, k)); });
 });
@@ -5202,6 +5254,54 @@ function mxAfter(a, d){
   renderSession();
   updateTotal();
 }
+/* ---- a matrix run without the app (29 Oct) ----
+   Timed on a watch and entered afterwards: whether it was passed, the time,
+   how many attempts, and how far she got if not. Marked as entered by hand. */
+function mxManualForm(a, d, host){
+  var n = gtN(a), lim = Math.round(gtLimit(a, d) / 60000);
+  var box = document.createElement("details"); box.className = "fold mxman";
+  box.innerHTML = '<summary>Done it without the app? Enter the time</summary>' +
+    '<div class="mxmanf">' +
+      '<div class="mxmanrow"><span>Passed all ' + n + '?</span><div class="chips" id="mxmPass">' +
+        '<button type="button" data-p="1" aria-pressed="true">Yes</button><button type="button" data-p="0" aria-pressed="false">No, time ran out</button></div></div>' +
+      '<div class="mxmanrow" id="mxmTimeRow"><span>Time</span><div class="mxmtime"><input type="number" inputmode="numeric" min="0" max="' + lim + '" id="mxmMin" placeholder="min"><b>:</b>' +
+        '<input type="number" inputmode="numeric" min="0" max="59" id="mxmSec" placeholder="sec"></div></div>' +
+      '<div class="mxmanrow"><span>Attempts</span><input type="number" inputmode="numeric" min="1" max="99" id="mxmTries" value="1"></div>' +
+      '<div class="mxmanrow" id="mxmFarRow" hidden><span>Furthest station cleared</span><select id="mxmFar">' +
+        Array.apply(null, Array(n)).map(function(_, i){ return '<option value="' + i + '">' + i + ' of ' + n + '</option>'; }).join("") + '</select></div>' +
+      '<button type="button" class="rdstart" id="mxmSave">Save this run</button>' +
+      '<p class="note" id="mxmMsg"></p>' +
+    '</div>';
+  host.appendChild(box);
+  var passed = true;
+  box.querySelector("#mxmPass").addEventListener("click", function(e){
+    var b = e.target.closest("[data-p]"); if(!b) return;
+    passed = b.getAttribute("data-p") === "1";
+    [].forEach.call(this.querySelectorAll("button"), function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    box.querySelector("#mxmTimeRow").hidden = !passed;
+    box.querySelector("#mxmFarRow").hidden = passed;
+  });
+  box.querySelector("#mxmSave").addEventListener("click", function(){
+    var msg = box.querySelector("#mxmMsg");
+    var tries = Math.max(1, parseInt(box.querySelector("#mxmTries").value, 10) || 1);
+    var ms;
+    if(passed){
+      var m = parseInt(box.querySelector("#mxmMin").value, 10) || 0, s = parseInt(box.querySelector("#mxmSec").value, 10) || 0;
+      ms = (m * 60 + s) * 1000;
+      if(!ms){ msg.textContent = "Put in the time it took."; return; }
+      if(ms > lim * 60000){ msg.textContent = "That is longer than the " + lim + " minute clock. Choose No if time ran out."; return; }
+    } else ms = lim * 60000;
+    var far = passed ? n : (parseInt(box.querySelector("#mxmFar").value, 10) || 0);
+    var laps = [];
+    for(var i = 1; i < tries; i++) laps.push(passed ? 0 : Math.min(far, 0));
+    laps.push(far);
+    var now = Date.now();
+    d.mx = { at:0, acc:ms, since:0, laps:laps, first:now - ms, end:ms, endWall:now, pauses:0, manual:true, lim:d.mx && d.mx.lim ? d.mx.lim : undefined };
+    if(d.mx.lim === undefined) delete d.mx.lim;
+    mxAfter(a, d);
+  });
+}
+
 function buildGauntlet(a){
   var d = state.draft;
   mxSeed(a, d);
@@ -5282,6 +5382,7 @@ function buildGauntlet(a){
         + "It keeps running if you lock the phone.";
       host.appendChild(hint);
       $("mxBegin").addEventListener("click", gtStart);
+      mxManualForm(a, d, host);
     } else if(gtPaused(d)){
       acts.innerHTML = '<button type="button" class="mxgo" id="mxResume">Carry on</button>'+
                        '<button type="button" class="mxno quit" id="mxQuit">Give up</button>';
@@ -5304,7 +5405,8 @@ function buildGauntlet(a){
     }
   }
 
-  host.appendChild(gtReachTable(a, d));
+  if(!(d.mx && d.mx.manual)) host.appendChild(gtReachTable(a, d));
+  else { var mm = document.createElement("p"); mm.className = "note"; mm.textContent = "Entered by hand after the run."; host.appendChild(mm); }
 
   var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
   nb.style.marginTop = "18px";
@@ -7475,6 +7577,11 @@ function drillBest(d){
   }
   if(best === null) return null;
   var at = best.d.reps > 1 ? " at " + drillBallsN(best.d) + " " + drillUnit(best.d) : "";
+  if(d.shape === "p9"){
+    var fewest = null;
+    runs.forEach(function(r){ var q = p9Total(r, d); if(q.done === 9 && (fewest == null || q.total < fewest)) fewest = q.total; });
+    return fewest == null ? null : { big:String(fewest), small:"attempts, your best" };
+  }
   if(d.matrix){
     var bt = null;
     runs.forEach(function(r){ if(gtComplete(d, r) && r.mx && r.mx.end && (bt == null || r.mx.end < bt)) bt = r.mx.end; });
@@ -7505,6 +7612,10 @@ function renderDrills(){
     var mine = allDrills().filter(function(x){
       if(x.hidden) return false;
       return pn === "home" ? drillPlace(x).zone === 1 : drillPlace(x).zone === 0 && pillarNo(x.area) === pn;
+    }).sort(function(a, b){
+      /* tee before approach, and in each the matrix before the Perfect 9 */
+      if(pn === "home") return 0;
+      return (a.area === b.area ? 0 : a.area === 10 ? -1 : b.area === 10 ? 1 : 0) || ((a.shape === "p9") - (b.shape === "p9"));
     });
     if(!mine.length) return;
     var hd = document.createElement("div");
@@ -8296,6 +8407,9 @@ function updateNav(){
   $("navBack").disabled = !d || d.idx === 0;
   $("navNext").hidden = !d || last;
   $("saveBtn").hidden = !!d && !last;
+  /* a matrix is saved when it is over, not before */
+  var ma = (state.view === "session" && state.draft) ? area(state.draft.areaId) : null;
+  if(ma && ma.shape === "gauntlet" && !gtDone(state.draft)) $("saveBtn").hidden = true;
 }
 function stashNotes(){
   if(state.draft && $("sessNotes")) state.draft.notes = $("sessNotes").value;
@@ -8870,7 +8984,7 @@ function p9Att(d, set){
 }
 function p9Total(d, a){
   var t = 0, n = 0, made = 0;
-  liveSets(a).forEach(function(s){ var v = p9Att(d, s); if(v != null){ t += v; n++; if(v > 0) made++; } });
+  liveSets(a).forEach(function(s){ var v = p9Att(d, s); if(v != null){ t += (v === P9_FAIL && a && a.p9fail5) ? P9_MAX : v; n++; if(v > 0) made++; } });
   return { total:t, done:n, made:made };
 }
 /* Better is more of the nine completed, then fewer attempts: a failed shot
@@ -8898,13 +9012,18 @@ function p9Grid(a, d, live){
     return '<tr><th class="p9t p9-' + s.tier + '">' + s.label + '</th>' + cells + '</tr>';
   }).join("");
   var tot = p9Total(d, a);
-  return '<div class="p9card"><table><thead><tr><th>Shot type</th>' +
+  var ug = (a.upgame && tot.done === 9) ? '<p class="ugscore">UpGame score <b>' + tot.total + '</b> <span>attempts, 9 to 45, lower is better</span></p>' : '';
+  return ug + '<div class="p9card"><table><thead><tr><th>Shot type</th>' +
     [1, 2, 3, 4, 5].map(function(k){ return '<th>Attempt<br>' + k + '</th>'; }).join("") + '</tr></thead><tbody>' + rows +
     '<tr class="p9tot"><th>Total</th>' + col.map(function(n){ return '<td>' + (tot.done ? n : "") + '</td>'; }).join("") + '</tr></tbody></table></div>' +
     '<p class="note sqsum"><b>' + tot.total + '</b> attempts · <b>' + tot.made + '</b> of 9 completed' +
     (tot.done === 9 ? (tot.made === 9 && tot.total === 9 ? ' · perfect' : ' · 9 is perfect') : ' · ' + tot.done + ' of 9 played') + '</p>';
 }
-function p9Head(){
+function p9Head(a){
+  if(a && a.p9tiers){
+    return '<div class="p9head"><h3>Perfect 9</h3><p>Complete the 9 shots in as few attempts as possible, 9 being perfect. A shot not done in five counts as five. To complete a shot it must finish:</p>' +
+      '<div class="p9dist">' + a.p9tiers.map(function(t){ return '<span class="p9-' + t[0] + '">' + t[1] + ' <b>' + t[2] + '</b> ' + (t[3] || "") + '</span>'; }).join("") + '</div></div>';
+  }
   return '<div class="p9head"><h3>Perfect 9</h3><p>Complete the 9 shots in as few shots as possible, with 9 being the perfect score. To complete a shot it must finish inside:</p>' +
     '<div class="p9dist"><span class="p9-easy">Easy <b>3 ft</b> one club</span><span class="p9-medium">Medium <b>6 ft</b> two clubs</span><span class="p9-hard">Hard <b>9 ft</b> three clubs</span></div>' +
     '<p>Do not leave the shot you are on until you have achieved the desired footage.</p></div>';
@@ -8914,7 +9033,7 @@ function buildP9(a){
   d.shots = d.shots || {};
   var host = $("sessCards"); host.innerHTML = "";
   var wrap = document.createElement("div");
-  wrap.innerHTML = p9Head() + p9Grid(a, d, true) +
+  wrap.innerHTML = p9Head(a) + p9Grid(a, d, true) +
     '<p class="note">Tap the attempt that went in: the ones before it fill with crosses. All five missed? Tap attempt 5 again. Tap a tick to clear the row.</p>';
   host.appendChild(wrap);
   wrap.querySelectorAll("[data-r]").forEach(function(b){
@@ -8933,7 +9052,7 @@ function buildP9(a){
   saveDraft();
 }
 function p9PastHtml(a, s){
-  return p9Head().replace('<h3>Perfect 9</h3>', '') + p9Grid(a, s, false);
+  return p9Head(a).replace('<h3>Perfect 9</h3>', '') + p9Grid(a, s, false);
 }
 /* The saved card, read back */
 function sq18PastHtml(a, s){
