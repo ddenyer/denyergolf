@@ -86,9 +86,12 @@
 <div id="sheet" hidden>
   <div class="row" id="modes">
     <button class="chip on" data-mode="approach">Approach</button>
-    <button class="chip" data-mode="driver">Driver</button>
+    <button class="chip" data-mode="wedge">Wedges</button>
+    <button class="chip" data-mode="chip">Chipping</button>
+    <button class="chip" data-mode="driver">Tee</button>
     <button class="chip" data-mode="windows">Windows</button>
   </div>
+  <div class="row" id="clubs" hidden></div>
   <div class="row" id="dists"></div>
 
   <p class="note" id="tip">Tap the flag on screen to put the target there.</p>
@@ -157,15 +160,24 @@
      15 yard draw over 150 m is only 1.58 m off the line at 20 m. Straight is
      within about 5 yards of curve, a working shape runs 5 to 15.
      --------------------------------------------------------------------- */
-  var CIRC = { 125:26, 145:32, 165:38, 185:43 };  // ft from the flag: inside scores
-  var BULL = { 125:22, 145:25, 165:28, 185:33 };  // ft from the flag: tour standard
+  /* Every number below is lifted out of the tool's own sets by targets.js and
+     pasted in, rather than typed. c is the scoring radius in feet, b the
+     bullseye radius where the set has one. Chipping is stated in clubs and
+     paces; the tool puts one club at 3 ft, so two clubs is 6. Nothing here is
+     rounded, interpolated or improved on: if it does not match the card she is
+     scoring against, the overlay is worse than no overlay. */
+  var APPROACH = { 110:{c:24,b:20}, 125:{c:26,b:22}, 140:{c:30,b:24}, 145:{c:32,b:25}, 155:{c:34,b:27}, 165:{c:38,b:28}, 185:{c:43,b:33} };
+  var WEDGE    = { 30:{c:11}, 50:{c:17}, 70:{c:19}, 90:{c:20} };
+  var CHIP     = { 10:{c:6,b:3}, 15:{c:6,b:3}, 20:{c:6,b:3}, 30:{c:6,b:3}, 40:{c:6,b:3}, 50:{c:6,b:3} };
+  var CORRIDOR = { "Driver":26, "3-wood":23, "5-wood / 2H":22 };
 
-  function circleFt(d){ return CIRC[d] || (0.3*d - 11.5); }
-  function bullFt(d){ return BULL[d] || 0; }
-  // radius in feet over distance in feet, so this is the HALF angle directly
+  var TABLE = { approach:APPROACH, wedge:WEDGE, chip:CHIP };
+  var UNIT  = { approach:"yd", wedge:"yd", chip:"paces", driver:"yd", windows:"yd" };
+
+  function tgt(){ var t = TABLE[state.mode]; return (t && t[state.dist]) || {c:0}; }
+  // radius in feet over distance in feet, so this comes out as the HALF angle
   function ftHalfAngle(ft, d){ return Math.atan(ft / (3*d)); }
-  function approachHalfAngle(d){ return ftHalfAngle(circleFt(d), d); }
-  function corridorHalfAngle(d){ return Math.atan(13 / d); }
+  function corridorHalfAngle(d){ return Math.atan((CORRIDOR[state.club]/2) / d); }
 
   var WIN_STRAIGHT = 1.5 * Math.PI/180;   // inner edge of a working shape
   var WIN_OUTER    = 4.5 * Math.PI/180;   // beyond this is too much curve
@@ -173,14 +185,18 @@
   var state = {
     mode: "approach",
     dist: 145,
+    club: "Driver",
     fov: 69,                 // horizontal field of view, degrees
     elev: 14,                // window grid height above the flag, degrees
     rowh: 4,                 // each window row, degrees
     aim: null                // {x,y} in css pixels, where she tapped
   };
 
+  function keys(o){ return Object.keys(o).map(Number).sort(function(a,b){ return a-b; }); }
   var DISTS = {
-    approach: [125, 145, 165, 185],
+    approach: keys(APPROACH),
+    wedge:    keys(WEDGE),
+    chip:     keys(CHIP),
     driver:   [200, 220, 240, 260],
     windows:  [130, 145, 165, 185]
   };
@@ -230,10 +246,12 @@
     line(p.x, p.y - r, p.x, p.y + r, "rgba(255,255,255,.75)", 1.2);
   }
 
-  function drawApproach(){
-    var p = aimPoint(), d = state.dist;
-    var half = approachHalfAngle(d), w = dx(half);
-    var bull = bullFt(d), bw = bull ? dx(ftHalfAngle(bull, d)) : 0;
+  /* Approach, wedges and chipping are all the same picture: a circle on the
+     ground, seen from the tee, so what she can actually judge is its width. */
+  function drawCircle(){
+    var p = aimPoint(), d = state.dist, t = tgt();
+    var half = ftHalfAngle(t.c, d), w = dx(half);
+    var bull = t.b || 0, bw = bull ? dx(ftHalfAngle(bull, d)) : 0;
     var top = p.y - 70*DPR, bot = p.y + 70*DPR;
 
     ctx.save();
@@ -256,10 +274,33 @@
     ctx.restore();
 
     drawCross(p);
-    tag(Math.round(circleFt(d) * 2) + " ft across", p.x, bot + 16*DPR, "#ffffff");
+    tag(t.c * 2 + " ft across", p.x, bot + 16*DPR, "#ffffff");
     tag((half*2*180/Math.PI).toFixed(2) + "° wide", p.x, top - 16*DPR, "#b9c3bc");
     // on the left edge, so it does not sit on top of the scoring bracket
     if(bw) tag(bull + " ft", p.x - bw, p.y - 54*DPR, "rgba(255,255,255,.8)");
+    offscreen(p, w);
+  }
+
+  /* Close in, a target can be wider than the phone can see: two clubs at ten
+     paces is 22 degrees across and the frame, cropped to portrait, is nearer
+     twenty. Both edges then sit outside the canvas and the overlay draws
+     nothing at all, which reads as broken rather than as "bigger than this".
+     Mark the edges and say so. */
+  function offscreen(p, w){
+    var lo = p.x - w, hi = p.x + w;
+    if(lo >= 0 && hi <= cv.width) return;
+    ctx.save();
+    ctx.fillStyle = "#d2006a";
+    [[0, 1], [cv.width, -1]].forEach(function(e){
+      if(e[1] > 0 ? lo >= 0 : hi <= cv.width) return;
+      ctx.beginPath();
+      ctx.moveTo(e[0], p.y - 16*DPR);
+      ctx.lineTo(e[0] + e[1]*18*DPR, p.y);
+      ctx.lineTo(e[0], p.y + 16*DPR);
+      ctx.fill();
+    });
+    ctx.restore();
+    tag("wider than the frame · step back", p.x, p.y + 104*DPR, "#ffd27f");
   }
 
   function drawDriver(){
@@ -282,7 +323,7 @@
     });
     drawCross(p);
     var hw = corridorHalfAngle(d);
-    tag("26 yd lane", p.x, p.y + 74*DPR + 16*DPR, "#ffffff");
+    tag(CORRIDOR[state.club] + " yd lane", p.x, p.y + 74*DPR + 16*DPR, "#ffffff");
     tag((hw*2*180/Math.PI).toFixed(2) + "° at " + d + " yd", p.x, p.y - 74*DPR - 16*DPR, "#b9c3bc");
   }
 
@@ -331,7 +372,7 @@
 
   function paint(){
     ctx.clearRect(0,0,cv.width,cv.height);
-    if(state.mode === "approach") drawApproach();
+    if(TABLE[state.mode]) drawCircle();
     else if(state.mode === "driver") drawDriver();
     else drawWindows();
     hud();
@@ -351,16 +392,18 @@
 
   function hud(){
     var f = document.getElementById("hudFig"), s = document.getElementById("hudSub");
-    var d = state.dist;
-    if(state.mode === "approach"){
-      var a = approachHalfAngle(d)*2*180/Math.PI;
-      f.textContent = "Inside " + circleFt(d) + " ft at " + d + " yd";
-      s.textContent = Math.round(circleFt(d)*2) + " ft across · " + a.toFixed(2) +
-                      "° wide · dashed is the " + bullFt(d) + " ft bullseye";
+    var d = state.dist, u = UNIT[state.mode];
+    if(TABLE[state.mode]){
+      var t = tgt(), a = ftHalfAngle(t.c, d)*2*180/Math.PI;
+      var lab = state.mode === "chip" ? "Inside two clubs at " + d + " paces"
+                                      : "Inside " + t.c + " ft at " + d + " " + u;
+      f.textContent = lab;
+      s.textContent = (t.c*2) + " ft across · " + a.toFixed(2) + "° wide" +
+                      (t.b ? " · dashed is the " + t.b + " ft bullseye" : "");
     } else if(state.mode === "driver"){
       var c = corridorHalfAngle(d)*2*180/Math.PI;
-      f.textContent = "26 yd corridor at " + d + " yd";
-      s.textContent = c.toFixed(2) + "° wide · narrows the further she hits it";
+      f.textContent = state.club + " · " + CORRIDOR[state.club] + " yd corridor";
+      s.textContent = c.toFixed(2) + "° wide at " + d + " yd · narrows the further she hits it";
     } else {
       f.textContent = "Five windows · " + d + " yd shot";
       s.textContent = "straight within 1.5° · working shape 1.5° to 4.5°";
@@ -370,12 +413,26 @@
   /* ---- chrome ---------------------------------------------------------- */
   function buildDists(){
     var host = document.getElementById("dists");
+    var u = state.mode === "chip" ? "paces" : "yd";
     host.innerHTML = "";
     DISTS[state.mode].forEach(function(d){
       var b = document.createElement("button");
       b.className = "chip sm" + (d === state.dist ? " on" : "");
-      b.textContent = d + " yd";
+      b.textContent = d + " " + u;
       b.addEventListener("click", function(){ state.dist = d; buildDists(); paint(); });
+      host.appendChild(b);
+    });
+  }
+  function buildClubs(){
+    var host = document.getElementById("clubs");
+    host.hidden = state.mode !== "driver";
+    host.innerHTML = "";
+    if(host.hidden) return;
+    Object.keys(CORRIDOR).forEach(function(c){
+      var b = document.createElement("button");
+      b.className = "chip sm" + (c === state.club ? " on" : "");
+      b.textContent = c;
+      b.addEventListener("click", function(){ state.club = c; buildClubs(); paint(); });
       host.appendChild(b);
     });
   }
@@ -390,7 +447,7 @@
     document.getElementById("tip").textContent = state.mode === "windows"
       ? "Tap the flag. The windows hang above it, where the ball actually is at 20 m."
       : "Tap the flag on screen to put the target there.";
-    buildDists(); paint();
+    buildClubs(); buildDists(); paint();
   });
 
   function slider(id, valId, key, suffix, digits){
@@ -436,7 +493,7 @@
       try{ var pr = video.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){}
       document.getElementById("start").hidden = true;
       sheet.hidden = false;
-      buildDists();
+      buildClubs(); buildDists();
       slider("fov",  "fovV",  "fov",  "°", 0);
       slider("elev", "elevV", "elev", "°", 0);
       slider("rowh", "rowV",  "rowh", "°", 1);
