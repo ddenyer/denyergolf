@@ -2316,12 +2316,41 @@
   .mxclockset button{width:50px; height:50px; border-radius:12px; border:2px solid var(--ink); background:var(--surface); color:var(--ink); font-size:26px; font-weight:700}
   .mxclockset b{font-size:28px; font-weight:800; min-width:110px; text-align:center; font-variant-numeric:tabular-nums}
   .mxclockset .note{font-size:12.5px; color:var(--ink-2)}
+  .ugart{display:block; width:100%; height:auto; max-height:230px; margin:6px 0 10px}
+  .ugart .bg{fill:var(--turf-wash); stroke:var(--turf-line); stroke-width:1.5}
+  .ugart text{font-family:inherit; fill:var(--turf-ink); font-weight:700}
+  .ugart text.big{font-size:17px; fill:var(--ink)} .ugart text.sm{font-size:11px} .ugart text.xs{font-size:9.5px} .ugart text.spn{font-size:10px; fill:var(--ink)}
+  .ugart .ln{fill:none; stroke:var(--turf-line); stroke-width:1.6; stroke-dasharray:5 4}
+  .ugart .dim, .ugart .rule{stroke:var(--turf-ink); stroke-width:1.3}
+  .ugart .ar{stroke:var(--ink); stroke-width:2}
+  .ugart .ahd{fill:var(--ink)}
+  .ugart .z1{fill:var(--surface); stroke:var(--turf-line); stroke-width:1.4}
+  .ugart .z2{fill:var(--up-wash); stroke:var(--up); stroke-width:1.6}
+  .ugart .pz{fill:var(--down-wash); stroke:var(--down); stroke-width:1.4; stroke-dasharray:4 3}
+  .ugart .tee, .ugart .dotk{fill:var(--ink)}
+  .ugart .dot{fill:var(--surface); stroke:var(--ink); stroke-width:1.5}
+  .ugart .hole{fill:var(--hole); stroke:var(--ink); stroke-width:1.4}
+  .ugart .green{fill:var(--surface); stroke:var(--turf-line); stroke-width:1.6}
+  .ugart .bunker{fill:var(--t-short); stroke:var(--turf-line); stroke-width:1}
+  .ugart .spot{fill:var(--surface); stroke:var(--ink); stroke-width:1.5}
+  .ugart .bo{fill:var(--down-wash); stroke:var(--down); stroke-width:1.2}
+  .ugart .by{fill:var(--t-wedge); stroke:var(--gold); stroke-width:1.2}
+  .ugart .bgr{fill:var(--up-wash); stroke:var(--up); stroke-width:1.2}
+  .ugchips{display:flex; flex-wrap:wrap; gap:5px; margin:6px 0}
+  .ugchip{display:inline-flex; align-items:baseline; gap:3px; border:1px solid var(--line-strong); border-radius:8px; padding:4px 7px; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums}
+  .ugchip i{font-style:normal; font-size:10px; font-weight:600; color:var(--muted)}
+  .ugchip.done{background:var(--up-wash); border-color:var(--up)} .ugchip.now{border:2px solid var(--ink)}
+  .ugchip.good{background:var(--up-wash)} .ugchip.bad{background:var(--down-wash)}
+  .ugundo{margin-top:6px; border:1px solid var(--line-strong); background:var(--surface); border-radius:10px; padding:9px 14px; font:inherit; font-weight:600; color:var(--ink); min-height:44px}
+  .ugnow .ugscore{margin-top:4px}
+  .ugpick button{min-width:0; padding:10px 4px}
+  .ugpick button b{font-size:20px; overflow-wrap:anywhere}
   .ugscore{margin:10px 0 0; padding:10px 12px; border:2px solid var(--ink); border-radius:12px; font-size:15px; font-weight:600; color:var(--ink)}
   .ugscore b{font-size:26px; font-weight:800; margin:0 6px}
   .ugscore span{color:var(--ink-2); font-weight:500}
   /* ---- one menu, a slim header (28 Oct) ---- */
   nav.lookrow{display:none !important}
-  #tabTests, #tabDrills{display:none !important}
+  #tabTests, #tabDrills, #tabUpgame{display:none !important}
   .brand{font-size:14px; color:var(--ink-2)}
   .brandrow{align-items:center; flex-wrap:nowrap}
   .topin{padding:8px 16px 8px}
@@ -2493,6 +2522,7 @@
   <button id="tabTests" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="2.1"></circle><circle cx="12" cy="12" r="1.9" fill="currentColor"></circle></svg><span>Squad</span></button>
   <button id="tabSC" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.6" y="9.4" width="2.6" height="5.2" rx="1.1"></rect><rect x="5" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="9.2" y="10.7" width="5.6" height="2.6"></rect><rect x="15.6" y="6.8" width="3.4" height="10.4" rx="1.4"></rect><rect x="19.8" y="9.4" width="2.6" height="5.2" rx="1.1"></rect></svg><span>S&amp;C</span></button>
   <button id="tabDrills" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.4" r="7.8"></circle><path d="M12 9.6v3.8l2.6 1.7"></path><path d="M9.4 2.6h5.2"></path><path d="M12 2.6v3"></path></svg><span>Drills</span></button>
+  <button id="tabUpgame" role="tab" aria-selected="false">UpGame</button>
   <button id="tabProg" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"></path><path d="M6 17v-5"></path><path d="M11 17V8"></path><path d="M16 17v-7"></path><path d="m5 8.5 5-4 5 3 5-4"></path></svg><span>Progress</span></button>
   <button id="tabCal" role="tab" aria-selected="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="4.8" width="17.2" height="15.8" rx="2.6"></rect><path d="M3.4 9.6h17.2"></path><path d="M8 2.8v4"></path><path d="M16 2.8v4"></path></svg><span>Calendar</span></button>
 </nav>
@@ -2601,6 +2631,12 @@
     <p class="lede">Two tests for each pillar: a matrix (five in a row against the clock) and a Perfect 9 (nine shots in as few attempts as you can). Then the drills you can do at home.</p>
     <div id="drillWhere"></div>
     <div id="drillList"></div>
+  </section>
+
+  <section id="viewUpgame" hidden>
+    <h1>UpGame</h1>
+    <p class="lede">The Pro and Super Pro challenges from the UpGame library, played and scored the way UpGame scores them. Lower is better on every one. When you finish, type the score into UpGame.</p>
+    <div id="ugList"></div>
   </section>
 
   <section id="viewSC" hidden>
@@ -3025,7 +3061,7 @@ function guard(fn, label){
 /* ============ the programme ============ */
 /* Bumped whenever anything that scores a session changes, so "is the new version
    live" is answerable by looking rather than by asking. Shown at the foot of Goals. */
-var BUILD = { on:"2026-10-29", note:"A Perfect 9 for every pillar beside its matrix; matrix runs can be entered by hand; one menu of five tabs, Ready and Finish screens" };
+var BUILD = { on:"2026-10-29", note:"An UpGame tab under Practice with the fifteen Pro and Super Pro challenges, scored the UpGame way; a Perfect 9 for every pillar; matrix runs can be entered by hand" };
 var AREAS = [
 { id:10, no:4, name:"Tee shots (Ball flight control)", sub:"Driver, 3-wood, 5-wood / 2 hybrid \u00b7 off the tee", block:"long", track:true, shape:"corridor",
   sg:true, hitLabel:"in the fairway",
@@ -4840,6 +4876,384 @@ function inARow(n, first, rest){
   return out;
 }
 
+/* ---- UpGame (29 Oct) ----
+   The Pro and Super Pro challenges from the UpGame library, played the way
+   UpGame sets them out and scored the way UpGame scores them, so the number at
+   the end can be typed straight into UpGame. Lower is better on every one.
+   The pictures are our own drawings of each set-up, not UpGame's artwork.
+   A run is kept as the list of outcomes she tapped (d.ug.log), and everything
+   else, where she is, the lives, the score, is worked out from that list each
+   time, so Undo is just taking the last one off. */
+function UGD(id, ar, place, mins, name, level, game, gp, sub, rules){
+  return { id:id, area:ar, place:place, mins:mins, shape:"ug", ugame:true, keep:true, lower:true,
+    name:name, ugLevel:level, game:game, gp:gp, sub:sub, ruleText:rules,
+    why:"From the UpGame library (" + level + "). Scored exactly as UpGame scores it, so the number at the end goes straight into UpGame.",
+    where:DRILL_PLACES[place].nm + (gp.lm ? ", with a launch monitor" : ""), sets:[], balls:0, ugMin:gp.min, ugMax:gp.max };
+}
+function ugElimRule(g){
+  return g.balls + " balls. Start at " + g.from + " yards and hit one ball at each distance, every " + g.step + " yards up to " + g.to +
+    ". A ball that lands within " + g.win + " yards either side of its number knocks that number out. Go round the ones still in until all " +
+    ((g.to - g.from) / g.step + 1) + " are out or the " + g.balls + " balls are gone. Score: the balls it took, lower is better.";
+}
+function ugSgRule(g){
+  return "Set up six " + g.kind.toLowerCase() + " spots round the green and play one shot at a time, going round them in turn. Finish inside " + g.ft +
+    " ft and that spot is out. Score: the shots it took to knock out all six, with one taken off for every chip in. Thirty shots at most.";
+}
+function ugBoxRule(g){
+  return "Make a box of five one-foot sections, orange, yellow, green, yellow, orange, and set tees uphill and downhill of it at 10, 15, 20 and 25 ft. " +
+    "Play 10 ft uphill, 10 ft downhill, 15 ft uphill and so on. Green: move on" + (g.pro ? " and gain a life" : "") + ". Yellow: " +
+    (g.pro ? "move on" : "stay where you are") + ". Orange or outside the box: move back." +
+    (g.pro ? " A life saves you from moving back, or comes off the score at the end." : "") + " Finish by completing 25 ft downhill. Score: total putts, 40 at most.";
+}
+var UG_GAMES = [
+  UGD("u-tee-pz-sp", 10, 0, 25, "Tee Shot Points Target + Penalty Zone (Super Pro)", "Super Pro", "tpz",
+    { goal:10, balls:20, min:5, max:20, unit:"balls" }, "Ten points to finish, twenty balls at most",
+    "Pick a new target line every ball. Inside the 25 yard zone scores 2, inside the 45 yard zone 1. Miss the 45 yard zone on the penalty side and lose 1. " +
+    "Balls 1, 5, 9, 13 and 17 have no penalty zone, 2, 6, 10, 14 and 18 have it on the right, 3, 7, 11, 15 and 19 on the left, and 4, 8, 12, 16 and 20 both sides. " +
+    "Reach 10 points to finish. Score: the balls it took, lower is better."),
+  UGD("u-tee-pz-pro", 10, 0, 25, "Tee Shot Points Target + Penalty Zone (Pro)", "Pro", "tpz",
+    { goal:8, balls:20, min:4, max:20, unit:"balls" }, "Eight points to finish, twenty balls at most",
+    "As the Super Pro version, but 8 points finishes it. Inside 25 yards scores 2, inside 45 yards 1, a miss on the penalty side loses 1. Score: the balls it took."),
+  UGD("u-app-el-150-sp", 11, 0, 30, "Eliminator 150-200Y (Super Pro)", "Super Pro", "elim",
+    { from:150, to:200, step:5, win:4, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 150 to 200, knock each out inside 4 yards", ""),
+  UGD("u-app-el-150-pro", 11, 0, 30, "Eliminator 150-200Y (Pro)", "Pro", "elim",
+    { from:150, to:200, step:5, win:5, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 150 to 200, knock each out inside 5 yards", ""),
+  UGD("u-app-el-100-sp", 11, 0, 30, "Eliminator 100-150Y (Super Pro)", "Super Pro", "elim",
+    { from:100, to:150, step:5, win:3, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 100 to 150, knock each out inside 3 yards", ""),
+  UGD("u-app-el-100-pro", 11, 0, 30, "Eliminator 100-150Y (Pro)", "Pro", "elim",
+    { from:100, to:150, step:5, win:4, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 100 to 150, knock each out inside 4 yards", ""),
+  UGD("u-wdg-el-50-sp", 2, 0, 30, "Eliminator 50-100Y (Super Pro)", "Super Pro", "elim",
+    { from:50, to:100, step:5, win:2, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 50 to 100, knock each out inside 2 yards", ""),
+  UGD("u-wdg-el-50-pro", 2, 0, 30, "Eliminator 50-100Y (Pro)", "Pro", "elim",
+    { from:50, to:100, step:5, win:3, balls:25, min:11, max:25, lm:true, unit:"balls" }, "Eleven numbers from 50 to 100, knock each out inside 3 yards", ""),
+  UGD("u-sg-el-med-sp", 3, 1, 30, "Short Game Eliminator (Medium) Super Pro", "Super Pro", "sgel",
+    { kind:"Medium", ft:3, spots:6, balls:30, min:0, max:30, unit:"shots" }, "Six medium spots, each knocked out inside 3 ft", ""),
+  UGD("u-sg-el-med-pro", 3, 1, 30, "Short Game Eliminator (Medium) Pro", "Pro", "sgel",
+    { kind:"Medium", ft:6, spots:6, balls:30, min:0, max:30, unit:"shots" }, "Six medium spots, each knocked out inside 6 ft", ""),
+  UGD("u-sg-el-easy-pro", 3, 1, 30, "Short Game Eliminator (Easy) Pro", "Pro", "sgel",
+    { kind:"Easy", ft:3, spots:6, balls:30, min:0, max:30, unit:"shots" }, "Six easy spots, each knocked out inside 3 ft", ""),
+  UGD("u-putt-star-pro", 4, 2, 20, "Putting Star Ladder (Pro)", "Pro", "star",
+    { tees:[3, 7, 4, 8, 5, 9, 6, 10], min:8, max:40, unit:"putts" }, "Eight tees round a hole, up and down the ladder",
+    "Tees at 3, 4, 5 and 6 ft north, east, south and west of a hole, and at 7, 8, 9 and 10 ft in between. Start at 3 ft. Hole it and move on to the next tee " +
+    "(3, 7, 4, 8, 5, 9, 6, 10). Miss and move back one, or stay put on the 3 ft putt. It ends when you hole the 10 footer. Score: total putts, 40 at most."),
+  UGD("u-putt-circuit-pro", 4, 2, 30, "Putting Circuit Ladder (Pro)", "Pro", "circ",
+    { st:[12, 15, 18, 21, 24, 27, 30, 35, 40, 45, 50, 3, 4, 5, 6, 7, 8, 9], min:18, max:60, unit:"putts" }, "Eighteen stations from 3 to 50 ft, with safe zones and lives",
+    "Eighteen stations in order: 12 to 30 ft in threes, then 35 to 50 ft in fives, then 3 to 9 ft. Safe zone: a 2 ft semicircle past the hole from 12 to 30 ft, " +
+    "and a 2 ft circle round the hole from 35 to 50 ft. From 3 to 9 ft: holed moves you on, a miss moves you back. From 12 ft out: holed moves you on and gains a life, " +
+    "the safe zone moves you on, outside it moves you back. A life saves you from moving back, or comes off the score at the end. Score: total putts, 60 at most."),
+  UGD("u-putt-box-sp", 4, 2, 25, "Speed Box Ladder 10-25FT (Super Pro)", "Super Pro", "box",
+    { pro:false, min:8, max:40, unit:"putts" }, "Pace into a five-section box, uphill and down", ""),
+  UGD("u-putt-box-pro", 4, 2, 25, "Speed Box Ladder 10-25FT (Pro)", "Pro", "box",
+    { pro:true, min:0, max:40, unit:"putts" }, "Pace into a five-section box, with lives", "")
+];
+UG_GAMES.forEach(function(d){
+  if(d.ruleText) return;
+  d.ruleText = d.game === "elim" ? ugElimRule(d.gp) : d.game === "sgel" ? ugSgRule(d.gp) : ugBoxRule(d.gp);
+});
+DRILLS.push.apply(DRILLS, UG_GAMES);
+var UG_BOX = ["10 ft uphill", "10 ft downhill", "15 ft uphill", "15 ft downhill", "20 ft uphill", "20 ft downhill", "25 ft uphill", "25 ft downhill"];
+
+/* Where the run has got to, from the taps alone. A finished score is kept
+   inside UpGame's own range: the Circuit Ladder's lives can take the count
+   below 18, which UpGame will not accept, so it stops at 18. */
+function ugRun(a, log){
+  var r = ugRun0(a, log), g = a.gp;
+  if(r.done && g && g.min != null && r.score < g.min){
+    r.status += ". The lives would take it to " + r.score + ", but UpGame's lowest score here is " + g.min + ", so it goes in as " + g.min;
+    r.score = g.min;
+  }
+  return r;
+}
+function ugRun0(a, log){
+  var g = a.gp, r = { n:0, done:false, score:0, opts:[], trail:"", big:"", small:"", eye:"", status:"", lives:0 };
+  log = log || [];
+  var i, k, lab;
+  if(a.game === "tpz"){
+    var pts = 0;
+    log.forEach(function(x){ r.n++; pts += { t2:2, t1:1, t0:0, tp:-1 }[x] || 0; });
+    r.done = pts >= g.goal || r.n >= g.balls;
+    r.score = (pts >= g.goal) ? r.n : (r.done ? g.balls : r.n);
+    var b = r.n + 1, pat = (b - 1) % 4;
+    r.eye = "Ball " + b + " of " + g.balls;
+    r.big = pts + " of " + g.goal + " points";
+    r.small = ["No penalty zone on this one.", "Penalty zone on the right.", "Penalty zone on the left.", "Penalty zones both sides."][pat] + " New target line.";
+    r.opts = [["t2", "2", "inside 25 yds"], ["t1", "1", "inside 45 yds"]];
+    if(pat === 0) r.opts.push(["t0", "0", "missed 45 yds"]);
+    if(pat === 1) r.opts.push(["t0", "0", "missed left"], ["tp", "−1", "missed right"]);
+    if(pat === 2) r.opts.push(["t0", "0", "missed right"], ["tp", "−1", "missed left"]);
+    if(pat === 3) r.opts.push(["tp", "−1", "missed"]);
+    r.trail = log.map(function(x, j){ var v = { t2:"2", t1:"1", t0:"0", tp:"−1" }[x];
+      return '<span class="ugchip ' + (x === "t2" ? "good" : x === "tp" ? "bad" : x === "t1" ? "ok" : "") + '"><i>' + (j + 1) + '</i>' + v + '</span>'; }).join("");
+    r.status = pts + " points from " + r.n + " ball" + (r.n === 1 ? "" : "s") + (r.done && pts < g.goal ? ". Twenty balls used without reaching " + g.goal + ", so the score is 20." : "");
+    return r;
+  }
+  if(a.game === "elim" || a.game === "sgel"){
+    var nums = [], out = {}, pos = 0, chips = 0;
+    if(a.game === "elim") for(i = g.from; i <= g.to; i += g.step) nums.push(i);
+    else for(i = 1; i <= g.spots; i++) nums.push(i);
+    var nextIn = function(p){ for(var q = 0; q < nums.length; q++){ var j = (p + q) % nums.length; if(!out[nums[j]]) return j; } return -1; };
+    log.forEach(function(x){
+      var j = nextIn(pos); if(j < 0) return;
+      r.n++;
+      if(x === "in" || x === "hole"){ out[nums[j]] = true; if(x === "hole") chips++; }
+      pos = j + 1;
+    });
+    var left = nums.filter(function(v){ return !out[v]; }).length;
+    r.done = !left || r.n >= g.balls;
+    r.score = !left ? Math.max(0, r.n - chips) : (r.done ? g.max : r.n - chips);
+    var cur = nums[nextIn(pos)];
+    if(a.game === "elim"){
+      r.eye = "Ball " + (r.n + 1) + " of " + g.balls;
+      r.big = cur + " yards";
+      r.small = "Land it between " + (cur - g.win) + " and " + (cur + g.win) + " yards to knock it out.";
+      r.opts = [["in", "In", "within " + g.win + " yds"], ["out", "Out", "missed it"]];
+      r.trail = nums.map(function(v){ return '<span class="ugchip ' + (out[v] ? "done" : v === cur && !r.done ? "now" : "") + '">' + v + '</span>'; }).join("");
+      r.status = (nums.length - left) + " of " + nums.length + " knocked out, " + r.n + " ball" + (r.n === 1 ? "" : "s") + " used" +
+        (r.done && left ? ". All " + g.balls + " balls gone with " + left + " still in, so the score is " + g.max + "." : "");
+    } else {
+      r.eye = "Shot " + (r.n + 1) + " of " + g.balls;
+      r.big = g.kind + " spot " + cur;
+      r.small = "Inside " + g.ft + " ft knocks it out. A chip in knocks it out and takes one off the score.";
+      r.opts = [["hole", "In!", "chipped in, minus 1"], ["in", "Inside", g.ft + " ft"], ["out", "Outside", g.ft + " ft"]];
+      r.trail = nums.map(function(v){ return '<span class="ugchip ' + (out[v] ? "done" : v === cur && !r.done ? "now" : "") + '"><i>spot</i>' + v + '</span>'; }).join("");
+      r.status = (nums.length - left) + " of 6 spots out, " + r.n + " shot" + (r.n === 1 ? "" : "s") + (chips ? ", " + chips + " chip in" + (chips === 1 ? "" : "s") : "") +
+        (r.done && left ? ". Thirty shots used with spots still in, so the score is 30." : "");
+    }
+    return r;
+  }
+  if(a.game === "star"){
+    var t = g.tees, at = 0, fin = false;
+    log.forEach(function(x){ if(fin) return; r.n++; if(x === "in"){ if(at === t.length - 1) fin = true; else at++; } else at = Math.max(0, at - 1); });
+    r.done = fin || r.n >= g.max;
+    r.score = fin ? r.n : (r.done ? g.max : r.n);
+    r.eye = "Tee " + (at + 1) + " of 8";
+    r.big = t[at] + " ft";
+    r.small = at === 0 ? "Hole it to move on. Miss and you stay on the 3 footer." : at === t.length - 1 ? "Hole this one and you are done. Miss and go back one." : "Hole it to move on. Miss and go back one.";
+    r.opts = [["in", "Holed", "move on"], ["out", "Missed", at ? "back one" : "stay"]];
+    r.trail = t.map(function(v, j){ return '<span class="ugchip ' + (j < at || fin ? "done" : j === at && !r.done ? "now" : "") + '">' + v + '<i>ft</i></span>'; }).join("");
+    r.status = r.n + " putt" + (r.n === 1 ? "" : "s") + (r.done && !fin ? ". Forty putts without finishing, so the score is 40." : "");
+    return r;
+  }
+  if(a.game === "circ" || a.game === "box"){
+    var circ = a.game === "circ", st = circ ? g.st : UG_BOX, p = 0, lives = 0, end = false;
+    var pro = circ || g.pro;
+    log.forEach(function(x){
+      if(end) return;
+      r.n++;
+      var fwd = function(){ if(p === st.length - 1) end = true; else p++; };
+      if(circ){
+        var shortP = st[p] <= 9;
+        if(x === "h"){ if(!shortP) lives++; fwd(); }
+        else if(x === "s") fwd();
+        else if(x === "L"){ lives = Math.max(0, lives - 1); }
+        else p = Math.max(0, p - 1);
+      } else {
+        if(x === "g"){ if(pro) lives++; fwd(); }
+        else if(x === "y"){ if(pro) fwd(); }
+        else if(x === "L"){ lives = Math.max(0, lives - 1); }
+        else p = Math.max(0, p - 1);
+      }
+    });
+    r.lives = lives;
+    r.done = end || r.n >= g.max;
+    r.score = end ? Math.max(0, r.n - (pro ? lives : 0)) : (r.done ? g.max : r.n);
+    var here = st[p];
+    if(circ){
+      var sp = here <= 9;
+      r.eye = "Station " + (p + 1) + " of 18" + (lives ? " · " + lives + (lives === 1 ? " life" : " lives") : "");
+      r.big = here + " ft";
+      r.small = sp ? "Holed moves you on, a miss moves you back." :
+        "Safe zone: " + (here <= 30 ? "a 2 ft semicircle past the hole" : "a 2 ft circle round the hole") + ". Holed moves you on and gains a life.";
+      r.opts = sp ? [["h", "Holed", "move on"], ["m", "Missed", "back one"]]
+                  : [["h", "Holed", "on, plus a life"], ["s", "Safe zone", "move on"], ["o", "Outside", "back one"]];
+      if(lives) r.opts.push(["L", sp ? "Missed" : "Outside", "use a life, stay"]);
+      r.trail = st.map(function(v, j){ return '<span class="ugchip ' + (j < p || end ? "done" : j === p && !r.done ? "now" : "") + '"><i>' + (j + 1) + '</i>' + v + '</span>'; }).join("");
+    } else {
+      r.eye = "Putt " + (p + 1) + " of 8" + (lives ? " · " + lives + (lives === 1 ? " life" : " lives") : "");
+      r.big = here;
+      r.small = "Green: " + (pro ? "move on and gain a life" : "move on") + ". Yellow: " + (pro ? "move on" : "stay") + ". Orange or outside the box: move back.";
+      r.opts = [["g", "Green", pro ? "on, plus a life" : "move on"], ["y", "Yellow", pro ? "move on" : "stay"], ["o", "Orange", "or outside, back one"]];
+      if(pro && lives) r.opts.push(["L", "Orange", "use a life, stay"]);
+      r.trail = st.map(function(v, j){ return '<span class="ugchip ' + (j < p || end ? "done" : j === p && !r.done ? "now" : "") + '">' + v.replace(" ft ", "<i>") + '</i></span>'; }).join("");
+    }
+    r.status = r.n + " putt" + (r.n === 1 ? "" : "s") + (pro && lives ? ", " + lives + " unused " + (lives === 1 ? "life" : "lives") + (end ? " off the score" : "") : "") +
+      (r.done && !end ? ". " + g.max + " putts without finishing, so the score is " + g.max + "." : "");
+    return r;
+  }
+  return r;
+}
+function ugUnit(a){ return (a && a.gp && a.gp.unit) || "shots"; }
+function ugDoneRuns(d){
+  return drillFamSessions(d).filter(function(x){ return x.status !== "live" && x.ugDone && x.total != null; });
+}
+
+/* ---- the drawings: our own, in the app's turf style ---- */
+var UG_ART_N = 0;
+function ugArt(a){
+  var g = a.gp, id = "uga" + (++UG_ART_N), s = "";
+  var head = '<svg class="ugart" viewBox="0 0 320 190" role="img" aria-label="The set-up for ' + a.name.replace(/"/g, "") + '">' +
+    '<defs><marker id="' + id + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">' +
+    '<path d="M0 0 L10 5 L0 10 z" class="ahd"/></marker></defs><rect class="bg" x="1" y="1" width="318" height="188" rx="12"/>';
+  var arrow = function(x1, y1, x2, y2){ return '<line class="ar" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" marker-end="url(#' + id + ')"/>'; };
+  var txt = function(x, y, t, cls, anc){ return '<text x="' + x + '" y="' + y + '" class="' + (cls || "") + '" text-anchor="' + (anc || "middle") + '">' + t + '</text>'; };
+  var dot = function(x, y, r, cls){ return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 5) + '" class="' + (cls || "dot") + '"/>'; };
+  if(a.game === "tpz"){
+    var bands = [[22, 72, "pz", "−1"], [72, 126, "z1", "1"], [126, 194, "z2", "2"], [194, 248, "z1", "1"], [248, 298, "pz", "−1"]];
+    bands.forEach(function(b){ s += '<rect class="' + b[2] + '" x="' + b[0] + '" y="22" width="' + (b[1] - b[0]) + '" height="42"/>' + txt((b[0] + b[1]) / 2, 48, b[3], "big"); });
+    s += txt(47, 78, "penalty", "sm") + txt(273, 78, "penalty", "sm");
+    s += '<line class="ln" x1="72" y1="64" x2="72" y2="172"/><line class="ln" x1="248" y1="64" x2="248" y2="172"/>';
+    s += '<line class="dim" x1="126" y1="92" x2="194" y2="92"/>' + txt(168, 106, "25 yds", "sm", "start");
+    s += '<line class="dim" x1="72" y1="120" x2="248" y2="120"/>' + txt(168, 134, "45 yds", "sm", "start");
+    s += arrow(160, 170, 160, 70) + dot(160, 174, 6, "tee");
+    s += txt(300, 180, "goal " + g.goal + " pts", "sm", "end");
+  } else if(a.game === "elim"){
+    var n = (g.to - g.from) / g.step + 1, x0 = 70, x1 = 300, X = function(v){ return x0 + (v - g.from) / (g.to - g.from) * (x1 - x0); };
+    var w = X(g.from + g.win) - X(g.from);
+    s += '<rect class="z2" x="' + (X(g.from) - w) + '" y="58" width="' + (2 * w) + '" height="56" rx="4"/>' + txt(X(g.from), 50, "±" + g.win + " yds", "sm");
+    s += dot(30, 86, 6, "tee") + arrow(38, 86, X(g.from) - 4, 86);
+    s += '<line class="rule" x1="' + x0 + '" y1="140" x2="' + x1 + '" y2="140"/>';
+    for(var i = 0; i < n; i++){ var v = g.from + i * g.step, xx = X(v);
+      s += '<line class="rule" x1="' + xx + '" y1="134" x2="' + xx + '" y2="146"/>' + (i % 2 === 0 ? txt(xx, 162, v, "sm") : "") + dot(xx, 122, 3.2, i ? "dot" : "dotk"); }
+    s += txt(185, 182, "every " + g.step + " yds, round again until all " + n + " are out", "sm");
+  } else if(a.game === "sgel"){
+    s += '<ellipse class="green" cx="160" cy="98" rx="92" ry="60"/>';
+    s += '<ellipse class="bunker" cx="72" cy="160" rx="26" ry="11"/><ellipse class="bunker" cx="262" cy="40" rx="22" ry="10"/>';
+    var R = g.ft === 3 ? 13 : 22;
+    s += '<circle class="ln" cx="160" cy="98" r="' + R + '"/>' + dot(160, 98, 4.5, "hole") + txt(160 + R + 4, 94, g.ft + " ft", "sm", "start");
+    var far = g.kind === "Easy" ? [1.12, 1.15] : [1.45, 1.5];
+    for(var j = 0; j < 6; j++){ var ang = -Math.PI / 2 + j * Math.PI / 3 + 0.35;
+      var px = 160 + Math.cos(ang) * 92 * far[0], py = 98 + Math.sin(ang) * 60 * far[1];
+      px = Math.max(16, Math.min(304, px)); py = Math.max(16, Math.min(176, py));
+      s += dot(px, py, 9, "spot") + txt(px, py + 4, j + 1, "spn"); }
+    s += txt(12, 184, g.kind.toLowerCase() + " spots", "sm", "start");
+  } else if(a.game === "star"){
+    var cx = 160, cy = 96, k = 8.2, dirs = { 3:[0, 1], 4:[1, 0], 5:[0, -1], 6:[-1, 0], 7:[0.71, 0.71], 8:[0.71, -0.71], 9:[-0.71, -0.71], 10:[-0.71, 0.71] };
+    var P = function(ft){ var d0 = dirs[ft]; return [cx + d0[0] * ft * k, cy + d0[1] * ft * k * 0.95]; };
+    s += dot(cx, cy, 6, "hole");
+    var path = g.tees.map(P);
+    for(var q = 0; q < path.length - 1; q++){ var A = path[q], B = path[q + 1], f = 0.12;
+      s += arrow((A[0] + (B[0] - A[0]) * f).toFixed(1), (A[1] + (B[1] - A[1]) * f).toFixed(1), (B[0] - (B[0] - A[0]) * f).toFixed(1), (B[1] - (B[1] - A[1]) * f).toFixed(1)); }
+    g.tees.forEach(function(ft, idx){ var pp = P(ft); s += dot(pp[0], pp[1], 5, idx ? "dot" : "dotk") + (ft === 5 ? txt(pp[0], pp[1] - 9, "5 ft", "sm") : ft === 3 ? txt(pp[0], pp[1] + 17, "3 ft", "sm") : txt(pp[0] + (pp[0] > cx ? 9 : -9), pp[1] + 4, ft + " ft", "sm", pp[0] > cx ? "start" : "end")); });
+  } else if(a.game === "circ"){
+    var hx = 62, hy = 96;
+    s += '<path class="ln" d="M' + (hx - 14) + ' ' + hy + ' A14 14 0 0 1 ' + (hx + 14) + ' ' + hy + '"/>' + dot(hx, hy, 5.5, "hole");
+    g.st.forEach(function(ft, idx){
+      var x, y;
+      if(ft >= 12 && ft <= 30){ x = hx; y = hy - 22 - (idx) * 10.5; }
+      else if(ft >= 35){ x = hx + 100 + (idx - 7) * 46; y = hy; }
+      else { x = hx; y = hy + 22 + (idx - 11) * 10.5; }
+      if(ft >= 35) s += dot(x, y, 3.6, "dot") + txt(x, y - 8, idx + 1, "xs") + txt(x, y + 14, ft + " ft", "xs");
+      else s += dot(x, y, 3.6, idx ? "dot" : "dotk") + txt(x - 8, y + 3.5, idx + 1, "xs", "end") + txt(x + 8, y + 3.5, ft + " ft", "xs", "start");
+    });
+    s += arrow(hx + 40, hy - 70, hx + 40, hy - 26) + arrow(hx + 250, hy + 26, hx + 100, hy + 26) + arrow(hx + 40, hy + 82, hx + 40, hy + 26);
+    s += txt(230, 40, "1 to 7: 12 to 30 ft", "sm") + txt(230, 150, "8 to 11: 35 to 50 ft", "sm") + txt(230, 166, "12 to 18: 3 to 9 ft", "sm");
+  } else if(a.game === "box"){
+    var cols = ["bo", "by", "bgr", "by", "bo"];
+    cols.forEach(function(c, i2){ s += '<rect class="' + c + '" x="150" y="' + (66 + i2 * 12) + '" width="20" height="12"/>'; });
+    s += txt(144, 100, "five 1 ft sections", "sm", "end");
+    var lab = g.pro ? ["back", "on", "on, +1 life", "on", "back"] : ["back", "stay", "move on", "stay", "back"];
+    lab.forEach(function(t2, i2){ s += txt(176, 75 + i2 * 12, t2, "xs", "start"); });
+    [[160, 44, "10 ft", "2"], [160, 22, "15 ft", "4"], [160, 150, "10 ft", "1"], [160, 172, "15 ft", "3"]].forEach(function(t3){
+      s += dot(t3[0], t3[1], 4.5, "dot") + txt(t3[0] - 10, t3[1] + 4, t3[2], "xs", "end") + txt(t3[0] + 10, t3[1] + 4, "tee " + t3[3], "xs", "start"); });
+    s += arrow(160, 50, 160, 62) + arrow(160, 144, 160, 130);
+    s += txt(300, 30, "downhill", "sm", "end") + txt(300, 172, "uphill", "sm", "end") + txt(20, 182, "then 20 and 25 ft", "sm", "start");
+  }
+  return head + s + '</svg>';
+}
+
+/* ---- the list ---- */
+function renderUpgame(){
+  var host = $("ugList"); if(!host) return;
+  host.innerHTML = "";
+  [1, 2, 3, 4].forEach(function(pn){
+    var mine = allDrills().filter(function(x){ return x.ugame && pillarNo(x.area) === pn; })
+      .sort(function(a, b){ return (a.area === b.area ? 0 : a.area === 10 ? -1 : b.area === 10 ? 1 : 0); });
+    if(!mine.length) return;
+    var hd = document.createElement("div");
+    hd.innerHTML = pillarHead(pn, mine.length + (mine.length === 1 ? " challenge" : " challenges"));
+    host.appendChild(hd.firstChild);
+    mine.forEach(function(d){
+      var sk = TILE[d.area] || TILE[10], runs = drillFamSessions(d).filter(function(x){ return x.status !== "live"; });
+      var best = drillBest(d), did = "udet-" + d.id;
+      var card = document.createElement("div");
+      card.className = "testcard drillcard";
+      card.innerHTML =
+        '<button type="button" class="trow" aria-expanded="false" aria-controls="' + did + '" style="--tint:' + sk.tint + '">' +
+          '<span class="puck">' + TICON[sk.ic](21) + '</span>' +
+          '<span class="tx"><span class="nm">' + d.name.replace(/\s*\((Super Pro|Pro)\)\s*$/, "").replace(/\s+(Super Pro|Pro)$/, "") +
+            '<span class="dtag">' + d.ugLevel + '</span>' + (d.gp.lm ? '<span class="dtag">launch monitor</span>' : '') + '</span>' +
+            '<span class="sub">' + d.sub + '</span></span>' +
+          '<span class="rt">' + (best ? '<b>' + best.big + '</b><span>' + best.small + '</span>' : '<span>not tried yet</span>') + '</span>' +
+          '<span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg></span>' +
+        '</button>' +
+        '<div class="tdet" id="' + did + '" hidden>' + ugArt(d) +
+          '<p class="note"><b>How to play.</b> ' + d.ruleText + '</p>' +
+          '<p class="note">Score range in UpGame: ' + d.ugMin + ' to ' + d.ugMax + ' ' + ugUnit(d) + ', lower is better.</p>' +
+          '<p class="tstat">' + (runs.length ? runs.length + (runs.length === 1 ? " run" : " runs") + ' logged' : 'Nothing logged yet') + '</p>' +
+          '<div class="tacts"><button type="button" class="pri" data-run="' + d.id + '">Start</button><span class="twhere">' + d.where + '</span></div>' +
+        '</div>';
+      var row = card.querySelector(".trow"), det = card.querySelector(".tdet");
+      row.addEventListener("click", function(){
+        var open = row.getAttribute("aria-expanded") === "true";
+        row.setAttribute("aria-expanded", open ? "false" : "true");
+        det.hidden = open;
+      });
+      card.querySelector("[data-run]").addEventListener("click", function(){ openDrill(d.id); });
+      host.appendChild(card);
+    });
+  });
+}
+
+/* ---- the session ---- */
+function buildUG(a){
+  var d = state.draft;
+  if(!d.ug) d.ug = { log:[] };
+  var r = ugRun(a, d.ug.log);
+  d.ugDone = r.done;
+  var host = $("sessCards"); host.innerHTML = "";
+  var top = document.createElement("div"); top.className = "ughead";
+  top.innerHTML = '<details class="fold"' + (d.ug.log.length ? '' : ' open') + '><summary>The set-up and the rules</summary>' + ugArt(a) +
+    '<p class="note">' + a.ruleText + '</p></details>';
+  host.appendChild(top);
+  var card = document.createElement("div"); card.className = "sqnow ugnow";
+  if(!r.done){
+    card.innerHTML = '<p class="eyebrow">' + r.eye + '</p><h3>' + r.big + '</h3><p class="sqpar">' + r.small + '</p>' +
+      '<div class="sqpick ugpick" style="grid-template-columns:repeat(' + (r.opts.length === 4 ? 2 : r.opts.length) + ', minmax(0, 1fr))">' + r.opts.map(function(o){
+        return '<button type="button" data-o="' + o[0] + '"><b>' + o[1] + '</b><span>' + o[2] + '</span></button>'; }).join("") + '</div>';
+  } else {
+    card.innerHTML = '<p class="eyebrow">Finished</p><p class="ugscore">UpGame score <b>' + r.score + '</b> <span>' + ugUnit(a) +
+      ', ' + a.ugMin + ' to ' + a.ugMax + ', lower is better</span></p><p class="sqpar">Type it into UpGame, then save it here.</p>';
+  }
+  host.appendChild(card);
+  var tr = document.createElement("div"); tr.className = "ugtrail";
+  tr.innerHTML = '<div class="ugchips">' + r.trail + '</div><p class="note sqsum">' + r.status + '</p>' +
+    (d.ug.log.length ? '<button type="button" class="ugundo">Undo the last one</button>' : '');
+  host.appendChild(tr);
+  card.querySelectorAll("[data-o]").forEach(function(b){
+    b.addEventListener("click", function(){
+      d.ug.log.push(b.getAttribute("data-o"));
+      stashNotes(); buildUG(a); updateTotal();
+      if($("sessNotes")) $("sessNotes").value = d.notes || "";
+    });
+  });
+  var ub = tr.querySelector(".ugundo");
+  if(ub) ub.addEventListener("click", function(){
+    d.ug.log.pop();
+    stashNotes(); buildUG(a); updateTotal();
+    if($("sessNotes")) $("sessNotes").value = d.notes || "";
+  });
+  var nb = notesBlock("sessNotes", "Session notes · what worked · one thing to fix");
+  nb.style.marginTop = "18px";
+  host.appendChild(nb);
+  saveDraft();
+}
+function ugPastHtml(a, s){
+  var r = ugRun(a, (s.ug && s.ug.log) || []);
+  return '<div class="pastsum"><div><b>' + (s.total == null ? "–" : s.total) + '</b><span>UpGame score</span></div>' +
+    '<div><b>' + r.n + '</b><span>' + ugUnit(a) + ' played</span></div><div><b>' + (s.ugDone ? "Yes" : "No") + '</b><span>finished</span></div></div>' +
+    '<div class="ugchips">' + r.trail + '</div><p class="note">' + r.status + '</p>' + ugArt(a) + '<p class="note">' + a.ruleText + '</p>';
+}
+
 /* Slices are resolved once, at load. After this a drill is an ordinary area
    with sets, and every render path that already walks sets walks these too. */
 DRILLS.forEach(function(d){
@@ -4892,7 +5306,7 @@ DRILLS.forEach(function(d){
   d.hidden = true; d.shelved = true;   /* not "retired": that word marks an old scoring format */
 });
 DRILLS.slice().forEach(function(d){
-  if(d.hidden || d.family || mxShape(d) || d.shape === "p9") return;
+  if(d.hidden || d.family || mxShape(d) || d.shape === "p9" || d.shape === "ug") return;
   d.family = d.id; d.reps = 1;
   DRILL_LENS.slice(1).forEach(function(k){ DRILLS.push(drillVariant(d, k)); });
 });
@@ -6974,7 +7388,7 @@ var $ = function(id){ return document.getElementById(id); };
 function paintBack(){
   var bk = state.draft ? state.draft.kind : null;
   if($("sessionBack")) $("sessionBack").textContent = state.fromWeek ? "\u2190 This week"
-    : bk === "drill" ? "\u2190 Drills" : bk === "test" ? "\u2190 Squad" : "\u2190 Core sessions";
+    : bk === "drill" ? (state.draft && drillById(state.draft.drillId) && drillById(state.draft.drillId).ugame ? "\u2190 UpGame" : "\u2190 Drills") : bk === "test" ? "\u2190 Squad" : "\u2190 Core sessions";
 }
 function show(view){
   state.view = view;
@@ -6998,6 +7412,7 @@ function show(view){
   $("viewSC").hidden = view!=="sc";
   $("viewTests").hidden = view!=="tests";
   $("viewDrills").hidden = view!=="drills";
+  if($("viewUpgame")) $("viewUpgame").hidden = view!=="upgame";
   $("viewHistory").hidden = view!=="history";
   $("viewCoach").hidden = view!=="coach";
   $("viewProg").hidden = view!=="prog";
@@ -7562,6 +7977,11 @@ function drillLapBest(d){
   return best;
 }
 function drillBest(d){
+  if(d && d.shape === "ug"){
+    var ub = null;
+    ugDoneRuns(d).forEach(function(r){ if(ub == null || r.total < ub) ub = r.total; });
+    return ub == null ? null : { big:String(ub), small:ugUnit(d) + ", your best" };
+  }
   var runs = drillFamSessions(d).filter(function(x){ return x.status !== "live"; }), best = null, i, x, v, k;
   var lapB = drillLapBest(d);
   if(lapB !== null) return runs.length ? { big:String(lapB), small:"in a row, your best" } : null;
@@ -7610,7 +8030,7 @@ function renderDrills(){
      below them (28 Oct). */
   [1, 2, 3, 4, "home"].forEach(function(pn){
     var mine = allDrills().filter(function(x){
-      if(x.hidden) return false;
+      if(x.hidden || x.ugame) return false;
       return pn === "home" ? drillPlace(x).zone === 1 : drillPlace(x).zone === 0 && pillarNo(x.area) === pn;
     }).sort(function(a, b){
       /* tee before approach, and in each the matrix before the Perfect 9 */
@@ -8579,6 +8999,7 @@ function draftProgress(d){
     return ((d.mx && d.mx.hits ? d.mx.hits.length : 0)) + " of " + cdShots(ma) + " shots";
   }
   var da = area(d.areaId);
+  if(da && da.shape === "ug"){ var dr = ugRun(da, d.ug && d.ug.log); return dr.n + " " + ugUnit(da) + " in, " + dr.score + " so far"; }
   /* How much is left, not only how much is done: she is deciding whether she
      has time to finish it, and "4 balls in" does not answer that. */
   var want = da ? sgAreaBalls(da) : 0;
@@ -8659,7 +9080,7 @@ function openDrill(drillId, resume, exact){
     state.draft.kind = "drill";
     state.draft.drillId = drillId;
     if(drillPairs(d) && !resume && state.draft.pair == null){ state.draft.pair = !!drillPref(d.family).pair; renderSessSeg(drillId); renderSession(); }
-    $("sessArea").textContent = (d.challengeOf ? "Challenge" : "Drill") + " \u00b7 " + drillPlace(d).nm;
+    $("sessArea").textContent = d.ugame ? "UpGame \u00b7 " + d.ugLevel : (d.challengeOf ? "Challenge" : "Drill") + " \u00b7 " + drillPlace(d).nm;
     paintBack();
     saveDraft();
   }
@@ -8873,6 +9294,16 @@ function renderSession(){
     if($("navBack")) $("navBack").hidden = true;
     if($("navNext")) $("navNext").hidden = true;
     if(a.shape === "gauntlet") buildGauntlet(a); else buildCard(a);
+    if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
+    updateTotal();
+    return;
+  }
+  if(a && a.shape === "ug"){
+    stashNotes();
+    var mbu = $("sessMode") ? $("sessMode").parentNode : null;
+    if(mbu) mbu.hidden = true;
+    ["sessProg", "runBar", "navBack", "navNext"].forEach(function(id){ if($(id)) $(id).hidden = true; });
+    buildUG(a);
     if($("sessNotes")) $("sessNotes").value = state.draft.notes || "";
     updateTotal();
     return;
@@ -12865,6 +13296,17 @@ function updateTotal(){
     saveDraft();
     return;
   }
+  if(a.shape === "ug"){
+    var ur = ugRun(a, d.ug && d.ug.log);
+    d.total = ur.score; d.max = a.ugMax; d.balls = ur.n; d.ugDone = ur.done;
+    $("totFig").textContent = String(ur.score);
+    $("totOf").textContent = ugUnit(a);
+    $("totVs").innerHTML = ur.done ? "UpGame score" : "so far";
+    $("saveBtn").textContent = "Finish and save";
+    $("saveBtn").disabled = false;
+    saveDraft();
+    return;
+  }
   if(a.shape === "p9"){
     var p9 = p9Total(d, a);
     d.total = p9.total; d.max = 9; d.balls = p9.done;
@@ -14551,6 +14993,7 @@ function histRow(x, wrapEl){
     row.innerHTML = '<span class="d">'+fmtDate(x.date)+'</span>'+
       '<span>'+label+'</span>'+
       '<span class="s">'+(mxWord(x) ? mxWord(x) : x.kind==="log" ? hrs(x.hours||0)+" h" : x.kind==="gym" ? x.total+"/"+x.max+" sets"
+                          : area(x.areaId) && area(x.areaId).shape === "ug" ? x.total+" "+ugUnit(area(x.areaId))+(x.ugDone ? "" : ", unfinished")
                           : area(x.areaId) && area(x.areaId).shape === "p9" ? x.total+" att."
                           : x.sgUnknown ? "\u2013"
                           : isSG(area(x.areaId)) ? fmtSG(x.total)
@@ -14677,6 +15120,13 @@ function openPast(s){
   var h = "";
 
   var pa = isGym ? null : area(s.areaId);
+  if(pa && pa.shape === "ug"){
+    $("pastBody").innerHTML = ugPastHtml(pa, s) +
+      '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
+      (s.notes ? String(s.notes).replace(/</g,"&lt;") : "Nothing written down for this one.")+'</p></div>';
+    show("past");
+    return;
+  }
   if(pa && pa.shape === "p9"){
     $("pastBody").innerHTML = p9PastHtml(pa, s) +
       '<div class="pastnotes"><p class="eyebrow">Session notes</p><p>'+
@@ -15276,6 +15726,7 @@ function sessResult(s){
   var a = area(s.drillId || s.testId || s.areaId);
   if(s.total == null || s.sgUnknown) return "";
   if(a && a.shape === "sg18") return sq18Fmt(s.total) + " strokes gained";
+  if(a && a.shape === "ug") return "UpGame score " + s.total + " " + ugUnit(a) + (s.ugDone ? "" : ", not finished");
   if(a && a.shape === "p9"){ var pr = p9Total(s, a); return s.total + " attempts, " + pr.made + " of 9 completed"; }
   if(a && isSG(a)) return fmtSG(s.total) + " strokes";
   return s.max ? s.total + " of " + s.max : String(s.total);
@@ -16379,6 +16830,7 @@ function doneWords(s){
   if(mxWord(s)) return "Done " + shortDate(s.date) + " \u00b7 " + mxWord(s);
   if(s.kind === "gym") return "Done " + shortDate(s.date);
   var a = area(s.areaId);
+  if(s.total != null && a && a.shape === "ug") return "Done " + shortDate(s.date) + " · UpGame " + s.total + " " + ugUnit(a) + (s.ugDone ? "" : ", unfinished");
   if(s.total != null && a && a.shape === "p9") return "Done " + shortDate(s.date) + " · " + s.total + " attempts, " + p9Total(s, a).made + "/9";
   if(s.total != null && a && a.shape === "sg18") return "Done " + shortDate(s.date) + " · " + sq18Fmt(s.total);
   if(s.total != null && a && isSG(a) && !s.sgUnknown) return "Done " + shortDate(s.date) + " · " + fmtSG(s.total);
@@ -17401,10 +17853,10 @@ document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("l
    old buttons stay in the page, out of sight, because everything else in the
    app already knows how to drive them. */
 var SEGS = {
-  practice:{ views:["home", "tests", "drills"], items:[["Core", "tabPractice", ["home"]], ["Squad", "tabTests", ["tests"]], ["Drills", "tabDrills", ["drills"]]] },
+  practice:{ views:["home", "tests", "drills", "upgame"], items:[["Core", "tabPractice", ["home"]], ["Squad", "tabTests", ["tests"]], ["Drills", "tabDrills", ["drills"]], ["UpGame", "tabUpgame", ["upgame"]]] },
   progress:{ views:["history", "goals", "sessions", "review", "past"], items:[["Progress", "segProgress", ["history"]], ["Goals", "segGoals", ["goals"]], ["History", "tabSessions", ["sessions", "past"]], ["Review", "tabReview", ["review"]]] }
 };
-var VIEW_SECTION = { home:"viewHome", tests:"viewTests", drills:"viewDrills", history:"viewHistory", goals:"viewGoals", sessions:"viewSessions", review:"viewReview" };
+var VIEW_SECTION = { home:"viewHome", tests:"viewTests", drills:"viewDrills", upgame:"viewUpgame", history:"viewHistory", goals:"viewGoals", sessions:"viewSessions", review:"viewReview" };
 function segInit(){
   Object.keys(SEGS).forEach(function(g){
     SEGS[g].views.forEach(function(v){
@@ -17431,7 +17883,7 @@ function segPaint(view){
   var sk = view === "session" && state.draft ? state.draft.kind : null;
   var on = {
     tabWeek: view === "week",
-    tabPractice: ["home", "tests", "drills", "test"].indexOf(view) > -1 || view === "session",
+    tabPractice: ["home", "tests", "drills", "upgame", "test"].indexOf(view) > -1 || view === "session",
     tabSC: view === "sc" || view === "gym",
     tabProg: ["history", "goals", "sessions", "review", "past", "bench", "prog"].indexOf(view) > -1,
     tabCal: view === "season" || view === "event"
@@ -17582,6 +18034,7 @@ $("tabPractice").addEventListener("click", function(){ state.homePage = 1; show(
 $("tabSC").addEventListener("click", function(){ renderSC(); show("sc"); });
 $("tabTests").addEventListener("click", function(){ renderTests(); show("tests"); });
 $("tabDrills").addEventListener("click", function(){ renderDrills(); show("drills"); });
+$("tabUpgame").addEventListener("click", function(){ renderUpgame(); show("upgame"); });
 $("dueGo").addEventListener("click", function(){ var id = state.dueTest; closeDue(); if(id) openTest(id); });
 $("dueLater").addEventListener("click", function(){
   var id = state.dueArea; closeDue(); if(id != null) openSession(id);
@@ -17612,6 +18065,7 @@ if($("tabGoals")) $("tabGoals").addEventListener("click", function(){ openProgTa
 $("sessionBack").addEventListener("click", function(){
   var bk = state.draft ? state.draft.kind : null;
   if(state.fromWeek) show("week");
+  else if(bk === "drill" && state.draft && drillById(state.draft.drillId) && drillById(state.draft.drillId).ugame){ renderUpgame(); show("upgame"); }
   else if(bk === "drill"){ renderDrills(); show("drills"); }
   else if(bk === "test"){ renderTests(); show("tests"); }
   else show("home");
