@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>The evidence request · Viability Thinking Lab</title>
+<link rel="stylesheet" href="/family.css?v=20261105i"><link rel="stylesheet" href="/lab-family.css?v=20261105i">
+<script>(function(){try{var t=localStorage.getItem('vt_theme');if(!t)t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
+<style>
+/* The evidence request, as the client answers it: grouped by who should answer, three answers to each. */
+:root { --bg: #16130f; --paper: #f4f3f0; --muted: #a09a90; --line: #3a3732; --card: #16130f; --accent: #e07030; --ok: #8fd3a8; --bad: #ff9f8a; color-scheme: dark; }
+:root[data-theme="light"] { --bg: #f4f3f0; --paper: #141414; --muted: #6b665f; --line: #c9c5bd; --card: #f4f3f0; --ok: #2e8a56; --bad: #c4502f; color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--paper); font: 400 16px/1.5 "DM Sans", system-ui, sans-serif; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 14px max(16px, 3vw); border-bottom: 1px solid var(--line); }
+.brand { font-family: "Archivo", "DM Sans", sans-serif; font-weight: 700; font-stretch: 125%; font-variation-settings: "wdth" 125; font-size: 18px; }
+.brand span { color: var(--accent); font-size: 11px; letter-spacing: .3em; margin-left: 6px; }
+main { max-width: 900px; margin: 0 auto; padding: 28px 16px 80px; }
+h1 { font-family: "Archivo", "DM Sans", sans-serif; font-weight: 700; font-stretch: 125%; font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; }
+.lead { color: var(--muted); max-width: 70ch; }
+.group { margin-top: 22px; }
+.group h2 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+.item { border: 1px solid var(--line); background: var(--card); border-radius: 14px; padding: 14px 16px; margin-top: 10px; }
+.item .q { font-weight: 500; }
+.item .meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+button, .btn { font: 500 14px "DM Sans", system-ui, sans-serif; color: var(--paper); background: transparent; border: 1px solid var(--line); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+button.solid { background: var(--paper); color: var(--bg); border-color: var(--paper); font-weight: 700; }
+button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+textarea, input[type=text] { width: 100%; font: inherit; color: var(--paper); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-top: 8px; }
+.done { color: var(--ok); font-size: 14px; } .err { color: var(--bad); font-size: 14px; min-height: 1.2em; }
+.signin { max-width: 420px; margin-top: 20px; }
+.hidden { display: none !important; }
+
+/* the family look (31 October 2026) */
+html, body { background: var(--bg); font-family: 'DM Sans', system-ui, sans-serif; }
+h1, h2, h3 { font-family: 'Outfit', sans-serif !important; font-weight: 300 !important; font-stretch: 100% !important; font-variation-settings: normal !important; letter-spacing: -.02em; }
+.brand { font-stretch: 100% !important; font-variation-settings: normal !important; }
+.brand .vt-wordmark b { color: var(--paper); } .brand span.vt-wordmark { font-size: 19px; letter-spacing: -.02em; margin: 0; color: var(--paper); } .brand span.vt-wordmark i { color: #e07030; }
+header { min-height: 64px; border-bottom: 1px solid var(--line); }
+label { font-family: 'DM Mono', monospace; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.btn.solid, button.solid, .go { background: var(--accent); border-color: var(--accent); color: #f4f3f0; }
+.vt-foot { --vt-footline: var(--line); } .vt-foot .vt-family { color: var(--muted); } .vt-foot .vt-family b { color: var(--paper); }
+</style>
+</head>
+<body>
+<header><a class="brand" href="/hub" style="text-decoration:none" aria-label="Viability Thinking Lab: Home"><span class="vt-wordmark"><b>viabilitythinking</b><i>lab</i></span></a><span style="display:flex;gap:12px;align-items:center"><a href="/about" target="_blank" rel="noopener" style="color:inherit;font-size:14px">About Viability Thinking</a><a class="btn" href="/">Back</a></span></header>
+<main id="main">
+  <h1>The evidence request</h1>
+  <p class="lead" id="lead">These are the documents and facts the team has asked for. For each one, upload it, tell us what you have instead, or tell us you don’t have it. “We don’t have this” is a useful answer, and the team records it as one. Please do not send anything that names patients, customers or members of staff unless the request asks for it.</p>
+  <form class="signin hidden" id="signin">
+    <label for="code">Type the session code you were given</label>
+    <input type="text" id="code" autocomplete="off" autocapitalize="characters">
+    <div class="row"><button class="solid" type="submit">Open the request</button></div>
+    <div class="err" id="signErr"></div>
+  </form>
+  <div id="list"></div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var list = document.getElementById('list'), code = null;
+  try { code = sessionStorage.getItem('vt_part'); } catch (e) {}
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  function deviceId() {
+    var d = null; try { d = localStorage.getItem('vt_device'); } catch (e) {}
+    if (!d) { var a = new Uint8Array(16); crypto.getRandomValues(a); d = Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); try { localStorage.setItem('vt_device', d); } catch (e) {} }
+    return d;
+  }
+  async function post(url, b) {
+    var r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+    var d = await r.json().catch(function () { return {}; }); if (!r.ok) { var e = new Error(d.error || 'Something went wrong. Please try again.'); e.status = r.status; throw e; } return d;
+  }
+  function loadScript(src) { return new Promise(function (ok, no) { var s2 = document.createElement('script'); s2.src = src; s2.onload = ok; s2.onerror = function () { no(new Error('Could not load the reader for this kind of file')); }; document.head.appendChild(s2); }); }
+  // The file is read here, in the browser, and only its text is sent.
+  async function readText(fl) {
+    var ext = (fl.name.split('.').pop() || '').toLowerCase();
+    if (['txt', 'md', 'csv', 'tsv', 'json'].indexOf(ext) >= 0) return fl.text();
+    if (ext === 'docx') { if (!window.mammoth) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js'); return (await window.mammoth.extractRawText({ arrayBuffer: await fl.arrayBuffer() })).value; }
+    if (ext === 'pdf') {
+      if (!window.pdfjsLib) { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'); window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
+      var pdf = await window.pdfjsLib.getDocument({ data: await fl.arrayBuffer() }).promise, out = [];
+      for (var i = 1; i <= pdf.numPages; i++) { var pg = await pdf.getPage(i); var tc = await pg.getTextContent(); out.push(tc.items.map(function (it) { return it.str; }).join(' ')); }
+      return out.join('\n\n');
+    }
+    throw new Error('This page can take Word (.docx), PDF, CSV and text files. For anything else, choose "We have something else" and describe it.');
+  }
+  var WORD = { upload: 'You uploaded a file', other: 'You told us what you have instead', none: 'You told us you don’t have this' };
+  async function load() {
+    var d;
+    try { await post('/api/lab', { action: 'join', session_code: code, device_id: deviceId() }); d = await post('/api/problem', { action: 'q_list', session_code: code, device_id: deviceId() }); }
+    catch (e) { showSignin(e.message); return; }
+    document.getElementById('signin').classList.add('hidden');
+    list.innerHTML = '';
+    if (!d.items.length) { list.innerHTML = '<p class="lead">Nothing has been asked for yet. The team will tell you when the first request is ready.</p>'; return; }
+    var by = {}; d.items.forEach(function (it) { (by[it.holder] = by[it.holder] || []).push(it); });
+    Object.keys(by).sort().forEach(function (h) {
+      var g = document.createElement('section'); g.className = 'group'; g.setAttribute('data-holder', h);
+      g.innerHTML = '<h2>' + esc(h) + '</h2>';
+      by[h].sort(function (a, b) { return a.round - b.round; }).forEach(function (it) { g.appendChild(item(it)); });
+      list.appendChild(g);
+    });
+  }
+  function item(it) {
+    var box = document.createElement('div'); box.className = 'item'; box.setAttribute('data-key', it.key);
+    box.innerHTML = '<div class="q">' + esc(it.text) + '</div><div class="meta">Round ' + it.round + (it.answer ? ' · <span class="done">' + WORD[it.answer.choice] + '</span>' : '') + '</div>';
+    var row = document.createElement('div'); row.className = 'row';
+    var area = document.createElement('div'); var err = document.createElement('div'); err.className = 'err';
+    var mode = null;
+    [['upload', 'Upload it'], ['other', 'We have something else'], ['none', 'We don’t have this']].forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c[1]; b.setAttribute('data-choice', c[0]); b.setAttribute('aria-pressed', 'false');
+      b.onclick = function () { mode = c[0]; Array.prototype.forEach.call(row.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); }); draw(); };
+      row.appendChild(b);
+    });
+    function draw() {
+      area.innerHTML = ''; err.textContent = '';
+      var note = document.createElement('textarea'); note.rows = 2;
+      note.placeholder = mode === 'upload' ? 'Anything we should know about this file (optional)' : mode === 'other' ? 'What you have instead, and where it is' : 'Anything we should know, for example who might hold it (optional)';
+      var file = null;
+      if (mode === 'upload') { file = document.createElement('input'); file.type = 'file'; file.accept = '.docx,.pdf,.csv,.txt,.md,.tsv'; area.appendChild(file); }
+      area.appendChild(note);
+      var send = document.createElement('button'); send.type = 'button'; send.className = 'solid'; send.textContent = 'Send'; send.setAttribute('data-send', it.key);
+      send.onclick = async function () {
+        err.textContent = ''; send.disabled = true;
+        try {
+          var body = '';
+          if (mode === 'upload') { if (!file.files[0]) throw new Error('Choose a file first'); body = await readText(file.files[0]); }
+          await post('/api/problem', { action: 'q_answer', session_code: code, device_id: deviceId(), key: it.key, choice: mode, text: note.value, body: body });
+          await load();
+        } catch (e) { err.textContent = e.message; send.disabled = false; }
+      };
+      var r2 = document.createElement('div'); r2.className = 'row'; r2.appendChild(send); area.appendChild(r2);
+    }
+    box.appendChild(row); box.appendChild(area); box.appendChild(err);
+    return box;
+  }
+  function showSignin(msg) {
+    var f = document.getElementById('signin'); f.classList.remove('hidden');
+    document.getElementById('signErr').textContent = code ? msg : '';
+    f.onsubmit = function (e) { e.preventDefault(); code = String(document.getElementById('code').value || '').trim().toUpperCase(); if (!code) return; try { sessionStorage.setItem('vt_part', code); } catch (e2) {} load(); };
+  }
+  if (code) load(); else showSignin('');
+})();
+</script>
+<footer class="vt-foot" id="vtFoot"><div class="vt-family"><a href="https://viabilitythinking.com"><b>Viability Thinking</b> the method and the book</a><a href="https://changebefore.com"><b>ChangeBefore</b> the company</a><a href="/hub"><b>The Lab</b> the working tool</a></div></footer>
+</body>
+</html>

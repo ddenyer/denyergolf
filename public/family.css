@@ -1,0 +1,45 @@
+/* Viability family kit: the shared look of viabilitythinking.com, changebefore.com and the Lab.
+   Everything is prefixed vt- so it can sit beside a site's own styles without clashing.
+   Font paths assume the fonts/ folder sits next to this file; change the url()s if a site keeps fonts elsewhere. */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300 600;font-display:swap;src:url(fonts/outfit-300-600.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/dm-sans-400-600.woff2) format('woff2')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/dm-mono-400.woff2) format('woff2')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/dm-mono-500.woff2) format('woff2')}
+
+:root{
+  /* colours: orange is the only accent */
+  --vt-ink:#141414;        /* text on light, ground on dark */
+  --vt-ivory:#f4f3f0;      /* ground on light, text on dark */
+  --vt-stone:#e8e5df;      /* quiet panels on light */
+  --vt-shell:#16130f;      /* the Lab's warm near-black app shell */
+  --vt-orange:#e07030;     /* labels, one main button, the second word of each wordmark */
+  --vt-line-dark:#3a3732;  /* 1px lines on dark */
+  --vt-muted:#6b665f;      /* secondary text on light */
+  --vt-muted-dark:#a09a90; /* secondary text on dark */
+  /* type */
+  --vt-head:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;   /* headings, names, wordmarks */
+  --vt-sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;  /* body text, buttons, menus */
+  --vt-mono:"DM Mono",ui-monospace,Menlo,monospace;                   /* labels, codes, step numbers */
+  /* shape: square corners, 1px lines, no shadows */
+  --vt-radius:0;
+  --vt-bar:64px;
+  --vt-pad:clamp(20px,5vw,72px);
+}
+body{margin:0;background:var(--vt-ivory);color:var(--vt-ink);font:400 17px/1.6 var(--vt-sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--vt-head);font-weight:300;letter-spacing:-.02em;margin:0}
+
+/* the orange capital label: LEARN, STEP 02, FACILITATOR CODE */
+.vt-label{display:block;font:500 12px/1 var(--vt-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--vt-orange)}
+
+/* wordmark: <span class="vt-wordmark"><b>change</b><i>before</i></span> */
+.vt-wordmark{font:600 19px/1 var(--vt-head);letter-spacing:-.02em;white-space:nowrap}
+.vt-wordmark b{font-weight:600}.vt-wordmark i{font-style:normal;font-weight:400;color:var(--vt-orange)}
+
+/* square buttons */
+.vt-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border:1px solid currentColor;border-radius:var(--vt-radius);background:transparent;color:inherit;font:500 16px/1 var(--vt-sans);text-decoration:none;cursor:pointer}
+.vt-btn-go{background:var(--vt-orange);border-color:var(--vt-orange);color:var(--vt-ivory)}
+.vt-btn-light{background:var(--vt-ivory);border-color:var(--vt-ivory);color:var(--vt-ink)}
+
+/* the family line in every footer */
+.vt-family{display:flex;flex-wrap:wrap;gap:8px 26px;font:400 13px/1.5 var(--vt-sans);color:var(--vt-muted-dark)}
+.vt-family b{font-weight:500}

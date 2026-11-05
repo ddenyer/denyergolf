@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Viability Thinking Lab</title>
+<link rel="stylesheet" href="/family.css?v=20261105i"><link rel="stylesheet" href="/lab-family.css?v=20261105i">
+<style>
+/* What the client sees for How we might help: the three questions before the call (/brief),
+   and the check of what was drafted (/check). Never shows the team note or other team material. */
+:root { --g: #f4f3f0; --sf: #f4f3f0; --tn: #e8e5df; --tx: #141414; --t2: #3a3732; --mu: #6b665f; --fa: #8a857d; --exp: #e07030; --expt: #9a4310; --expw: #f6e3d6; --val: #1E6FD9; --ok: #1F7A4D; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--g); color: var(--tx); font: 400 16px/1.55 Inter, system-ui, sans-serif; }
+main { max-width: 1000px; margin: 40px auto; padding: 0 16px 60px; }
+.sheet { background: var(--sf); border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,.08); padding: 48px 64px; }
+@media (max-width: 700px) { .sheet { padding: 28px 22px; } }
+.aboutlink { text-align: right; margin: 14px 18px 0; font-size: 13px; } .aboutlink a { color: var(--mu); }
+@media print { .aboutlink { display: none; } }
+.over { font-size: 12px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mu); }
+h1 { font-size: 32px; line-height: 1.2; margin: 8px 0 6px; font-weight: 700; }
+.meta { font-size: 14px; color: var(--mu); }
+.sec { border-top: 1px solid #E6E4DF; margin-top: 28px; padding-top: 22px; }
+.sec h2 { font-size: 17px; margin: 0 0 10px; display: flex; justify-content: space-between; gap: 12px; }
+.st { font-size: 14px; font-weight: 600; color: var(--mu); }
+.st.ok { color: var(--ok); } .st.nq { color: var(--expt); }
+.words { font-family: Newsreader, Georgia, serif; font-size: 26px; line-height: 1.45; border-radius: 10px; padding: 6px 10px; margin: 0 -10px; outline: none; white-space: pre-wrap; }
+.words:hover { background: #FAF9F7; } .words:focus { background: #FAF9F7; box-shadow: 0 0 0 2px #D5D3CE; }
+.hint { font-size: 13px; color: var(--fa); margin-top: 6px; }
+.sum { margin-top: 16px; color: var(--t2); } .sum b { color: var(--tx); }
+.bar { border-top: 2px solid var(--tx); margin-top: 40px; padding-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+button { font: 600 15px Inter, system-ui, sans-serif; cursor: pointer; border-radius: 12px; padding: 12px 18px; min-height: 48px; border: 1.5px solid #D5D3CE; background: #fff; color: var(--tx); }
+button.on { border-color: var(--tx); background: var(--tx); color: #fff; }
+button.primary { background: var(--tx); color: #fff; border-color: var(--tx); margin-left: auto; }
+button:disabled { opacity: .45; cursor: default; }
+:focus-visible { outline: 3px solid var(--val); outline-offset: 2px; }
+input, textarea { font: 15px/1.5 Inter, system-ui, sans-serif; color: var(--tx); border: 1px solid #D5D3CE; border-radius: 10px; padding: 11px 12px; width: 100%; background: #fff; }
+label { display: grid; gap: 6px; font-size: 14px; color: var(--t2); margin-top: 16px; }
+.err { color: #B3261E; font-size: 14px; min-height: 1.2em; margin-top: 10px; }
+.done { text-align: center; padding: 40px 0; } .done .tick { font-size: 40px; color: var(--ok); }
+.hidden { display: none !important; }
+.q { font-weight: 600; font-size: 17px; color: var(--tx); }
+.reply { background: var(--expw); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+
+/* the family look (31 October 2026) */
+html, body { font-family: 'DM Sans', system-ui, sans-serif; }
+.sheet { border: 1px solid #141414; }
+.over { font-family: 'DM Mono', monospace; font-weight: 500; letter-spacing: .08em; color: #e07030; }
+h1 { font-family: 'Outfit', sans-serif; font-weight: 300; font-size: 38px; letter-spacing: -.02em; }
+.sec h2, .q { font-family: 'Outfit', sans-serif; font-weight: 400; }
+.words { font-family: 'Outfit', sans-serif; font-weight: 300; }
+button, input, textarea { font-family: 'DM Sans', system-ui, sans-serif; border-color: #141414; background: #f4f3f0; }
+button.primary { background: #e07030; border-color: #e07030; color: #f4f3f0; font-weight: 500; }
+button.on { background: #141414; border-color: #141414; color: #f4f3f0; }
+:focus-visible { outline-color: #e07030; }
+.vt-hdr { display: flex; align-items: stretch; justify-content: space-between; height: 64px; border-bottom: 1px solid #c9c5bd; padding-left: max(16px, 2.6vw); } .vt-hdr a { display: flex; align-items: center; color: #141414; text-decoration: none; }
+.vt-hdr .aboutlink { margin: 0; display: flex; align-items: center; padding: 0 22px; border-left: 1px solid #c9c5bd; }
+.vt-foot .vt-family { color: #6b665f; } .vt-foot .vt-family b { color: #141414; }
+</style>
+</head>
+<body>
+<header class="vt-hdr"><a href="/hub" aria-label="Viability Thinking Lab: Home"><span class="vt-wordmark"><b>viabilitythinking</b><i>lab</i></span></a><span class="aboutlink"><a href="/about" target="_blank" rel="noopener">About Viability Thinking</a></span></header>
+<main>
+  <form id="signin" class="sheet hidden">
+    <p class="over">Viability Thinking Lab</p>
+    <h1>Sign in</h1>
+    <p class="meta">Use the code the team sent you.</p>
+    <label>Your code <input id="code" autocomplete="off" autocapitalize="characters"></label>
+    <div class="err" id="signErr"></div>
+    <div class="bar" style="border:0;margin-top:10px"><button class="primary" type="submit">Continue</button></div>
+  </form>
+  <div id="page"></div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var PATH0 = location.pathname.replace(/^\//, '').split(/[/.]/)[0], MODE = PATH0 === 'check' ? 'check' : PATH0 === 'try' ? 'try' : 'brief';
+  var code = null; try { code = sessionStorage.getItem('vt_part'); } catch (e) {}
+  // a link from the team can carry the project code (/try#code=...); it is kept for this visit and taken off the address
+  var hc = /code=([A-Za-z0-9-]+)/.exec(location.hash); if (hc) { code = hc[1].toUpperCase(); try { sessionStorage.setItem('vt_part', code); } catch (e) {} history.replaceState(null, '', location.pathname); }
+  var page = document.getElementById('page');
+  function deviceId() {
+    var d = null; try { d = localStorage.getItem('vt_device'); } catch (e) {}
+    if (!d) { var a = new Uint8Array(16); crypto.getRandomValues(a); d = Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); try { localStorage.setItem('vt_device', d); } catch (e) {} }
+    return d;
+  }
+  async function post(url, b) {
+    var r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+    var d = await r.json().catch(function () { return {}; }); if (!r.ok) { var e = new Error(d.error || 'Something went wrong. Please try again.'); e.status = r.status; throw e; } return d;
+  }
+  var api = function (b) { b.session_code = code; b.device_id = deviceId(); return post('/api/problem', b); };
+  function el(tag, a, kids) {
+    var e = document.createElement(tag);
+    for (var k in (a || {})) { var v = a[k]; if (v == null || v === false) continue; if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); }
+    (kids || []).forEach(function (c) { if (c == null) return; e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  // the same wording as the team's page, spoken to the client
+  var SIDES = { harm: 'Avoiding harm', want: 'Reaching something wanted' }, WHENP = { here: 'that is already here', might: 'that might happen', date: 'coming on a known date' };
+  var MK = { trigger: { routine: 'routine', triggered: 'triggered by events' }, idea: { own: 'your own idea', asked: 'someone asked you to', ours: 'our suggestion' }, solution: { none: 'no solution chosen yet', ideas: 'some ideas for a solution', chosen: 'a solution chosen' }, whose: { theirs: 'your choice', other: 'someone else’s choice', unknown: 'whose choice not yet known' } };
+  function kindText(k) { if (!k || !k.main) return ''; var m = k.main.split('.'), t = SIDES[m[0]] + ' ' + WHENP[m[1]]; if (k.second) { var s = k.second.split('.'); t += ', and ' + SIDES[s[0]].toLowerCase() + ' ' + WHENP[s[1]]; } return t + '.'; }
+  function markText(m) { m = m || {}; return ['trigger', 'idea', 'solution', 'whose'].filter(function (id) { return m[id] && MK[id][m[id]] && !(id === 'whose' && (!m.solution || m.solution === 'none')); }).map(function (id, i) { var t = MK[id][m[id]]; return i ? t : t.charAt(0).toUpperCase() + t.slice(1); }).join(' · '); }
+  var words = function (s) { return String(s || '').trim().split(/\s+/).filter(Boolean).length; };
+
+  async function load() {
+    try { await post('/api/lab', { action: 'join', session_code: code, device_id: deviceId() }); }
+    catch (e) { return showSignin(e.message); }
+    document.getElementById('signin').classList.add('hidden');
+    return MODE === 'check' ? check() : MODE === 'try' ? tryIt() : brief();
+  }
+
+  // ---------- /brief: three questions before the call ----------
+  async function brief() {
+    var d; try { d = await api({ action: 'c_brief_get' }); } catch (e) { return showSignin(e.message); }
+    var a = el('textarea', { id: 'bPrompted', rows: 4 }), b = el('textarea', { id: 'bWant', rows: 4 }), c = el('textarea', { id: 'bRead', rows: 3 });
+    var nm = el('input', { id: 'bName' }), rl = el('input', { id: 'bRole' }), err = el('div', { class: 'err', role: 'alert' });
+    page.innerHTML = '';
+    page.appendChild(el('div', { class: 'sheet' }, [el('p', { class: 'over', text: 'Before we speak' }), el('h1', { text: 'Three short questions' }),
+      el('p', { class: 'meta', text: 'Your answers go only to the team you are working with. Write as much or as little as you like; there are no right answers.' }),
+      el('label', {}, [el('span', { class: 'q', text: 'What has prompted this now?' }), a]),
+      el('label', {}, [el('span', { class: 'q', text: 'What would you like from us?' }), b]),
+      el('label', {}, [el('span', { class: 'q', text: 'Is there anything we should read?' }), el('span', { class: 'meta', text: 'Names of reports or papers, or links. You can send documents separately.' }), c]),
+      el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px' }, [el('label', {}, ['Your name', nm]), el('label', {}, ['Your role', rl])]),
+      err, el('div', { class: 'bar' }, [el('button', { class: 'primary', id: 'bSend', onclick: async function (e) {
+        e.currentTarget.disabled = true;
+        try { await api({ action: 'c_brief', prompted: a.value, want: b.value, read: c.value, name: nm.value, role: rl.value }); thanks('Thank you. The team has your answers and will use them in your first conversation.'); }
+        catch (er) { err.textContent = er.message; e.currentTarget.disabled = false; }
+      } }, ['Send to the team'])])]));
+  }
+
+  // ---------- /check: their words, to amend and agree ----------
+  async function check() {
+    var d; try { d = await api({ action: 'c_check_get' }); } catch (e) { return showSignin(e.message); }
+    page.innerHTML = '';
+    if (!d.open) { page.appendChild(el('div', { class: 'sheet' }, [el('p', { class: 'over', text: 'Problem framing' }), el('h1', { text: 'Nothing to check yet' }), el('p', { class: 'meta', text: 'The team will let you know when there is something for you to read.' })])); return; }
+    var agreed = d.agreed && d.agreed.words === d.words, verdict = null;
+    var w = el('div', { class: 'words', id: 'cWords', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true', 'aria-label': 'In your words. Change anything that is not quite right.', spellcheck: 'true', text: d.words });
+    var cnt = el('div', { class: 'hint', id: 'cCount', text: 'Change anything that is not quite right. Your change is kept as a new version, and the earlier one is kept too.' });
+    w.addEventListener('input', function () { var n = words(w.innerText); cnt.textContent = n + ' of 150 words' + (n > 150 ? '. Please shorten it a little.' : ''); });
+    var st = el('span', { class: 'st' + (agreed ? ' ok' : ''), id: 'cState', text: agreed ? 'Agreed' : 'For you to check' });
+    var kt = kindText(d.kind), mt = markText(d.markers);
+    var cm = el('textarea', { id: 'cComment', rows: 3, placeholder: 'What is not quite right?' }), cmw = el('label', { class: 'hidden', id: 'cCommentWrap' }, ['Your comment', cm]);
+    var nm = el('input', { id: 'cName', placeholder: 'Name, role' }), err = el('div', { class: 'err', role: 'alert', id: 'cErr' });
+    var bA = el('button', { id: 'vAgree', 'aria-pressed': 'false', onclick: function () { pick('agree'); } }, ['Agree']);
+    var bN = el('button', { id: 'vNot', 'aria-pressed': 'false', onclick: function () { pick('notquite'); } }, ['Not quite']);
+    var bC = el('button', { id: 'vComment', 'aria-pressed': 'false', onclick: function () { pick('comment'); } }, ['Comment']);
+    var send = el('button', { class: 'primary', id: 'cSend', disabled: true, onclick: submit }, ['Send']);
+    function pick(v) { verdict = v; [[bA, 'agree'], [bN, 'notquite'], [bC, 'comment']].forEach(function (x) { x[0].classList.toggle('on', x[1] === v); x[0].setAttribute('aria-pressed', String(x[1] === v)); }); cmw.classList.toggle('hidden', v === 'agree'); send.disabled = false; send.textContent = v === 'agree' ? 'Sign as agreed for now' : 'Send to the team'; if (v !== 'agree') cm.focus(); }
+    async function submit() {
+      err.textContent = ''; send.disabled = true;
+      try {
+        var nw = w.innerText.trim(), r = await api({ action: 'c_check', verdict: verdict, comment: cm.value, name: nm.value, words: nw !== d.words.trim() ? nw : null, sign: verdict === 'agree' });
+        thanks(r.agreed ? 'Thank you. You have agreed these words for now. They stay open to change as the work goes on.' : 'Thank you. The team has your reply and will come back to you.');
+      } catch (e) { err.textContent = e.message; send.disabled = false; }
+    }
+    page.appendChild(el('div', { class: 'sheet' }, [el('p', { class: 'over', text: 'Problem framing · For agreement' }), el('h1', { text: d.service || d.session.client || 'How we might help' }),
+      el('p', { class: 'meta', text: 'Version ' + d.version + (d.at ? ' · ' + new Date(d.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '') + ' · agreed for now, open to change as evidence comes in' }),
+      el('div', { class: 'sec', 'data-section': 'help' }, [el('h2', {}, ['Why we are here, in your words', st]), w, cnt, kt || mt ? el('p', { class: 'sum' }, [kt ? el('b', { text: kt }) : null, mt ? ' ' + mt : null]) : null]),
+      el('div', { class: 'bar' }, [bA, bN, bC, el('span', { class: 'meta', style: 'flex:1;min-width:180px' }, [el('label', { style: 'margin:0' }, ['Your name and role', nm])]), send]), cmw, err]));
+  }
+  // ---------- /try: the beta test, for the people who run the service (30 October 2026) ----------
+  // They see each change marked ready to try in use, and report what happened when they tried it.
+  var PACE = [['purpose', 'Purpose', 'A shared sense of what the service is for'], ['awareness', 'Awareness', 'Knowing how the service works and how it could fail'], ['coordination', 'Coordination', 'The parts working together'], ['engagement', 'Engagement', 'People taking part in keeping it working']];
+  var PVAL = [['better', 'Better'], ['same', 'No change'], ['worse', 'Worse'], ['unknown', 'Can’t say']];
+  async function tryIt(sel) {
+    var d; try { d = await api({ action: 't_list' }); } catch (e) { return showSignin(e.message); }
+    page.innerHTML = '';
+    var sheet = el('div', { class: 'sheet' }, [el('p', { class: 'over', text: (d.session.client || d.session.name || '') + ' · Trying the changes' }), el('h1', { text: 'What happened when you tried it?' }),
+      el('p', { class: 'meta', text: 'The team has designed these changes and tested them in a model. You run the service, so you are the people who can say whether they work in real life. Choose a change, then tell us what happened. There are no right answers: what did not work is as useful as what did.' })]);
+    page.appendChild(sheet);
+    if (!d.props.length) { sheet.appendChild(el('p', { class: 'sec', id: 'tNone', text: 'There is nothing to try just now. The team will let you know when there is.' })); return; }
+    var cur = sel ? d.props.filter(function (x) { return x.id === sel; })[0] : null;
+    if (!cur) {
+      sheet.appendChild(el('div', { class: 'sec' }, [el('h2', {}, ['The changes to try'])].concat(d.props.map(function (x) {
+        var n = d.mine.filter(function (r) { return r.prop === x.id; }).length;
+        return el('div', { class: 'tcard', 'data-prop': x.id }, [el('p', { class: 'q', text: x.label + '. ' + x.n }), el('p', { class: 'meta', text: x.i }), el('div', { style: 'display:flex;gap:12px;align-items:center;flex-wrap:wrap' }, [el('button', { class: 'on', 'data-try': x.id, onclick: function () { tryIt(x.id); } }, [n ? 'Report again' : 'Report on this change']), n ? el('span', { class: 'st ok', text: 'You have reported ' + (n === 1 ? 'once' : n + ' times') }) : null])]);
+      }))));
+      return;
+    }
+    var sv = {}, P = {};
+    var blk = function (h, t) { return el('div', { style: 'margin-top:10px' }, [el('div', { class: 'over', text: h }), el('p', { style: 'margin:4px 0 0', text: t || 'Not written' })]); };
+    sheet.appendChild(el('div', { class: 'sec', id: 'tProp', 'data-prop': cur.id }, [el('h2', {}, [cur.label + '. ' + cur.n]), blk('Where', cur.c), blk('What changes', cur.i), blk('Why it should work', cur.m), blk('What it should lead to', cur.o),
+      cur.predicted ? el('div', { class: 'reply', id: 'tPredicted' }, [el('div', { class: 'over', text: 'What the model predicted' }), el('p', { style: 'margin:4px 0 0', text: (cur.predicted.scenario ? 'Tested against: ' + cur.predicted.scenario + '. ' : '') + cur.predicted.showed + (cur.predicted.holds ? ' It should hold when: ' + cur.predicted.holds : '') })]) : null]));
+    var nm = el('input', { id: 'tName' }), rl = el('input', { id: 'tRole' }), wh = el('input', { id: 'tWhen', placeholder: 'For example: the weekend of 14 November' });
+    var what = el('textarea', { id: 'tWhat', rows: 4 }), val = el('textarea', { id: 'tValue', rows: 3 }), ht = el('textarea', { id: 'tHarm', rows: 2 });
+    var choice = function (id, opts, key) { return el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap', role: 'group' }, opts.map(function (o) { var b = el('button', { type: 'button', 'data-choice': id + ':' + o[0], 'aria-pressed': 'false', onclick: function () { sv[key] = o[0]; Array.prototype.forEach.call(b.parentNode.children, function (c) { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', String(c === b)); }); } }, [o[1]]); return b; })); };
+    var paceRow = function (p) { var g = el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }, PVAL.map(function (o) { var b = el('button', { type: 'button', 'data-pace': p[0] + ':' + o[0], style: 'min-height:40px;padding:8px 12px', onclick: function () { P[p[0]] = o[0]; Array.prototype.forEach.call(g.children, function (c) { c.classList.toggle('on', c === b); }); } }, [o[1]]); return b; })); return el('div', { style: 'display:grid;grid-template-columns:minmax(160px,1fr) 2fr;gap:10px;align-items:center;margin-top:8px' }, [el('span', {}, [el('b', { text: p[1] }), el('span', { class: 'meta', text: ' · ' + p[2] })]), g]); };
+    var err = el('div', { class: 'err', role: 'alert', id: 'tErr' });
+    sheet.appendChild(el('div', { class: 'sec' }, [el('h2', {}, ['Your report']),
+      el('label', {}, [el('span', { class: 'q', text: 'What happened when you tried it?' }), what]),
+      el('label', {}, ['When you tried it', wh]),
+      el('label', {}, [el('span', { class: 'q', text: 'What did it deliver for the people who depend on the service?' }), val]),
+      el('div', { style: 'margin-top:16px' }, [el('span', { class: 'q', text: 'Did anyone come to harm that should not be tolerated?' }), choice('harm', [['within', 'No, harm stayed within what is tolerable'], ['crossed', 'Yes, it went beyond that'], ['unknown', 'Can’t say']], 'harm')]),
+      el('label', {}, ['If so, or if it came close, what happened?', ht]),
+      el('div', { style: 'margin-top:16px' }, [el('span', { class: 'q', text: 'Since the change, how are these in your part of the service?' })].concat(PACE.map(paceRow))),
+      cur.predicted ? el('div', { style: 'margin-top:16px' }, [el('span', { class: 'q', text: 'Compared with what the model predicted, it went' }), choice('compare', [['as', 'As predicted'], ['better', 'Better'], ['worse', 'Worse'], ['unsure', 'Can’t say']], 'compare')]) : null,
+      el('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px' }, [el('label', {}, ['Your name', nm]), el('label', {}, ['Your role', rl])]),
+      err, el('div', { class: 'bar' }, [el('button', { type: 'button', onclick: function () { tryIt(); } }, ['Back to the changes']), el('button', { class: 'primary', id: 'tSend', onclick: async function (e) {
+        var btn = e.currentTarget; btn.disabled = true; err.textContent = '';
+        try { await api({ action: 't_report', prop: cur.id, what: what.value, when: wh.value, value: val.value, harm: sv.harm || 'unknown', harmText: ht.value, pace: P, compare: sv.compare || null, name: nm.value, role: rl.value });
+          thanks('Thank you. Your report has gone to the team. You can report on this change again, or on another one, from the same page.'); var again = el('p', {}, [el('button', { id: 'tAgain', onclick: function () { tryIt(); } }, ['Back to the changes'])]); document.getElementById('thanks').appendChild(again); }
+        catch (er) { err.textContent = er.message; btn.disabled = false; }
+      } }, ['Send to the team'])])]));
+  }
+  // a little more room for the cards on /try
+  (function () { var st = document.createElement('style'); st.textContent = '.tcard { border: 1px solid #E6E4DF; border-radius: 12px; padding: 14px 16px; margin-top: 12px; } .tcard p { margin: 0 0 6px; }'; document.head.appendChild(st); })();
+  function thanks(t) { page.innerHTML = ''; page.appendChild(el('div', { class: 'sheet done', id: 'thanks' }, [el('div', { class: 'tick', text: '✓' }), el('p', { text: t })])); }
+  function showSignin(msg) {
+    var f = document.getElementById('signin'); f.classList.remove('hidden'); page.innerHTML = '';
+    document.getElementById('signErr').textContent = code ? msg : '';
+    f.onsubmit = function (e) { e.preventDefault(); code = String(document.getElementById('code').value || '').trim().toUpperCase(); if (!code) return; try { sessionStorage.setItem('vt_part', code); } catch (e2) {} load(); };
+  }
+  if (code) load(); else showSignin('');
+})();
+</script>
+<footer class="vt-foot" id="vtFoot"><div class="vt-family"><a href="https://viabilitythinking.com"><b>Viability Thinking</b> the method and the book</a><a href="https://changebefore.com"><b>ChangeBefore</b> the company</a><a href="/hub"><b>The Lab</b> the working tool</a></div></footer>
+</body>
+</html>

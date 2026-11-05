@@ -1,0 +1,19 @@
+/* The Lab in the family (31 October 2026). Loaded after family.css on every Lab page.
+   The old fonts are mapped to the kit's, so screens drawn by scripts (the guided framing, the box pages,
+   the old views) follow without each being rewritten: the serif and display faces become Outfit, Inter
+   becomes DM Sans, the monospace becomes DM Mono. Printed canvases set Arial for themselves. */
+@font-face{font-family:'Newsreader';font-weight:300 700;font-display:swap;src:url(fonts/outfit-300-600.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-weight:300 700;font-display:swap;src:url(fonts/outfit-300-600.woff2) format('woff2')}
+@font-face{font-family:'Georgia';font-weight:300 700;font-display:swap;src:url(fonts/outfit-300-600.woff2) format('woff2')}
+@font-face{font-family:'Archivo';font-weight:300 700;font-display:swap;src:url(fonts/outfit-300-600.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-weight:400 700;font-display:swap;src:url(fonts/dm-sans-400-600.woff2) format('woff2')}
+@font-face{font-family:'Geist Mono';font-weight:400;font-display:swap;src:url(fonts/dm-mono-400.woff2) format('woff2')}
+@font-face{font-family:'Geist Mono';font-weight:500 700;font-display:swap;src:url(fonts/dm-mono-500.woff2) format('woff2')}
+/* shape: square corners, 1px lines, no shadows */
+*, *::before, *::after { border-radius: 0 !important; box-shadow: none !important; }
+/* the wordmark and the family line */
+.vt-wordmark { font: 600 19px/1 "Outfit", system-ui, sans-serif; letter-spacing: -.02em; white-space: nowrap; }
+.vt-wordmark b { font-weight: 600; } .vt-wordmark i { font-style: normal; font-weight: 400; color: #e07030; }
+.vt-foot { border-top: 1px solid var(--vt-footline, #c9c5bd); margin-top: 48px; padding: 20px max(16px, 2.6vw) 26px; }
+.vt-foot .vt-family a { color: inherit; text-decoration: none; } .vt-foot .vt-family a:hover b { color: #e07030; }
+@media print { .vt-foot { display: none !important; } }

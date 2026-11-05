@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex"/>
+<title>Viability Thinking Lab: admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<link rel="stylesheet" href="/family.css?v=20261105i"><link rel="stylesheet" href="/lab-family.css?v=20261105i">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f0ede8;color:#1a1a1a;-webkit-font-smoothing:antialiased;font-size:15px}
+.wrap{max-width:960px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.narrow{max-width:460px}
+.tag{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#e07030;margin-bottom:.5rem}
+h1{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:2.1rem;line-height:1.15;margin-bottom:.4rem}
+h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.35rem;margin:1.6rem 0 .6rem}
+p.sub{color:#555;line-height:1.6;margin-bottom:1.2rem}
+label{display:block;font-size:.72rem;font-weight:700;color:#555;margin:.9rem 0 .3rem;letter-spacing:.03em}
+input,textarea,select{width:100%;border:1px solid #a09890;border-radius:3px;padding:.65rem .8rem;font:inherit;background:#fff;color:#1a1a1a}
+input:focus,textarea:focus{outline:none;border-color:#e07030}
+.btn{display:inline-flex;align-items:center;gap:.4rem;border:none;border-radius:3px;font:inherit;font-weight:700;padding:.65rem 1.2rem;cursor:pointer;background:#e07030;color:#fff}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn.s{background:#fff;color:#1a1a1a;border:1px solid #d8d3cb;font-weight:500}
+.btn.s:hover{border-color:#1a1a1a}
+.btn.sm{padding:.4rem .75rem;font-size:.8rem}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem}
+.card{background:#fff;border:1px solid #d8d3cb;border-radius:4px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.err{background:#fff8f6;border:1px solid #f0b8a8;color:#a33;border-radius:3px;padding:.7rem .9rem;margin:.8rem 0;font-size:.85rem}
+.ok{background:#eef4ef;border:1px solid #b9d6c2;color:#16794a;border-radius:3px;padding:.7rem .9rem;margin:.8rem 0;font-size:.85rem}
+.muted{color:#888;font-size:.8rem}
+.pill{display:inline-block;font-size:.7rem;font-weight:700;padding:.15rem .55rem;border-radius:20px;background:#ebe7e0;color:#555;text-transform:uppercase;letter-spacing:.05em}
+.pill.open{background:#e3f1e7;color:#16794a}.pill.closed{background:#f3ece0;color:#9a6a1c}.pill.expired{background:#f6e3df;color:#a33}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{text-align:left;padding:.5rem .4rem;border-bottom:1px solid #ebe7e0;vertical-align:top}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#888}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:1.4rem;letter-spacing:.08em;font-weight:700}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;font-size:.82rem;color:#555}
+.link{background:none;border:none;color:#e07030;font:inherit;cursor:pointer;text-decoration:underline;padding:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.qr svg{width:150px;height:150px}
+
+/* the family look (31 October 2026) */
+body{font-family:'DM Sans',sans-serif;background:#f4f3f0;color:#141414}
+h1{font-family:'Outfit',sans-serif;font-weight:300;font-size:2.4rem;letter-spacing:-.02em} h2{font-family:'Outfit',sans-serif;font-weight:400;letter-spacing:-.01em}
+.tag,label,th{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#e07030}
+input,textarea,select,.card,.btn.s{background:#f4f3f0;border:1px solid #141414;color:#141414}
+.card{border-color:#c9c5bd}
+.btn{background:#e07030;color:#f4f3f0;font-weight:500;min-height:44px} .btn.s{font-weight:500}
+.pill{font-family:'DM Mono',monospace;font-weight:500;background:none;border:1px solid currentColor}
+.code{font-family:'DM Mono',monospace;font-weight:500}
+th,td{border-bottom-color:#d6d2ca}
+.vt-hdr{display:flex;align-items:stretch;height:64px;border-bottom:1px solid #c9c5bd;padding-left:max(16px,2.6vw)} .vt-hdr a{display:flex;align-items:center;color:#141414;text-decoration:none}
+.vt-foot .vt-family{color:#6b665f} .vt-foot .vt-family b{color:#141414}
+</style>
+</head>
+<body>
+<header class="vt-hdr"><a href="/hub" aria-label="Viability Thinking Lab: Home"><span class="vt-wordmark"><b>viabilitythinking</b><i>lab</i></span></a></header>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback } = React;
+
+// ---------- tokens: kept in this tab only (sessionStorage), never in the address ----------
+const store = {
+  get: () => { try { return JSON.parse(sessionStorage.getItem('vt_auth') || 'null'); } catch { return null; } },
+  set: (t) => { try { sessionStorage.setItem('vt_auth', JSON.stringify(t)); } catch {} },
+  clear: () => { try { sessionStorage.removeItem('vt_auth'); } catch {} },
+};
+
+// Sign-in and invite links arrive with tokens after "#": read once, store, clear the address.
+function takeTokensFromLink() {
+  if (!location.hash.includes('access_token')) return null;
+  const h = new URLSearchParams(location.hash.slice(1));
+  const t = { access_token: h.get('access_token'), refresh_token: h.get('refresh_token'), type: h.get('type') };
+  history.replaceState(null, '', location.pathname);
+  if (t.access_token) { store.set({ access_token: t.access_token, refresh_token: t.refresh_token }); return t; }
+  return null;
+}
+
+let masterSecret = null;   // fallback route: held in memory only, gone on reload
+
+async function api(path, body, { auth = true } = {}) {
+  const go = async () => {
+    const t = store.get();
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && t?.access_token && !masterSecret) headers.Authorization = 'Bearer ' + t.access_token;
+    const b = masterSecret ? { ...body, master_secret: masterSecret } : body;
+    const r = await fetch('/api/' + path, { method: 'POST', headers, body: JSON.stringify(b) });
+    return { r, data: await r.json().catch(() => ({})) };
+  };
+  let { r, data } = await go();
+  if (r.status === 401 && auth && store.get()?.refresh_token && !masterSecret) {
+    const rr = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'refresh', refresh_token: store.get().refresh_token }) });
+    if (rr.ok) { store.set(await rr.json()); ({ r, data } = await go()); }
+  }
+  if (!r.ok) { const e = new Error(data.error || 'Something went wrong'); e.status = r.status; throw e; }
+  return data;
+}
+
+const fmt = (d) => d ? new Date(d).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'none';
+const dateOnly = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'none';
+const endOfDay = (yyyy_mm_dd) => new Date(yyyy_mm_dd + 'T23:59:00').toISOString();
+
+// ---------- sign in ----------
+function SignIn({ onIn }) {
+  const [email, setEmail] = useState(''); const [pw, setPw] = useState('');
+  const [mode, setMode] = useState('password'); const [secret, setSecret] = useState('');
+  const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [msg, setMsg] = useState('');
+
+  async function login(e) {
+    e.preventDefault(); setBusy(true); setErr(''); setMsg('');
+    try {
+      if (mode === 'password') {
+        store.set(await api('auth', { action: 'login', email, password: pw }, { auth: false }));
+        onIn();
+      } else if (mode === 'link') {
+        await api('auth', { action: 'link', email }, { auth: false });
+        setMsg('If that address belongs to the master, a sign-in link is on its way. It also works if you have forgotten your password.');
+      } else {
+        masterSecret = secret;
+        await api('master', { action: 'list' });
+        onIn({ viaSecret: true });
+      }
+    } catch (e2) { masterSecret = null; setErr(e2.message); }
+    setBusy(false);
+  }
+
+  return (
+    <div className="wrap narrow">
+      <p className="tag">Viability Thinking Lab</p>
+      <h1>Sign in</h1>
+      <p className="sub">For the master only. Facilitators and participants sign in on the Lab's front page, with their codes.</p>
+      <form onSubmit={login}>
+        {mode !== 'secret' && <><label>Email</label><input type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required/></>}
+        {mode === 'password' && <><label>Password</label><input type="password" autoComplete="current-password" value={pw} onChange={e => setPw(e.target.value)} required/></>}
+        {mode === 'secret' && <><label>Master secret</label><input type="password" autoComplete="off" value={secret} onChange={e => setSecret(e.target.value)} required/></>}
+        {err && <div className="err">{err}</div>}
+        {msg && <div className="ok">{msg}</div>}
+        <div className="row"><button className="btn" disabled={busy}>{mode === 'link' ? 'Email me a link' : 'Sign in'}</button></div>
+      </form>
+      <div className="row" style={{ fontSize: '.82rem' }}>
+        {mode !== 'password' && <button className="link" onClick={() => setMode('password')}>Sign in with password</button>}
+        {mode !== 'link' && <button className="link" onClick={() => setMode('link')}>Email me a sign-in link (or reset my password)</button>}
+        {mode !== 'secret' && <button className="link" onClick={() => setMode('secret')}>Master fallback</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- set a password (after an invitation or reset link) ----------
+function SetPassword({ onDone }) {
+  const [pw, setPw] = useState(''); const [pw2, setPw2] = useState(''); const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
+  async function save(e) {
+    e.preventDefault(); setErr('');
+    if (pw.length < 12) return setErr('Use at least 12 characters.');
+    if (pw !== pw2) return setErr('The two passwords do not match.');
+    setBusy(true);
+    try { await api('auth', { action: 'set_password', password: pw }); onDone(); } catch (e2) { setErr(e2.message); }
+    setBusy(false);
+  }
+  return (
+    <div className="wrap narrow">
+      <p className="tag">Viability Thinking Lab</p><h1>Choose a password</h1>
+      <p className="sub">At least 12 characters. You will use it with your email address to sign in.</p>
+      <form onSubmit={save}>
+        <label>New password</label><input type="password" autoComplete="new-password" value={pw} onChange={e => setPw(e.target.value)}/>
+        <label>Again</label><input type="password" autoComplete="new-password" value={pw2} onChange={e => setPw2(e.target.value)}/>
+        {err && <div className="err">{err}</div>}
+        <div className="row"><button className="btn" disabled={busy}>Save password</button></div>
+      </form>
+    </div>
+  );
+}
+
+// ---------- the master's panel ----------
+function MasterPanel({ onOpen }) {
+  const [sessions, setSessions] = useState(null); const [err, setErr] = useState(''); const [made, setMade] = useState(null);
+  const load = useCallback(async () => { try { setSessions((await api('master', { action: 'list' })).sessions); } catch (e) { setErr(e.message); } }, []);
+  useEffect(() => { load(); }, [load]);
+  return (
+    <>
+      {made && <CodeOnce title="Session created" session={made.session} code={made.facilitator_code} onDone={() => { setMade(null); onOpen(made.session.id); }}/>}
+      <h2>Sessions</h2>
+      {err && <div className="err">{err}</div>}
+      {!sessions ? <p className="muted">Loading...</p> : sessions.length === 0 ? <p className="muted">No sessions yet.</p> : (
+        <div className="card" style={{ padding: '.4rem .8rem' }}>
+          <table><thead><tr><th>Session</th><th>Code</th><th>Status</th><th>Joined</th><th>Expires</th><th></th></tr></thead>
+            <tbody>{sessions.map(s => (
+              <tr key={s.id}>
+                <td><b>{s.name || 'Untitled'}</b><br/><span className="muted">{s.client}</span></td>
+                <td style={{ fontFamily: 'ui-monospace,Menlo,monospace' }}>{s.session_code}</td>
+                <td><span className={'pill ' + s.status}>{s.status}</span></td>
+                <td>{s.participants?.[0]?.count ?? 0}{s.max_participants ? ' (limit ' + s.max_participants + ')' : ''}</td>
+                <td>{dateOnly(s.expiry_at)}</td>
+                <td><button className="btn s sm" onClick={() => onOpen(s.id)}>Open</button></td>
+              </tr>))}</tbody></table>
+        </div>
+      )}
+      <CreateSession onCreated={(r) => { load(); setMade(r); }}/>
+    </>
+  );
+}
+
+// The facilitator code is shown once, here, and never again: only its hash is kept.
+function CodeOnce({ title, session, code, onDone }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="card" style={{ borderColor: '#e07030' }}>
+      <p className="tag">{title}</p>
+      <div className="grid2">
+        <div>
+          <p className="muted">Session code (for participants)</p>
+          <p className="code">{session.session_code}</p>
+        </div>
+        <div>
+          <p className="muted">Facilitator code (for the facilitators)</p>
+          <p className="code">{code}</p>
+        </div>
+      </div>
+      <p className="sub" style={{ marginTop: '.8rem', marginBottom: 0 }}>Copy the facilitator code now and send it to the facilitators. It will not be shown again. If it is lost or leaked, issue a new one: the old one stops working at once.</p>
+      <div className="row">
+        <button className="btn s sm" onClick={() => { navigator.clipboard?.writeText(code); setCopied(true); }}>{copied ? 'Copied' : 'Copy facilitator code'}</button>
+        <button className="btn sm" onClick={onDone}>I have saved it</button>
+      </div>
+    </div>
+  );
+}
+
+function CreateSession({ onCreated }) {
+  const [f, setF] = useState({ name: '', client: '', expiry: '', max: '' });
+  const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  async function create(e) {
+    e.preventDefault(); setErr(''); setBusy(true);
+    try {
+      const r = await api('master', { action: 'create', name: f.name, client: f.client, expiry_at: f.expiry ? endOfDay(f.expiry) : '',
+        max_participants: f.max || null });
+      setF({ name: '', client: '', expiry: '', max: '' });
+      onCreated(r);
+    } catch (e2) { setErr(e2.message); }
+    setBusy(false);
+  }
+  return (
+    <div className="card">
+      <h2 style={{ marginTop: 0 }}>New session</h2>
+      <form onSubmit={create}>
+        <div className="grid2">
+          <div><label>Name</label><input value={f.name} onChange={set('name')} placeholder="For example: Maylands Hospital, September 2003" required/></div>
+          <div><label>Organisation</label><input value={f.client} onChange={set('client')} required/></div>
+          <div><label>Expires at the end of</label><input type="date" value={f.expiry} onChange={set('expiry')} required/></div>
+          <div><label>Maximum participants (blank for no limit)</label><input type="number" min="1" value={f.max} onChange={set('max')}/></div>
+        </div>
+        <p className="muted" style={{ marginTop: '.8rem' }}>Creating the session issues one facilitator code, shown once. Facilitators sign in on the Lab's front page with the session code and their facilitator code.</p>
+        {err && <div className="err">{err}</div>}
+        <div className="row"><button className="btn" disabled={busy}>Create session</button></div>
+      </form>
+    </div>
+  );
+}
+
+// ---------- one session ----------
+function Session({ id, onBack }) {
+  const [d, setD] = useState(null); const [log, setLog] = useState(null); const [newCode, setNewCode] = useState(null);
+  const [err, setErr] = useState(''); const [msg, setMsg] = useState('');
+  const load = useCallback(async () => {
+    try { setD(await api('master', { action: 'get', session_id: id })); } catch (e) { setErr(e.message); }
+  }, [id]);
+  useEffect(() => { load(); const t = setInterval(load, 15000); return () => clearInterval(t); }, [load]);
+
+  async function act(body, done) {
+    setErr(''); setMsg('');
+    try { const r = await api('master', { session_id: id, ...body }); setMsg(done); load(); return r; } catch (e) { setErr(e.message); }
+  }
+
+  if (!d) return <div>{err ? <div className="err">{err}</div> : <p className="muted">Loading...</p>}</div>;
+  const s = d.session;
+  const joinUrl = location.origin + '/#code=' + encodeURIComponent(s.session_code);
+  const active = (d.codes || []).filter(c => c.status === 'active');
+  return (
+    <>
+      <button className="link" onClick={onBack}>Back</button>
+      <p className="tag" style={{ marginTop: '1rem' }}>{s.client}</p>
+      <h1>{s.name || 'Untitled'} <span className={'pill ' + s.status} style={{ verticalAlign: 'middle' }}>{s.status}</span></h1>
+      <p className="sub">Expires {fmt(s.expiry_at)}. {d.joined} joined{s.max_participants ? ' of ' + s.max_participants : ''}.</p>
+      {err && <div className="err">{err}</div>}{msg && <div className="ok">{msg}</div>}
+      {newCode && <CodeOnce title="New facilitator code" session={s} code={newCode} onDone={() => setNewCode(null)}/>}
+
+      <div className="card" style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="qr" dangerouslySetInnerHTML={{ __html: qrSvg(joinUrl) }}/>
+        <div>
+          <p className="muted">Session code for participants</p>
+          <p className="code">{s.session_code}</p>
+          <p className="muted" style={{ marginTop: '.4rem' }}>Participants scan the QR code, or open {location.host} and type the code. Facilitators open the same page, enter the code, then choose Facilitator.</p>
+          <div className="row">
+            <button className="btn s sm" onClick={() => navigator.clipboard?.writeText(s.session_code)}>Copy code</button>
+            <button className="btn s sm" onClick={() => navigator.clipboard?.writeText(joinUrl)}>Copy participant link</button>
+          </div>
+        </div>
+      </div>
+
+      <h2>Facilitator code</h2>
+      <div className="card">
+        <p className="sub" style={{ marginBottom: '.4rem' }}>{active.length ? 'One active code' + (active[0].last_used_at ? ', last used ' + fmt(active[0].last_used_at) : ', not used yet') + '. Issued ' + fmt(active[0].created_at) + '.' : 'No active code. Issue one to let the facilitators in.'}</p>
+        <p className="muted">Codes are never shown again after they are issued. Issuing a new one stops the old one working.</p>
+        <div className="row"><button className="btn s sm" onClick={async () => {
+          if (active.length && !window.confirm('Issue a new facilitator code? The current one stops working straight away.')) return;
+          const r = await act({ action: 'reissue_code' }, 'New facilitator code issued.'); if (r?.facilitator_code) setNewCode(r.facilitator_code);
+        }}>{active.length ? 'Issue a new code' : 'Issue a code'}</button></div>
+      </div>
+
+      <h2>Running the session</h2>
+      <div className="row" style={{ marginTop: 0 }}>
+        <button className="btn" onClick={() => { try { sessionStorage.setItem('vt_fac', JSON.stringify({ session_code: s.session_code, master: true })); } catch {} location.href = '/hub'; }}>Open in the hub</button>
+        {s.status === 'open' && <button className="btn s" onClick={() => act({ action: 'close' }, 'Session closed. Participants can no longer join.')}>Close the session</button>}
+        {s.status === 'closed' && <button className="btn s" onClick={() => act({ action: 'reopen' }, 'Session reopened.')}>Reopen</button>}
+      </div>
+      <MasterActions s={s} act={act}/>
+
+      <h2>Audit trail</h2>
+      {!log ? <button className="btn s sm" onClick={async () => setLog((await api('master', { action: 'audit', session_id: id })).audit)}>Show</button> : (
+        <div className="card" style={{ padding: '.4rem .8rem', maxHeight: 360, overflow: 'auto' }}><table><thead><tr><th>When</th><th>Who</th><th>What</th></tr></thead>
+          <tbody>{log.map((a, i) => <tr key={i}><td>{fmt(a.created_at)}</td><td>{a.actor_email || a.actor_type}</td><td>{a.action.replace(/_/g, ' ')}</td></tr>)}</tbody></table></div>
+      )}
+    </>
+  );
+}
+
+function MasterActions({ s, act }) {
+  const [expiry, setExpiry] = useState(''); const [max, setMax] = useState('');
+  return (
+    <div className="card" style={{ marginTop: '1rem' }}>
+      <div className="grid2">
+        <div>
+          <label>{s.status === 'expired' ? 'Recover: new expiry date' : 'Extend expiry to the end of'}</label>
+          <input type="date" value={expiry} onChange={e => setExpiry(e.target.value)}/>
+          <div className="row"><button className="btn s sm" disabled={!expiry} onClick={() =>
+            act({ action: s.status === 'expired' ? 'recover' : 'extend', expiry_at: endOfDay(expiry) },
+              s.status === 'expired' ? 'Session recovered and open.' : 'Expiry extended.')}>
+            {s.status === 'expired' ? 'Recover' : 'Extend'}</button></div>
+        </div>
+        <div>
+          <label>Raise the participant limit to</label>
+          <input type="number" min="1" value={max} onChange={e => setMax(e.target.value)}/>
+          <div className="row"><button className="btn s sm" disabled={!max} onClick={() => act({ action: 'raise', max_participants: Number(max) }, 'Limit raised.')}>Raise</button></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function qrSvg(text) {
+  try { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); }
+  catch { return ''; }
+}
+
+// ---------- app ----------
+function App() {
+  const [phase, setPhase] = useState('loading');   // loading, signin, setpw, in
+  const [me, setMe] = useState(null); const [open, setOpen] = useState(null);
+
+  const whoami = useCallback(async (opts = {}) => {
+    if (opts.viaSecret) { setMe({ email: 'master (fallback)', is_master: true }); setPhase('in'); return; }
+    try { setMe(await api('auth', { action: 'whoami' })); setPhase('in'); }
+    catch { store.clear(); setPhase('signin'); }
+  }, []);
+
+  useEffect(() => {
+    const t = takeTokensFromLink();
+    if (t && (t.type === 'invite' || t.type === 'recovery')) { setPhase('setpw'); return; }
+    if (store.get()) whoami(); else setPhase('signin');
+  }, [whoami]);
+
+  function signOut() { store.clear(); masterSecret = null; setMe(null); setOpen(null); setPhase('signin'); }
+
+  if (phase === 'loading') return <div className="wrap"><p className="muted">Loading...</p></div>;
+  if (phase === 'signin') return <SignIn onIn={whoami}/>;
+  if (phase === 'setpw') return <SetPassword onDone={() => whoami()}/>;
+
+  return (
+    <div className="wrap">
+      <div className="top"><span>Viability Thinking Lab · signed in as {me.email}{me.is_master ? ' (master)' : ''}</span><button className="link" onClick={signOut}>Sign out</button></div>
+      {!me.is_master ? <p className="sub">This account is not the master. Facilitators use the facilitator code on the Lab's front page instead.</p>
+        : open ? <Session id={open} onBack={() => setOpen(null)}/> : (
+        <><p className="tag">Viability Thinking Lab</p><h1>Sessions</h1><MasterPanel onOpen={setOpen}/></>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+<footer class="vt-foot" id="vtFoot"><div class="vt-family"><a href="https://viabilitythinking.com"><b>Viability Thinking</b> the method and the book</a><a href="https://changebefore.com"><b>ChangeBefore</b> the company</a><a href="/hub"><b>The Lab</b> the working tool</a></div></footer>
+</body>
+</html>
